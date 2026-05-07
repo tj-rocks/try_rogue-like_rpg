@@ -1,0 +1,536 @@
+WEAPON_CATEGORIES:
+  onehanded_sword:
+    name: 片手剣
+    type: onehanded_sword
+    attack_bonus: 5
+    accuracy_bonus_close: 5
+    accuracy_bonus_ranged: 0
+    crit_rate: 0.05
+    price: 100
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.2
+    describe: 標準的な近接武器。扱いやすくバランスが良い。
+    position:
+      hand_offsets:
+        down:
+        - - -19
+          - -9
+        - - -8
+          - 31
+        left:
+        - - -22
+          - -2
+        - - -28
+          - 24
+        right:
+        - - -7
+          - -4
+        - - 25
+          - 24
+        up:
+        - - 17
+          - -4
+        - - 36
+          - 13
+      weapon_angles:
+        down:
+        - 0
+        - 210
+        left:
+        - -343
+        - 106
+        right:
+        - 26
+        - -111
+        up:
+        - 0
+        - -81
+      draw_over_player:
+        down: true
+        left: false
+        right: true
+        up: false
+  axe:
+    name: 斧
+    type: axe
+    attack_bonus: 15
+    accuracy_bonus_close: 0
+    accuracy_bonus_ranged: 0
+    crit_rate: 0.08
+    price: 600
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.3
+    describe: 重量級の武器。命中に難があるが、高い攻撃力を誇る。
+    position:
+      hand_offsets:
+        down:
+        - - -19
+          - -9
+        - - -8
+          - 31
+        left:
+        - - -22
+          - -2
+        - - -28
+          - 24
+        right:
+        - - -7
+          - -4
+        - - 25
+          - 24
+        up:
+        - - 17
+          - -4
+        - - 36
+          - 13
+      weapon_angles:
+        down:
+        - 0
+        - 210
+        left:
+        - -343
+        - 106
+        right:
+        - 26
+        - -111
+        up:
+        - 0
+        - -81
+      draw_over_player:
+        down: true
+        left: false
+        right: true
+        up: false
+  dagger:
+    name: 短剣
+    type: dagger
+    attack_bonus: 5
+    accuracy_bonus_close: 20
+    accuracy_bonus_ranged: 10
+    crit_rate: 0.15
+    price: 400
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.0
+    describe: 軽量で扱いやすい武器。攻撃力は低いが命中と会心率が高い。
+    position:
+      hand_offsets:
+        down:
+        - - -19
+          - -9
+        - - -8
+          - 31
+        left:
+        - - -22
+          - -2
+        - - -28
+          - 24
+        right:
+        - - -7
+          - -4
+        - - 25
+          - 24
+        up:
+        - - 17
+          - -4
+        - - 36
+          - 13
+      weapon_angles:
+        down:
+        - 0
+        - 210
+        left:
+        - -343
+        - 106
+        right:
+        - 26
+        - -111
+        up:
+        - 0
+        - -81
+      draw_over_player:
+        down: true
+        left: false
+        right: true
+        up: false
+  greatsword:
+    name: 大剣
+    type: twohanded_sword
+    attack_bonus: 20
+    accuracy_bonus_close: -5
+    accuracy_bonus_ranged: 0
+    crit_rate: 0.1
+    price: 800
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.5
+    describe: 両手で扱う巨大な剣。圧倒的な破壊力で敵を粉砕する。
+    position:
+      hand_offsets:
+        down:
+        - - -19
+          - -9
+        - - -8
+          - 31
+        left:
+        - - -22
+          - -2
+        - - -28
+          - 24
+        right:
+        - - -7
+          - -4
+        - - 25
+          - 24
+        up:
+        - - 17
+          - -4
+        - - 36
+          - 13
+      weapon_angles:
+        down:
+        - 0
+        - 210
+        left:
+        - -343
+        - 106
+        right:
+        - 26
+        - -111
+        up:
+        - 0
+        - -81
+      draw_over_player:
+        down: true
+        left: false
+        right: true
+        up: false
+ARMOR_CATEGORIES:
+  light:
+    name: 軽装
+    defense_bonus: 3
+    hp_bonus: 5
+    accuracy_bonus: 10
+    eva_bonus: 5
+    price: 200
+    image_dir: components/pictures/armor/leather_breastplate
+    describe: 動きやすさを重視した軽量防具。
+    position:
+      offsets:
+        down:
+        - 0
+        - 0
+        up:
+        - 0
+        - 0
+        left:
+        - 0
+        - 0
+        right:
+        - 0
+        - 0
+  medium:
+    name: 中装
+    defense_bonus: 5
+    hp_bonus: 10
+    accuracy_bonus: 0
+    eva_bonus: 0
+    price: 400
+    image_dir: components/pictures/armor/iron_breastplate
+    describe: 防御力と重量のバランスが取れた標準的な防具。
+    position:
+      offsets:
+        down:
+        - 0
+        - 0
+        up:
+        - 0
+        - 0
+        left:
+        - 0
+        - 0
+        right:
+        - 0
+        - 0
+  heavy:
+    name: 重装
+    defense_bonus: 12
+    hp_bonus: 20
+    accuracy_bonus: -10
+    eva_bonus: -10
+    aggro_mod: 3
+    price: 800
+    image_dir: components/pictures/armor/plate_armor
+    describe: 防御を最優先した重厚な鎧。物音がするため敵に気づかれやすい。
+    position:
+      offsets:
+        down:
+        - 0
+        - 0
+        up:
+        - 0
+        - 0
+        left:
+        - 0
+        - 0
+        right:
+        - 0
+        - 0
+  robe:
+    name: 法衣
+    defense_bonus: 2
+    hp_bonus: 0
+    attack_bonus: 5
+    stave_bonus: 2
+    eva_bonus: 5
+    price: 300
+    image_dir: components/pictures/armor/leather_armor
+    describe: 魔力を高める効果のある布製の防具。
+    position:
+      offsets:
+        down:
+        - 0
+        - 0
+        up:
+        - 0
+        - 0
+        left:
+        - 0
+        - 0
+        right:
+        - 0
+        - 0
+SHIELD_CATEGORIES:
+  round_shield:
+    name: 円盾
+    block_chance: 0.1
+    block_chance_close: 0.1
+    block_chance_ranged: 0.1
+    price: 100
+    image_scale: 1.0
+    describe: 扱いやすい円形の盾。
+    position:
+      offsets:
+        down:
+        - 22
+        - 15
+        up:
+        - -15
+        - 13
+        left:
+        - 0
+        - 16
+        right:
+        - 15
+        - 12
+  large_shield:
+    name: 大盾
+    block_chance: 0.2
+    block_chance_close: 0.2
+    block_chance_ranged: 0.2
+    price: 600
+    image_scale: 1.0
+    describe: 大型で堅牢な盾。物理攻撃をしっかりと防ぐ。
+    position:
+      offsets:
+        down:
+        - 19
+        - 14
+        up:
+        - -11
+        - 10
+        left:
+        - 9
+        - 17
+        right:
+        - 11
+        - 10
+WEAPON_DATA:
+  iron_sword:
+    name: 鉄の剣
+    category: onehanded_sword
+    price: 100
+    min_rank: F
+    rarity: 2
+    image_path: components/pictures/weapon/iron_sword.png
+    shop_buyable: true
+    attack_bonus: 4.5
+  old_sword:
+    name: 古びた剣
+    category: onehanded_sword
+    attack_bonus: 2
+    min_rank: SS
+    rarity: 8
+    image_path: components/pictures/weapon/old_sword.png
+    shop_buyable: false
+    describe: 長年放置され、刃がこぼれた古い剣。戦うには心もとない。
+  wooden_stick:
+    name: 木の棍棒
+    category: axe
+    min_rank: F
+    rarity: 1
+    attack_bonus: 2
+    price: 10
+    image_path: components/pictures/weapon/wooden_stick.png
+    sound: components/sounds/sfx/wood_swing.wav
+    shop_buyable: true
+    describe: その辺の枝を削って作った粗末な武器。素手よりはマシな程度。
+  fullmetal_sword:
+    name: 鋼の剣
+    category: onehanded_sword
+    min_rank: F
+    rarity: 3
+    attack_bonus: 5
+    price: 200
+    image_path: components/pictures/weapon/fullmetal_sword.png
+    shop_buyable: false
+  shinobi_katana:
+    name: 盗賊のナイフ
+    category: dagger
+    min_rank: E
+    rarity: 3
+    attack_bonus: 3
+    crit_rate: 0.15
+    aggro_mod: -5
+    image_path: components/pictures/weapon/iron_sword.png
+    shop_buyable: true
+    describe: 音もなく獲物を屠るための特殊な刀。装備するとモンスターに気づかれにくくなる。
+  battle_axe:
+    name: バトルアクス
+    category: axe
+    min_rank: E
+    rarity: 3
+    image_path: components/pictures/weapon/iron_sword.png
+    shop_buyable: true
+  claymore:
+    name: クレイモア
+    category: greatsword
+    min_rank: D
+    rarity: 4
+    image_path: components/pictures/weapon/iron_sword.png
+    shop_buyable: true
+ARMOR_DATA:
+  adventurers_clothes:
+    name: 冒険者の服
+    category: robe
+    min_rank: F
+    rarity: 1
+    defense_bonus: 1
+    attack_bonus: 0
+    stave_bonus: 0
+    price: 50
+    image_dir: components/pictures/armor/adventurers_clothes
+    shop_buyable: false
+  leather_breastplate:
+    name: 皮の胸当て
+    category: light
+    min_rank: F
+    rarity: 1
+    shop_buyable: true
+  iron_breastplate:
+    name: 鉄の胸当て
+    category: medium
+    min_rank: F
+    rarity: 2
+    shop_buyable: true
+  fullmetal_breastplate:
+    name: 鋼の胸当て
+    category: medium
+    min_rank: F
+    rarity: 3
+    defense_bonus: 2
+    price: 100
+    shop_buyable: false
+  mage_robe:
+    name: 魔術師のローブ
+    category: robe
+    min_rank: D
+    rarity: 4
+    hp_bonus: -5
+    shop_buyable: true
+  ninja_garb:
+    name: 忍びの装束
+    category: light
+    min_rank: B
+    rarity: 5
+    defense_bonus: 2
+    eva_bonus: 15
+    crit_bonus: 0.05
+    aggro_mod: -5
+    price: 2300
+    shop_buyable: true
+  regeneration_armor:
+    name: 再生のヨロイ
+    category: medium
+    min_rank: C
+    rarity: 5
+    defense_bonus: 3
+    regen_bonus: 0.2
+    price: 2600
+    image_dir: components/pictures/armor/chain_mail
+    shop_buyable: true
+  plate_armor:
+    name: プレートアーマー
+    category: heavy
+    min_rank: E
+    rarity: 4
+    defense_bonus: 3
+    price: 1200
+    shop_buyable: true
+SHIELD_DATA:
+  wooden_round_shield:
+    name: 木の円盾
+    category: round_shield
+    min_rank: F
+    rarity: 1
+    price: 50
+    image_dir: components/pictures/shield/wooden_round_shield
+    shop_buyable: true
+    describe: 木板を張り合わせただけの簡素な盾。初心者向け
+  leather_round_shield:
+    name: 皮の円盾
+    category: round_shield
+    min_rank: F
+    rarity: 2
+    hp_bonus: 10
+    aggro_mod: -2
+    image_dir: components/pictures/shield/leather_round_shield
+    shop_buyable: true
+  iron_round_shield:
+    name: 鉄の円盾
+    category: round_shield
+    min_rank: F
+    rarity: 2
+    aggro_mod: -2
+    price: 300
+    image_dir: components/pictures/shield/iron_round_shield
+    shop_buyable: true
+  fullmetal_round_shield:
+    name: 鋼の円盾
+    category: round_shield
+    min_rank: F
+    rarity: 3
+    block_chance_close: 0.25
+    aggro_mod: 2
+    price: 500
+    image_dir: components/pictures/shield/fullmetal_round_shield
+    shop_buyable: false
+  sun_shield:
+    name: 陽光の盾
+    category: large_shield
+    min_rank: C
+    rarity: 5
+    hp_bonus: 5
+    lantern_bonus: 3
+    price: 2200
+    image_dir: components/pictures/shield/iron_shield
+    shop_buyable: true
+  iron_shield:
+    name: 鉄の盾
+    category: large_shield
+    min_rank: F
+    rarity: 3
+    hp_bonus: 5
+    accuracy_bonus: -2
+    eva_bonus: -2
+    price: 600
+    image_dir: components/pictures/shield/iron_shield
+    shop_buyable: true

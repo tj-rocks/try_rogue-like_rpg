@@ -1,0 +1,200 @@
+# ==============================================================================
+# ダンジョン・罠 データ (dungeon.yml)
+# ==============================================================================
+# 【TRAP_DATA パラメータ】
+# - name       : 罠の名前
+# - weight     : 出現確率の重み（大きいほど出やすい）
+# - damage     : ダメージ量（ダメージ床 等）
+# - status     : 付与する状態異常（毒 等）
+# - color      : デバッグ描画やパーティクル用色 [R, G, B]
+# - sound      : 発動時の効果音
+# - image_path : 罠の画像パス
+#
+# 【DUNGEON_IMAGES パラメータ】
+# 階層（'0', '1' などの階層キー）ごとのマップ環境設定
+# - image                : 床・壁テクスチャのテーマ
+# - sound                : その階層のBGM
+# - brightness           : 視界の広さ（大きいほど明るい）
+# - map                  : 固定マップファイルの指定（nullでランダム生成）
+# - wall_decoration_ratio: 壁に松明などの装飾が付く確率
+# ==============================================================================
+
+TRAP_DATA:
+  pitfall:
+    name: 落とし穴
+    weight: 20
+    color:
+    - 40
+    - 40
+    - 40
+    sound: components/sounds/sfx/fall.wav
+    image_path: components/pictures/trap/pitfall.png
+  damage_floor:
+    name: ダメージ床
+    weight: 50
+    damage: 10
+    color:
+    - 150
+    - 0
+    - 0
+    sound: components/sounds/sfx/damage.wav
+    image_path: components/pictures/trap/damage_floor.png
+  mine:
+    name: 地雷
+    weight: 30
+    color:
+    - 150
+    - 150
+    - 0
+    sound: components/sounds/sfx/explosion.wav
+    image_path: components/pictures/trap/mine.png
+  poison_trap:
+    name: 毒矢の罠
+    weight: 40
+    status: poison
+    damage: 5
+    color: [180, 0, 255]
+    sound: components/sounds/sfx/damage.wav
+    image_path: components/pictures/trap/damage_floor.png
+  flood_switch:
+    name: 怪しいスイッチ
+    weight: 0
+    color: [0, 200, 255]
+    sound: components/sounds/sfx/click.wav
+    image_path: components/pictures/trap/switch.png
+
+DUNGEON_IMAGES:
+  path: components/pictures/dungeon
+  bgm_path: components/sounds/bgm
+  '0':
+    image: home
+    sound: components/sounds/bgm/village_theme.mp3
+    brightness: 5
+    map: village.txt
+    wall_decoration_ratio: 0.2
+  '1':
+    image: shallow
+    sound: need_more_adventures.mp3
+    brightness: 4
+    map: null
+    wall_decoration_ratio: 0.3
+  '2':
+    image: shallow
+    sound: need_more_adventures.mp3
+    brightness: 4
+    map: null
+    wall_decoration_ratio: 0.3
+  '3':
+    image: shallow
+    sound: need_more_adventures.mp3
+    brightness: 4
+    map: null
+    wall_decoration_ratio: 0.3
+  '4':
+    image: standard
+    sound: goto_unknown_area.mp3
+    brightness: 5
+    map: null
+    wall_decoration_ratio: 0.3
+  '5':
+    image: standard
+    sound: goto_unknown_area.mp3
+    brightness: 3
+    map: null
+    wall_decoration_ratio: 0.3
+  '6':
+    image: standard
+    sound: goto_unknown_area.mp3
+    brightness: 3
+    map: null
+    wall_decoration_ratio: 0.3
+  '7':
+    image: standard
+    sound: just_move.mp3
+    brightness: 3
+    map: null
+    wall_decoration_ratio: 0.3
+  '8':
+    image: standard
+    sound: just_move.mp3
+    brightness: 3
+    map: null
+    wall_decoration_ratio: 0.3
+  '9':
+    image: standard
+    sound: just_move.mp3
+    brightness: 3
+    map: null
+    wall_decoration_ratio: 0.3
+  '10':
+    image: standard
+    sound: dungeon_boss.mp3
+    brightness: 5
+    map: null
+  '11':
+    image: temple
+    sound: just_move.mp3
+    brightness: 3
+    map: first_rest_point.txt
+    wall_decoration_ratio: 0.3
+  '12':
+    image: temple
+    sound: just_move.mp3
+    brightness: 3
+    map: first_rest_point.txt
+    wall_decoration_ratio: 0.3
+  '13':
+    image: temple
+    sound: just_move.mp3
+    brightness: 3
+    map: first_rest_point.txt
+    wall_decoration_ratio: 0.3
+  '14':
+    image: deesert_ruin
+    sound: just_move.mp3
+    brightness: 3
+    map: first_rest_point.txt
+    wall_decoration_ratio: 0.3
+  '15':
+    image: deesert_ruin
+    sound: just_move.mp3
+    brightness: 3
+    map: first_rest_point.txt
+    wall_decoration_ratio: 0.3
+  '16':
+    image: evil_castle
+    sound: just_move.mp3
+    brightness: 3
+    map: first_rest_point.txt
+    wall_decoration_ratio: 0.3
+  '17':
+    image: evil_castle
+    sound: just_move.mp3
+    brightness: 3
+    map: first_rest_point.txt
+    wall_decoration_ratio: 0.3
+  '18':
+    image: evil_castle
+    sound: just_move.mp3
+    brightness: 3
+    map: first_rest_point.txt
+    wall_decoration_ratio: 0.3
+  '19':
+    image: evil_castle
+    sound: just_move.mp3
+    brightness: 3
+    map: first_rest_point.txt
+    wall_decoration_ratio: 0.3
+  '20':
+    image: evil_castle
+    sound: just_move.mp3
+    brightness: 3
+    map: first_rest_point.txt
+    wall_decoration_ratio: 0.3
+
+
+
+
+
+
+

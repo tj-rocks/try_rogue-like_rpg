@@ -1,0 +1,45 @@
+# ==============================================================================
+# 敵の攻撃エフェクト (enemy_attack_effects.yml)
+# ==============================================================================
+# 敵の攻撃ごとの演出・効果音を定義します。
+# - type        : 攻撃タイプ (close = 近接, ranged = 遠距離)
+# - launch_sound: 攻撃発動時の効果音
+# - hit_sound   : 命中時の効果音 (nullで省略)
+# - visual      : 遠距離攻撃用のエフェクト画像ID (nullで画像なし)
+# ==============================================================================
+
+physical_light:
+  type: close
+  launch_sound: components/sounds/sfx/attack_1.wav
+  hit_sound: null
+  visual: null
+physical_heavy:
+  type: close
+  launch_sound: components/sounds/sfx/attack_2.wav
+  hit_sound: null
+  visual: null
+strange_mucus:
+  type: ranged
+  launch_sound: components/sounds/sfx/attack_0.wav
+  hit_sound: null
+  visual: strange_mucus
+sonic_wave:
+  type: ranged
+  launch_sound: components/sounds/sfx/attack_0.wav
+  hit_sound: null
+  visual: sonic_wave
+dark_bolt:
+  type: ranged
+  launch_sound: components/sounds/sfx/attack_arrow.wav
+  hit_sound: null
+  visual: dark_bolt
+fireball:
+  type: ranged
+  launch_sound: components/sounds/sfx/attack_3.wav
+  hit_sound: components/sounds/sfx/explosion.wav
+  visual: fireball
+arrow:
+  type: ranged
+  launch_sound: components/sounds/sfx/attack_arrow.wav
+  hit_sound: null
+  visual: arrow

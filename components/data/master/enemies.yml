@@ -1,0 +1,103 @@
+ENEMY_CATEGORIES:
+  slime: {name: スライム種, hp: 10, attack: 7, defense: 1, evasion: 5, exp: 5, reward_gold: 20,
+    accuracy_close: 100, accuracy_ranged: 100, attack_range: 0, stupidity: 3, image_scale: 1.0,
+    close_attack_effect: physical_light, ranged_attack_effect: strange_mucus}
+  animal: {name: 獣種, hp: 15, attack: 10, defense: 2, evasion: 0, exp: 8, reward_gold: 25,
+    accuracy_close: 80, accuracy_ranged: 80, attack_range: 1, stupidity: 5, image_scale: 1.0,
+    close_attack_effect: physical_heavy, ranged_attack_effect: sonic_wave}
+  monster: {name: 魔物種, hp: 22, attack: 12, defense: 0, evasion: 25, exp: 10, reward_gold: 100,
+    accuracy_close: 85, accuracy_ranged: 85, attack_range: 4, stupidity: 0, image_scale: 1.0,
+    close_attack_effect: physical_heavy, ranged_attack_effect: dark_bolt}
+  humanoid: {name: 亜人種, hp: 30, attack: 10, defense: 5, evasion: 5, exp: 15, reward_gold: 150,
+    accuracy_close: 100, accuracy_ranged: 100, attack_range: 1, stupidity: 2, image_scale: 1.0,
+    close_attack_effect: physical_light, ranged_attack_effect: arrow}
+  undead: {name: 不死種, hp: 25, attack: 15, defense: 3, evasion: 0, exp: 12, reward_gold: 200,
+    accuracy_close: 90, accuracy_ranged: 90, attack_range: 2, stupidity: 1, image_scale: 1.0,
+    close_attack_effect: physical_heavy, ranged_attack_effect: dark_bolt}
+ENEMY_DATA:
+  slime:
+    name: スライム
+    category: slime
+    min_rank: F
+    image_folder: components/pictures/enemies/slime
+    crit_rate: 0.05
+    drops:
+    - {item: hp_potion, rate: 0.1}
+    - {item: wooden_stick, rate: 0.05}
+    hp: 9
+    defense: 1
+    attack: 6
+  mawaru_kame:
+    name: まわるがめ
+    category: animal
+    min_rank: F
+    image_folder: components/pictures/enemies/kame
+    attack_range: 1
+    crit_rate: 0.05
+    drops:
+    - {item: hp_potion, rate: 0.05}
+    hp: 15
+    defense: 3
+  normal_tako:
+    name: ふつうたこ
+    category: animal
+    min_rank: F
+    image_folder: components/pictures/enemies/tako_doku
+    image_scale: 0.8
+    status: poison
+    attack_range: 2
+    status_chance: 0
+    close_attack_effect: physical_light
+    ranged_attack_effect: strange_mucus
+    drops:
+    - {item: hp_potion, rate: 0.05}
+    hp: 11
+    defense: 3
+  doku_tako:
+    name: どくだこ
+    category: animal
+    min_rank: E
+    image_folder: components/pictures/enemies/tako_doku
+    image_scale: 0.8
+    status: poison
+    attack_range: 2
+    status_chance: 15
+    drops:
+    - {item: hp_potion, rate: 0.05}
+    hp: 11
+    defense: 0
+  ghost:
+    name: ゴースト
+    category: monster
+    min_rank: D
+    image_folder: components/pictures/enemies/ghost
+    drops:
+    - {item: knockback_stave, rate: 0.1}
+    - {item: fire_stave, rate: 0.1}
+  skeleton_archer:
+    name: スケルトン弓兵
+    category: humanoid
+    min_rank: C
+    image_folder: components/pictures/enemies/slime
+    attack_range: 5
+    equip_chance: 0.5
+    equipped_weapon: iron_sword
+    equipped_shield: wooden_shield
+    drops:
+    - {item: iron_sword, rate: 0.05}
+  dragon_boss:
+    name: レッドドラゴン
+    category: animal
+    min_rank: S
+    image_folder: components/pictures/enemies/dragon
+    image_scale: 0.5
+    attack: 10
+    min_floor: 10
+    max_floor: 10
+    max_concurrent: 1
+    max_spawns: 1
+    drops:
+    - {item: invincible_stave, rate: 1.0}
+    crit_rate: 0.2
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: fireball

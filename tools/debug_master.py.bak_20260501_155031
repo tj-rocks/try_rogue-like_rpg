@@ -1,0 +1,186 @@
+import pygame
+import sys
+import os
+import random
+import traceback
+
+# プロジェクトのルートをパスに追加
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from constants import *
+from components.sprites.player import Player, EquipInstance
+from components.sprites.enemy import Enemy
+from systems.dungeon import warp_to_floor
+from systems.scene_handler import handle_game
+from systems.session_handler import init_ui_elements, setup_ui_relations
+from systems.resources import font_small, font_medium
+from systems.events import handle_events, active_direction_keys
+
+def show_menu(screen):
+    print("[Debug] Showing Menu...")
+    running = True
+    selected = 0
+    options = [
+        "1. Monster Overflow Test (Start 1F, Forced 5F)",
+        "2. Enemy Equipment / Combat Test (Spawn + Equip)",
+        "3. Dungeon Texture / Item Drop Test (Gungeon 4F)",
+        "4. Guild / Quest Debug (High GP)",
+        "EXIT (ESC)"
+    ]
+    
+    while running:
+        screen.fill((30, 30, 30))
+        for i, option in enumerate(options):
+            color = (255, 255, 255) if i == selected else (100, 100, 100)
+            text = font_medium.render(option, True, color)
+            screen.blit(text, (100, 150 + i * 50))
+        pygame.display.flip()
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: return None, False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP: selected = (selected - 1) % len(options)
+                elif event.key == pygame.K_DOWN: selected = (selected + 1) % len(options)
+                elif event.key == pygame.K_ESCAPE: return None, False
+                elif event.key in [pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE]:
+                    if selected == 0: return 1, False
+                    if selected == 1: return 1, False
+                    if selected == 2: return 4, True
+                    if selected == 3: return 0, False
+                    if selected == 4: return None, False
+    return None, False
+
+def setup_gungeon_mode(dungeon, player):
+    """テクスチャ・アイテム確認用の特殊フロア設定"""
+    theme_name = dungeon.floor_info.get("image", "unknown")
+    print(f"[Debug] Gungeon Mode: Floor {dungeon.current_floor}, Theme: {theme_name}")
+    
+    try:
+        # 正方形の部屋(12x12)に作り変える
+        w, h = 12, 12
+        dungeon.map_width = w + 4
+        dungeon.map_height = h + 4
+        dungeon.map_data = [[0 for _ in range(dungeon.map_width)] for _ in range(dungeon.map_height)]
+        
+        # 中央に部屋を作成
+        for y in range(2, h + 2):
+            for x in range(2, w + 2):
+                dungeon.map_data[y][x] = 1 # 床
+        
+        # テクスチャが存在しないバリアントを除去
+        def get_valid_variants(variants):
+            return [v for v in variants if v in dungeon.textures]
+
+        floor_vars = get_valid_variants(dungeon.available_floor_variants)
+        if not floor_vars: floor_vars = ["floor"]
+        top_vars = get_valid_variants(dungeon.available_wall_top_variants)
+        if not top_vars: top_vars = ["wall_top"]
+        none_vars = get_valid_variants(dungeon.available_wall_none_variants)
+        if not none_vars: none_vars = ["wall_none"]
+
+        dungeon.floor_variants = [[random.choice(floor_vars) for _ in range(dungeon.map_width)] for _ in range(dungeon.map_height)]
+        dungeon.base_floor_variants = [[random.choice(floor_vars) for _ in range(dungeon.map_width)] for _ in range(dungeon.map_height)]
+        dungeon.wall_top_variants = [[random.choice(top_vars) for _ in range(dungeon.map_width)] for _ in range(dungeon.map_height)]
+        dungeon.wall_variants = [[random.choice(top_vars) for _ in range(dungeon.map_width)] for _ in range(dungeon.map_height)]
+        dungeon.wall_none_variants = [[random.choice(none_vars) for _ in range(dungeon.map_width)] for _ in range(dungeon.map_height)]
+        dungeon.wall_decoration_variants = [["" for _ in range(dungeon.map_width)] for _ in range(dungeon.map_height)]
+
+        # 階段(目印)
+        dungeon.map_data[3][3] = 2 
+        dungeon.map_data[3][4] = 3 
+        
+        dungeon.edges = []
+        ts = getattr(dungeon, 'tile_size', TILE_SIZE)
+        player.x = (w // 2 + 2) * ts
+        player.y = (h // 2 + 2) * ts
+        player.prev_x, player.prev_y = player.x, player.y
+        player.target_x, player.target_y = player.x, player.y
+        
+        dungeon.enemies = []
+        dungeon.dropped_items = [] # Dungeon.draw が見ているのは dropped_items
+        
+        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA
+        from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave
+        
+        candidates = []
+        for catalog, itype in [(CONSUMABLE_DATA, "consumable"), (WEAPON_DATA, "weapon"), 
+                               (ARMOR_DATA, "armor"), (SHIELD_DATA, "shield"), (STAVE_DATA, "stave")]:
+            for key, data in catalog.items():
+                if data.get("min_floor", 1) <= dungeon.current_floor <= data.get("max_floor", 999):
+                    candidates.append((key, itype, data))
+        
+        floor_tiles = [(c, r) for r in range(2, h + 2) for c in range(2, w + 2)]
+        random.shuffle(floor_tiles)
+        
+        for i, (key, itype, data) in enumerate(candidates):
+            if i >= len(floor_tiles): break
+            tx, ty = floor_tiles[i]
+            px, py = tx * ts, ty * ts
+            if itype == "weapon": item = DroppedWeapon(px, py, key, data)
+            elif itype == "armor": item = DroppedArmor(px, py, key, data)
+            elif itype == "shield": item = DroppedShield(px, py, key, data)
+            elif itype == "stave": item = DroppedStave(px, py, key, data)
+            else: item = DroppedConsumable(px, py, key, data)
+            dungeon.dropped_items.append(item) # ここを修正
+        
+        dungeon._add_floor_edges() # 影を再生成
+        dungeon.reveal_floor()
+        dungeon.is_lighted = True
+        
+        print(f"[Debug] Gungeon Mode Ready. MapSize:{dungeon.map_width}x{dungeon.map_height}")
+        return dungeon
+    except Exception as e:
+        print(f"[Error] {e}")
+        traceback.print_exc()
+        return dungeon
+
+def main():
+    try:
+        pygame.init()
+        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption("Debug Master")
+        
+        start_floor, is_gungeon_mode = show_menu(screen)
+        if start_floor is None:
+            pygame.quit()
+            return
+
+        player = Player()
+        player.hp = player.max_hp
+        
+        dungeon = warp_to_floor(start_floor, player)
+        
+        if is_gungeon_mode:
+            dungeon = setup_gungeon_mode(dungeon, player)
+        
+        ui_elements = init_ui_elements(SCREEN_WIDTH, SCREEN_HEIGHT)
+        game_state = {"dialog_modal": False, "current_scene": "game"}
+        setup_ui_relations(ui_elements, player, dungeon, game_state)
+
+        clock = pygame.time.Clock()
+        running = True
+
+        while running:
+            from systems.events import handle_events
+            success, events = handle_events()
+            if not success: running = False
+            
+            if is_gungeon_mode:
+                dungeon.is_lighted = True
+                dungeon.reveal_floor()
+
+            new_d = handle_game(screen, events, player, dungeon, ui_elements, game_state)
+            if not is_gungeon_mode:
+                dungeon = new_d
+            
+            pygame.display.flip()
+            clock.tick(60)
+
+    except Exception as e:
+        print(f"[Fatal Error] {e}")
+        traceback.print_exc()
+        input("Press Enter to exit...")
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()

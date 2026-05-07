@@ -1,0 +1,40 @@
+# UI Aesthetics Configuration
+# 
+# [使い方ガイド]
+# - corner_radius: 0 にすると四角く、12 程度にすると今風の丸い角になります。
+# - font.size: dialog, menu, hud などの数値を大きくすると文字が大きくなります。
+# - bg_color: [R, G, B, A] の形式で、4つ目の数字が透明度（0〜255）です。
+
+# --- Fonts ---
+font:
+  path: "components/fonts/font.ttf"
+  size:
+    small: 22
+    medium: 32
+    large: 48
+  # 各UI要素別の専用フォントサイズ
+  dialog: 28
+  menu: 32
+  hud: 24
+
+# --- Dialog & Window Style (一般ウィンドウ) ---
+dialog:
+  # 背景色 (RGBA: 赤, 緑, 青, 透明度)
+  bg_color: [20, 20, 35, 220]
+  # 枠線の色 (RGB)
+  border_color: [200, 200, 220]
+  border_width: 2
+  # 角の丸み (0で四角、大きいほど丸くなる)
+  corner_radius: 12
+
+# --- Message Area (画面下部のメッセージウィンドウ) ---
+message_window:
+  bg_color: [10, 10, 25, 230]
+  border_color: [255, 255, 255]
+  corner_radius: 8
+  font_size: 28
+
+# --- HUD Style (HPやステータス表示) ---
+hud:
+  bg_color: [0, 0, 0, 150]
+  text_color: [255, 255, 255]

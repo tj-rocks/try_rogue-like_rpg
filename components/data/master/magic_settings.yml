@@ -1,0 +1,39 @@
+# ==============================================================================
+# 魔法（杖）の設定データ (magic_settings.yml)
+# ==============================================================================
+# 【各パラメータの説明】
+# - is_surround       : 周囲8マスに効果が及ぶか (true/false)
+# - damage_mult       : 攻撃魔法のダメージ倍率 (基本攻撃力 × この値)
+# - effect_color      : エフェクトのパーティクル色 [R, G, B]
+# - max_distance      : 吹き飛ばし等の最大移動距離
+# - collision_dmg_mult: 吹き飛ばしで壁に激突した際の追加ダメージ倍率
+# - heal_ratio        : 回復魔法の回復割合 (最大HPの割合)
+# - duration_turns    : 無敵等の効果持続ターン数
+# ==============================================================================
+
+fire_stave:
+  is_surround: true
+  damage_mult: 1.5
+  effect_color:
+  - 255
+  - 69
+  - 0
+knockback_stave:
+  max_distance: 10
+  collision_dmg_mult: 0.5
+  effect_color:
+  - 100
+  - 200
+  - 255
+heal_stave:
+  heal_ratio: 0.5
+  effect_color:
+  - 50
+  - 255
+  - 50
+invincible_stave:
+  duration_turns: 3
+  effect_color:
+  - 255
+  - 255
+  - 100

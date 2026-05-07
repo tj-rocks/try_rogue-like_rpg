@@ -1,0 +1,163 @@
+# ==============================================================================
+# ⚖️ balance.yml - ゲーム全体のバランス調整窓口
+# ==============================================================================
+
+# 👤 PLAYER (プレイヤーの初期能力と成長)
+# ------------------------------------------------------------------------------
+PLAYER:
+  # 基本ステータス
+  max_hp: 100         # 初期最大HP
+  attack: 5           # 初期攻撃力（武器なし状態）
+  defense: 0          # 初期防御力（防具なし状態）
+  
+  # 命中率 (100 = 100%)
+  accuracy_close: 100 # 近接攻撃の基本命中率
+  accuracy_ranged: 100 # 遠距離攻撃（弓など）の基本命中率
+
+  # 回避率・会心率
+  evasion: 1          # 基本回避率 (%)
+  crit_rate: 0.01     # 基本会心率 (0.01 = 1%)
+  
+  # 初期リソース
+  initial_coin: 100   # スタート時の所持金
+  max_item_slots: 20  # アイテム（消耗品）の最大スロット数
+  max_equip_slots: 10 # 装備（武器・鎧・盾）の最大スロット数
+  max_stave_slots: 10 # 杖の最大スロット数
+
+  # レベルアップ時の成長（将来的な拡張用）
+  growth:
+    hp_per_level: 5   # レベルアップ時のHP上昇量
+    atk_per_level: 2  # レベルアップ時の攻撃力上昇量
+    def_per_level: 1  # レベルアップ時の防御力上昇量
+
+# 🏰 DUNGEON (ダンジョン生成)
+# ------------------------------------------------------------------------------
+DUNGEON:
+  DUNGEON_MIN_ROOMS: 3              # 1階層あたりの初期最小部屋数
+  DUNGEON_MAX_ROOMS: 6              # 1階層あたりの初期最大部屋数
+  DUNGEON_ROOM_INCREASE_INTERVAL: 5 # 何階ごとに部屋数を増やすか (5階ごと)
+  
+  # 指数成長とハードキャップ設定
+  DUNGEON_ROOM_MAX_CAP: 20          # 最大部屋数の絶対上限 (深層でもこれを超えない)
+  DUNGEON_ROOM_MIN_CAP: 10          # 最小部屋数の増加上限 (深層での最低部屋数)
+  DUNGEON_ROOM_GROWTH_LIMIT_FLOOR: 50 # 成長がストップする階層
+  
+  # --- 部屋数の成長ロジック解説 ---
+  # 式: 現在数 = 初期値 * ( (上限値 / 初期値) ^ 進捗率 )
+  # 進捗率: (現在の階層 - 1) / (成長止まり階層 - 1)  ※5階ごとのステップ処理あり
+  # 特徴: 指数関数（掛け算）で増えるため、最初はゆっくり、後半で一気に広くなります。
+  
+  DUNGEON_MIN_ROOM_DISTANCE: 4      # 部屋同士の最小距離（近いと密集する）
+  DUNGEON_ROOM_DISTANCE_GROWTH: 0.5 # 階層が進むごとに部屋の距離をどれだけ広げるか
+  DUNGEON_CORRIDOR_W2_CHANCE: 0.1   # 通路が「2マス幅」になる確率 (0.0〜1.0)
+  DUNGEON_STAIRS_FLOOR_RADIUS: 1    # 階段の周囲に確保する歩行可能タイルの半径
+  DUNGEON_MIN_ROOM_SIZE: 2          # 部屋の最小サイズの初期値
+  DUNGEON_MAX_ROOM_SIZE: 5          # 部屋の最大サイズの初期値
+  DUNGEON_ROOM_SIZE_GROWTH: 0.08    # 1階層進むごとに部屋サイズを何%ずつ増やすか
+  DUNGEON_ROOM_MIN_SIZE_CAP: 3      # 最小サイズの成長上限
+  DUNGEON_ROOM_MAX_SIZE_CAP: 20     # 最大サイズの成長上限
+
+# 👹 ENEMY_AI (敵の行動・スポーン・難易度)
+# ------------------------------------------------------------------------------
+ENEMY_AI:
+  # 基本AI挙動
+  ENEMY_AGGRO_RADIUS: 7             # 敵がプレイヤーに気づく距離（マス数）
+  ENEMY_WANDER_CHANCE: 0.5          # 非戦闘時に敵がうろつく確率 (0.0〜1.0)
+
+  # スポーン数設定
+  ENEMY_SPAWN_MIN: 1                # 1部屋に初期配置される敵の最小数
+  ENEMY_SPAWN_MAX: 2                # 1部屋に初期配置される敵の最大数
+  ENEMY_TOTAL_MAX: 2                # 1部屋あたりの敵数倍率（部屋数 × この値 がフロア全体の合計上限になる）
+  ENEMY_RESPAWN_INTERVAL: 20.0      # 新しい敵がリスポーンするまでの基本間隔（ターン数）
+  ENEMY_RESPAWN_MIN_INTERVAL: 15.0   # リスポーン間隔の最短下限値（ターン数）
+  ENEMY_RESPAWN_SCALE_SUB: 0.2      # 1階層進むごとにリスポーン間隔を何ターン短縮するか（0.1 = 10階で1ターン短縮）
+
+  # 階層に応じた難易度スケーリング
+  ENEMY_SPAWN_SCALE_EVERY: 3       # 何階ごとに1部屋あたりの最大出現数を +1 するか
+  ENEMY_SPAWN_SCALE_ADD: 1
+  ENEMY_TOTAL_SCALE_EVERY: 3        # 何階ごとにフロア全体の合計上限を増やすか
+  ENEMY_TOTAL_SCALE_ADD: 1          # 増加量 (+1)
+
+  # スポーン位置制御
+  ENEMY_SPAWN_SAFE_RADIUS: 5        # プレイヤーの周囲何マス以内には湧かせないか
+  ENEMY_SPAWN_ATTEMPTS: 10          # 配置を試みる最大回数
+  ENEMY_SPAWN_SCATTER: 5            # 部屋の中心からどれだけ散らして配置するか
+
+  # 後半階層の特殊スポーン（意地悪設定）
+  ENEMY_SPAWN_NEAR_RANDOM_FLOOR: 20 # この階以降、確率でプレイヤーの近くに湧くようになる
+  ENEMY_SPAWN_NEAR_CHANCE: 1        # 近くに湧く確率 (n/10)
+  ENEMY_SPAWN_NEAR_FLOOR: 50        # この階以降は、空きがあれば必ずプレイヤーの近くに湧く
+
+# ⚔️ COMBAT (戦闘システム設定)
+# ------------------------------------------------------------------------------
+COMBAT:
+  CRITICAL_RATE_MAX: 0.7            # 会心率（痛恨率）の最終的な上限値 (0.7 = 70%)
+  ENEMY_THINK_LIMIT_PER_FRAME: 10   # 1フレームに思考を許される敵の最大数（負荷対策）
+  
+  # アニメーションフレーム設定 (1/60秒単位)
+  ATTACK_TAME_DURATION: 0           # 攻撃の「溜め」時間
+  ATTACK_STRIKE_DURATION: 16        # 攻撃の「振り」時間
+  ATTACK_PRE_DELAY_FRAMES: 30       # 敵が攻撃モーションに入るまでの予備動作時間
+  HIT_STUN_DURATION: 12             # 攻撃を食らった時ののけぞり時間
+  DAMAGE_FLASH_FRAMES: 6            # ダメージ時の点滅時間
+  COMBAT_LOG_WAIT_FRAMES: 60        # ログが表示されてから消えるまでの待機時間
+  INTER_ACTION_BREATHER: 1          # 連続行動の間のわずかな静止時間
+
+# 💎 ITEMS (ドロップアイテム)
+# ------------------------------------------------------------------------------
+ITEMS:
+  FLOOR_ITEM_SPAWN_MIN: 0           # 1部屋に落ちているアイテムの最小数
+  FLOOR_ITEM_SPAWN_MAX: 2           # 1部屋に落ちているアイテムの最大数
+  FLOOR_ITEM_SCALE_LIMIT: 30        # アイテム数増加のスケーリング上限階層
+  FLOOR_ITEM_SCALE_EVERY: 10        # 何階ごとにアイテムを増やすか
+  FLOOR_ITEM_SCALE_ADD: 1           # 増やす数
+
+  # ドロップ率の調整（ここを変えると敵や障害物からのドロップが一括で変わります！）
+  DROP_RATE_MULTIPLIER: 0.8         # 全体のドロップ率倍率 (0.5 = 半分, 1.0 = 標準)
+
+# 🧱 OBSTACLES (障害物 - 壊せる壁や樽など)
+# ------------------------------------------------------------------------------
+OBSTACLES:
+  OBSTACLE_SPAWN_MIN: 1             # 1部屋に配置される障害物の最小数
+  OBSTACLE_SPAWN_MAX: 2             # 1部屋に配置される障害物の最大数
+  OBSTACLE_TOTAL_MAX: 0.5            # 1部屋あたりの敵数倍率（部屋数 × この値 がフロア全体の合計上限になる）
+
+  # 階層に応じた難易度スケーリング
+  OBSTACLE_SPAWN_LIMIT: 30          # スケーリング（増加）が止まる上限階層
+  OBSTACLE_SPAWN_SCALE_EVERY: 8    # 何階ごとに1部屋あたりの最大出現数を +1 するか
+  OBSTACLE_SPAWN_SCALE_ADD: 1
+  OBSTACLE_TOTAL_SCALE_EVERY: 10    # 何階ごとにフロア全体の合計上限を +2 するか
+  OBSTACLE_TOTAL_SCALE_ADD: 1
+
+# 🕸️ TRAPS (罠)
+# ------------------------------------------------------------------------------
+TRAPS:
+  TRAP_SPAWN_MIN: 0                 # 1部屋に配置される罠の最小数
+  TRAP_SPAWN_MAX: 3                # 1部屋に配置される罠の最大数
+  TRAP_SPAWN_SCALE_LIMIT: 20        # 罠の数増加のスケーリング上限階層
+  TRAP_SPAWN_SCALE_EVERY: 5        # 何階ごとに罠を増やすか
+  TRAP_SPAWN_SCALE_ADD: 1           # 増やす数
+
+# 💜 STATUS_EFFECTS (状態異常)
+# ------------------------------------------------------------------------------
+STATUS_EFFECTS:
+  poison:
+    damage_rate: 0.05               # 1ターンごとのダメージ率 (0.05 = 5%)
+    color_tint: [180, 100, 255]     # 毒状態の時のプレイヤーの色（紫色のブレンド）
+    min_damage: 1                   # 毒による最低ダメージ（0にならないように）
+    cure_fee: 100                   # 医者での解毒費用
+
+# 🏠 VILLAGE_SERVICES (村の施設・サービス料金)
+# ------------------------------------------------------------------------------
+VILLAGE_SERVICES:
+  INN_FEE: 100           # 宿屋の宿泊費
+  DOCTOR_FEE: 50         # 医者の治療費（解毒以外）
+  WAREHOUSE_FEE: 10      # 預かり屋の利用料
+  BANK_INTEREST: 0.0     # 銀行の利息（将来用）
+
+# 📈 GLOBAL_SCALING (ランクによる自動スケーリング倍率)
+# ------------------------------------------------------------------------------
+GLOBAL_SCALING:
+  ENEMY: 1.05             # 敵のランクごとの強化倍率 (1ランクにつき 1.05倍: インフレ抑制)
+  EQUIPMENT: 1.05         # 装備のランクごとの強化倍率 (1ランクにつき 1.05倍: シブい成長)
+

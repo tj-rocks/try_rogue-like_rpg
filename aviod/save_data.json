@@ -1,0 +1,33 @@
+{
+  "hp": 50,
+  "max_hp": 50,
+  "coin": 5000,
+  "attack": 10,
+  "items": ["hp_potion", "hp_potion", "magic_crystal"],
+  "weapon_inventory": [
+    {"iid": 1, "type": "weapon", "key": "iron_sword", "enhance": 0}
+  ],
+  "armor_inventory": [
+    {"iid": 2, "type": "armor", "key": "leather_armor", "enhance": 0}
+  ],
+  "shield_inventory": [],
+  "equipped_weapon": 1,
+  "equipped_armor": 2,
+  "equipped_shield": null,
+  "stave_inventory": [
+    {"iid": 3, "key": "knockback_stave", "charges": 9},
+    {"iid": 4, "key": "fire_stave", "charges": 9},
+    {"iid": 5, "key": "heal_stave", "charges": 9},
+    {"iid": 6, "key": "invincible_stave", "charges": 9},
+    {"iid": 7, "key": "light_stave", "charges": 9}
+  ],
+  "lantern_inventory": [
+    {"iid": 8, "type": "lantern", "key": "luxury_lantern", "enhance": 0}
+  ],
+  "equipped_lantern": 8,
+  "invincible_turns": 0,
+  "guild_point": 0,
+  "active_quests": [],
+  "quest_tokens": {},
+  "warehouse_items": []
+}

@@ -1,0 +1,415 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balance Master Dashboard v3.2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0f1e;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --primary: #00d4ff;
+            --secondary: #ff007a;
+            --accent: #00ff88;
+            --text: #e0e6ed;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --danger: #ff4444;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: rgba(0, 0, 0, 0.3);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin-bottom: 4px;
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 4px;
+            border: 1px solid var(--border);
+            margin-bottom: 8px;
+        }
+        .mode-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .mode-btn.active { background: var(--primary); color: black; }
+        .mode-btn.active.defense { background: var(--secondary); color: white; }
+
+        /* Controls */
+        .control-group {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        select, input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 13px;
+        }
+        
+        .inline-edit {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .edit-row { display: flex; align-items: center; gap: 8px; }
+        .edit-row label { flex: 1; font-size: 11px; color: var(--text-dim); }
+        .edit-row input { width: 70px; padding: 4px; margin: 0; text-align: center; color: var(--primary); border-color: var(--primary); }
+        .defense-mode-input input { color: var(--secondary); border-color: var(--secondary); }
+
+        .side-save-btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 6px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .side-save-btn:hover { background: var(--primary); color: black; }
+
+        /* Main Content */
+        .main { flex: 1; padding: 40px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .stat-card {
+            background: var(--card-bg);
+            padding: 12px 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            display: flex;
+            gap: 20px;
+        }
+        .stat-val { font-weight: 700; font-family: 'JetBrains Mono'; }
+        .val-atk { color: var(--primary); }
+        .val-def { color: var(--secondary); }
+        .val-hp { color: var(--accent); }
+
+        /* Table */
+        .table-container { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; backdrop-filter: blur(10px); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: rgba(255, 255, 255, 0.05); padding: 16px; font-size: 11px; color: var(--text-dim); text-transform: uppercase; }
+        td { padding: 16px; border-bottom: 1px solid var(--border); }
+        .row-id { font-family: 'JetBrains Mono'; font-size: 12px; color: var(--text-dim); }
+        .row-name { font-weight: 600; }
+        .badge { padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .hit-1 { background: rgba(0, 255, 136, 0.1); color: var(--accent); border: 1px solid var(--accent); }
+        .hit-2 { background: rgba(0, 212, 255, 0.1); color: var(--primary); border: 1px solid var(--primary); }
+        .hit-3 { background: rgba(255, 0, 122, 0.1); color: var(--secondary); border: 1px solid var(--secondary); }
+        .hit-danger { background: rgba(255, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+
+        .edit-input { width: 60px; text-align: center; background: transparent; border-bottom: 1px solid var(--border); margin: 0; padding: 4px; }
+        .edit-input:focus { border-color: var(--primary); outline: none; }
+        .save-btn { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        .save-btn:hover { background: var(--primary); color: black; }
+
+        .loading-overlay { position: fixed; inset: 0; background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 1000; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading-overlay">⚙️ Live Sync...</div>
+
+    <div class="sidebar">
+        <div class="logo">Balance Master</div>
+        
+        <div class="mode-toggle">
+            <button id="mode-atk" class="mode-btn active" onclick="setMode('atk')">Attack</button>
+            <button id="mode-def" class="mode-btn" onclick="setMode('def')">Defense</button>
+        </div>
+
+        <div class="control-group">
+            <div class="section-title">Enemy Rank</div>
+            <select id="rank-select" onchange="updateUI()"></select>
+        </div>
+
+        <!-- Weapon -->
+        <div id="atk-controls" class="control-group">
+            <div class="section-title">Active Weapon</div>
+            <select id="weapon-select" onchange="updateUI()"></select>
+            <div class="inline-edit">
+                <div class="edit-row">
+                    <label>Attack Bonus</label>
+                    <input type="number" id="edit-weapon-atk" step="0.5" oninput="livePreview()">
+                </div>
+            </div>
+            <button id="btn-save-weapon" class="side-save-btn" onclick="manualSaveEquipment('weapon')">SAVE WEAPON</button>
+        </div>
+
+        <!-- Armor / Shield -->
+        <div id="def-controls" style="display: none;">
+            <div class="control-group">
+                <div class="section-title">Active Armor</div>
+                <select id="armor-select" onchange="updateUI()"></select>
+                <div class="inline-edit defense-mode-input">
+                    <div class="edit-row"><label>Def Bonus</label><input type="number" id="edit-armor-def" step="0.5" oninput="livePreview()"></div>
+                    <div class="edit-row"><label>HP Bonus</label><input type="number" id="edit-armor-hp" oninput="livePreview()"></div>
+                </div>
+                <button id="btn-save-armor" class="side-save-btn" onclick="manualSaveEquipment('armor')">SAVE ARMOR</button>
+            </div>
+            <div class="control-group">
+                <div class="section-title">Active Shield</div>
+                <select id="shield-select" onchange="updateUI()"></select>
+                <div class="inline-edit defense-mode-input">
+                    <div class="edit-row"><label>Def Bonus</label><input type="number" id="edit-shield-def" step="0.5" oninput="livePreview()"></div>
+                </div>
+                <button id="btn-save-shield" class="side-save-btn" onclick="manualSaveEquipment('shield')">SAVE SHIELD</button>
+            </div>
+        </div>
+
+        <div style="margin-top: auto; font-size: 12px; color: var(--text-dim)">
+            Status: <span id="status-text" style="color: var(--accent)">Connected</span>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <h1 id="view-title">Loading...</h1>
+            <div id="stat-summary" class="stat-card"></div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead id="table-head"></thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let masterData = null;
+        let currentMode = 'atk';
+        let liveEnemyOverrides = {};
+
+        async function fetchData() {
+            try {
+                const res = await fetch('/api/data');
+                masterData = await res.json();
+                initUI();
+                document.getElementById('loading').style.display = 'none';
+            } catch (e) {
+                document.getElementById('loading').innerText = "❌ Connection Failed";
+            }
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-atk').classList.toggle('active', mode === 'atk');
+            document.getElementById('mode-def').classList.toggle('active', mode === 'def');
+            document.getElementById('mode-def').classList.toggle('defense', mode === 'def');
+            document.getElementById('atk-controls').style.display = mode === 'atk' ? 'flex' : 'none';
+            document.getElementById('def-controls').style.display = mode === 'def' ? 'block' : 'none';
+            updateUI();
+        }
+
+        function initUI() {
+            if (!masterData || !masterData.guild || !masterData.guild.RANK_ORDER) return;
+            const rankSelect = document.getElementById('rank-select');
+            const currentRank = rankSelect.value;
+            const ranks = masterData.guild.RANK_ORDER.filter(r => r !== "-");
+            rankSelect.innerHTML = ranks.map(r => `<option value="${r}">${r} Rank</option>`).join('');
+            if (currentRank && ranks.includes(currentRank)) rankSelect.value = currentRank;
+            populateSelector('weapon-select', masterData.weapons);
+            populateSelector('armor-select', masterData.armor);
+            populateSelector('shield-select', masterData.shields);
+            updateUI();
+        }
+
+        function populateSelector(id, data) {
+            const select = document.getElementById(id);
+            const currentVal = select.value;
+            const rankOrder = masterData.guild.RANK_ORDER;
+            const list = Object.entries(data).map(([id, item]) => ({ id, name: item.name, rank: item.min_rank || item.rank || "F" }))
+                .sort((a, b) => rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank));
+            let html = list.map(item => `<option value="${item.id}">[${item.rank}] ${item.name}</option>`).join('');
+            if (id !== 'weapon-select') html = '<option value="none">None</option>' + html;
+            select.innerHTML = html;
+            if (currentVal && select.querySelector(`option[value="${currentVal}"]`)) select.value = currentVal;
+        }
+
+        function livePreview() { updateUI(true); }
+
+        function onEnemyInput(id, param, value) {
+            if (!liveEnemyOverrides[id]) liveEnemyOverrides[id] = {};
+            liveEnemyOverrides[id][param] = parseFloat(value);
+            updateUI(true);
+        }
+
+        async function manualSaveEquipment(type) {
+            const id = document.getElementById(`${type}-select`).value;
+            if (id === 'none') return;
+            if (type === 'weapon') {
+                await updateStat('equipment', id, 'attack_bonus', document.getElementById('edit-weapon-atk').value);
+            } else if (type === 'armor') {
+                await updateStat('equipment', id, 'defense_bonus', document.getElementById('edit-armor-def').value);
+                await updateStat('equipment', id, 'hp_bonus', document.getElementById('edit-armor-hp').value);
+            } else if (type === 'shield') {
+                await updateStat('equipment', id, 'defense_bonus', document.getElementById('edit-shield-def').value);
+            }
+        }
+
+        async function updateStat(file, id, param, value) {
+            const status = document.getElementById('status-text');
+            status.innerText = "Saving...";
+            try {
+                const res = await fetch('/api/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ file, id, param, value: parseFloat(value) })
+                });
+                if (res.ok) {
+                    // Clear override after successful save
+                    if (file === 'enemies' && liveEnemyOverrides[id]) {
+                        delete liveEnemyOverrides[id][param];
+                    }
+                    await fetchData();
+                    status.innerText = "Saved";
+                }
+            } catch (e) { status.innerText = "Error"; }
+        }
+
+        function updateUI(isLive = false) {
+            if (!masterData) return;
+            const rank = document.getElementById('rank-select').value;
+            const summary = document.getElementById('stat-summary');
+            const tableBody = document.getElementById('table-body');
+            const tableHead = document.getElementById('table-head');
+
+            if (currentMode === 'atk') {
+                document.getElementById('view-title').innerText = "Attack Simulator";
+                const baseAtk = masterData.balance.PLAYER.attack || 5;
+                const weaponId = document.getElementById('weapon-select').value;
+                const weapon = masterData.weapons[weaponId] || {};
+                
+                const inputVal = document.getElementById('edit-weapon-atk');
+                if (!isLive) inputVal.value = weapon.attack_bonus || 0;
+                
+                const finalWeaponAtk = parseFloat(inputVal.value) || 0;
+                const totalAtk = baseAtk + finalWeaponAtk;
+                summary.innerHTML = `<span>Base: ${baseAtk}</span><span>Weapon: +${finalWeaponAtk}</span><span class="stat-val val-atk">Total: ${totalAtk}</span>`;
+
+                tableHead.innerHTML = `<tr><th>Enemy ID</th><th>Name</th><th>HP</th><th>DEF</th><th>Hits to Kill</th><th>Actions</th></tr>`;
+                const rankEnemies = Object.entries(masterData.enemies).filter(([id, e]) => (e.min_rank || e.rank) === rank && !e.is_static);
+                tableBody.innerHTML = rankEnemies.map(([id, e]) => {
+                    const hp = liveEnemyOverrides[id]?.hp ?? e.hp;
+                    const def = liveEnemyOverrides[id]?.defense ?? e.defense;
+                    const dmg = Math.max(1, totalAtk - def);
+                    const hits = Math.ceil(hp / dmg);
+                    const cls = hits <= 1 ? 'hit-1' : (hits === 2 ? 'hit-2' : (hits === 3 ? 'hit-3' : 'hit-danger'));
+                    return `
+                        <tr>
+                            <td class="row-id">${id}</td><td class="row-name">${e.name}</td>
+                            <td><input class="edit-input" type="number" value="${hp}" oninput="onEnemyInput('${id}', 'hp', this.value)" onblur="updateStat('enemies', '${id}', 'hp', this.value)"></td>
+                            <td><input class="edit-input" type="number" value="${def}" oninput="onEnemyInput('${id}', 'defense', this.value)" onblur="updateStat('enemies', '${id}', 'defense', this.value)"></td>
+                            <td><span class="badge ${cls}">${hits}撃</span></td>
+                            <td><button class="save-btn" onclick="updateStat('enemies', '${id}', 'hp', this.parentNode.parentNode.querySelectorAll('input')[0].value)">Save All</button></td>
+                        </tr>`;
+                }).join('');
+
+            } else {
+                document.getElementById('view-title').innerText = "Survival Simulator";
+                const playerBaseDef = masterData.balance.PLAYER.defense || 0;
+                const playerBaseHp = masterData.balance.PLAYER.max_hp || 100;
+                
+                const armorId = document.getElementById('armor-select').value;
+                const armor = masterData.armor[armorId] || {};
+                const inputADef = document.getElementById('edit-armor-def');
+                const inputAHp = document.getElementById('edit-armor-hp');
+                if (!isLive) {
+                    inputADef.value = armor.defense_bonus || 0;
+                    inputAHp.value = armor.hp_bonus || 0;
+                }
+                const finalADef = parseFloat(inputADef.value) || 0;
+                const finalAHp = parseFloat(inputAHp.value) || 0;
+
+                const shieldId = document.getElementById('shield-select').value;
+                const shield = masterData.shields[shieldId] || {};
+                const inputSDef = document.getElementById('edit-shield-def');
+                if (!isLive) inputSDef.value = shield.defense_bonus || 0;
+                const finalSDef = parseFloat(inputSDef.value) || 0;
+
+                const totalDef = playerBaseDef + finalADef + finalSDef;
+                const totalHp = playerBaseHp + finalAHp;
+
+                summary.innerHTML = `<span>Total HP: <span class="stat-val val-hp">${totalHp}</span></span><span>Total DEF: <span class="stat-val val-def">${totalDef}</span></span>`;
+                tableHead.innerHTML = `<tr><th>Enemy ID</th><th>Name</th><th>Enemy ATK</th><th>Survival Hits</th><th>Actions</th></tr>`;
+                const rankEnemies = Object.entries(masterData.enemies).filter(([id, e]) => (e.min_rank || e.rank) === rank && !e.is_static);
+                tableBody.innerHTML = rankEnemies.map(([id, e]) => {
+                    const atk = liveEnemyOverrides[id]?.attack ?? e.attack;
+                    const dmg = Math.max(1, atk - totalDef);
+                    const hits = Math.floor(totalHp / dmg);
+                    const cls = hits >= 10 ? 'hit-1' : (hits >= 5 ? 'hit-2' : (hits >= 3 ? 'hit-3' : 'hit-danger'));
+                    return `
+                        <tr>
+                            <td class="row-id">${id}</td><td class="row-name">${e.name}</td>
+                            <td><input class="edit-input" type="number" value="${atk}" oninput="onEnemyInput('${id}', 'attack', this.value)" onblur="updateStat('enemies', '${id}', 'attack', this.value)"></td>
+                            <td><span class="badge ${cls}">${hits}発耐える</span></td>
+                            <td><button class="save-btn" onclick="updateStat('enemies', '${id}', 'attack', this.parentNode.parentNode.querySelector('input').value)">Save</button></td>
+                        </tr>`;
+                }).join('');
+            }
+        }
+        fetchData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+# ==============================================================================
+# ギルドランク設定マスタ (guild.yml)
+# ==============================================================================
+# 各ランクのステータス、クエスト受注制限、および「到達可能階層」を定義します。
+#
+# 【重要：limit_floor について】
+# この値に基づき、constants.py がエネミーの出現範囲を自動計算します。
+# - そのランクの敵が出る開始階: 前のランクの limit_floor + 1
+# - そのランクの敵が出る終了階: そのランクの limit_floor + 2 (オーバーラップ)
+#
+# 【各パラメータの説明】
+# - rank             : ランク名 (F 〜 SS)
+# - required_gp      : 昇級に必要なギルドポイント(GP)
+# - allowed_ranks    : 掲示板に並ぶクエストのランク範囲
+# - reward_multiplier: クエスト達成報酬の倍率
+# - amount_range     : 掲示板に並ぶクエストの数 [最小, 最大]
+# - limit_floor      : このランクでの「到達可能最大階層」
+# - required_gp      : そのランクへの「昇級試験を受ける」ために必要な累積GP
+# - rank_up_item     : 昇級試験で回収を求められるアイテム
+# ==============================================================================
+
+GUILD_RANKS:
+- rank: "-"
+  required_gp: 0
+  allowed_ranks: []
+  reward_multiplier: 0.0
+  amount_range:
+  - 0
+  - 0
+  limit_floor: 0
+- rank: F
+  required_gp: 0
+  allowed_ranks:
+  - F
+  reward_multiplier: 1.0
+  amount_range:
+  - 1
+  - 3
+  limit_floor: 11
+  rank_up_item: adventurer_proof
+  rank_up_reward_gold: 1000
+- rank: E
+  required_gp: 50
+  allowed_ranks:
+  - F
+  - E
+  reward_multiplier: 1.1
+  amount_range:
+  - 1
+  - 3
+  limit_floor: 21
+  rank_up_item: guild_cert_e
+  rank_up_reward_gold: 2500
+- rank: D
+  required_gp: 90
+  allowed_ranks:
+  - E
+  - D
+  reward_multiplier: 1.2
+  amount_range:
+  - 2
+  - 4
+  limit_floor: 30
+  rank_up_item: guild_cert_d
+  rank_up_reward_gold: 5000
+- rank: C
+  required_gp: 150
+  allowed_ranks:
+  - D
+  - C
+  reward_multiplier: 1.5
+  amount_range:
+  - 3
+  - 5
+  limit_floor: 35
+  rank_up_item: guild_cert_c
+  rank_up_reward_gold: 10000
+- rank: B
+  required_gp: 250
+  allowed_ranks:
+  - C
+  - B
+  reward_multiplier: 2.0
+  amount_range:
+  - 4
+  - 6
+  limit_floor: 55
+  rank_up_item: guild_cert_b
+  rank_up_reward_gold: 25000
+- rank: A
+  required_gp: 400
+  allowed_ranks:
+  - B
+  - A
+  reward_multiplier: 2.5
+  amount_range:
+  - 5
+  - 7
+  limit_floor: 70
+  rank_up_item: guild_cert_a
+- rank: S
+  required_gp: 800
+  allowed_ranks:
+  - A
+  - S
+  reward_multiplier: 3.0
+  amount_range:
+  - 5
+  - 8
+  limit_floor: 80
+  rank_up_item: guild_cert_s
+- rank: SS
+  required_gp: 1500
+  allowed_ranks:
+  - S
+  - SS
+  reward_multiplier: 4.0
+  amount_range:
+  - 6
+  - 10
+  limit_floor: 99
+  rank_up_item: guild_cert_ss
+RANK_ORDER:
+- "-"
+- F
+- E
+- D
+- C
+- B
+- A
+- S
+- SS

@@ -1,0 +1,1313 @@
+import pygame
+import random
+import os
+import math
+from constants import *
+from components.sprites.npc import NPC
+from components.sprites.enemy import Enemy
+from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave
+from systems.ui import Dialog, ConfirmDialog, InventoryDialog, StatusBar, StatusDialog, EnhanceDialog, ItemActionDialog, OreSelectionDialog, ShopDialog, StaveSelectionDialog, GuildDialog, WarehouseDialog
+from systems.guild import GuildSystem
+# from systems.dungeon_settings import dungeon_settings
+from systems.game_state import is_paused
+from wordings import Text
+
+
+def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False):
+    """指定した階層へ移動するための新しいダンジョンオブジェクトを生成する"""
+    player.current_floor = floor_level
+    new_dungeon = Dungeon(level=floor_level, player=player, debug_overflow=debug_overflow)
+    
+    # プレイヤーを階段の位置へ移動
+    if floor_level == 0: # 村に戻る場合
+        if is_death and new_dungeon.clinic_pos:
+            # 診療所で目覚める（医者と重ならないよう一マス右へ）
+            px, py = new_dungeon.clinic_pos
+            tx, ty = px + 1, py
+            player.x = tx * new_dungeon.tile_size
+            player.y = ty * new_dungeon.tile_size
+            new_dungeon.spawn_pos = (tx, ty)
+        elif getattr(player, "prev_floor", 0) > 0:
+            # ダンジョンから戻ってきた場合は階段(3)の横
+            found = False
+            for y in range(new_dungeon.map_height):
+                for x in range(new_dungeon.map_width):
+                    if new_dungeon.map_data[y][x] == 3: # 下り階段
+                        # 階段の左隣に配置
+                        tx, ty = x - 1, y
+                        if tx < 0: tx = x + 1
+                        player.x = tx * new_dungeon.tile_size
+                        player.y = ty * new_dungeon.tile_size
+                        new_dungeon.spawn_pos = (tx, ty)
+                        found = True
+                        break
+                if found: break
+            if not found and new_dungeon.rooms:
+                px, py = new_dungeon.rooms[0]
+                player.x = px * new_dungeon.tile_size
+                player.y = py * new_dungeon.tile_size
+                new_dungeon.spawn_pos = (px, py)
+        else:
+            # 初期スポーン
+            if new_dungeon.rooms:
+                px, py = new_dungeon.rooms[0]
+                player.x = px * new_dungeon.tile_size
+                player.y = py * new_dungeon.tile_size
+                new_dungeon.spawn_pos = (px, py)
+    else:
+        # ダンジョンの場合、登り階段(2)か下り階段(3)の場所に配置
+        target_tile = 2 if floor_level > getattr(player, "prev_floor", 0) else 3
+        found = False
+        for y in range(new_dungeon.map_height):
+            for x in range(new_dungeon.map_width):
+                if new_dungeon.map_data[y][x] == target_tile:
+                    player.x = x * new_dungeon.tile_size
+                    player.y = y * new_dungeon.tile_size
+                    new_dungeon.spawn_pos = (x, y) # ワープ直後の位置を記録
+                    found = True
+                    break
+            if found: break
+            
+    player.prev_floor = floor_level
+    player.reset_status()
+    
+    # 敵・アイテムを初期配置（村や固定マップ階層以外）
+    if floor_level > 0 and not new_dungeon.floor_info.get("map"):
+        new_dungeon.enemies = Enemy.spawn_enemies(new_dungeon, player)
+        new_dungeon.spawn_floor_items(player)
+        new_dungeon.spawn_traps(player)
+        
+    new_dungeon.last_respawn_ticks = pygame.time.get_ticks()
+    # 階層に応じたBGMを再生
+    new_dungeon.play_floor_bgm()
+    return new_dungeon
+
+class Dungeon:
+    def __init__(self, level=1, player=None, debug_overflow=False):
+        self.current_floor = level
+        self.player = player
+        self.debug_overflow = debug_overflow
+        self.last_respawn_ticks = 0
+        self.tile_size = TILE_SIZE
+        
+        inc = int((level - 1) * 1.5)
+        self.min_rooms = min(DUNGEON_MAX_ROOMS, DUNGEON_MIN_ROOMS + inc)
+        self.max_rooms = min(DUNGEON_MAX_ROOMS, self.min_rooms + 3)
+        
+        room_growth = 1.0 + (level - 1) * 0.1
+        self.min_room_size = int(DUNGEON_MIN_ROOM_SIZE * room_growth)
+        self.max_room_size = int(DUNGEON_MAX_ROOM_SIZE * room_growth)
+        
+        # [DEBUG] 5Fはテスト用フラグがあれば部屋数を3つに固定し、氾濫を発生しやすくする
+        if self.debug_overflow and level == 5:
+            self.min_rooms = 3
+            self.max_rooms = 3
+        
+        avg_room_area = ((self.min_room_size + self.max_room_size) / 2.0) ** 2
+        target_rooms = (self.min_rooms + self.max_rooms) / 2.0
+        
+        margin_factor = 6.0 
+        target_total_area = avg_room_area * target_rooms * margin_factor
+        
+        calculated_side = int(math.sqrt(target_total_area))
+        
+        self.map_width = calculated_side
+        self.map_height = calculated_side
+
+        self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
+        self.rooms = []
+        self.room_info = [] # [NEW] 部屋の (x, y, w, h) 情報を保持
+        self.room_rects = []
+        self.enemies = []
+        self.npcs = []
+        self.dropped_items = []
+        self.traps = []
+        self.magic_effects = []
+        self.spawn_counts = {}
+        self.clinic_pos = None # 診療所の位置 (gx, gy)
+        
+        self.guild_system = GuildSystem()
+        
+        self.weapon_shop_stock = []
+        self.item_shop_stock = []
+        
+        self.shake_amount = 0
+        self.shake_timer = 0
+        self.shake_offset = (0, 0)
+        self.flash_timer = 0 # [NEW] クリティカル演出用
+        
+        # --- モンスター氾濫 (Monster Overflow) ---
+        self.overflow_room_rect = None # (x, y, w, h)
+        self.overflow_trigger_pos = None # (gx, gy)
+        self.is_overflow_triggered = False
+        self.has_overflow_potential = False
+        self.overflow_message_shown = False
+        self.overflow_sequence_step = 0 # 0:通常, 1:メッセージ1表示中, 2:SE再生中(ウェイト), 3:メッセージ2表示中
+        self.overflow_wait_timer = 0
+        
+        self.textures = self._create_placeholder_textures()
+        
+        current_level = self.get_current_floor_level()
+        main_path = DUNGEON_IMAGES.get("path", "components/pictures/dungeon")
+        info = DUNGEON_IMAGES.get(str(current_level))
+        
+        if info is None and current_level > 0:
+            valid_keys = [k for k in DUNGEON_IMAGES.keys() if k.isdigit() and k != "0"]
+            if valid_keys:
+                info = DUNGEON_IMAGES.get(random.choice(valid_keys))
+        
+        if info is None:
+            info = {"image": "normal"}
+            
+        self.floor_info = info
+        folder = info["image"] if isinstance(info, dict) else info
+
+        print(f"Floor {current_level} theme: {folder}")
+        img_dir = main_path + "/" + folder
+        keys_to_load = ["floor", "wall_top", "wall_bottom", "wall_side", "wall_none", 
+                        "wall_corner", "corridor", "wall_single", "wall_base"]
+        def load_and_scale(path):
+            img = pygame.image.load(path).convert_alpha()
+            if img.get_size() != (self.tile_size, self.tile_size):
+                return pygame.transform.scale(img, (self.tile_size, self.tile_size))
+            return img
+
+        for key in keys_to_load:
+            p = f"{img_dir}/{key}.png"
+            if os.path.exists(p):
+                self.textures[key] = load_and_scale(p)
+        
+        self.available_floor_variants = []
+        self.available_wall_variants = []
+        self.available_wall_top_variants = []
+        self.available_wall_none_variants = []
+        if os.path.exists(img_dir):
+            for f in os.listdir(img_dir):
+                if f.endswith(".png"):
+                    key = f[:-4]
+                    path = f"{img_dir}/{f}"
+                    if f.startswith("floor"):
+                        self.textures[key] = load_and_scale(path)
+                        self.available_floor_variants.append(key)
+                    elif f.startswith("wall_single"):
+                        self.textures[key] = load_and_scale(path)
+                        self.available_wall_variants.append(key)
+                    elif f.startswith("wall_top"):
+                        self.textures[key] = load_and_scale(path)
+                        self.available_wall_top_variants.append(key)
+                    elif f.startswith("wall_none"):
+                        self.textures[key] = load_and_scale(path)
+                        self.available_wall_none_variants.append(key)
+        
+        for base_key, variant_list in [("floor", self.available_floor_variants), 
+                                       ("wall_top", self.available_wall_top_variants),
+                                       ("wall_none", self.available_wall_none_variants)]:
+            has_real = os.path.exists(f"{img_dir}/{base_key}.png")
+            if not has_real:
+                # ファイル本体がない場合、バリエーションがあればそれを基本にする
+                actual_v = [v for v in variant_list if v != base_key]
+                if actual_v:
+                    self.textures[base_key] = self.textures[actual_v[0]]
+                    if base_key not in variant_list: variant_list.append(base_key)
+            else:
+                # ファイル本体がある場合、リストに追加
+                if base_key not in variant_list: variant_list.append(base_key)
+
+        self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
+        
+        def get_rand_floor():
+            return random.choice(self.available_floor_variants) if self.available_floor_variants else "floor"
+        def get_rand_wall():
+            return random.choice(self.available_wall_variants) if self.available_wall_variants else "wall_single"
+        def get_rand_wall_top():
+            return random.choice(self.available_wall_top_variants) if self.available_wall_top_variants else "wall_top"
+        def get_rand_wall_none():
+            return random.choice(self.available_wall_none_variants) if self.available_wall_none_variants else "wall_none"
+        
+        self.floor_variants = [[get_rand_floor() for _ in range(self.map_width)] for _ in range(self.map_height)]
+        self.base_floor_variants = [[get_rand_floor() for _ in range(self.map_width)] for _ in range(self.map_height)]
+        self.wall_variants = [[get_rand_wall() for _ in range(self.map_width)] for _ in range(self.map_height)]
+        self.wall_top_variants = [[get_rand_wall_top() for _ in range(self.map_width)] for _ in range(self.map_height)]
+        self.wall_none_variants = [[get_rand_wall_none() for _ in range(self.map_width)] for _ in range(self.map_height)]
+        
+        if "corridor" in self.textures:
+            self.textures["corridor_h"] = pygame.transform.rotate(self.textures["corridor"], -90)
+            
+        if "wall_single" not in self.textures and "wall_side" in self.textures:
+            surface = pygame.Surface((self.tile_size, self.tile_size), pygame.SRCALPHA)
+            side = self.textures["wall_side"]
+            side_flip = pygame.transform.flip(side, True, False)
+            surface.blit(side, (0, 0), (0, 0, self.tile_size//2, self.tile_size))
+            surface.blit(side_flip, (self.tile_size//2, 0), (self.tile_size//2, 0, self.tile_size//2, self.tile_size))
+            self.textures["wall_single"] = surface
+        
+        stairs_dir = main_path + "/stairs"
+        for key in ["stairs_up", "stairs_down"]:
+            if os.path.exists(f"{stairs_dir}/{key}.png"):
+                self.textures[key] = load_and_scale(f"{stairs_dir}/{key}.png")
+            
+        # [NEW] 固定マップの読み込み判定
+        map_file = self.floor_info.get("map")
+        if map_file:
+            self.generate_fixed_map(map_file)
+        else:
+            self.generate_dungeon()
+            self._remove_lone_walls()
+            self._convert_inner_walls_to_floors()
+            self._remove_thin_walls()
+            if player:
+                self._spawn_wall_obstacles(player)
+            
+            # 全ての配置が終わった後に最終クリーニングを行う（障害物が挟まっていた場合も床にする）
+            self._convert_sandwiched_walls()
+        
+        self._add_floor_edges()
+        
+        self.next_dungeon = None
+        self.brightness = self.floor_info.get("brightness", 1)
+        self.is_lighted = (self.current_floor == 0 or self.brightness == 5)
+
+    def reveal_floor(self):
+        self.is_lighted = True
+        from systems.magic_handler import FlashEffect
+        for trap in self.traps:
+            if not trap.is_revealed:
+                trap.is_revealed = True
+        self.magic_effects.append(FlashEffect(color=(255, 255, 200), duration=20))
+    
+    def generate_dungeon(self):
+        from constants import DUNGEON_MIN_ROOM_DISTANCE, DUNGEON_ROOM_DISTANCE_GROWTH, DUNGEON_CORRIDOR_W2_CHANCE, DUNGEON_STAIRS_FLOOR_RADIUS
+        num_rooms = random.randint(self.min_rooms, self.max_rooms)
+        required_dist = int(DUNGEON_MIN_ROOM_DISTANCE + (self.current_floor - 1) * DUNGEON_ROOM_DISTANCE_GROWTH)
+        
+        self.valid_floor_coords = set()
+        pending_rooms = []
+        
+        for _ in range(num_rooms):
+            placed = False
+            for attempt in range(50):
+                w = random.randint(self.min_room_size, self.max_room_size)
+                h = random.randint(self.min_room_size, self.max_room_size)
+                x = random.randint(1, self.map_width - w - 1)
+                y = random.randint(1, self.map_height - h - 1)
+                
+                conflict = False
+                for (rx, ry, rw, rh) in self.room_rects:
+                    if (x < rx + rw + required_dist and x + w + required_dist > rx and
+                        y < ry + rh + required_dist and y + h + required_dist > ry):
+                        conflict = True
+                        break
+                        
+                if not conflict:
+                    center_x, center_y = x + w // 2, y + h // 2
+                    
+                    if self.rooms:
+                        min_dist = float('inf')
+                        closest_center = None
+                        for (rx, ry) in self.rooms:
+                            dist = abs(rx - center_x) + abs(ry - center_y)
+                            if dist < min_dist:
+                                min_dist = dist
+                                closest_center = (rx, ry)
+                        prev_cx, prev_cy = closest_center
+                        
+                        # 氾濫判定は最後に行うので、ここでは通常の通路生成
+                        c_width = 2 if random.random() < DUNGEON_CORRIDOR_W2_CHANCE else 1
+                        self.create_corridor(prev_cx, center_x, prev_cy, prev_cy, width=c_width)
+                        self.create_corridor(center_x, center_x, prev_cy, center_y, width=c_width)
+                        
+                    self.room_rects.append((x, y, w, h))
+                    self.rooms.append((center_x, center_y))
+                    pending_rooms.append((x, y, w, h))
+                    placed = True
+                    break
+        
+        for (x, y, w, h) in pending_rooms:
+            for row in range(y, y + h):
+                for col in range(x, x + w):
+                    self.map_data[row][col] = 1
+                    self.valid_floor_coords.add((col, row))
+            
+        start_room_idx = 0
+        self.map_data[self.rooms[start_room_idx][1]][self.rooms[start_room_idx][0]] = 2
+        
+        # 階段の配置: デバッグモードなら同じ部屋、通常なら最も遠い部屋
+        if self.debug_overflow:
+            target_room_idx = start_room_idx
+            # 上り階段の右隣を下り階段にする
+            tx, ty = self.rooms[target_room_idx][0] + 1, self.rooms[target_room_idx][1]
+            self.map_data[ty][tx] = 3
+        else:
+            max_dist = -1
+            target_room_idx = len(self.rooms) - 1
+            for i in range(1, len(self.rooms)):
+                r = self.rooms[i]
+                dist = abs(r[0] - self.rooms[start_room_idx][0]) + abs(r[1] - self.rooms[start_room_idx][1])
+                if dist > max_dist:
+                    max_dist = dist
+                    target_room_idx = i
+            self.map_data[self.rooms[target_room_idx][1]][self.rooms[target_room_idx][0]] = 3
+
+        # --- モンスター氾濫の専用部屋生成 ---
+        from constants import OVERFLOW_CHANCE, OVERFLOW_MIN_FLOOR
+        
+        # 発生条件: 
+        # 1. デバッグ中かつB11の場合(テスト用) 
+        # 2. または、ランダム確率(OVERFLOW_CHANCE)に当選
+        # 3. かつ、最低階層(OVERFLOW_MIN_FLOOR)以上
+        # 4. かつ、固定マップでない(map情報がない)
+        is_min_floor = self.current_floor >= OVERFLOW_MIN_FLOOR
+        is_fixed_map = bool(self.floor_info.get("map"))
+        
+        force_overflow = (self.debug_overflow and self.current_floor == OVERFLOW_MIN_FLOOR) or (random.random() < OVERFLOW_CHANCE)
+        
+        if force_overflow and is_min_floor and not is_fixed_map:
+            # 氾濫用の追加部屋を1つ生成
+            placed = False
+            for attempt in range(50):
+                w = random.randint(self.min_room_size, self.max_room_size)
+                h = random.randint(self.min_room_size, self.max_room_size)
+                x = random.randint(1, self.map_width - w - 1)
+                y = random.randint(1, self.map_height - h - 1)
+                
+                # 既存の部屋との衝突判定
+                conflict = False
+                for (rx, ry, rw, rh) in self.room_rects:
+                    if (x < rx + rw + 2 and x + w + 2 > rx and
+                        y < ry + rh + 2 and y + h + 2 > ry):
+                        conflict = True; break
+                
+                if not conflict:
+                    center_x, center_y = x + w // 2, y + h // 2
+                    # 最も近い既存の部屋を探して接続
+                    min_dist = float('inf')
+                    closest_center = self.rooms[0]
+                    for (rx, ry) in self.rooms:
+                        dist = abs(rx - center_x) + abs(ry - center_y)
+                        if dist < min_dist:
+                            min_dist = dist
+                            closest_center = (rx, ry)
+                    
+                    prev_cx, prev_cy = closest_center
+                    # 1マス幅の通路で接続
+                    self.create_corridor(prev_cx, center_x, prev_cy, prev_cy, width=1)
+                    self.create_corridor(center_x, center_x, prev_cy, center_y, width=1)
+                    
+                    # トリガー地点（入口）の特定ロジックを修正
+                    # 通路は (prev_cx, prev_cy) -> (center_x, prev_cy) -> (center_x, center_y) の順で作られる
+                    # 1. 水平移動が部屋のY範囲内なら、左右の壁が入り口になる
+                    if y <= prev_cy < y + h:
+                        if center_x > prev_cx: self.overflow_trigger_pos = (x - 1, prev_cy)
+                        else: self.overflow_trigger_pos = (x + w, prev_cy)
+                    # 2. そうでなければ、垂直移動が上下の壁に刺さる
+                    else:
+                        if center_y > prev_cy: self.overflow_trigger_pos = (center_x, y - 1)
+                        else: self.overflow_trigger_pos = (center_x, y + h)
+                    
+                    self.has_overflow_potential = True
+                    self.overflow_room_rect = (x, y, w, h)
+                    self.room_rects.append((x, y, w, h))
+                    self.rooms.append((center_x, center_y))
+                    # 部屋の床を塗る
+                    for row in range(y, y + h):
+                        for col in range(x, x + w):
+                            self.map_data[row][col] = 1
+                            self.valid_floor_coords.add((col, row))
+
+                    # [NEW] フロードスイッチを配置
+                    if self.overflow_trigger_pos:
+                        from components.sprites.trap import Trap
+                        from constants import OVERFLOW_CENTER_SWITCH_MIN_FLOOR
+                        tx, ty = self.overflow_trigger_pos
+                        
+                        # 深い階層では、50%の確率で部屋の中心にスイッチを置く
+                        if self.current_floor >= OVERFLOW_CENTER_SWITCH_MIN_FLOOR and random.random() < 0.5:
+                            tx, ty = center_x, center_y
+                            print(f"[Dungeon] Deep floor detected. Placing switch at center: ({tx}, {ty})")
+                        else:
+                            print(f"[Dungeon] Placing switch at entrance: ({tx}, {ty})")
+                            
+                        # スイッチを配置
+                        self.traps.append(Trap(tx, ty, "flood_switch"))
+                    
+                    placed = True
+                    break
+
+        r_stairs = DUNGEON_STAIRS_FLOOR_RADIUS
+        for sx, sy in [self.rooms[start_room_idx], self.rooms[target_room_idx]]:
+            for dy in range(-r_stairs, r_stairs + 1):
+                for dx in range(-r_stairs, r_stairs + 1):
+                    nx, ny = sx + dx, sy + dy
+                    if 0 <= nx < self.map_width and 0 <= ny < self.map_height:
+                        if nx == sx and ny == sy: continue
+                        if self.map_data[ny][nx] == 0:
+                            self.map_data[ny][nx] = 1
+                            self.valid_floor_coords.add((nx, ny))
+        
+        # 最後に有効エリア以外を削る
+        self._trim_to_valid_areas()
+        
+    def check_overflow(self, player, dialog):
+        """プレイヤーが氾濫部屋の入口を踏んだかチェックする"""
+        if not self.has_overflow_potential or self.is_overflow_triggered:
+            return self
+            
+        # 最初の予感メッセージ
+        if not self.overflow_message_shown:
+            dialog.text = Text.System.OVERFLOW_SENSE
+            dialog.is_active = True
+            self.overflow_message_shown = True
+            
+        # 以前はここで直接トリガー判定をしていたが、
+        # 今後は Trap(flood_switch) がトリガーされることで trigger_overflow が呼ばれる
+        return self
+
+    def trigger_overflow(self, player, dialog):
+        # 演出シーケンス開始！
+        self.is_overflow_triggered = True
+        self.overflow_sequence_step = 1 # Step 1: 発生メッセージ表示
+        
+        dialog.text = Text.System.OVERFLOW_START
+        dialog.is_active = True
+        
+        # 画面揺らし演出
+        self.shake_amount = 15
+        self.shake_timer = 60
+
+    def _update_overflow_sequence(self, dialog):
+        """演出シーケンスの更新処理"""
+        from systems.game_state import game_state
+        
+        if self.overflow_sequence_step == 1:
+            # Step 1: メッセージ1が閉じられるのを待つ
+            if not dialog.is_active and game_state.get("dialog_just_closed"):
+                # 効果音再生
+                from systems.audio_manager import play_sfx
+                from constants import SOUND_OVERFLOW
+                play_sfx(SOUND_OVERFLOW)
+                
+                self.overflow_sequence_step = 2
+                self.overflow_wait_timer = 60 # 1秒程度待機
+                
+        elif self.overflow_sequence_step == 2:
+            # Step 2: SE再生中のウェイト
+            self.overflow_wait_timer -= 1
+            if self.overflow_wait_timer <= 0:
+                # BGM開始
+                from systems.audio_manager import play_bgm
+                from constants import BGM_OVERFLOW
+                play_bgm(BGM_OVERFLOW)
+                
+                # Step 3: 煽りメッセージ表示 ＆ 召喚
+                dialog.text = Text.System.OVERFLOW_SURVIVE
+                dialog.is_active = True
+                
+                self._spawn_overflow_monsters()
+                self.overflow_sequence_step = 3
+                
+        elif self.overflow_sequence_step == 3:
+            # Step 3: メッセージ2が閉じられたらシーケンス終了
+            if not dialog.is_active and game_state.get("dialog_just_closed"):
+                self.overflow_sequence_step = 4 # 完了
+                print("[Dungeon] Overflow sequence completed.")
+
+    def _spawn_overflow_monsters(self):
+        """モンスターを部屋の中に召喚する"""
+        x, y, w, h = self.overflow_room_rect
+        num_spawn = (w * h) // 2
+        num_spawn = max(8, min(num_spawn, 25))
+        
+        spawned_count = 0
+        attempts = 0
+        while spawned_count < num_spawn and attempts < 100:
+            attempts += 1
+            gx = random.randint(x, x + w - 1)
+            gy = random.randint(y, y + h - 1)
+            
+            conflict = False
+            if (gx, gy) == (int(self.player.x // self.tile_size), int(self.player.y // self.tile_size)):
+                conflict = True
+            for e in self.enemies:
+                if (gx, gy) == (int(e.x // self.tile_size), int(e.y // self.tile_size)):
+                    conflict = True
+                    break
+            
+            if not conflict:
+                from components.sprites.enemy import Enemy
+                from constants import ENEMY_DATA
+                available_types = []
+                for etype, edata in ENEMY_DATA.items():
+                    if edata["min_floor"] <= self.current_floor <= edata["max_floor"]:
+                        available_types.append(etype)
+                
+                if not available_types: available_types = ["slime"]
+                etype = random.choice(available_types)
+                
+                new_enemy = Enemy(gx * self.tile_size, gy * self.tile_size, etype)
+                new_enemy.update_equipment_stats() 
+                self.enemies.append(new_enemy)
+                spawned_count += 1
+        
+        print(f"[Dungeon] Overflow triggered! Spawned {spawned_count} enemies.")
+
+    def generate_fixed_map(self, map_name):
+        """テキストファイルから固定マップを生成する（村や休憩ポイント用）"""
+        # 読み込みパスの優先順位: 1. components/data/dungeon/  2. ルート
+        paths = [f"components/data/dungeon/{map_name}", map_name]
+        lines = None
+        
+        for p in paths:
+            if os.path.exists(p):
+                try:
+                    with open(p, "r", encoding="utf-8") as f:
+                        lines = [line.rstrip("\n") for line in f.readlines() if line.strip() and not line.strip().startswith("//") and not line.strip().startswith("#")]
+                    if lines: break
+                except Exception as e:
+                    print(f"[Dungeon] Error reading map file {p}: {e}")
+
+        if lines:
+            try:
+                self.map_height = len(lines)
+                self.map_width = max(len(line) for line in lines)
+                self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
+                f_list = self.available_floor_variants
+                w_list = self.available_wall_variants
+                self.floor_variants = [[(random.choice(f_list) if f_list else "floor") for _ in range(self.map_width)] for _ in range(self.map_height)]
+                self.wall_variants = [[(random.choice(w_list) if w_list else "wall_single") for _ in range(self.map_width)] for _ in range(self.map_height)]
+                wt_list = self.available_wall_top_variants
+                self.wall_top_variants = [[(random.choice(wt_list) if wt_list else "wall_top") for _ in range(self.map_width)] for _ in range(self.map_height)]
+                wn_list = self.available_wall_none_variants
+                self.wall_none_variants = [[(random.choice(wn_list) if wn_list else "wall_none") for _ in range(self.map_width)] for _ in range(self.map_height)]
+                self.base_floor_variants = [[(random.choice(f_list) if f_list else "floor") for _ in range(self.map_width)] for _ in range(self.map_height)]
+                self.npcs = []
+                self.rooms = []
+                ts = self.tile_size
+                for r, line in enumerate(lines):
+                    for c, char in enumerate(line):
+                        if c >= self.map_width: break
+                        if char == "X": self.map_data[r][c] = 0
+                        elif char == ".":
+                            self.map_data[r][c] = 1
+                            self.floor_variants[r][c] = random.choice(self.available_floor_variants)
+                        elif char == "1":
+                            self.map_data[r][c] = 1
+                            self.floor_variants[r][c] = "floor_1"
+                        elif char == "2":
+                            self.map_data[r][c] = 1
+                            self.floor_variants[r][c] = "floor_2"
+                        elif char == "3":
+                            self.map_data[r][c] = 1
+                            self.floor_variants[r][c] = "floor_3"
+                        elif char == "4":
+                            self.map_data[r][c] = 1
+                            self.floor_variants[r][c] = "floor_4"
+                        elif char == "a":
+                            self.map_data[r][c] = 0
+                            self.wall_variants[r][c] = "wall_single_0"
+                        elif char == "b":
+                            self.map_data[r][c] = 0
+                            self.wall_variants[r][c] = "wall_single_1"
+                        elif char == "c":
+                            self.map_data[r][c] = 0
+                            self.wall_variants[r][c] = "wall_single_2"
+                        elif char == "d":
+                            self.map_data[r][c] = 0
+                            self.wall_variants[r][c] = "wall_single_3"
+                        elif char == "e":
+                            self.map_data[r][c] = 0
+                            self.wall_variants[r][c] = "wall_single_4"
+                        elif char == "C": self.map_data[r][c] = 4
+                        elif char == "-": self.map_data[r][c] = 5
+                        elif char == "|": self.map_data[r][c] = 6
+                        elif char == "P":
+                            self.map_data[r][c] = 1
+                            self.floor_variants[r][c] = random.choice(self.available_floor_variants)
+                            self.rooms = [(c, r)]
+                        elif char == "D": self.map_data[r][c] = 3
+                        elif char == "U": self.map_data[r][c] = 2
+                        elif char in NPC_DATA:
+                            self.map_data[r][c] = 1
+                            # NPCごとに指定された床タイルを敷く（指定がなければランダム）
+                            data = NPC_DATA[char]
+                            if data.get("base_tile"):
+                                self.floor_variants[r][c] = data["base_tile"]
+                            else:
+                                self.floor_variants[r][c] = random.choice(self.available_floor_variants)
+                            
+                            px, py = c * ts, r * ts
+                            npc = NPC(data["name"], px, py, dialogue=data["dialogue"], image_path=data["image_path"])
+                            self.npcs.append(npc)
+                            
+                            if char == "R": self.clinic_pos = (c, r)
+                        else: self.map_data[r][c] = 0
+                if not self.rooms: self.rooms = [(self.map_width // 2, self.map_height // 2)]
+                self.refresh_shop_stock()
+                self.enemies = []
+                return
+            except Exception as e:
+                import traceback
+                print(f"[Dungeon] Error parsing fixed map {map_name}: {e}")
+                traceback.print_exc()
+
+        # フォールバック（ファイルがない場合）
+        print(f"[Dungeon] Warning: Fixed map {map_name} not found. Using fallback layout.")
+        self.map_width, self.map_height = 25, 20
+        self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
+        
+        # 属性マップ（バリエーション）も新しいサイズで初期化し直す
+        f_list = self.available_floor_variants
+        w_list = self.available_wall_variants
+        wt_list = self.available_wall_top_variants
+        wn_list = self.available_wall_none_variants
+        self.floor_variants = [[(random.choice(f_list) if f_list else "floor") for _ in range(self.map_width)] for _ in range(self.map_height)]
+        self.wall_variants = [[(random.choice(w_list) if w_list else "wall_single") for _ in range(self.map_width)] for _ in range(self.map_height)]
+        self.wall_top_variants = [[(random.choice(wt_list) if wt_list else "wall_top") for _ in range(self.map_width)] for _ in range(self.map_height)]
+        self.wall_none_variants = [[(random.choice(wn_list) if wn_list else "wall_none") for _ in range(self.map_width)] for _ in range(self.map_height)]
+        for row in range(5, 15):
+            for col in range(5, 20): self.map_data[row][col] = 1
+        self.rooms = [(12, 10)]
+        self.map_data[10][19] = 3
+        self.enemies = []
+        self.play_floor_bgm()
+
+    def play_floor_bgm(self):
+        """現在の階層設定に基づいたBGMを再生する"""
+        from systems.audio_manager import play_bgm
+        from constants import DUNGEON_IMAGES
+        bgm_folder = DUNGEON_IMAGES.get("bgm_path", "components/sounds/bgm")
+        sound_file = self.floor_info.get("sound")
+        if sound_file:
+            if "/" in sound_file or "\\" in sound_file:
+                play_bgm(sound_file)
+            else:
+                play_bgm(bgm_folder + "/" + sound_file)
+
+    def spawn_floor_items(self, player):
+        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, ITEM_DROP_RATES
+        from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave
+        floor = self.current_floor
+        scale_steps = (floor - 1) // FLOOR_ITEM_SCALE_EVERY
+        max_count = min(FLOOR_ITEM_SPAWN_MAX + scale_steps * FLOOR_ITEM_SCALE_ADD, FLOOR_ITEM_SCALE_LIMIT)
+        count = random.randint(FLOOR_ITEM_SPAWN_MIN, max_count)
+        
+        # ランクアップアイテムのチェック
+        cert_to_spawn = None
+        for q in player.active_quests:
+            if q.get("is_rank_up"):
+                # 現在のランクの最大階層なら証を出現させる
+                max_f = self.guild_system.get_max_floor(player.guild_rank)
+                if floor == max_f:
+                    cert_to_spawn = q["target_key"]
+                    break
+        
+        candidates = []
+        # Consumable
+        for key, data in CONSUMABLE_DATA.items():
+            if data.get("category", "common") == "common":
+                if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
+                    candidates.append((key, "consumable", data, ITEM_DROP_RATES.get(data.get("rarity", "F"), 0.1)))
+        # Weapon, Armor, Shield, Stave (default to common)
+        for key, data in WEAPON_DATA.items():
+            if data.get("category", "common") == "common":
+                if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
+                    candidates.append((key, "weapon", data, ITEM_DROP_RATES.get(data.get("rarity", "F"), 0.1)))
+        for key, data in ARMOR_DATA.items():
+            if data.get("category", "common") == "common":
+                if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
+                    candidates.append((key, "armor", data, ITEM_DROP_RATES.get(data.get("rarity", "F"), 0.1)))
+        for key, data in SHIELD_DATA.items():
+            if data.get("category", "common") == "common":
+                if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
+                    candidates.append((key, "shield", data, ITEM_DROP_RATES.get(data.get("rarity", "F"), 0.1)))
+        for key, data in STAVE_DATA.items():
+            if data.get("category", "common") == "common":
+                if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
+                    candidates.append((key, "stave", data, ITEM_DROP_RATES.get(data.get("rarity", "F"), 0.1)))
+        if not candidates: return
+        player_gx, player_gy = int((player.x + self.tile_size / 2) // self.tile_size), int((player.y + self.tile_size / 2) // self.tile_size)
+        floor_tiles = [(c, r) for r in range(self.map_height) for c in range(self.map_width) if self.map_data[r][c] == 1 and (abs(c - player_gx) > 4 or abs(r - player_gy) > 4)]
+        random.shuffle(floor_tiles)
+        placed = 0
+        for tile_pos in floor_tiles:
+            if placed >= count: break
+            weights = [c[3] for c in candidates]
+            chosen_key, chosen_type, chosen_data, _ = random.choices(candidates, weights=weights, k=1)[0]
+            px, py = tile_pos[0] * self.tile_size, tile_pos[1] * self.tile_size
+            if chosen_type == "weapon": item = DroppedWeapon(px, py, chosen_key, chosen_data)
+            elif chosen_type == "consumable": item = DroppedConsumable(px, py, chosen_key, chosen_data)
+            elif chosen_type == "armor": item = DroppedArmor(px, py, chosen_key, chosen_data)
+            elif chosen_type == "shield": item = DroppedShield(px, py, chosen_key, chosen_data)
+            elif chosen_type == "stave": item = DroppedStave(px, py, chosen_key, chosen_data)
+            else: continue
+            self.dropped_items.append(item)
+            placed += 1
+            
+        # 2. イベントアイテムの強制配置（カテゴリ: event かつ条件合致）
+        event_candidates = []
+        for key, data in CONSUMABLE_DATA.items():
+            if data.get("category") == "event":
+                # 階層条件
+                if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
+                    # ギルド証の場合はクエストが必要
+                    if key.startswith("guild_cert_"):
+                        is_needed = any(q.get("is_rank_up") and q.get("target_key") == key for q in player.active_quests)
+                        if not is_needed: continue
+                    
+                    # 重複チェック（所持品、床の上）
+                    if key not in player.items and not any(isinstance(di, DroppedConsumable) and di.item_key == key for di in self.dropped_items):
+                        event_candidates.append((key, data))
+                        
+        if event_candidates and floor_tiles:
+            for e_key, e_data in event_candidates:
+                # 空いているタイルを探す
+                for tile_pos in floor_tiles:
+                    # 既にアイテムがある場所を避ける
+                    if any(int(di.x//self.tile_size) == tile_pos[0] and int(di.y//self.tile_size) == tile_pos[1] for di in self.dropped_items):
+                        continue
+                    
+                    px, py = tile_pos[0] * self.tile_size, tile_pos[1] * self.tile_size
+                    item = DroppedConsumable(px, py, e_key, e_data)
+                    self.dropped_items.append(item)
+                    print(f"[Dungeon] Forced spawn of event item: {e_key} at {tile_pos}")
+                    break
+
+    def create_corridor(self, x1, x2, y1, y2, width=1):
+        for x in range(min(x1, x2), max(x1, x2) + 1):
+            for y in range(min(y1, y2), max(y1, y2) + 1):
+                for dw in range(width):
+                    tx, ty = (x + dw, y) if x1 == x2 else (x, y + dw)
+                    if 0 <= ty < self.map_height and 0 <= tx < self.map_width:
+                        if self.map_data[ty][tx] == 0: self.map_data[ty][tx] = 4
+                        if hasattr(self, "valid_floor_coords"):
+                            self.valid_floor_coords.add((tx, ty))
+
+    def _trim_to_valid_areas(self):
+        """有効な床エリア(valid_floor_coords)に含まれない床・通路タイルを削除します。"""
+        if not hasattr(self, "valid_floor_coords"): return
+        removed = 0
+        for y in range(self.map_height):
+            for x in range(self.map_width):
+                # 床(1)や通路(4,5,6)で、かつ有効エリアに含まれないものを壁(0)に戻す
+                if self.map_data[y][x] in [1, 4, 5, 6] and (x, y) not in self.valid_floor_coords:
+                    self.map_data[y][x] = 0
+                    removed += 1
+        if removed > 0:
+            print(f"[Dungeon] Trimmed {removed} artifact floor tiles.")
+
+    def _is_room(self, x, y):
+        if not (0 <= x < self.map_width and 0 <= y < self.map_height): return False
+        t = self.map_data[y][x]
+        return 1 <= t <= 3
+
+    def _is_corridor(self, x, y):
+        if not (0 <= x < self.map_width and 0 <= y < self.map_height): return False
+        t = self.map_data[y][x]
+        return 4 <= t <= 6
+    
+    def _convert_sandwiched_walls(self):
+        """上下を床に挟まれた壁（0）を床（1）に変換します。"""
+        to_floor = []
+        for y in range(1, self.map_height - 1):
+            for x in range(self.map_width):
+                if self.map_data[y][x] == 0:
+                    # 上下ともに床（ID > 0）なら、それは挟まれた壁
+                    if self.map_data[y-1][x] > 0 and self.map_data[y+1][x] > 0:
+                        to_floor.append((x, y))
+        
+        for x, y in to_floor:
+            self.map_data[y][x] = 1
+            if hasattr(self, "valid_floor_coords"):
+                self.valid_floor_coords.add((x, y))
+        
+        if to_floor:
+            print(f"[Dungeon] Converted {len(to_floor)} sandwiched walls to floor.")
+
+    def is_nw(self, x, y):
+        """指定した座標が「南側に床がある北壁」かどうかを判定します。"""
+        if not (0 <= x < self.map_width and 0 <= y < self.map_height): return False
+        return self.map_data[y][x] == 0 and y < self.map_height - 1 and self.map_data[y+1][x] > 0
+
+    def _get_wall_texture_key(self, x, y):
+        # 南側が床（ID > 0）である壁のみを「表示される壁」とする
+        if not self.is_nw(x, y):
+            return "wall_none"
+            
+        # 左右に壁があるか
+        w_l = (x > 0 and self.map_data[y][x-1] == 0)
+        w_r = (x < self.map_width - 1 and self.map_data[y][x+1] == 0)
+        # 独立した1マス幅なら wall_single
+        if not w_l and not w_r: return "wall_single"
+        return "wall_top"
+    def export_debug_map(self, player):
+        """現在のマップの状態をテキストファイルとして書き出します（デバッグ用）。"""
+        px, py = int(player.x // self.tile_size), int(player.y // self.tile_size)
+        lines = []
+        for y in range(self.map_height):
+            row_chars = []
+            for x in range(self.map_width):
+                char = "?"
+                tile = self.map_data[y][x]
+                
+                # プレイヤーの位置を最優先で表示
+                if x == px and y == py:
+                    char = "P"
+                elif tile == 1: char = "." # 床
+                elif tile == 2: char = "U" # 階段上
+                elif tile == 3: char = "D" # 階段下
+                elif tile in [4, 5, 6]: char = "C" # 通路
+                elif tile == 0:
+                    if self.is_nw(x, y): char = "@" # 許可された壁（縁）
+                    else: char = "#" # 許可されていない壁（背景）
+                
+                row_chars.append(char)
+            lines.append(" ".join(row_chars))
+        
+        try:
+            with open("debug_map.txt", "w", encoding="utf-8") as f:
+                f.write(f"Floor: {self.current_floor}\n")
+                f.write(f"Player Pos: ({px}, {py})\n")
+                f.write("-" * (self.map_width * 2) + "\n")
+                f.write("\n".join(lines))
+            print(f"[Debug] Map exported to debug_map.txt (Player at {px}, {py})")
+        except Exception as e:
+            print(f"[Debug] Failed to export map: {e}")
+
+    def _spawn_wall_obstacles(self, player):
+        """床の上にランダムに障害物（独立壁）を配置する。"""
+        from constants import (OBSTACLE_SPAWN_MIN, OBSTACLE_SPAWN_MAX, 
+                               OBSTACLE_SPAWN_SCALE_EVERY, OBSTACLE_SPAWN_SCALE_ADD, OBSTACLE_SPAWN_LIMIT)
+        scale = (self.current_floor - 1) // OBSTACLE_SPAWN_SCALE_EVERY * OBSTACLE_SPAWN_SCALE_ADD
+        count = random.randint(OBSTACLE_SPAWN_MIN, OBSTACLE_SPAWN_MAX) + scale
+        count = min(count, OBSTACLE_SPAWN_LIMIT)
+        floor_tiles = []
+        for y in range(1, self.map_height - 1):
+            for x in range(1, self.map_width - 1):
+                tile = self.map_data[y][x]
+                # 床タイル（ID 1）を対象にする
+                if tile == 1:
+                    # 階段(2,3)や通路(4,5,6)の隣には置かない（入り口を塞がない）
+                    neighbors = [self.map_data[y+dy][x+dx] for dy, dx in [(-1,0),(1,0),(0,-1),(0,1)]]
+                    if all(t not in [2, 3, 4, 5, 6] for t in neighbors):
+                        floor_tiles.append((x, y))
+        random.shuffle(floor_tiles)
+        placed = 0
+        px, py = int(player.x // self.tile_size), int(player.y // self.tile_size)
+        for tx, ty in floor_tiles:
+            if placed >= count: break
+            if abs(tx - px) <= 1 and abs(ty - py) <= 1: continue
+            self.map_data[ty][tx] = 0
+            if self.available_wall_variants:
+                self.wall_variants[ty][tx] = random.choice(self.available_wall_variants)
+            placed += 1
+        print(f"[Dungeon] Spawned {placed} wall obstacles (Floor {self.current_floor})")
+
+    def _remove_lone_walls(self):
+        """上下左右がすべて床（または通路）である孤立した壁を床に置き換える。"""
+        for y in range(1, self.map_height - 1):
+            for x in range(1, self.map_width - 1):
+                if self.map_data[y][x] == 0:
+                    is_lone = True
+                    for dy, dx in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                        if self.map_data[y+dy][x+dx] == 0:
+                            is_lone = False
+                            break
+                    if is_lone:
+                        self.map_data[y][x] = 1
+
+    def _convert_inner_walls_to_floors(self):
+        """上下左右がすべて可視領域（＝縁が出ない場所）である壁を床に置き換える。"""
+        def is_vis(tx, ty):
+            if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): return False
+            return self.map_data[ty][tx] > 0 or self.is_nw(tx, ty)
+        
+        while True:
+            to_floor = []
+            for y in range(1, self.map_height - 1):
+                for x in range(1, self.map_width - 1):
+                    if self.map_data[y][x] == 0:
+                        if all(is_vis(x+dx, y+dy) for dx, dy in [(-1,0),(1,0),(0,-1),(0,1)]):
+                            to_floor.append((x, y))
+            if not to_floor: break
+            for x, y in to_floor:
+                self.map_data[y][x] = 1
+
+    def _remove_thin_walls(self):
+        """周囲が空白（Void）に囲まれすぎている不自然な壁を床に変換する。"""
+        def is_void(tx, ty):
+            if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): return True
+            return self.map_data[ty][tx] == 0 and not self.is_nw(tx, ty)
+
+        while True:
+            to_floor = []
+            for y in range(1, self.map_height - 1):
+                for x in range(1, self.map_width - 1):
+                    if self.is_nw(x, y):
+                        # 上下左右の空白（Void）の数を数える
+                        void_neighbors = 0
+                        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                            if is_void(x+dx, y+dy):
+                                void_neighbors += 1
+                        
+                        # 3方向以上が空白（行き止まりのような突起）なら床にする
+                        if void_neighbors >= 3:
+                            to_floor.append((x, y))
+            if not to_floor: break
+            for x, y in to_floor:
+                self.map_data[y][x] = 1
+
+    def _add_floor_edges(self):
+        """床と北壁の外側のみに縁を配置します。"""
+        self.edges = []
+        edge_size = max(1, self.tile_size // 4)
+        base_tex = self.textures.get("wall_base")
+        if not base_tex:
+            base_tex = pygame.Surface((self.tile_size, self.tile_size), pygame.SRCALPHA)
+            base_tex.fill((120, 100, 80, 200))
+
+        # 影なし: 全ての縁でベーステクスチャの「一部」を切り取って使用
+        h_tex_base = base_tex.subsurface((0, 0, self.tile_size, edge_size)).copy()
+        corner_tex_base = base_tex.subsurface((0, 0, edge_size, edge_size)).copy()
+        side_tex = base_tex.subsurface((0, 0, edge_size, self.tile_size)).copy()
+
+        def is_vis(tx, ty):
+            if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): return False
+            return self.map_data[ty][tx] > 0 or self.is_nw(tx, ty)
+
+        for y in range(self.map_height):
+            for x in range(self.map_width):
+                # 1. 横方向の判定 (最優先)
+                if y < self.map_height - 1:
+                    # 下隣のタイル情報をチェック
+                    is_floor_below = (self.map_data[y+1][x] > 0)
+                    below_tex_key = self._get_wall_texture_key(x, y+1)
+                    # wall_none 以外の壁画像、または壁として判定されているなら「壁」とみなす
+                    is_wall_below = (not is_floor_below and below_tex_key != "wall_none")
+                    
+                    if is_wall_below:
+                        # 下が壁なら境界に縁を描く（影なし）
+                        self.edges.append({"x": x, "y": y, "img": h_tex_base, "ox": 0, "oy": self.tile_size - edge_size})
+                    elif not is_vis(x, y) and is_floor_below:
+                        # 下が床で、自分がVoidなら縁を描く（影なし）
+                        self.edges.append({"x": x, "y": y, "img": h_tex_base, "ox": 0, "oy": self.tile_size - edge_size})
+
+                # 上隣 (x, y-1) が表示対象の場合 (Void cell (x, y) の上端に描画)（影なし）
+                if y > 0 and not is_vis(x, y) and is_vis(x, y-1):
+                    self.edges.append({"x": x, "y": y, "img": pygame.transform.flip(h_tex_base, False, True), "ox": 0, "oy": 0})
+
+                # 2. 縦方向・角の判定 (Voidセルの内側のみ)
+                if not is_vis(x, y):
+                    # 縦方向 (影なしの基本テクスチャを強制)
+                    if x < self.map_width - 1 and is_vis(x+1, y):
+                        self.edges.append({"x": x, "y": y, "img": side_tex, "ox": self.tile_size - edge_size, "oy": 0})
+                    if x > 0 and is_vis(x-1, y):
+                        self.edges.append({"x": x, "y": y, "img": pygame.transform.flip(side_tex, True, False), "ox": 0, "oy": 0})
+                    
+                    # 角の処理
+                    for dx, dy in [(1, 1), (-1, 1), (1, -1), (-1, -1)]:
+                        tx, ty = x + dx, y + dy
+                        if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): continue
+                        if not is_vis(tx, ty): continue
+                        
+                        # 通常の角（両隣がVoid）
+                        is_normal_corner = not is_vis(x+dx, y) and not is_vis(x, y+dy)
+                        # 壁との接合部（床にも触れている場合）
+                        is_wall_junction = False
+                        below_key = self._get_wall_texture_key(tx, ty)
+                        is_wall_diag = (below_key in ["wall_top", "wall_single"])
+                        
+                        if is_wall_diag:
+                            # 斜めが壁 かつ 隣接タイルのどちらかが床（map_data > 0）ならジャンクション
+                            adj_x_is_floor = (0 <= x+dx < self.map_width) and self.map_data[y][x+dx] > 0
+                            adj_y_is_floor = (0 <= y+dy < self.map_height) and self.map_data[y+dy][x] > 0
+                            if adj_x_is_floor or adj_y_is_floor:
+                                is_wall_junction = True
+                        
+                        if is_normal_corner or is_wall_junction:
+                            # 影なし: 全角でベーステクスチャ
+                            ox = self.tile_size - edge_size if dx > 0 else 0
+                            oy = self.tile_size - edge_size if dy > 0 else 0
+                            self.edges.append({"x": x, "y": y, "img": corner_tex_base, "ox": ox, "oy": oy})
+
+    def _create_placeholder_textures(self):
+        size = self.tile_size
+        textures = {}
+        floor = pygame.Surface((size, size))
+        floor.fill((139, 115, 85))
+        pygame.draw.line(floor, (100, 80, 60), (0, size//2), (size, size//2), 2)
+        pygame.draw.line(floor, (100, 80, 60), (size//2, 0), (size//2, size//2), 2)
+        pygame.draw.line(floor, (100, 80, 60), (size//4, size//2), (size//4, size), 2)
+        pygame.draw.line(floor, (100, 80, 60), (size*3//4, size//2), (size*3//4, size), 2)
+        textures["floor"] = floor
+        corridor = pygame.Surface((size, size))
+        corridor.fill((120, 100, 75))
+        pygame.draw.line(corridor, (90, 70, 50), (size//2, 0), (size//2, size), 2)
+        textures["corridor"] = corridor
+        wall_top = pygame.Surface((size, size))
+        wall_top.fill((180, 80, 80))
+        pygame.draw.rect(wall_top, (120, 50, 50), (0, 0, size, size), 4)
+        textures["wall_top"] = wall_top
+        from constants import DUNGEON_VOID_COLOR
+        wall_none = pygame.Surface((size, size))
+        wall_none.fill(DUNGEON_VOID_COLOR)
+        textures["wall_none"] = wall_none
+        stairs_up = pygame.Surface((size, size))
+        stairs_up.fill((139, 115, 85))
+        pygame.draw.rect(stairs_up, (180, 100, 255), (size//6, size//6, size*2//3, size*2//3))
+        textures["stairs_up"] = stairs_up
+        stairs_down = pygame.Surface((size, size))
+        stairs_down.fill((139, 115, 85))
+        pygame.draw.rect(stairs_down, (100, 0, 150), (size//6, size//6, size*2//3, size*2//3))
+        textures["stairs_down"] = stairs_down
+        wall_base = pygame.Surface((size, size), pygame.SRCALPHA)
+        wall_base.fill((100, 80, 60, 200))
+        textures["wall_base"] = wall_base
+        return textures
+
+    def refresh_shop_stock(self):
+        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, ITEM_DROP_RATES
+        
+        def should_spawn(v):
+            if not v.get("shop_buyable", True): return False
+            rarity = v.get("rarity", "F")
+            # 出現率をレアリティから算出（ドロップ率の約5倍をショップ出現率とする）
+            rate = ITEM_DROP_RATES.get(rarity, 0.1) * 5
+            return random.random() < rate
+
+        eq_candidates = []
+        for k, v in WEAPON_DATA.items():
+            if should_spawn(v):
+                eq_candidates.append((k, "weapon", v))
+        for k, v in ARMOR_DATA.items():
+            if should_spawn(v):
+                eq_candidates.append((k, "armor", v))
+        for k, v in SHIELD_DATA.items():
+            if should_spawn(v):
+                eq_candidates.append((k, "shield", v))
+        for k, v in STAVE_DATA.items():
+            if should_spawn(v):
+                eq_candidates.append((k, "stave", v))
+        random.shuffle(eq_candidates)
+        self.weapon_shop_stock = [{"key": k, "type": t, "name": v["name"], "price": v["price"], "count": random.randint(1, 10)} for k, t, v in eq_candidates[:20]]
+        
+        item_candidates = []
+        for k, v in CONSUMABLE_DATA.items():
+            if should_spawn(v):
+                item_candidates.append((k, "consumable", v))
+        random.shuffle(item_candidates)
+        self.item_shop_stock = [{"key": k, "type": t, "name": v["name"], "price": v["price"], "count": random.randint(1, 10)} for k, t, v in item_candidates[:20]]
+
+    def spawn_traps(self, player):
+        from constants import TRAP_SPAWN_MIN, TRAP_SPAWN_MAX, TRAP_SPAWN_SCALE_EVERY, TRAP_SPAWN_SCALE_ADD, TRAP_SPAWN_SCALE_LIMIT, TRAP_DATA
+        from components.sprites.trap import Trap
+        if self.current_floor == 0: return
+        scale = (self.current_floor - 1) // TRAP_SPAWN_SCALE_EVERY * TRAP_SPAWN_SCALE_ADD
+        max_traps = min(TRAP_SPAWN_SCALE_LIMIT, TRAP_SPAWN_MAX + scale)
+        target_count = random.randint(TRAP_SPAWN_MIN, max_traps)
+        px, py = int((player.x + player.width / 2) // self.tile_size), int((player.y + player.height / 2) // self.tile_size)
+        trap_types = list(TRAP_DATA.keys())
+        weights = [data["weight"] for data in TRAP_DATA.values()]
+        placed_count = 0
+        attempts = 0
+        while placed_count < target_count and attempts < 100:
+            attempts += 1
+            if not self.room_rects: break
+            rx, ry, rw, rh = random.choice(self.room_rects)
+            tx, ty = random.randint(rx, rx + rw - 1), random.randint(ry, ry + rh - 1)
+            if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): continue
+            if self.map_data[ty][tx] != 1 and self.map_data[ty][tx] not in [4, 5, 6]: continue
+            if abs(tx - px) <= 2 and abs(ty - py) <= 2: continue
+            if any(t.x == tx and t.y == ty for t in self.traps): continue
+            t_type = random.choices(trap_types, weights=weights, k=1)[0]
+            self.traps.append(Trap(tx, ty, t_type))
+            placed_count += 1
+
+    def trigger_shake(self, amount, duration):
+        self.shake_amount = amount
+        self.shake_timer = duration
+
+    def update(self, dialog=None):
+        """ダンジョン全体の更新（タイマーや演出）"""
+        # モンスター氾濫演出シーケンスの更新
+        if getattr(self, "overflow_sequence_step", 0) > 0 and dialog:
+            self._update_overflow_sequence(dialog)
+
+        # 画面揺らしの更新
+        if self.shake_timer > 0:
+            self.shake_timer -= 1
+            self.shake_offset = (random.randint(-self.shake_amount, self.shake_amount), random.randint(-self.shake_amount, self.shake_amount))
+            if self.shake_timer <= 0:
+                self.shake_amount = 0
+                self.shake_offset = (0, 0)
+        
+        # [NEW] 落とし穴の落下待ち処理
+        if self.player and self.player.is_falling and self.player.falling_timer <= 0:
+            self.player.is_falling = False
+            self.next_dungeon = warp_to_floor(self.current_floor + 1, self.player)
+        
+        # [NEW] フラッシュタイマーの更新
+        if self.flash_timer > 0:
+            self.flash_timer -= 1
+
+        for effect in self.magic_effects[:]:
+            effect.update()
+            if effect.is_done():
+                self.magic_effects.remove(effect)
+        
+        # [NEW] NPCのアニメーション更新
+        for npc in self.npcs:
+            npc.update_animation()
+
+    def check_traps(self, player, dialog):
+        if getattr(player, "is_moving", False): return self
+        px, py = int((player.x + player.width / 2) // self.tile_size), int((player.y + player.height / 2) // self.tile_size)
+        for trap in self.traps[:]:
+            if trap.x == px and trap.y == py and not trap.is_triggered:
+                # ランクチェック (落とし穴の場合)
+                if trap.type == "pitfall":
+                    target_floor = self.current_floor + 1
+                    guild = GuildSystem()
+                    max_f = guild.get_max_floor(player.guild_point)
+                    if target_floor > max_f:
+                        req_rank = guild.get_required_rank_for_floor(target_floor)
+                        if dialog:
+                            dialog.text = Text.UI.RANK_LIMIT_REACHED.format(rank=req_rank)
+                            dialog.is_active = True
+                        return self
+
+                msg = trap.trigger(player, self, dialog)
+                if dialog:
+                    # すでにメッセージがある場合は改行して追加
+                    if dialog.is_active:
+                        dialog.text += "\n" + msg
+                    else:
+                        dialog.text = msg
+                        dialog.is_active = True
+                if trap.type == "mine":
+                    self.traps.remove(trap)
+                    self.trigger_shake(15, 30)
+                elif trap.type == "pitfall":
+                    self.trigger_shake(8, 20)
+                    # 以前はここで即座に warp_to_floor していたが、
+                    # Trap.trigger -> player.start_falling が呼ばれるので、
+                    # Dungeon.update 側でタイマー終了を待ってから遷移するように変更
+                    pass 
+        return self
+
+    def draw(self, screen, camera_x, camera_y):
+        sw, sh = screen.get_size()
+        sx, ex = max(0, int(camera_x // self.tile_size)), min(self.map_width, int((camera_x + sw) // self.tile_size) + 1)
+        sy, ey = max(0, int(camera_y // self.tile_size)), min(self.map_height, int((camera_y + sh) // self.tile_size) + 1)
+        for y in range(sy, ey):
+            for x in range(sx, ex):
+                dx, dy = (x * self.tile_size) - camera_x, (y * self.tile_size) - camera_y
+                tile = self.map_data[y][x]
+                
+                fk = "wall_none"
+                if tile > 0:
+                    # 床、階段、通路
+                    if tile == 2: fk = "stairs_up"
+                    elif tile == 3: fk = "stairs_down"
+                    elif 4 <= tile <= 6: fk = "corridor"
+                    else: fk = self.floor_variants[y][x]
+                else:
+                    # 壁(ID 0)
+                    wall_type = self._get_wall_texture_key(x, y)
+                    if wall_type == "wall_top":
+                        fk = self.wall_top_variants[y][x]
+                    elif wall_type == "wall_single":
+                        fk = self.wall_variants[y][x]
+                    else:
+                        fk = self.wall_none_variants[y][x]
+                
+                img = self.textures.get(fk, self.textures.get("wall_none"))
+                if img:
+                    # [NEW] 床系、または1マスの壁（壺や樽などの障害物）の場合はベースレイヤーを描画する
+                    is_floor_type = (tile > 0)
+                    is_obstacle = (tile == 0 and wall_type == "wall_single")
+                    
+                    if is_floor_type or is_obstacle:
+                        # 階層生成時にランダム決定したベース床を描画
+                        base_fk = self.base_floor_variants[y][x]
+                        base_img = self.textures.get(base_fk)
+                        # 今描画しようとしているタイル自体が「床系(available_floor_variants)」でない場合のみ、
+                        # 背景としてベース床を敷く（これで模様の混ざりを防ぐ）
+                        if base_img and base_fk != fk and fk not in self.available_floor_variants:
+                             screen.blit(base_img, (dx, dy))
+                    
+                    screen.blit(img, (dx, dy))
+        for e in self.edges:
+            dx, dy = (e["x"] * self.tile_size) + e["ox"] - camera_x, (e["y"] * self.tile_size) + e["oy"] - camera_y
+            if -self.tile_size <= dx <= sw and -self.tile_size <= dy <= sh: screen.blit(e["img"], (dx, dy))
+        for t in self.traps: t.draw(screen, camera_x, camera_y, self.tile_size)
+        for f in self.magic_effects: f.draw(screen, camera_x, camera_y)
+        for i in self.dropped_items:
+            if camera_x - self.tile_size <= i.x <= camera_x + sw and camera_y - self.tile_size <= i.y <= camera_y + sh: i.draw(screen, camera_x, camera_y)
+        for n in self.npcs:
+            if camera_x - n.width <= n.x <= camera_x + sw and camera_y - n.height <= n.y <= camera_y + sh: n.draw(screen, camera_x, camera_y)
+        
+        # デバッグ: 氾濫トリガー位置の可視化（スイッチが配置されるので不要）
+        pass
+
+        # [NEW] フラッシュ（クリティカル演出）の描画
+        if self.flash_timer > 0:
+            # 最初の数フレームは真っ白、徐々に透明にする
+            alpha = min(255, self.flash_timer * 30)
+            flash_surf = pygame.Surface((sw, sh))
+            flash_surf.fill((255, 255, 255))
+            flash_surf.set_alpha(alpha)
+            screen.blit(flash_surf, (0, 0))
+        for e in self.enemies:
+            if camera_x - e.width <= e.x <= camera_x + sw and camera_y - e.height <= e.y <= camera_y + sh: e.draw(screen, camera_x, camera_y)
+
+    def get_current_floor_level(self): return self.current_floor
+
+    def tick_respawn(self, player):
+        if is_paused() or self.current_floor == 0: return
+        now = pygame.time.get_ticks()
+        scale = (self.current_floor - 1) // ENEMY_RESPAWN_SCALE_EVERY * ENEMY_RESPAWN_SCALE_SUB
+        if now - self.last_respawn_ticks >= max(ENEMY_RESPAWN_MIN_INTERVAL, ENEMY_RESPAWN_INTERVAL - scale) * 1000:
+            self.last_respawn_ticks = now
+            Enemy.spawn_one(self, player)
+
+    def check_stairs(self, player, confirm_dialog, dialog=None):
+        if self.next_dungeon: return self.next_dungeon
+        if is_paused() or getattr(player, "is_moving", False): return self
+        tx, ty = int((player.x + player.width / 2) // self.tile_size), int((player.y + player.height / 2) // self.tile_size)
+        
+        # ワープ直後の地点にいる場合は、一度動くまで反応させない
+        if hasattr(self, "spawn_pos") and self.spawn_pos == (tx, ty):
+            # まだその場から一歩も動いていない（prevと同じ）ならスキップ
+            if player.x == player.prev_x and player.y == player.prev_y:
+                return self
+            else:
+                # 一度でも動いたら制限解除
+                self.spawn_pos = (-1, -1)
+
+        if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): return self
+        ct = self.map_data[ty][tx]
+        if ct == 3:
+            # ランクチェック
+            target_floor = self.current_floor + 1
+            guild = GuildSystem()
+            max_f = guild.get_max_floor(player.guild_point)
+            if target_floor > max_f:
+                req_rank = guild.get_required_rank_for_floor(target_floor)
+                if dialog:
+                    dialog.text = Text.UI.RANK_LIMIT_REACHED.format(rank=req_rank)
+                    dialog.is_active = True
+                
+                # 階段の上で止まらないように押し戻す
+                player.x, player.y = player.prev_x, player.prev_y
+                player.target_x, player.target_y = player.x, player.y
+                return self
+
+            confirm_dialog.text = Text.UI.CONFIRM_DUNGEON_START if self.current_floor == 0 else Text.UI.CONFIRM_GO_DEEPER
+            confirm_dialog.on_yes = lambda: setattr(self, "next_dungeon", warp_to_floor(self.current_floor + 1, player, debug_overflow=self.debug_overflow))
+            confirm_dialog.on_no = lambda: (setattr(player, "x", player.prev_x), setattr(player, "y", player.prev_y))
+            confirm_dialog.is_active = True
+        elif ct == 2 and self.current_floor >= 1:
+            confirm_dialog.text = Text.UI.CONFIRM_RETURN_VILLAGE if self.current_floor == 1 else Text.UI.CONFIRM_GO_UPPER
+            confirm_dialog.on_yes = lambda: setattr(self, "next_dungeon", warp_to_floor(self.current_floor - 1, player, debug_overflow=self.debug_overflow))
+            confirm_dialog.on_no = lambda: (setattr(player, "x", player.prev_x), setattr(player, "y", player.prev_y))
+            confirm_dialog.is_active = True
+        return self

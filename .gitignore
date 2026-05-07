@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Save Data
+components/data/savefile/*.json
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store

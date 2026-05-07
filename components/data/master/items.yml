@@ -1,0 +1,340 @@
+# ==============================================================================
+# アイテムデータ定義 (items.yml)
+# ==============================================================================
+# CONSUMABLE_DATA, STAVE_DATA, LANTERN_DATA の各種アイテムを定義します。
+# 
+# 【各パラメータの説明】
+# - name            : ゲーム内で表示されるアイテム名
+# - effect / effect_type : アイテムの効果（heal_hp, antidote, fire など）
+# - heal_amount     : HPの回復量 (効果が回復の場合)
+# - recharge_amount : 杖の使用回数回復量
+# - price           : ショップでの購入価格 (売値はこの半額)
+# - min_rank        : 対象となるギルドランク基準（自動で出現階層が算出されます）
+# - rarity          : ドロップ率・出現率 (1〜8)
+#                     1(20%), 2(15%), 3(10%), 4(7.5%), 5(5%), 6(3.5%), 7(0.2%), 8(0.1%)
+# - image_path      : インベントリ等で表示するアイコン画像
+# - sound           : 使用時の効果音
+# - shop_buyable    : お店に商品として並ぶか (true/false)
+# - max_stack       : インベントリで1枠に重なる最大数
+# - category        : 内部カテゴリ (common, event など)
+# - describe        : UIで表示される詳細説明文
+# ==============================================================================
+
+CONSUMABLE_DATA:
+  return_wing:
+    name: 帰還の道標
+    effect: warp_home
+    price: 5000
+    min_rank: G
+    rarity: 7
+    image_path: components/pictures/icon/item.png
+    sound: components/sounds/sfx/stairs.wav
+    shop_buyable: true
+    max_stack: 1
+    describe: 使うと一瞬で村に帰還できる魔法の羽。非常に高価だが、命を救う最後の手段になる。
+  revive_amulet:
+    name: 復活のお守り
+    effect: revive
+    price: 3000
+    min_rank: D
+    rarity: 6
+    image_path: components/pictures/icon/revive_amulet.png
+    sound: components/sounds/sfx/recharge.wav
+    shop_buyable: true
+    max_stack: 1
+    describe: 不思議な魔力が込められたお守り。所持していると、力尽きた時に一度だけHP半分で復活できる。
+  hp_potion:
+    name: ヒールポーション
+    effect: heal_hp
+    heal_amount: 40
+    price: 50
+    min_rank: F
+    rarity: 1
+    image_path: components/pictures/icon/hp_potion.png
+    sound: components/sounds/sfx/drink.wav
+    shop_buyable: true
+    category: common
+    max_stack: 3
+    describe: 傷を癒やす一般的な薬草の煎じ薬。
+  antidote_potion:
+    name: 毒消薬
+    effect: antidote
+    price: 100
+    min_rank: F
+    rarity: 1
+    image_path: components/pictures/icon/hp_potion.png
+    sound: components/sounds/sfx/drink.wav
+    shop_buyable: true
+    max_stack: 10
+    describe: 解毒作用を持つ薬。毒状態を回復する。
+    max_stack: 3
+  hi_potion:
+    name: ハイポーション
+    effect: heal_hp
+    heal_amount: 70
+    price: 200
+    min_rank: F
+    rarity: 3
+    image_path: components/pictures/icon/hi_potion.png
+    sound: components/sounds/sfx/drink.wav
+    shop_buyable: true
+    category: common
+    max_stack: 10
+    describe: 高度な精製技術で作られた強力な回復薬。
+    max_stack: 3
+  magic_crystal:
+    name: 魔力の水晶
+    effect: recharge
+    recharge_amount: 5
+    price: 1000
+    min_rank: C
+    rarity: 4
+    image_path: components/pictures/icon/magic_crystal.png
+    sound: components/sounds/sfx/recharge.wav
+    max_stack: 5
+    shop_buyable: true
+    describe: 神秘的な光を放つ水晶。使い古した杖の魔力を回復させることができる。
+  copper_ore:
+    name: 銅の鉱石
+    effect: material
+    enhance_bonus: 1
+    price: 100
+    min_rank: F
+    rarity: 4
+    image_path: components/pictures/icon/copper_ore.png
+    max_stack: 99
+    shop_buyable: true
+    describe: どこにでもある一般的な銅の鉱石。鍛冶屋で装備の強化に利用できる。
+  iron_ore:
+    name: 鉄の鉱石
+    effect: material
+    enhance_bonus: 1
+    price: 300
+    min_rank: D
+    rarity: 4
+    image_path: components/pictures/icon/iron_ore.png
+    max_stack: 99
+    shop_buyable: true
+    describe: 硬度の高い鉄の鉱石。装備をより強力に叩き直すための必需品。
+  gold_ore:
+    name: 金の鉱石
+    effect: material
+    enhance_bonus: 2
+    price: 1000
+    min_rank: B
+    rarity: 5
+    image_path: components/pictures/icon/gold_ore.png
+    max_stack: 99
+    shop_buyable: true
+    describe: まばゆい輝きを放つ金の鉱石。非常に価値が高く、武具の性能を大幅に引き出す。
+  basic_lantern:
+    name: カンテラ
+    effect: lantern
+    lantern_key: basic
+    price: 300
+    min_rank: F
+    rarity: 1
+    image_path: components/pictures/icon/basic_lantern.png
+    shop_buyable: true
+    describe: 冒険者の必需品。周囲の闇を照らし出し、視界を確保する。
+  luxury_lantern:
+    name: 上等なカンテラ
+    effect: lantern
+    lantern_key: luxury
+    price: 2000
+    min_rank: B
+    rarity: 3
+    image_path: components/pictures/icon/luxury_lantern.png
+    shop_buyable: true
+    describe: 精巧な細工が施された高級なカンテラ。広範囲を明るく照らし続けることができる。
+  guild_cert_e:
+    name: E級ギルド証
+    effect: none
+    price: 0
+    min_rank: G
+    rarity: 1
+    category: event
+    image_path: components/pictures/icon/item.png
+    shop_buyable: false
+    describe: E級冒険者の証。ギルドに認められた駆け出し冒険者の象徴。
+  guild_cert_d:
+    name: D級ギルド証
+    effect: none
+    price: 0
+    min_rank: G
+    rarity: 1
+    category: event
+    image_path: components/pictures/icon/item.png
+    shop_buyable: false
+    describe: D級冒険者の証。一通りの経験を積んだ冒険者として認められた証。
+  guild_cert_c:
+    name: C級ギルド証
+    effect: none
+    price: 0
+    min_rank: G
+    rarity: 1
+    category: event
+    image_path: components/pictures/icon/item.png
+    shop_buyable: false
+    describe: C級冒険者の証。中堅冒険者として、より危険な依頼への参加が許される。
+  guild_cert_b:
+    name: B級ギルド証
+    effect: none
+    price: 0
+    min_rank: G
+    rarity: 1
+    category: event
+    image_path: components/pictures/icon/item.png
+    shop_buyable: false
+    describe: B級冒険者の証。熟練の冒険者のみが手にできる栄誉ある証。
+  guild_cert_a:
+    name: A級ギルド証
+    effect: none
+    price: 0
+    min_rank: G
+    rarity: 1
+    category: event
+    image_path: components/pictures/icon/item.png
+    shop_buyable: false
+    describe: 'A級冒険者の証。一流の証であり、多くの冒険者の憧れの大。 '
+  guild_cert_s:
+    name: S級ギルド証
+    effect: none
+    price: 0
+    min_rank: G
+    rarity: 1
+    category: event
+    image_path: components/pictures/icon/item.png
+    shop_buyable: false
+    describe: S級冒険者の証。英雄に等しい実力を持つ者だけに授与される。
+  guild_cert_ss:
+    name: SS級ギルド証
+    effect: none
+    price: 0
+    min_rank: G
+    rarity: 1
+    category: event
+    image_path: components/pictures/icon/item.png
+    shop_buyable: false
+    describe: SS級冒険者の証。伝説に名を刻む、至高の冒険者の証。
+  adventurer_proof:
+    name: 冒険者の証
+    effect: none
+    price: 0
+    min_rank: "-"
+    rarity: 1
+    category: event
+    image_path: components/pictures/icon/item.png
+    shop_buyable: false
+    min_floor: 5
+    max_floor: 5
+    describe: ギルドへの正式加入を認められるための証。これを持ち帰れば一人前の冒険者だ。
+  fathers_keepsake:
+    name: 父の遺品
+    effect: none
+    price: 0
+    min_rank: G
+    rarity: 1
+    category: event
+    image_path: components/pictures/icon/item.png
+    shop_buyable: false
+    min_floor: 99
+    max_floor: 99
+    describe: 父が遺した大切な品。かつての名冒険者だった父の記憶が刻まれている。
+STAVE_DATA:
+  knockback_stave:
+    name: 吹き飛ばしの杖
+    effect_type: knockback
+    min_rank: F
+    rarity: 1
+    price: 800
+    charges: 5
+    sound: components/sounds/sfx/knockback.wav
+    effect_color:
+    - 200
+    - 200
+    - 255
+    max_distance: 10
+    shop_buyable: true
+    describe: 前方の敵を激しく弾き飛ばす魔法の杖。囲まれた時の脱出に役立つ。
+  fire_stave:
+    name: 火炎の杖
+    effect_type: fire
+    min_rank: F
+    rarity: 1
+    price: 1200
+    charges: 5
+    sound: components/sounds/sfx/fire.wav
+    effect_color:
+    - 255
+    - 100
+    - 0
+    damage_mult: 1.5
+    shop_buyable: true
+    describe: 燃え盛る火炎を放つ魔法の杖。遠距離から敵に大ダメージを与える。
+  heal_stave:
+    name: 回復の杖
+    effect_type: heal
+    min_rank: F
+    rarity: 1
+    price: 1000
+    charges: 5
+    sound: components/sounds/sfx/heal.wav
+    effect_color:
+    - 100
+    - 255
+    - 100
+    heal_ratio: 0.5
+    shop_buyable: true
+    describe: 癒やしの光を放つ魔法の杖。自分や仲間の傷を癒やすことができる。
+  invincible_stave:
+    name: 無敵の杖
+    effect_type: invincible
+    min_rank: S
+    rarity: 7
+    price: 3000
+    charges: 5
+    sound: components/sounds/sfx/invincible.wav
+    effect_color:
+    - 255
+    - 255
+    - 150
+    duration_turns: 5
+    shop_buyable: false
+    describe: 一時的にあらゆる攻撃を無効化する聖なる杖。ここぞという時の切り札。
+  light_stave:
+    name: 燈の杖
+    effect_type: light_all
+    min_rank: F
+    rarity: 1
+    price: 1500
+    charges: 5
+    sound: components/sounds/sfx/light.wav
+    effect_color:
+    - 255
+    - 255
+    - 200
+    shop_buyable: true
+    describe: フロア全体を一瞬で明るく照らす魔法の杖。隠れた罠や敵を暴き出す。
+LANTERN_DATA:
+  none:
+    name: 古いカンテラ
+    radius: 1
+    fade_radius: 2
+    price: 0
+    image_path: components/pictures/icon/old_lantern.png
+    describe: ボロボロで暗い古いカンテラ。最低限の明かりしか得られない。
+  basic:
+    name: カンテラ
+    radius: 2
+    fade_radius: 5
+    price: 300
+    image_path: components/pictures/icon/basic_lantern.png
+    describe: 冒険者の必需品。周囲の闇を照らし出し、視界を確保する。
+  luxury:
+    name: 上等なカンテラ
+    radius: 5
+    fade_radius: 8
+    price: 2000
+    image_path: components/pictures/icon/luxury_lantern.png
+    describe: 精巧な細工が施された高級なカンテラ。広範囲を明るく照らし続けることができる。

@@ -1,0 +1,224 @@
+# ==============================================================================
+# 障害物データ (obstacles.yml)
+# ==============================================================================
+# 【各パラメータの説明】
+# - name          : ゲーム内に表示される名前。
+# - rank          : 強さランク (F〜SS)。出現階層の自動計算に使用されます。
+# - hp            : 耐久力。0になると破壊されます。playerの攻撃力の倍数を設定します。
+# - defense       : 防御力。ダメージからこの値が引かれます。
+# - evasion       : 回避率。攻撃を避ける確率。通常は 0。
+# - crit_rate     : 会心率（0.0 〜 1.0）。障害物の場合は通常 0.0。
+# - reward_gold   : 破壊（クエスト対象時）の基本報酬額。
+# - exp           : 破壊時に得られる経験値。
+# - min_floor     : 出現開始階。nullの場合はrankから自動計算。
+# - max_floor     : 出現終了階。nullの場合はrankから自動計算。
+# - max_concurrent: その階に同時に存在できる最大数。
+# - max_spawns    : その階で合計で出現する最大数。
+# - drops         : 破壊時に落とすアイテムのリスト (itemとrateを指定)。
+# - image_path    : 画像ファイルへのパス。
+# - image_scale   : 表示サイズのスケーリング (1.0 = 標準)。
+# ==============================================================================
+
+wood_barrel:
+  name: 樽
+  min_rank: "F"
+  rarity: 1
+  hp: 2
+  defense: 0
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 50
+  min_floor: null
+  max_floor: null
+  max_concurrent: 2
+  max_spawns: 2
+  drops:
+  - item: hp_potion
+    rate: 0.1
+  image_path: components/pictures/obstacles/barrel.png
+  image_scale: 0.8
+
+crate:
+  name: 木箱
+  min_rank: "F"
+  rarity: 1
+  hp: 2
+  defense: 0
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 60
+  min_floor: null
+  max_floor: null
+  max_concurrent: 4
+  max_spawns: 3
+  drops:
+  - item: hp_potion
+    rate: 0.4
+  image_path: components/pictures/obstacles/crate.png
+  image_scale: 0.8
+
+pot:
+  name: 壺
+  min_rank: "F"
+  rarity: 1
+  hp: 1
+  defense: 0
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 40
+  min_floor: null
+  max_floor: null
+  max_concurrent: 5
+  max_spawns: 10
+  drops:
+  - item: gold
+    rate: 0.6
+  image_path: components/pictures/obstacles/pot.png
+  image_scale: 1.0
+
+rubble:
+  name: 瓦礫
+  min_rank: "F"
+  rarity: 1
+  hp: 3
+  defense: 0
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 80
+  min_floor: null
+  max_floor: null
+  image_path: components/pictures/obstacles/rubble.png
+  image_scale: 1.0
+
+well:
+  name: 井戸
+  min_rank: "B"
+  rarity: 5
+  hp: 5
+  defense: 50
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 1500
+  min_floor: null
+  max_floor: null
+  max_concurrent: 1
+  max_spawns: 1
+  image_path: components/pictures/obstacles/well.png
+  image_scale: 1.2
+
+skeleton:
+  name: 骸骨
+  min_rank: "E"
+  rarity: 2
+  hp: 1
+  defense: 0
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 150
+  min_floor: null
+  max_floor: null
+  image_path: components/pictures/obstacles/skeleton.png
+  image_scale: 0.9
+
+crystal:
+  name: クリスタル
+  min_rank: "E"
+  rarity: 2
+  hp: 4
+  defense: 20
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 350
+  min_floor: null
+  max_floor: null
+  max_concurrent: 2
+  max_spawns: 2
+  drops:
+  - item: gold
+    rate: 1.0
+  image_path: components/pictures/obstacles/crystal.png
+  image_scale: 0.9
+
+sword_stuck:
+  name: 刺さった剣
+  min_rank: "E"
+  rarity: 2
+  hp: 2
+  defense: 0
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 250
+  min_floor: null
+  max_floor: null
+  max_concurrent: 1
+  max_spawns: 1
+  drops:
+  - item: iron_sword
+    rate: 0.2
+  image_path: components/pictures/obstacles/sword_stuck.png
+  image_scale: 0.9
+
+web:
+  name: 蜘蛛の巣
+  min_rank: "E"
+  rarity: 2
+  hp: 1
+  defense: 0
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 100
+  min_floor: null
+  max_floor: null
+  image_path: components/pictures/obstacles/web.png
+  image_scale: 1.0
+
+stained_armor_stand:
+  name: 汚れた鎧立て
+  min_rank: "D"
+  rarity: 3
+  hp: 3
+  defense: 10
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 450
+  min_floor: null
+  max_floor: null
+  max_concurrent: 1
+  max_spawns: 2
+  drops:
+  - item: adventurers_clothes
+    rate: 0.1
+  image_path: components/pictures/obstacles/stained_armor_stand.png
+  image_scale: 1.0
+
+broken_pillar:
+  name: 壊れた柱
+  min_rank: "D"
+  rarity: 3
+  hp: 4
+  defense: 5
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 500
+  min_floor: null
+  max_floor: null
+  max_concurrent: 2
+  max_spawns: 3
+  image_path: components/pictures/obstacles/broken_pillar.png
+  image_scale: 1.0
+
+statue:
+  name: 石像
+  min_rank: "C"
+  rarity: 4
+  hp: 5
+  defense: 30
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 800
+  min_floor: null
+  max_floor: null
+  max_concurrent: 1
+  max_spawns: 1
+  image_path: components/pictures/obstacles/statue.png
+  image_scale: 1.1
