@@ -1668,12 +1668,9 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             shop_dialog.open_shop("道具屋", dungeon.item_shop_stock)
                                             return
                                     elif npc.name == "大魔導士":
-                                        shop_dialog = kwargs.get("shop_dialog")
-                                        if shop_dialog and dungeon:
-                                            dialog.text = "魔法の杖が必要かな？ワシが秘蔵の品を分けてやろう。"
-                                            dialog.is_active = True
-                                            shop_dialog.open_shop("魔法屋", dungeon.magic_shop_stock)
-                                            return
+                                        dialog.text = "フォッフォッフォ、お主、なかなか良い目をしておるな。修行に励むが良いぞ。"
+                                        dialog.is_active = True
+                                        return
                                     elif npc.name == "商人":
                                         shop_dialog = kwargs.get("shop_dialog")
                                         if shop_dialog:
