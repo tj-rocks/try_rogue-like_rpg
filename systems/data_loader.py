@@ -193,3 +193,7 @@ def get_normalized_item_data(floor_map):
         apply_rank_floor_logic(d, floor_map)
         
     return consumables, staves, lanterns
+
+def get_story_data():
+    """オープニング・エンディングなどのストーリーテキストを読み込む"""
+    return load_master_data("story.yml")
