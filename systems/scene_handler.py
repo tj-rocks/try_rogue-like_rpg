@@ -146,8 +146,7 @@ def handle_title(screen, events, game_state, title_bg, has_save, start_new_game_
                     if has_save:
                         continue_game_func()
                 else:
-                    from systems.game_state import game_state as gs
-                    if gs["opening_seen"]:
+                    if game_state.get("opening_seen"):
                         start_new_game_func()
                     else:
                         game_state["opening_index"] = 0

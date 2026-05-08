@@ -28,6 +28,7 @@ class Entity:
         self.is_dead = False
         self.damage_flash_timer = 0 # 攻撃を受けた時の点滅演出用
         self.status_to_inflict = None # 攻撃時に相手に付与する状態
+        self.has_acted = False        # ターン内での行動済みフラグ
 
     def take_damage(self, amount):
         """他者から攻撃を受けてHPを減らす共通処理"""

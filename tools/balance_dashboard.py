@@ -92,9 +92,63 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     value = int(value)
             except:
                 pass
+            
+            # サージカル・アップデート（行単位での置換）の試行
+            path = os.path.join(MASTER_DATA_DIR, filename)
+            if os.path.exists(path):
+                with open(path, "r", encoding="utf-8") as f:
+                    lines = f.readlines()
+                
+                updated = False
+                in_data_section = False
+                in_target_block = False
+                section_key = "ENEMY_DATA:" if file_type == "enemies" else "WEAPON_DATA:" if file_type == "weapons" else None
+                
+                new_lines = []
+                for line in lines:
+                    stripped = line.strip()
+                    
+                    # セクションの開始を確認
+                    if section_key and stripped.startswith(section_key):
+                        in_data_section = True
+                    elif in_data_section and stripped.endswith(":") and not line.startswith(" "):
+                        # 次のトップレベルキーが来たらセクション終了（簡易判定）
+                        if not stripped.startswith(("#", section_key.split(":")[0])):
+                             in_data_section = False
+                    
+                    # ターゲット（個体）のブロックを確認
+                    if in_data_section and stripped == f"{target_id}:":
+                        in_target_block = True
+                    elif in_target_block and stripped.endswith(":") and line.startswith("  ") and not line.startswith("    "):
+                        # 次の個体ブロックが来たら終了
+                        if stripped != f"{target_id}:":
+                            in_target_block = False
+                    
+                    # パラメータの書き換え
+                    if in_target_block and stripped.startswith(f"{param}:"):
+                        indent = line[:line.find(param)]
+                        new_lines.append(f"{indent}{param}: {value}\n")
+                        updated = True
+                    else:
+                        new_lines.append(line)
+                
+                if updated:
+                    with open(path, "w", encoding="utf-8") as f:
+                        f.writelines(new_lines)
+                    print(f"  [SURGICAL SAVE SUCCESS] {filename}: {target_id}.{param} -> {value}")
+                    
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"status": "success"}).encode('utf-8'))
+                    return
 
-            updated = False
+            # もし上記で失敗した場合は、フォールバックとして以前の（コメント非保持）方式
+            print(f"  [SAVE FALLBACK] Using naive yaml dump for {filename}")
+            raw_data = load_master_data(filename)
+            
             # データの更新
+            updated = False
             if file_type == "enemies":
                 for section in ["ENEMY_DATA", "ENEMY_CATEGORIES"]:
                     if section in raw_data and target_id in raw_data[section]:
@@ -107,13 +161,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                         updated = True; break
             
             if updated:
-                path = os.path.join(MASTER_DATA_DIR, filename)
                 with open(path, "w", encoding="utf-8") as f:
-                    # 短いリストを [x, y] 形式で出力するための設定
                     yaml.dump(raw_data, f, allow_unicode=True, sort_keys=False, default_flow_style=None, indent=2)
-                
-                # 詳細なログを出力
-                print(f"  [SAVE SUCCESS] {filename}: {target_id}.{param} -> {value}")
                 
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')

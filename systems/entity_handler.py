@@ -1,7 +1,9 @@
+import pygame
 import random
 from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave, DroppedToken
 from constants import WEAPON_DATA, CONSUMABLE_DATA, ARMOR_DATA, SHIELD_DATA, STAVE_DATA
 from constants import ENEMY_DATA, ITEM_DROP_RATES
+from systems.game_state import game_state
 
 def update_dungeon_entities(dungeon, player, dialog=None):
     """
@@ -58,12 +60,14 @@ def update_dungeon_entities(dungeon, player, dialog=None):
             # 2. 通常のドロップ判定 (証を落とした場合は確実にスキップ)
             if not dropped_token:
                 from constants import DROP_RATE_MULTIPLIER
+                from systems.game_state import game_state
                 for dinfo in drop_infos:
                     # YAML の個別確率があればそれを使用、なければレアリティ別テーブルから取得
                     base_rate = dinfo["rate"] if dinfo["rate"] is not None else ITEM_DROP_RATES.get(dinfo["rank_val"], 0.30)
                     target_rate = base_rate * DROP_RATE_MULTIPLIER
                     
-                    if random.random() <= target_rate:
+                    # デバッグモードなら確定、そうでなければ確率判定
+                    if random.random() <= target_rate or game_state.get("is_debug_mode"):
                         grid_x = int((enemy.x + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size
                         grid_y = int((enemy.y + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size
     
@@ -91,6 +95,22 @@ def update_dungeon_entities(dungeon, player, dialog=None):
                         
                         dropped_any = True
                         break  # ★ 高レア順に計算し、1つでも落としたら即 break して終了
+
+            # 敵の撃破処理
+            # ボスの場合、特別な演出
+            if getattr(enemy, "is_boss", False):
+                from systems.ui import show_dialog
+                from constants import SOUND_QUEST_COMPLETE, SOUND_BOSS_VICTORY
+                import os
+                
+                # 勝利SEの再生 (自作の boss_victory.wav があれば優先)
+                victory_se = SOUND_BOSS_VICTORY if os.path.exists(SOUND_BOSS_VICTORY) else SOUND_QUEST_COMPLETE
+                
+                if os.path.exists(victory_se):
+                    pygame.mixer.Sound(victory_se).play()
+                
+                # 撃破メッセージを表示 (モーダル表示：入力を待つ)
+                show_dialog(dialog, f"{enemy.name} を 討伐した！", modal=True, auto_close=0)
 
             dungeon.enemies.remove(enemy)
             reason = "Destroyed" if getattr(enemy, "is_static", False) else "Killed"
@@ -129,6 +149,10 @@ def update_dungeon_entities(dungeon, player, dialog=None):
                     
                     if enemy.hp <= 0:
                         enemy.is_dead = True
+                        # 罠で死んだ場合も撃破演出（ボスなら）
+                        if getattr(enemy, "is_boss", False):
+                            from systems.ui import show_dialog
+                            show_dialog(dialog, f"{enemy.name} を 討伐した！")
 
     # 2. 敵の「思考（行動決定）」を処理する
     from systems.game_state import game_state
@@ -136,62 +160,35 @@ def update_dungeon_entities(dungeon, player, dialog=None):
     
     if game_state["turn_state"] == "enemies":
         enemies = dungeon.enemies
-        
-        # 思考用にキャッシュされたエンティティと占有情報を取得
         all_entities = game_state.get("all_entities_cache", [player] + enemies)
         occupied_cells = game_state.get("occupied_cells", set())
 
         think_count = 0
-        # 連続して敵に行動を決定させる（攻撃が発生するか、思考制限に達するまで）
         while game_state["current_enemy_idx"] < len(enemies):
             idx = game_state["current_enemy_idx"]
-            target_enemy = enemies[idx]
+            enemy = enemies[idx]
             
-            if target_enemy.is_dead or target_enemy.damage_flash_timer > 0:
+            if getattr(enemy, "has_acted", False) or getattr(enemy, "is_dead", False):
                 game_state["current_enemy_idx"] += 1
                 continue
             
-            # まだ行動していないなら思考させる
-            if not getattr(target_enemy, "has_acted", False):
-                # 1フレームあたりの思考回数制限
-                if think_count >= ENEMY_THINK_LIMIT_PER_FRAME:
-                    return # 次のフレームに持ち越し
-
-                target_enemy.take_turn(player, dungeon, all_entities, dialog, occupied_cells)
-                target_enemy.has_acted = True
-                think_count += 1
-                
-                # 移動先が決まったなら占有情報を更新（次の敵の思考に反映）
-                new_gx = int((target_enemy.target_x + target_enemy.width / 2) // dungeon.tile_size)
-                new_gy = int((target_enemy.target_y + target_enemy.height / 2) // dungeon.tile_size)
-                occupied_cells.add((new_gx, new_gy))
-
-                # 【重要】攻撃を開始したなら、一旦止まってアニメーションを待つ（シーケンシャル処理）
-                if target_enemy.is_attacking:
-                    return 
-                
-                # 移動だけなら、このフレーム内で次の敵の思考へ進む
-                game_state["current_enemy_idx"] += 1
-            else:
-                # すでに思考済み（アニメーション中、またはメッセージ待機中）
-                if target_enemy.is_attacking:
-                    return # 攻撃アニメが終わるまで待機
-                
-                if dialog and dialog.is_active:
-                    return # メッセージが閉じるまで待機
-                
-                # ★ 攻撃を行った敵の後は、今まで通り一呼吸置く（ウェイトを入れる）
-                if getattr(target_enemy, "has_dealt_impact_damage", False):
-                    if game_state["inter_action_timer"] == 0:
-                        game_state["inter_action_timer"] = INTER_ACTION_BREATHER
-                    
-                    if game_state["inter_action_timer"] > 1:
-                        game_state["inter_action_timer"] -= 1
-                        return
-                    game_state["inter_action_timer"] = 0
-
-                # 次の敵へ
-                game_state["current_enemy_idx"] += 1
+            if think_count >= ENEMY_THINK_LIMIT_PER_FRAME:
+                break
+            
+            # 敵の思考と行動実行
+            enemy.take_turn(player, dungeon, all_entities, dialog, occupied_cells)
+            enemy.has_acted = True
+            think_count += 1
+            game_state["current_enemy_idx"] += 1
+            
+            if enemy.is_attacking:
+                game_state["enemy_action_breather"] = INTER_ACTION_BREATHER
+                break
+        
+        if game_state["current_enemy_idx"] >= len(enemies):
+            if game_state.get("enemy_action_breather", 0) <= 0:
+                # 全ての敵の行動決定が終わった
+                pass 
 
         # 全ての敵が行動決定を終えたら、全員の移動アニメーション完了を待つ
         all_moving_done = True
@@ -247,4 +244,49 @@ def update_dungeon_entities(dungeon, player, dialog=None):
                         print(f"[Error] Failed to collect item: {e}")
 
     # 3. 敵のリスポーン処理（ターン制へ移行したため、ここでは何もしない）
+    # 4. ボスBGMの切り替え判定 [NEW]
+    from constants import ENEMY_AGGRO_RADIUS, BGM_BOSS
+    from systems.game_state import game_state
+    from systems.audio_manager import play_bgm
+    
+    was_boss_battle = game_state.get("is_boss_battle", False)
+    has_aggroed_boss = False
+    
+    # 視界内にボスがいて、かつプレイヤーに気づいているかチェック
+    active_boss = None
+    for enemy in dungeon.enemies:
+        if getattr(enemy, "is_boss", False) and not getattr(enemy, "is_dead", False):
+            # グリッド距離で判定
+            egx, egy = int(enemy.x // dungeon.tile_size), int(enemy.y // dungeon.tile_size)
+            pgx, pgy = int(player.x // dungeon.tile_size), int(player.y // dungeon.tile_size)
+            dist_x, dist_y = abs(egx - pgx), abs(egy - pgy)
+            
+            # 認識範囲（隠密補正込み）を取得
+            aggro_mod = player.get_aggro_modifier() if hasattr(player, "get_aggro_modifier") else 0
+            effective_radius = max(1, ENEMY_AGGRO_RADIUS + aggro_mod)
+            
+            if dist_x <= effective_radius and dist_y <= effective_radius:
+                active_boss = enemy
+                has_aggroed_boss = True
+                break
+    
+    # BGMの切り替え実行
+    if has_aggroed_boss:
+        if not was_boss_battle:
+            game_state["is_boss_battle"] = True
+            # 個別BGM設定があればそれを使う。なければ定数 BGM_BOSS を使う
+            target_bgm = getattr(active_boss, "bgm", None) or BGM_BOSS
+            play_bgm(target_bgm)
+            
+            # [NEW] ボス遭遇メッセージ (モーダル表示：入力を待つ)
+            from systems.ui import show_dialog
+            show_dialog(dialog, f"{active_boss.name} に 発見された！", modal=True, auto_close=0)
+            
+            print(f"[SOUND] Boss encountered! Switching to: {target_bgm}")
+    else:
+        if was_boss_battle:
+            game_state["is_boss_battle"] = False
+            dungeon.play_floor_bgm()
+            print("[SOUND] Boss battle ended. Reverting to floor BGM.")
+
     pass

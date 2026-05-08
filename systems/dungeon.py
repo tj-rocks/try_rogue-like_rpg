@@ -138,6 +138,7 @@ class Dungeon:
         
         self.weapon_shop_stock = []
         self.item_shop_stock = []
+        self.magic_shop_stock = []
         
         self.shake_amount = 0
         self.shake_timer = 0
@@ -1258,28 +1259,25 @@ class Dungeon:
             rate = ITEM_DROP_RATES.get(rarity, 0.1) * 3
             return random.random() < rate
 
-        eq_candidates = []
+        candidates = []
         for k, v in WEAPON_DATA.items():
-            if should_spawn(v):
-                eq_candidates.append((k, "weapon", v))
+            if should_spawn(v): candidates.append((k, "weapon", v))
         for k, v in ARMOR_DATA.items():
-            if should_spawn(v):
-                eq_candidates.append((k, "armor", v))
+            if should_spawn(v): candidates.append((k, "armor", v))
         for k, v in SHIELD_DATA.items():
-            if should_spawn(v):
-                eq_candidates.append((k, "shield", v))
-        for k, v in STAVE_DATA.items():
-            if should_spawn(v):
-                eq_candidates.append((k, "stave", v))
-        random.shuffle(eq_candidates)
-        self.weapon_shop_stock = [{"key": k, "type": t, "name": v["name"], "price": v["price"], "count": random.randint(1, 10)} for k, t, v in eq_candidates[:20]]
-        
-        item_candidates = []
+            if should_spawn(v): candidates.append((k, "shield", v))
         for k, v in CONSUMABLE_DATA.items():
-            if should_spawn(v):
-                item_candidates.append((k, "consumable", v))
-        random.shuffle(item_candidates)
-        self.item_shop_stock = [{"key": k, "type": t, "name": v["name"], "price": v["price"], "count": random.randint(1, 10)} for k, t, v in item_candidates[:20]]
+            if should_spawn(v): candidates.append((k, "item", v))
+        for k, v in STAVE_DATA.items():
+            if should_spawn(v): candidates.append((k, "stave", v))
+
+        random.shuffle(candidates)
+        # 全てのショップで共通の在庫リストを使用する
+        self.shop_stock = [{"key": k, "type": t, "name": v["name"], "price": v["price"], "count": random.randint(1, 10)} for k, t, v in candidates[:20]]
+        # 互換性のために他の変数も同じリストを参照させる
+        self.weapon_shop_stock = self.shop_stock
+        self.item_shop_stock = self.shop_stock
+        self.magic_shop_stock = self.shop_stock
 
     def spawn_traps(self, player):
         from constants import TRAP_SPAWN_MIN, TRAP_SPAWN_MAX, TRAP_SPAWN_SCALE_EVERY, TRAP_SPAWN_SCALE_ADD, TRAP_SPAWN_SCALE_LIMIT, TRAP_DATA

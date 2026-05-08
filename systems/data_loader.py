@@ -35,7 +35,13 @@ def load_data_file(filepath, default=None):
 
 # パス設定
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_official.json")
+SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_data.json")
+
+# [NEW] デバッグモード時はセーブファイルを分離する
+if os.environ.get("DEBUG_MODE") == "1":
+    SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_data_debug.json")
+    print(f"[DEBUG] Save path redirected to: {SAVE_OFFICIAL_PATH}")
+
 SAVE_SUSPEND_PATH = SAVE_OFFICIAL_PATH # 一本化：中断セーブも正式セーブと同じ場所へ
 SAVE_DATA_PATH = SAVE_OFFICIAL_PATH # 後方互換性のため
 MASTER_DATA_DIR = os.path.join(_ROOT, "components/data/master")

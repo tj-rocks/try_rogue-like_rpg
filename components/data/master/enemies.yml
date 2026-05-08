@@ -1,14 +1,3 @@
-# stupidity: 10 の場合 → 10/10 = 100% の確率でボケる（完全にランダム移動）
-# stupidity: 1 の場合 → 1/10 = 10% の確率でボケる（たまにボケる）
-# stupidity: 0 の場合 → 0%（常に完璧に動く）
-# 
-# attack_priority: 攻撃の優先思考スタイル
-#   - close: インファイター。射程に関わらず隣接（距離1）することを最優先する。
-#   - ranged: アウトボクサー。理想の間合い（射程-1）を保ちながら戦うことを優先する。
-# 
-# attack_range: 隣接攻撃は 1。遠距離はそれ以上の数値を設定。
-
-
 ENEMY_CATEGORIES:
   slime: {name: スライム種, hp: 10, attack: 7, defense: 1, evasion: 5, exp: 5, reward_gold: 20,
     accuracy_close: 100, accuracy_ranged: 100, attack_range: 1, stupidity: 3, image_scale: 1.0,
@@ -36,19 +25,21 @@ ENEMY_DATA:
     - {item: hp_potion}
     hp: 9
     defense: 1
-    attack: 6
+    attack: 11
   mawaru_kame:
     name: まわるがめ
     category: animal
     min_rank: F
+    max_rank: E
     image_folder: components/pictures/enemies/kame
     attack_range: 1
     crit_rate: 0.05
     drops:
     - {item: rotten_potion}
-    - {item: wooden_stick}
+    - {item: broken_armor}
     hp: 15
     defense: 3
+    attack: 12
   normal_tako:
     name: ふつうたこ
     category: animal
@@ -66,54 +57,98 @@ ENEMY_DATA:
     - {item: broken_sword}
     hp: 11
     defense: 3
-  doku_tako:
-    name: どくだこ
-    category: animal
+    attack: 13
+  kowai_kusa:
+    name: こわいくさ
+    category: monster
     min_rank: E
-    image_folder: components/pictures/enemies/tako_doku
+    image_folder: components/pictures/enemies/kowai_kusa
     image_scale: 0.8
     status: poison
-    attack_priority: close
+    attack_priority: ranged
     attack_range: 2
-    status_chance: 15
+    status_chance: 0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: arrow
+    drops:
+    - {item: expired_potion}
+    - {item: broken_sword}
+    hp: 11
+    defense: 3
+  slime_red:
+    name: あかいスライム
+    category: slime
+    min_rank: E
+    image_folder: components/pictures/enemies/slime
+    image_color: '#FF6666'
+    crit_rate: 0.05
+    drops:
+    - {item: broken_stave}
+    hp: 9
+    defense: 1
+    attack: 6
+  bakudan_man:
+    name: バクダンマン
+    category: monster
+    min_rank: E
+    image_folder: components/pictures/enemies/bakudan_man
+    crit_rate: 0.05
     drops:
     - {item: hp_potion}
-    hp: 11
-    defense: 0
-  ghost:
-    name: ゴースト
-    category: monster
-    min_rank: D
-    image_folder: components/pictures/enemies/ghost
-    drops:
-    - {item: knockback_stave, rate: 0.1}
-    - {item: fire_stave, rate: 0.1}
-  skeleton_archer:
-    name: スケルトン弓兵
-    category: humanoid
-    min_rank: C
-    image_folder: components/pictures/enemies/slime
-    attack_range: 5
-    equip_chance: 0.5
-    equipped_weapon: iron_sword
-    equipped_shield: wooden_shield
-    drops:
-    - {item: iron_sword}
-  dragon_boss:
-    name: レッドドラゴン
+    hp: 9
+    defense: 1
+    attack: 6
+    attack_range: 3
+    close_attack_effect: explosion
+    ranged_attack_effect: explosion
+  doku_kame:
+    name: どくがめ
     category: animal
-    min_rank: S
-    image_folder: components/pictures/enemies/dragon
-    image_scale: 0.5
-    attack: 10
-    attack_range: 5
-    attack_priority: ranged
+    min_rank: E
+    image_folder: components/pictures/enemies/kame
+    image_color: '#FFCCCC'
+    attack_range: 1
+    status: poison
+    status_chance: 15
+    close_attack_effect: strange_mucus
+    ranged_attack_effect: strange_mucus
+    drops:
+    - {item: rotten_potion}
+    - {item: broken_armor}
+    hp: 15
+    defense: 3
+    attack: 14
+  skeleton:
+    name: スケルトン
+    category: undead
+    min_rank: D
+    image_folder: components/pictures/enemies/skeleton
+    attack_range: 1
+    close_attack_effect: physical_heavy
+    drops:
+    - {item: broken_sword}
+    - {item: broken_armor}
+    hp: 25
+    defense: 3
+    attack: 15
+#BOSS--------------
+  suisui_slime:
+    name: スイスイスライム
+    category: slime
+    min_rank: F
     min_floor: 10
     max_floor: 10
     max_concurrent: 1
     max_spawns: 1
+    is_boss: true
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/suisui_slime
+    image_scale: 2.0
+    hp: 40
+    attack: 16
+    defense: 4
+    exp: 50
+    reward_gold: 500
     drops:
-    - {item: invincible_stave}
-    crit_rate: 0.2
-    close_attack_effect: physical_heavy
-    ranged_attack_effect: fireball
+    - {item: hp_potion}
+    - {item: iron_sword}

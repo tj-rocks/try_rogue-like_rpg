@@ -58,13 +58,15 @@ FIXED_QUESTS:
 #   title: 【常設】鉄鉱石の緊急調達
 
 # --- 以下、ボス討伐クエストのテンプレート ---
-- id: boss_hunt_red_dragon
+- id: boss_hunt_suisui_slime
   min_rank: F
   max_rank: D
   type: hunt
-  target_key: dragon_boss
+  target_key: suisui_slime
   amount: 1
   reward_gold: 500
-  reward_gp: 50
-  title: レッドドラゴンの討伐
+  reward_gp: 5
+  title: スイスイスライムの討伐
+  repeatable: true
+  chance: 1.0
 
