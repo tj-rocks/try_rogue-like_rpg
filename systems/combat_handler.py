@@ -42,7 +42,7 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     戻り値: (ダメージ量, クリティカルかどうか, ミスかどうか)
     """
     # 無敵状態のチェック
-    if getattr(target, "invincible_turns", 0) > 0:
+    if getattr(target, "is_god", False) or getattr(target, "invincible_turns", 0) > 0:
         return 0, False, False
         
     # 命中判定
@@ -114,7 +114,12 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     
     # 防御力によるベースダメージの算出 (防御力もボーナス込みを参照)
     defense = getattr(target, "total_defense", getattr(target, "defense", 0))
-    base_dmg = max(0.1, calc_atk - defense) # 最低0.1ダメージ保証（ステータスが浮動小数点のため）
+    
+    # [NEW] 武器の防御力貫通（Armor Penetration）判定
+    if weapon and weapon.data.get("armor_penetration"):
+        defense = 0
+        
+    base_dmg = max(0.1, calc_atk - defense) # 最低0.1ダメージ保証
     
     # 乱数要素: 9割は保証、1割が乱数 (90-100%)
     from systems.math_utils import hardcore_round

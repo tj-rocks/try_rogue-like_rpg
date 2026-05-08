@@ -1394,6 +1394,7 @@ class Player(Entity):
 
     def to_dict(self):
         return {
+            "x": self.x, "y": self.y,
             "hp": self.hp, "max_hp": self.max_hp, "coin": self.coin, "bank_coin": getattr(self, "bank_coin", 0), "attack": self.attack,
             "items": [dict(it) for it in self.items],
             "weapon_inventory": [eq.to_dict() for eq in getattr(self, "weapon_inventory", [])],
@@ -1419,6 +1420,8 @@ class Player(Entity):
         }
 
     def load_dict(self, data):
+        if "x" in data: self.x = data["x"]
+        if "y" in data: self.y = data["y"]
         self.hp = int(data.get("hp", self.hp))
         self.max_hp = int(data.get("max_hp", self.max_hp))
         self.coin = int(data.get("coin", self.coin))
@@ -1503,7 +1506,7 @@ class Player(Entity):
 
     def save_to_file(self, filepath=None):
         if filepath is None:
-            from constants import SAVE_DATA_PATH
+            from systems.data_loader import SAVE_DATA_PATH
             filepath = SAVE_DATA_PATH
         import json
         print(f"[SYSTEM] Saving progress to {filepath}...")

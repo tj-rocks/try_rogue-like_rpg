@@ -151,7 +151,7 @@ STATUS_EFFECTS:
 # 🏠 VILLAGE_SERVICES (村の施設・サービス料金)
 # ------------------------------------------------------------------------------
 VILLAGE_SERVICES:
-  INN_FEE: 100           # 宿屋の宿泊費
+  INN_FEE: 60            # 宿屋の宿泊費
   DOCTOR_FEE: 50         # 医者の治療費（解毒以外）
   WAREHOUSE_FEE: 10      # 預かり屋の利用料
   BANK_INTEREST: 0.0     # 銀行の利息（将来用）

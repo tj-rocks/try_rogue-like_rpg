@@ -101,7 +101,6 @@ def continue_game(ui_elements, game_state, player):
         target_path = SAVE_OFFICIAL_PATH
         
     if target_path and player.load_from_file(target_path):
-        # 永続セーブ化：再開してもファイルを消さないように変更
         print(f"[SESSION] Game loaded from: {target_path}")
 
         floor = player.current_floor if hasattr(player, "current_floor") else 0

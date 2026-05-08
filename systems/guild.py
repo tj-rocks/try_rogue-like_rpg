@@ -87,12 +87,18 @@ class GuildSystem:
             min_rank_idx = RANK_ORDER.index(min_rank)
             max_rank_idx = RANK_ORDER.index(max_rank)
             
-            # 条件：最小ランクがプレイヤーのランク以下、かつ未クリア、かつ現在受注していない
-            if min_rank_idx <= player_rank_idx:
-                if q_id not in player.completed_fixed_quests:
+            # 条件1：プレイヤーのランクが範囲内か
+            if min_rank_idx <= player_rank_idx <= max_rank_idx:
+                # 条件2：未クリア、あるいは繰り返し可能か
+                is_completed = q_id in player.completed_fixed_quests
+                if q_data.get("repeatable") or not is_completed:
+                    # 条件3：現在受注していないか
                     if not any(aq.get("id") == q_id for aq in player.active_quests):
-                        # コピーして追加
-                        self.fixed_quests.append(dict(q_data))
+                        # 条件4：出現確率 (chance) をクリアするか（未指定なら 1.0=100%）
+                        chance = q_data.get("chance", 1.0)
+                        if random.random() < chance:
+                            # コピーして追加
+                            self.fixed_quests.append(dict(q_data))
 
         # 2. ランダムクエストの生成 (常に3〜4つ生成する)
         num_random = random.randint(3, 4)
@@ -112,7 +118,8 @@ class GuildSystem:
         candidates = []
         for key, data in ENEMY_DATA.items():
             r = data.get("min_rank") or data.get("rank") or "F"
-            if r in allowed_ranks:
+            # ボス属性の敵、および特殊な敵はランダムクエストの対象外とする
+            if r in allowed_ranks and not data.get("is_boss", False):
                 candidates.append((key, data))
         
         if not candidates:
@@ -161,8 +168,8 @@ class GuildSystem:
         target_key, target_data = random.choice(candidates)
         amount = random.randint(min_amt, max_amt)
         
-        # 売値（購入価格の半額）の1.2倍 * 数量 * 倍率（ランクによる追加）
-        base_sell = target_data.get("price", 100) // 2
+        # 売値（購入価格の1/3）の1.2倍 * 数量 * 倍率（ランクによる追加）
+        base_sell = target_data.get("price", 100) // 3
         from systems.math_utils import hardcore_round
         reward_gold = hardcore_round(base_sell * 1.2 * amount * multiplier, is_hp=True)
         reward_gp = amount * 3 # 納品は討伐よりGP低め

@@ -65,7 +65,7 @@ CONSUMABLE_DATA:
   trap_remover:
     name: 罠解除ツール
     effect: remove_trap
-    price: 150
+    price: 50
     min_rank: F
     rarity: 3
     image_path: components/pictures/icon/tool.png
@@ -81,7 +81,7 @@ CONSUMABLE_DATA:
     name: ヒールポーション
     effect: heal_hp
     heal_amount: 40
-    price: 50
+    price: 80
     min_rank: F
     rarity: 1
     image_path: components/pictures/icon/hp_potion.png
@@ -93,7 +93,7 @@ CONSUMABLE_DATA:
   antidote_potion:
     name: 毒消薬
     effect: antidote
-    price: 100
+    price: 80
     min_rank: F
     rarity: 1
     image_path: components/pictures/icon/hp_potion.png
@@ -120,7 +120,7 @@ CONSUMABLE_DATA:
     name: 魔力の水晶
     effect: recharge
     recharge_amount: 5
-    price: 1000
+    price: 100
     min_rank: C
     rarity: 4
     image_path: components/pictures/icon/magic_crystal.png
@@ -132,9 +132,9 @@ CONSUMABLE_DATA:
     name: 銅の鉱石
     effect: material
     enhance_bonus: 1
-    price: 100
+    price: 500
     min_rank: F
-    rarity: 4
+    rarity: 3
     image_path: components/pictures/icon/copper_ore.png
     max_stack: 99
     shop_buyable: true
@@ -143,9 +143,9 @@ CONSUMABLE_DATA:
     name: 鉄の鉱石
     effect: material
     enhance_bonus: 1
-    price: 300
+    price: 600
     min_rank: D
-    rarity: 4
+    rarity: 3
     image_path: components/pictures/icon/iron_ore.png
     max_stack: 99
     shop_buyable: true
@@ -156,7 +156,7 @@ CONSUMABLE_DATA:
     enhance_bonus: 2
     price: 1000
     min_rank: B
-    rarity: 5
+    rarity: 2
     image_path: components/pictures/icon/gold_ore.png
     max_stack: 99
     shop_buyable: true
@@ -167,7 +167,7 @@ CONSUMABLE_DATA:
     lantern_key: basic
     price: 300
     min_rank: F
-    rarity: 1
+    rarity: 3
     image_path: components/pictures/icon/basic_lantern.png
     shop_buyable: true
     describe: 冒険者の必需品。周囲の闇を照らし出し、視界を確保する。
@@ -177,7 +177,7 @@ CONSUMABLE_DATA:
     lantern_key: luxury
     price: 2000
     min_rank: B
-    rarity: 3
+    rarity: 4
     image_path: components/pictures/icon/luxury_lantern.png
     shop_buyable: true
     describe: 精巧な細工が施された高級なカンテラ。広範囲を明るく照らし続けることができる。
@@ -369,25 +369,14 @@ STAVE_DATA:
     - 200
     shop_buyable: true
     describe: フロア全体を一瞬で明るく照らす魔法の杖。隠れた罠や敵を暴き出す。
+#以下は弄らない
 LANTERN_DATA:
   none:
-    name: 古いカンテラ
     radius: 1
     fade_radius: 2
-    price: 0
-    image_path: components/pictures/icon/old_lantern.png
-    describe: ボロボロで暗い古いカンテラ。最低限の明かりしか得られない。
   basic:
-    name: カンテラ
     radius: 2
     fade_radius: 5
-    price: 300
-    image_path: components/pictures/icon/basic_lantern.png
-    describe: 冒険者の必需品。周囲の闇を照らし出し、視界を確保する。
   luxury:
-    name: 上等なカンテラ
     radius: 5
     fade_radius: 8
-    price: 2000
-    image_path: components/pictures/icon/luxury_lantern.png
-    describe: 精巧な細工が施された高級なカンテラ。広範囲を明るく照らし続けることができる。

@@ -62,7 +62,7 @@ class Text:
         VILLAGE = "Village"
         FLOOR = "B{level}F"
         MENU_TITLE = "--- MENU ---"
-        QUIT_CONFIRM_MSG = "宿屋で寝ないとセーブされません\nセーブせずにタイトルへ戻りますか？"
+        QUIT_CONFIRM_MSG = "セーブせずにタイトルへ戻りますか？\nギルドか宿屋でセーブをお勧めします。"
         MENU_ITEMS = "1. アイテム"
         MENU_EQUIP = "2. 装備"
         MENU_STAVES = "3. 杖"

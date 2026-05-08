@@ -138,6 +138,7 @@ class Dungeon:
         
         self.weapon_shop_stock = []
         self.item_shop_stock = []
+        self.magic_shop_stock = []
         
         self.shake_amount = 0
         self.shake_timer = 0
@@ -366,9 +367,8 @@ class Dungeon:
             # デフォルトは開始地点(P)
             tx, ty = self.start_pos
             
-            # 復活(Continue) または 死亡時
-            if (spawn_reason == "continue" or is_death) and self.inn_pos != (0, 0):
-                # 宿屋(H)の右隣にスポーン
+            # 死亡時は宿屋(H)の右隣にスポーン
+            if is_death and self.inn_pos != (0, 0):
                 tx, ty = self.inn_pos[0] + 1, self.inn_pos[1]
                 
             # ダンジョンからの帰還
@@ -376,10 +376,11 @@ class Dungeon:
                 # ダンジョン入口(D)の右隣にスポーン
                 tx, ty = self.dungeon_pos[0] + 1, self.dungeon_pos[1]
             
-            # 座標を適用
-            player.x = tx * ts
-            player.y = ty * ts
-            self.spawn_pos = (tx, ty)
+            # 座標を適用 (再開時は player.load_dict で復元された座標を優先する)
+            if spawn_reason != "continue":
+                player.x = tx * ts
+                player.y = ty * ts
+            self.spawn_pos = (int(player.x // ts), int(player.y // ts))
             
         else: # ダンジョン
             # 登り階段(2)か下り階段(3)を探す
@@ -793,7 +794,7 @@ class Dungeon:
                             self.map_data[r][c] = 0
                 if not self.rooms: self.rooms = [self.start_pos]
                 else: self.rooms = [self.start_pos] # 固定マップでは開始地点を優先
-                self.refresh_shop_stock()
+                self.refresh_shop_stock(player_rank=getattr(self.player, "guild_rank", "-"))
                 self.enemies = []
                 return
             except Exception as e:
@@ -1248,38 +1249,78 @@ class Dungeon:
         textures["wall_base"] = wall_base
         return textures
 
-    def refresh_shop_stock(self):
+    def refresh_shop_stock(self, player_rank="-"):
         from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, ITEM_DROP_RATES
         
-        def should_spawn(v):
-            if not v.get("shop_buyable", True): return False
+        # 出現率をレアリティから算出（ドロップ率の5倍をショップ出現率とする）
+        def get_shop_rate(v):
             rarity = v.get("rarity", 1)
-            # 出現率をレアリティから算出（ドロップ率の約3倍をショップ出現率とする）
-            rate = ITEM_DROP_RATES.get(rarity, 0.1) * 3
-            return random.random() < rate
+            return ITEM_DROP_RATES.get(rarity, 0.1) * 5
 
-        eq_candidates = []
+        # ランク制限チェック
+        def is_rank_ok(v):
+            if not self.guild_system: return True
+            req_rank = v.get("min_rank") or v.get("rank") or "F"
+            return self.guild_system.is_rank_at_least(player_rank, req_rank)
+
+        # --- 1. 武器屋 (武器・防具・盾) ---
+        weapon_cands = []
         for k, v in WEAPON_DATA.items():
-            if should_spawn(v):
-                eq_candidates.append((k, "weapon", v))
+            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
+                weapon_cands.append({"key": k, "type": "weapon", "name": v["name"], "price": v["price"], "count": 1})
         for k, v in ARMOR_DATA.items():
-            if should_spawn(v):
-                eq_candidates.append((k, "armor", v))
+            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
+                weapon_cands.append({"key": k, "type": "armor", "name": v["name"], "price": v["price"], "count": 1})
         for k, v in SHIELD_DATA.items():
-            if should_spawn(v):
-                eq_candidates.append((k, "shield", v))
-        for k, v in STAVE_DATA.items():
-            if should_spawn(v):
-                eq_candidates.append((k, "stave", v))
-        random.shuffle(eq_candidates)
-        self.weapon_shop_stock = [{"key": k, "type": t, "name": v["name"], "price": v["price"], "count": random.randint(1, 10)} for k, t, v in eq_candidates[:20]]
+            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
+                weapon_cands.append({"key": k, "type": "shield", "name": v["name"], "price": v["price"], "count": 1})
         
-        item_candidates = []
+        # 最低在庫保証 (武器・防具・盾 合計3枠)
+        if not weapon_cands:
+            all_buyable = []
+            for k, v in WEAPON_DATA.items():
+                if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "weapon", v))
+            for k, v in ARMOR_DATA.items():
+                if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "armor", v))
+            for k, v in SHIELD_DATA.items():
+                if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "shield", v))
+            
+            if all_buyable:
+                while len(weapon_cands) < 3:
+                    k, t, v = random.choice(all_buyable)
+                    weapon_cands.append({"key": k, "type": t, "name": v["name"], "price": v["price"], "count": 1})
+        
+        self.weapon_shop_stock = weapon_cands[:10]
+
+        # --- 2. 道具屋 (消耗品) ---
+        item_cands = []
         for k, v in CONSUMABLE_DATA.items():
-            if should_spawn(v):
-                item_candidates.append((k, "consumable", v))
-        random.shuffle(item_candidates)
-        self.item_shop_stock = [{"key": k, "type": t, "name": v["name"], "price": v["price"], "count": random.randint(1, 10)} for k, t, v in item_candidates[:20]]
+            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
+                item_cands.append({"key": k, "type": "consumable", "name": v["name"], "price": v["price"], "count": random.randint(1, 5)})
+        
+        # 最低在庫保証 (道具 3枠)
+        if len(item_cands) < 3:
+            all_items = [(k, v) for k, v in CONSUMABLE_DATA.items() if v.get("shop_buyable", True) and is_rank_ok(v)]
+            if all_items:
+                while len(item_cands) < 3:
+                    k, v = random.choice(all_items)
+                    item_cands.append({"key": k, "type": "consumable", "name": v["name"], "price": v["price"], "count": random.randint(1, 5)})
+        self.item_shop_stock = item_cands[:10]
+
+        # --- 3. 魔法屋 (杖) ---
+        magic_cands = []
+        for k, v in STAVE_DATA.items():
+            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
+                magic_cands.append({"key": k, "type": "stave", "name": v["name"], "price": v["price"], "count": 1})
+        
+        # 最低在庫保証 (杖 2枠)
+        if len(magic_cands) < 2:
+            all_staves = [(k, v) for k, v in STAVE_DATA.items() if v.get("shop_buyable", True) and is_rank_ok(v)]
+            if all_staves:
+                while len(magic_cands) < 2:
+                    k, v = random.choice(all_staves)
+                    magic_cands.append({"key": k, "type": "stave", "name": v["name"], "price": v["price"], "count": 1})
+        self.magic_shop_stock = magic_cands[:10]
 
     def spawn_traps(self, player):
         from constants import TRAP_SPAWN_MIN, TRAP_SPAWN_MAX, TRAP_SPAWN_SCALE_EVERY, TRAP_SPAWN_SCALE_ADD, TRAP_SPAWN_SCALE_LIMIT, TRAP_DATA

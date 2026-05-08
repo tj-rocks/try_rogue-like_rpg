@@ -4,6 +4,9 @@ import os
 import random
 import traceback
 
+# [NEW] セーブファイルの分離などを有効化（他のモジュールが読み込まれる前に設定）
+os.environ["DEBUG_MODE"] = "1"
+
 # プロジェクトのルートをパスに追加
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -16,43 +19,7 @@ from systems.session_handler import init_ui_elements, setup_ui_relations
 from systems.resources import font_small, font_medium
 from systems.events import handle_events, active_direction_keys
 
-def show_menu(screen):
-    print("[Debug] Showing Menu...")
-    running = True
-    selected = 0
-    options = [
-        "1. Monster Overflow Test (Start 1F, Forced 5F)",
-        "2. Enemy Equipment / Combat Test (Spawn + Equip)",
-        "3. Dungeon Texture / Item Drop Test (Gungeon 4F)",
-        "4. Guild / Quest Debug (High GP)",
-        "5. Combat QA Mode (Normal Stats)",
-        "6. Quest QA Mode (Rank/GP Control)",
-        "EXIT (ESC)"
-    ]
-    
-    while running:
-        screen.fill((30, 30, 30))
-        for i, option in enumerate(options):
-            color = (255, 255, 255) if i == selected else (100, 100, 100)
-            text = font_medium.render(option, True, color)
-            screen.blit(text, (100, 150 + i * 50))
-        pygame.display.flip()
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT: return None, False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP: selected = (selected - 1) % len(options)
-                elif event.key == pygame.K_DOWN: selected = (selected + 1) % len(options)
-                elif event.key == pygame.K_ESCAPE: return None, False
-                elif event.key in [pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE]:
-                    if selected == 0: return 1, False
-                    if selected == 1: return 1, False
-                    if selected == 2: return 4, True
-                    if selected == 3: return 0, False
-                    if selected == 4: return 1, "COMBAT_QA"
-                    if selected == 5: return 1, "QUEST_QA"
-                    if selected == 6: return None, False
-    return None, False
+# show_menu is removed. Starting main directly.
 
 def setup_gungeon_mode(dungeon, player):
     """テクスチャ・アイテム確認用の特殊フロア設定"""
@@ -89,11 +56,10 @@ def setup_gungeon_mode(dungeon, player):
         dungeon.wall_none_variants = [[random.choice(none_vars) for _ in range(dungeon.map_width)] for _ in range(dungeon.map_height)]
         dungeon.wall_decoration_variants = [["" for _ in range(dungeon.map_width)] for _ in range(dungeon.map_height)]
 
-        # 階段(目印)
-        dungeon.map_data[3][3] = 2 
-        dungeon.map_data[3][4] = 3 
+        # 階段(上りと下り)
+        dungeon.map_data[2][2] = 2 
+        dungeon.map_data[2][3] = 3 
         
-        dungeon.edges = []
         ts = getattr(dungeon, 'tile_size', TILE_SIZE)
         player.x = (w // 2 + 2) * ts
         player.y = (h // 2 + 2) * ts
@@ -106,104 +72,105 @@ def setup_gungeon_mode(dungeon, player):
         from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA
         from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave
         
-        candidates = []
-        # [NEW] 全アイテムをテスト用にリストアップ
-        for catalog, itype in [(CONSUMABLE_DATA, "consumable"), (WEAPON_DATA, "weapon"), 
-                               (ARMOR_DATA, "armor"), (SHIELD_DATA, "shield"), (STAVE_DATA, "stave")]:
-            for tkey, tdata in catalog.items():
-                if tdata.get("min_rank") != "S": # Sランク(特殊)以外を全て並べる
-                    candidates.append((tkey, itype, tdata))
-
-        # [NEW] クエスト対象の強制追加 (Quest QAモード時)
-        if getattr(dungeon, "is_quest_qa", False):
-            for q in player.active_quests:
-                tkey = q.get("target_key")
-                qtype = q.get("type")
-                if qtype == "hunt":
-                    # モンスター配置が必要なことをフラグで持っておく（後述のモンスター配置ブロックで利用）
-                    pass
-                elif qtype == "delivery":
-                    # アイテムを candidates の先頭に追加
-                    for catalog, itype in [(CONSUMABLE_DATA, "consumable"), (WEAPON_DATA, "weapon"), 
-                                           (ARMOR_DATA, "armor"), (SHIELD_DATA, "shield"), (STAVE_DATA, "stave")]:
-                        if tkey in catalog:
-                            candidates.insert(0, (tkey, itype, catalog[tkey]))
-                            break
-
-        floor_tiles = [(c, r) for r in range(2, h + 2) for c in range(2, w + 2) if dungeon.map_data[r][c] == 1]
+        floor_tiles = [(c, r) for r in range(3, h + 2) for c in range(2, w + 2) if dungeon.map_data[r][c] == 1]
         random.shuffle(floor_tiles)
+
+        # [NEW] 出現可能なアイテムをリストアップ
+        candidates = []
+        # アイテムカタログをスキャン
+        for ctype, catalog in [("weapon", WEAPON_DATA), ("armor", ARMOR_DATA), 
+                               ("shield", SHIELD_DATA), ("item", CONSUMABLE_DATA), ("stave", STAVE_DATA)]:
+            for k, it in catalog.items():
+                # 階層チェックを優先 (Floor制限があるアイテムのみ)
+                min_f = it.get("min_floor", 1)
+                max_f = it.get("max_floor", 999)
+                if not (min_f <= dungeon.current_floor <= max_f):
+                    continue
+                
+                # ランクチェック
+                from constants import RANK_ORDER
+                p_rank_idx = RANK_ORDER.index(player.guild_rank) if player.guild_rank in RANK_ORDER else 0
+                
+                item_rank = it.get("min_rank", "F")
+                if item_rank in RANK_ORDER:
+                    i_rank_idx = RANK_ORDER.index(item_rank)
+                else:
+                    i_rank_idx = 0 # 未知のランク（Gなど）はFランク扱いにする
+                
+                # デバッグモードでは、現在のランクより少し上のものまでテストで見れるようにする
+                if i_rank_idx > p_rank_idx + 1: 
+                    continue
+
+                # 価格設定なし or shop_buyable: false でも、ドロップ品なら出す
+                candidates.append((ctype, k))
         
+        print(f"[Debug] Found {len(candidates)} spawnable items for Floor {dungeon.current_floor}")
+
         # アイテムの配置
-        for i, (key, itype, data) in enumerate(candidates):
+        dungeon.dropped_items = []
+        for i, cand in enumerate(candidates):
             if i >= len(floor_tiles): break
             tx, ty = floor_tiles[i]
-            px, py = tx * ts, ty * ts
-            if itype == "weapon": item = DroppedWeapon(px, py, key, data)
-            elif itype == "armor": item = DroppedArmor(px, py, key, data)
-            elif itype == "shield": item = DroppedShield(px, py, key, data)
-            elif itype == "stave": item = DroppedStave(px, py, key, data)
-            else: item = DroppedConsumable(px, py, key, data)
-            dungeon.dropped_items.append(item)
-            
-        # 罠の配置
-        from constants import TRAP_DATA
+            ctype, ckey = cand
+            try:
+                if ctype == "weapon": it = DroppedWeapon(tx * ts, ty * ts, ckey, WEAPON_DATA[ckey])
+                elif ctype == "armor": it = DroppedArmor(tx * ts, ty * ts, ckey, ARMOR_DATA[ckey])
+                elif ctype == "shield": it = DroppedShield(tx * ts, ty * ts, ckey, SHIELD_DATA[ckey])
+                elif ctype == "item": it = DroppedConsumable(tx * ts, ty * ts, ckey, CONSUMABLE_DATA[ckey])
+                elif ctype == "stave": it = DroppedStave(tx * ts, ty * ts, ckey, STAVE_DATA[ckey])
+                dungeon.dropped_items.append(it)
+            except Exception as e:
+                print(f"[Debug Error] Failed to spawn {ckey}: {e}")
+        
+        # トラップの配置 (全種類)
         from components.sprites.trap import Trap
         dungeon.traps = []
-        # アイテムの後ろに並べる
         trap_start_idx = len(candidates)
         trap_keys = [k for k in TRAP_DATA.keys() if k != "flood_switch"]
         for i, trap_key in enumerate(trap_keys):
             if trap_start_idx + i >= len(floor_tiles): break
             tx, ty = floor_tiles[trap_start_idx + i]
             trap = Trap(tx, ty, trap_key)
-            trap.is_revealed = True # デバッグ時は最初から見えるように
+            trap.is_revealed = True
             dungeon.traps.append(trap)
         
-        # モンスターの配置 (COMBAT_QA または QUEST_QA モード時)
-        if getattr(dungeon, "is_combat_qa", False) or getattr(dungeon, "is_quest_qa", False):
-            from components.sprites.enemy import Enemy
-            from constants import ENEMY_DATA
-            floor = dungeon.current_floor
-            valid_enemy_types = []
-            
-            # クエスト討伐対象を優先追加
+        # モンスターの配置 (現在のフロアに出現可能な全種類を最低1体ずつ)
+        from components.sprites.enemy import Enemy
+        from constants import ENEMY_DATA
+        floor = dungeon.current_floor
+        valid_enemy_types = []
+        
+        for e_type, e_data in ENEMY_DATA.items():
+            min_f = e_data.get("min_floor", 1)
+            max_f = e_data.get("max_floor", 999)
+            # ボスフラグがある場合は、その指定階層にのみ出す
+            if e_data.get("is_boss") and floor != min_f:
+                continue
+            if min_f <= floor <= max_f:
+                valid_enemy_types.append(e_type)
+        
+        dungeon.enemies = []
+        # アイテム・トラップの後ろに並べる
+        current_tile_idx = trap_start_idx + len(trap_keys)
+        for e_type in valid_enemy_types:
+            spawn_count = 1
+            # クエスト対象なら必要数分出す
             if getattr(dungeon, "is_quest_qa", False):
                 for q in player.active_quests:
-                    if q.get("type") == "hunt":
-                        tkey = q.get("target_key")
-                        if tkey in ENEMY_DATA and tkey not in valid_enemy_types:
-                            valid_enemy_types.append(tkey)
-
-            for e_type, e_data in ENEMY_DATA.items():
-                min_f = e_data.get("min_floor", 1)
-                max_f = e_data.get("max_floor", 999)
-                if min_f <= floor <= max_f:
-                    if e_type not in valid_enemy_types:
-                        valid_enemy_types.append(e_type)
+                    if q.get("type") == "hunt" and q.get("target_key") == e_type:
+                        spawn_count = max(spawn_count, q.get("amount", 1))
             
-            dungeon.enemies = []
-            # アイテムがない分、最初から並べる
-            current_tile_idx = 0
-            for e_type in valid_enemy_types:
-                # クエスト対象なら必要数分出す
-                spawn_count = 1
-                if getattr(dungeon, "is_quest_qa", False):
-                    for q in player.active_quests:
-                        if q.get("type") == "hunt" and q.get("target_key") == e_type:
-                            spawn_count = max(spawn_count, q.get("amount", 1))
-                
-                for _ in range(spawn_count):
-                    if current_tile_idx >= len(floor_tiles): break
-                    tx, ty = floor_tiles[current_tile_idx]
-                    en = Enemy(tx * ts, ty * ts, e_type)
-                    en.target_x, en.target_y = en.x, en.y
-                    dungeon.enemies.append(en)
-                    current_tile_idx += 1
-                
+            for _ in range(spawn_count):
                 if current_tile_idx >= len(floor_tiles): break
-            print(f"[Debug] Spawned {len(dungeon.enemies)} types of enemies for Floor {floor}")
-
-        dungeon._add_floor_edges() # 影を再生成
+                tx, ty = floor_tiles[current_tile_idx]
+                en = Enemy(tx * ts, ty * ts, e_type)
+                en.target_x, en.target_y = en.x, en.y
+                dungeon.enemies.append(en)
+                current_tile_idx += 1
+            
+            if current_tile_idx >= len(floor_tiles): break
+            
+        dungeon._add_floor_edges()
         dungeon.reveal_floor()
         dungeon.is_lighted = True
         
@@ -216,122 +183,70 @@ def setup_gungeon_mode(dungeon, player):
         print(f"[Debug] Gungeon Mode Ready. MapSize:{dungeon.map_width}x{dungeon.map_height}")
         return dungeon
     except Exception as e:
-        print(f"[Error] {e}")
+        print(f"[Error] setup_gungeon_mode: {e}")
         traceback.print_exc()
         return dungeon
 
-def setup_god_mode(player):
-    """クエストQA用などの最強プレイヤー設定（死なないようにするため）"""
-    player.attack = 999
-    player.defense = 999
-    player.hp = 999
-    player.max_hp = 999
-    type(player).eva_bonus = property(lambda self: 0)
-
-def setup_combat_qa_mode(player, dungeon):
-    """戦闘QA用のフラグ設定（ステータスは通常通り）"""
-    dungeon.is_combat_qa = True
-    print("[Debug] Combat QA Mode: Normal player stats for real combat testing.")
-
 def draw_debug_overlay(screen, dungeon, player):
-    """デバッグ用の操作ガイドを画面に表示"""
-    mode_str = "NORMAL"
-    if getattr(dungeon, "is_quest_qa", False): mode_str = "QUEST QA"
-    elif getattr(dungeon, "is_combat_qa", False): mode_str = "COMBAT QA"
-    
     info_lines = [
-        f"DEBUG MODE: {mode_str} - Floor: {dungeon.current_floor}",
+        f"ULTIMATE DEBUG MODE - Floor: {dungeon.current_floor}",
         f"Rank: {player.guild_rank} (GP: {player.guild_point})",
-        "[N] or [+/-] : Floor (1F) | [Shift] N/+/- : Jump 10F",
-        "[/] or [.] : Rank Up | [,] : Rank Down",
-        "[PgUp/Dn] : Adjust GP (+/-50)",
-        "[K] : Cycle Quest Catalog | [L] : Accept/Cancel Quest"
+        "[N/B] : Warp Next/Prev Floor | [Shift]+ : Jump 10F",
+        "[G] : God Mode (Invincibility + Atk x100)",
+        "[H] : Heal HP | [K] : Kill All Enemies",
+        "[PageUp/Dn] : Adjust GP (+/-100)",
+        "[. / ,] : Rank UP / DOWN"
     ]
     
-    # クエストプレビュー（カタログ選択）の表示
-    if getattr(dungeon, "is_quest_qa", False):
-        from constants import load_master_data
-        quests_data = load_master_data("quests.yml")
-        fixed_quests = quests_data.get("FIXED_QUESTS", [])
-        q_idx = getattr(player, "debug_quest_idx", 0)
-        if fixed_quests:
-            q = fixed_quests[q_idx % len(fixed_quests)]
-            # 受注条件チェック
-            from constants import RANK_ORDER
-            try:
-                rank_val = RANK_ORDER.index(player.guild_rank)
-                min_rank_val = RANK_ORDER.index(q.get("min_rank", "F"))
-                max_rank_val = RANK_ORDER.index(q.get("max_rank", "SS"))
-                can_accept = (min_rank_val <= rank_val <= max_rank_val)
-            except ValueError:
-                can_accept = False
-            
-            status = "AVAILABLE" if can_accept else "RANK LOCKED"
-            
-            is_active = any(aq["id"] == q["id"] for aq in player.active_quests)
-            active_mark = "[ACTIVE] " if is_active else ""
-            
-            info_lines.append(f"Catalog: {active_mark}{q['title']}")
-            info_lines.append(f" -> {status} (Min:{q['min_rank']} Max:{q['max_rank']})")
-
     # 受注中クエストの表示
     if player.active_quests:
         info_lines.append("Active Quests:")
         for q in player.active_quests:
             info_lines.append(f" - {q['title']} ({q['type']})")
 
-    # 表示位置の計算 (行数に合わせて上にずらす)
+    # 表示位置の計算
     y_offset = SCREEN_HEIGHT - (len(info_lines) * 30 + 30)
     for line in info_lines:
-        # カラー判定（簡易的）
         c = (255, 255, 255)
-        if "AVAILABLE" in line: c = (100, 255, 100)
-        elif "LOCKED" in line: c = (255, 100, 100)
-        elif "[ACTIVE]" in line: c = (255, 255, 100)
+        if "[ACTIVE]" in line: c = (255, 255, 100)
         
         text_surf = font_small.render(line, True, c)
         bg_rect = text_surf.get_rect(topleft=(20, y_offset))
         
         # 半透明の背景を作成
         bg_surf = pygame.Surface((bg_rect.width + 10, bg_rect.height + 4), pygame.SRCALPHA)
-        bg_surf.fill((0, 0, 0, 160)) # Alpha 160 (視認性向上のため少し濃く)
+        bg_surf.fill((0, 0, 0, 160))
         screen.blit(bg_surf, (bg_rect.x - 5, bg_rect.y - 2))
         
         screen.blit(text_surf, (20, y_offset))
-        y_offset += 30 # 行間を広げて重なりを解消
+        y_offset += 30
 
 def main():
+    """最強デバッグツール：メニューを廃止し、最初から全機能を有効にして起動する"""
     try:
         pygame.init()
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        pygame.display.set_caption("Debug Master")
-        
-        start_floor, is_gungeon_mode = show_menu(screen)
-        if start_floor is None:
-            pygame.quit()
-            return
+        pygame.display.set_caption("ULTIMATE DEBUG TOOL")
 
+        # 1. プレイヤーの初期化
         player = Player()
         player.is_debug = True
-        player.hp = player.max_hp
+        player.attack = 50
+        player.hp = 200
+        player.max_hp = 200
+        player.guild_point = 1000
+        player.guild_rank = "F"
+
+        # 2. ダンジョンの初期化 (1階から開始)
+        dungeon = warp_to_floor(1, player)
         
-        dungeon = warp_to_floor(start_floor, player)
-        
-        if is_gungeon_mode == "COMBAT_QA":
-            dungeon.is_combat_qa = True
-            dungeon = setup_gungeon_mode(dungeon, player)
-            setup_combat_qa_mode(player, dungeon)
-            is_gungeon_mode = True # 特殊マップ生成フラグとして維持
-        elif is_gungeon_mode == "QUEST_QA":
-            dungeon.is_quest_qa = True
-            dungeon = setup_gungeon_mode(dungeon, player)
-            setup_god_mode(player)
-            is_gungeon_mode = True
-        elif is_gungeon_mode:
-            dungeon = setup_gungeon_mode(dungeon, player)
+        # デバッグ用設定の強制有効化
+        dungeon.is_combat_qa = True
+        dungeon.is_quest_qa = True
+        dungeon = setup_gungeon_mode(dungeon, player)
         
         ui_elements = init_ui_elements(SCREEN_WIDTH, SCREEN_HEIGHT)
-        game_state = {"dialog_modal": False, "current_scene": "game"}
+        game_state = {"dialog_modal": False, "current_scene": "game", "is_debug_mode": True}
         setup_ui_relations(ui_elements, player, dungeon, game_state)
 
         clock = pygame.time.Clock()
@@ -341,116 +256,72 @@ def main():
             success, events = handle_events()
             if not success: running = False
             
-            if is_gungeon_mode:
-                dungeon.is_lighted = True
-                for event in events:
-                    if event.type == pygame.KEYDOWN:
-                        # 階層移動 (1階刻み / Shift押下で10階刻み)
-                        mods = pygame.key.get_mods()
-                        step = 10 if (mods & pygame.KMOD_SHIFT) else 1
-                        
-                        change = 0
-                        if event.key in (pygame.K_PLUS, pygame.K_SEMICOLON, pygame.K_EQUALS, pygame.K_KP_PLUS, pygame.K_n):
-                            change = step
-                        elif event.key in (pygame.K_MINUS, pygame.K_KP_MINUS):
-                            change = -step
-                        
-                        if change != 0:
-                            new_floor = max(0, dungeon.current_floor + change)
-                            if new_floor != dungeon.current_floor:
-                                # モードを判定
-                                is_combat_qa = getattr(dungeon, "is_combat_qa", False)
-                                is_quest_qa = getattr(dungeon, "is_quest_qa", False)
-                                is_gungeon = is_gungeon_mode # main内のフラグ
-                                
-                                dungeon.current_floor = new_floor
-                                dungeon = warp_to_floor(dungeon.current_floor, player)
-                                
-                                if is_combat_qa:
-                                    dungeon.is_combat_qa = True
-                                    dungeon = setup_gungeon_mode(dungeon, player)
-                                    setup_combat_qa_mode(player, dungeon)
-                                elif is_quest_qa:
-                                    dungeon.is_quest_qa = True
-                                    dungeon = setup_gungeon_mode(dungeon, player)
-                                    setup_god_mode(player)
-                                elif is_gungeon:
-                                    dungeon = setup_gungeon_mode(dungeon, player)
-                                    
-                                setup_ui_relations(ui_elements, player, dungeon, game_state)
-                                print(f"[Debug] Switched to Floor {dungeon.current_floor} (Step: {change})")
-
-                        # [NEW] ランク・GP操作
-                        from constants import RANK_ORDER
-                        if event.key in (pygame.K_RIGHTBRACKET, pygame.K_SLASH, pygame.K_PERIOD): # ] or / or . : Rank Up
-                            idx = RANK_ORDER.index(player.guild_rank)
-                            if idx < len(RANK_ORDER) - 1:
-                                player.guild_rank = RANK_ORDER[idx + 1]
-                                print(f"[Debug] Rank UP: {player.guild_rank}")
-                                # マップ再生成（クエスト出現テスト用）
-                                dungeon = setup_gungeon_mode(dungeon, player)
-                        elif event.key in (pygame.K_LEFTBRACKET, pygame.K_COMMA): # [ or , : Rank Down
-                            idx = RANK_ORDER.index(player.guild_rank)
-                            if idx > 0:
-                                player.guild_rank = RANK_ORDER[idx - 1]
-                                print(f"[Debug] Rank DOWN: {player.guild_rank}")
-                                dungeon = setup_gungeon_mode(dungeon, player)
-                        elif event.key == pygame.K_PAGEUP: # GP +50
-                            player.guild_point += 50
-                            print(f"[Debug] GP +50: {player.guild_point}")
+            # --- デバッグ用チートキー ---
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    mods = pygame.key.get_mods()
+                    # 階層ワープ
+                    change = 0
+                    if event.key == pygame.K_n: change = 10 if (mods & pygame.KMOD_SHIFT) else 1
+                    elif event.key == pygame.K_b: change = -(10 if (mods & pygame.KMOD_SHIFT) else 1)
+                    
+                    if change != 0:
+                        new_floor = max(0, dungeon.current_floor + change)
+                        dungeon = warp_to_floor(new_floor, player, spawn_reason="debug")
+                        dungeon.is_combat_qa = True
+                        dungeon.is_quest_qa = True
+                        dungeon = setup_gungeon_mode(dungeon, player)
+                        setup_ui_relations(ui_elements, player, dungeon, game_state)
+                        print(f"[DEBUG] Warp to Floor {new_floor}")
+                    
+                    # 各種チート
+                    elif event.key == pygame.K_h: # Heal
+                        player.hp = player.max_hp
+                        print("[DEBUG] Player Healed!")
+                    elif event.key == pygame.K_g: # God Mode
+                        player.is_god = not getattr(player, "is_god", False)
+                        if player.is_god: player.attack *= 100
+                        else: player.attack //= 100
+                        print(f"[DEBUG] God Mode: {'ON' if player.is_god else 'OFF'}")
+                    elif event.key == pygame.K_k: # Kill All
+                        count = len(dungeon.enemies)
+                        dungeon.enemies = []
+                        print(f"[DEBUG] Annihilated {count} enemies!")
+                    
+                    # 進捗調整
+                    elif event.key == pygame.K_PAGEUP:
+                        player.guild_point += 100
+                        print(f"[DEBUG] GP increased to {player.guild_point}")
+                    elif event.key == pygame.K_PAGEDOWN:
+                        player.guild_point = max(0, player.guild_point - 100)
+                        print(f"[DEBUG] GP decreased to {player.guild_point}")
+                    elif event.key == pygame.K_PERIOD:
+                        ranks = ["F", "E", "D", "C", "B", "A", "S"]
+                        idx = ranks.index(player.guild_rank) if player.guild_rank in ranks else 0
+                        if idx < len(ranks) - 1:
+                            player.guild_rank = ranks[idx + 1]
+                            print(f"[DEBUG] Rank UP: {player.guild_rank}")
+                            dungeon = setup_gungeon_mode(dungeon, player) # クエスト候補更新のため
+                    elif event.key == pygame.K_COMMA:
+                        ranks = ["F", "E", "D", "C", "B", "A", "S"]
+                        idx = ranks.index(player.guild_rank) if player.guild_rank in ranks else 0
+                        if idx > 0:
+                            player.guild_rank = ranks[idx - 1]
+                            print(f"[DEBUG] Rank DOWN: {player.guild_rank}")
                             dungeon = setup_gungeon_mode(dungeon, player)
-                        elif event.key == pygame.K_PAGEDOWN: # GP -50
-                            player.guild_point = max(0, player.guild_point - 50)
-                            print(f"[Debug] GP -50: {player.guild_point}")
-                            dungeon = setup_gungeon_mode(dungeon, player)
-                        
-                        # [NEW] クエスト選択・受注操作
-                        elif event.key == pygame.K_k: # K: Cycle Quest
-                            player.debug_quest_idx = getattr(player, "debug_quest_idx", 0) + 1
-                        elif event.key == pygame.K_l: # L: Toggle Accept
-                            from constants import load_master_data
-                            quests_data = load_master_data("quests.yml")
-                            fixed_quests = quests_data.get("FIXED_QUESTS", [])
-                            if fixed_quests:
-                                q_idx = getattr(player, "debug_quest_idx", 0)
-                                q = fixed_quests[q_idx % len(fixed_quests)]
-                                # 既に受けているかチェック
-                                existing = next((aq for aq in player.active_quests if aq["id"] == q["id"]), None)
-                                if existing:
-                                    player.remove_quest(existing)
-                                    print(f"[Debug] Quest Removed & Tokens Reset: {q['title']}")
-                                else:
-                                    # [NEW] 1つ制限
-                                    if len(player.active_quests) >= 1:
-                                        print("[Debug] Quest limit reached (1). Remove existing quest first.")
-                                    else:
-                                        player.accept_quest(q)
-                                        print(f"[Debug] Quest Accepted: {q['title']}")
-                                # ターゲット出現のためにマップ再生成
-                                dungeon = setup_gungeon_mode(dungeon, player)
 
-            # ギルドメニューを閉じた瞬間を検知
+            # 常に全表示
+            dungeon.is_lighted = True
+            
+            # ゲーム本編
             guild_was_active = ui_elements["guild_dialog"].is_active
+            dungeon = handle_game(screen, events, player, dungeon, ui_elements, game_state)
             
-            new_d = handle_game(screen, events, player, dungeon, ui_elements, game_state)
-            
-            # ギルドメニューが閉じられたらマップを最新化
-            if guild_was_active and not ui_elements["guild_dialog"].is_active and is_gungeon_mode:
-                print(f"[Debug] Guild Menu closed. Refreshing map for potential quest changes...")
+            # ギルドメニューが閉じられたらマップを最新化（クエスト対象反映のため）
+            if guild_was_active and not ui_elements["guild_dialog"].is_active:
                 dungeon = setup_gungeon_mode(dungeon, player)
-                new_d = dungeon
-                # 他のUI要素にも新しい参照を渡す
-                if ui_elements.get("shop_dialog"):
-                    ui_elements["shop_dialog"].dungeon_ref = dungeon
-            
-            if not is_gungeon_mode:
-                dungeon = new_d
-            else:
-                if new_d != dungeon:
-                    dungeon = new_d
             
             draw_debug_overlay(screen, dungeon, player)
-            
             pygame.display.flip()
             clock.tick(60)
 

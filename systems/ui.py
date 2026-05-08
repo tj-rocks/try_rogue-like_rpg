@@ -175,6 +175,27 @@ def draw_dialog_frame(screen, x, y, width, height, alpha=None):
             inner_rect = (x + inset, y + inset, width - inset*2, height - inset*2)
             pygame.draw.rect(screen, border_color, inner_rect, 1, border_radius=max(0, radius - inset))
 
+def show_dialog(dialog, text, modal=False, auto_close=None):
+    """
+    メッセージウィンドウにテキストを表示する。
+    既に表示中の場合は改行して追記する。
+    """
+    if not dialog: return
+    from constants import COMBAT_LOG_WAIT_FRAMES
+    
+    if dialog.is_active:
+        # 重複表示を避けるため、最後の行と同じなら追記しない
+        last_line = dialog.text.split("\n")[-1] if dialog.text else ""
+        if last_line != text:
+            dialog.text += "\n" + text
+    else:
+        dialog.text = text
+        dialog.is_active = True
+        
+    from systems.game_state import game_state
+    game_state["dialog_modal"] = modal
+    dialog.auto_close_timer = auto_close if auto_close is not None else COMBAT_LOG_WAIT_FRAMES
+
 class Dialog:
     def __init__(self, screen_width, screen_height):
         # 画面サイズに合わせて、下部に長方形のダイアログを自動配置する
@@ -1598,11 +1619,8 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                 def on_inn_done():
                                                     player.coin -= INN_FEE
                                                     player.hp = player.max_hp
-                                                    from systems.data_loader import SAVE_OFFICIAL_PATH, SAVE_SUSPEND_PATH
+                                                    from systems.data_loader import SAVE_OFFICIAL_PATH
                                                     player.save_to_file(SAVE_OFFICIAL_PATH)
-                                                    if os.path.exists(SAVE_SUSPEND_PATH):
-                                                        try: os.remove(SAVE_SUSPEND_PATH)
-                                                        except: pass
                                                     dialog.text = Text.NPC.INN_RECOVERED
                                                     dialog.is_active = True
                                                     print(f"[INN] Rest Complete. Official save created. HP: {player.hp}, Coin: {player.coin}")
@@ -1645,6 +1663,13 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             dialog.text = Text.NPC.ITEM_SHOP_WELCOME
                                             dialog.is_active = True
                                             shop_dialog.open_shop("道具屋", dungeon.item_shop_stock)
+                                            return
+                                    elif npc.name == "大魔導士":
+                                        shop_dialog = kwargs.get("shop_dialog")
+                                        if shop_dialog and dungeon:
+                                            dialog.text = "フォッフォッフォ、杖のことならわしに任せるがよいぞ。"
+                                            dialog.is_active = True
+                                            shop_dialog.open_shop("魔法屋", dungeon.magic_shop_stock)
                                             return
                                     elif npc.name == "商人":
                                         shop_dialog = kwargs.get("shop_dialog")
@@ -2208,7 +2233,18 @@ class StatusDialog:
         game_state["status_active"] = v
         if v:
             print(f"[UI] Open StatusDialog (Mode: {self.mode})")
-            self.mode = "MENU"; self.cursor_idx = 0
+            # 外部から mode が指定されていない場合（直接起動など）は MENU にする
+            if self.mode not in ("STATUS", "QUESTS"):
+                self.mode = "MENU"
+            
+            # モードに関わらず、詳細表示中は左側を「もどる」だけにする（迷わせない）
+            all_cats = [("STATUS", "能力確認"), ("QUESTS", "クエスト進捗"), ("QUIT", Text.UI.QUIT)]
+            if self.mode in ("STATUS", "QUESTS"):
+                self.categories = [("QUIT", Text.UI.QUIT)]
+                self.cursor_idx = 0
+            else:
+                self.categories = all_cats
+                self.cursor_idx = 0
         else:
             print(f"[UI] Close StatusDialog")
             game_state["dialog_just_closed"] = True
@@ -2244,8 +2280,10 @@ class StatusDialog:
                         print(f"[UI] Status Button Pressed: CANCEL")
                         self._close_back()
                 else:
+                    # 詳細表示中も、戻る（もどる/キャンセル）操作で直接閉じる
                     if event.key in (KEY_CANCEL, KEY_CONFIRM, KEY_MENU):
-                        self.mode = "MENU"
+                        # もし「もどる」にカーソルが合っている状態をシミュレートするならここでも閉じられるようにする
+                        self._close_back()
 
     def draw(self, screen, player):
         if not self.is_active: return
@@ -2255,16 +2293,20 @@ class StatusDialog:
         separator_x = self.x + 240
         pygame.draw.line(screen, (80, 100, 120), (separator_x, self.y + 30), (separator_x, self.y + self.height - 30), 2)
 
-        # --- 左側：カテゴリ ---
+        # --- 左側：カテゴリ (現在のモードに応じて制限されたリスト) ---
         for i, (code, label) in enumerate(self.categories):
             y_pos = self.y + 60 + i * 45
             color = (255, 255, 255)
-            if self.mode == "MENU" and i == self.cursor_idx:
+            # 現在表示中のモード、またはカーソルがあっている項目を強調
+            # 詳細モード（STATUS/QUESTS）の時は、唯一の項目である「もどる」を強制的に強調する
+            is_selected = (self.mode == "MENU" and i == self.cursor_idx)
+            is_active_mode = (self.mode == code)
+            is_detail_focused = (self.mode in ("STATUS", "QUESTS"))
+            
+            if is_selected or is_active_mode or is_detail_focused:
                 color = (255, 255, 100)
                 pygame.draw.rect(screen, (60, 70, 90), (self.x + 20, y_pos - 5, 200, 40), border_radius=5)
                 screen.blit(self.font.render(">", True, color), (self.x + 35, y_pos))
-            elif self.mode == code:
-                color = (200, 200, 255)
             
             screen.blit(self.font.render(label, True, color), (self.x + 65, y_pos))
 
@@ -2399,18 +2441,18 @@ class ShopDialog(BaseListDialog):
         from constants import CONSUMABLE_DATA, WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, STAVE_DATA
         for item in player.items:
             info = CONSUMABLE_DATA.get(item["key"], {})
-            self.items.append((item["key"], "consumable", info.get("name", item["key"]), int(info.get("price", 0) * 0.5), item["count"]))
+            self.items.append((item["key"], "consumable", info.get("name", item["key"]), int(info.get("price", 0) // 3), item["count"]))
         for eq in player.weapon_inventory:
-            price = int(WEAPON_DATA.get(eq.key, {}).get("price", 0) * 0.5)
+            price = int(WEAPON_DATA.get(eq.key, {}).get("price", 0) // 3)
             self.items.append((eq.iid, "weapon_inst", eq.get_name(), price, 1, eq.key))
         for eq in player.armor_inventory:
-            price = int(ARMOR_DATA.get(eq.key, {}).get("price", 0) * 0.5)
+            price = int(ARMOR_DATA.get(eq.key, {}).get("price", 0) // 3)
             self.items.append((eq.iid, "armor_inst", eq.get_name(), price, 1, eq.key))
         for eq in player.shield_inventory:
-            price = int(SHIELD_DATA.get(eq.key, {}).get("price", 0) * 0.5)
+            price = int(SHIELD_DATA.get(eq.key, {}).get("price", 0) // 3)
             self.items.append((eq.iid, "shield_inst", eq.get_name(), price, 1, eq.key))
         for st in player.stave_inventory:
-            price = int(STAVE_DATA.get(st.key, {}).get("price", 0) * 0.5)
+            price = int(STAVE_DATA.get(st.key, {}).get("price", 0) // 3)
             self.items.append((st.iid, "stave_inst", st.get_name_with_charges(), price, 1, st.key))
         self.items.append(("cancel", "cancel", Text.UI.SHOP_CANCEL, 0, 1))
 

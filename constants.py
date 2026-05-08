@@ -5,7 +5,7 @@ constants.py — ゲーム全体で使うキー設定やパラメータを一箇
 import pygame
 from wordings import Text
 from systems.data_loader import (
-    load_master_data, SAVE_DATA_PATH, MASTER_DATA_DIR,
+    load_master_data, MASTER_DATA_DIR,
     generate_rank_floor_map, get_normalized_enemy_data,
     get_normalized_equipment_data, get_normalized_item_data
 )
@@ -25,7 +25,9 @@ BGM_OPENING = "components/sounds/bgm/winding_adventure.mp3"
 BGM_VILLAGE  = "components/sounds/bgm/village_theme.mp3"
 BGM_DEFEAT   = "components/sounds/bgm/gameover.mp3"
 BGM_OVERFLOW = "components/sounds/bgm/beyond_the_suffer.mp3"
+BGM_BOSS     = "components/sounds/bgm/get_hornor.mp3"
 SOUND_QUEST_COMPLETE = "components/sounds/sfx/quest_complete.wav"
+SOUND_BOSS_VICTORY   = "components/sounds/sfx/killed_boss.wav"  # ボス撃破時の専用SE
 SOUND_RANK_UP        = "components/sounds/sfx/quest_complete.wav"  # ランクアップ時の効果音
 SOUND_INN_REST       = "components/sounds/sfx/recharge.wav"        # 宿屋宿泊時の効果音
 SOUND_CURSOR_MOVE    = "components/sounds/sfx/cursor.wav"          # カーソル移動音
@@ -213,6 +215,19 @@ OBSTACLE_TOTAL_SCALE_ADD   = _o.get("OBSTACLE_TOTAL_SCALE_ADD", 2)
 # Data Source: balance.yml (STATUS_EFFECTS)
 STATUS_EFFECTS = _balance.get("STATUS_EFFECTS", {})
 POISON_CURE_FEE = STATUS_EFFECTS.get("poison", {}).get("cure_fee", 100)
+
+# 🏠 VILLAGE_SERVICES (村の施設・サービス料金)
+# ------------------------------------------------------------------------------
+# Data Source: balance.yml (VILLAGE_SERVICES)
+_vs = _balance.get("VILLAGE_SERVICES", {})
+INN_FEE       = _vs.get("INN_FEE", 60)
+DOCTOR_FEE    = _vs.get("DOCTOR_FEE", 50)
+WAREHOUSE_FEE = _vs.get("WAREHOUSE_FEE", 10)
+
+# 🧙 MAGIC_SHOP (魔法屋)
+_ms = _vs.get("MAGIC_SHOP", {})
+RECHARGE_COST_PER_CHARGE = _ms.get("RECHARGE_COST_PER_CHARGE", 15)
+STAVE_PRICE_MULTIPLIER   = _ms.get("STAVE_PRICE_MULTIPLIER", 1.5)
 
 # ------------------------------------------------------------------------------
 

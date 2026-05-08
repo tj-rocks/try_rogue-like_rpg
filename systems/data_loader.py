@@ -35,9 +35,16 @@ def load_data_file(filepath, default=None):
 
 # パス設定
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# パス設定（他のPCでも動くよう、実行ファイルからの相対パスで算出）
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_official.json")
-SAVE_SUSPEND_PATH = SAVE_OFFICIAL_PATH # 一本化：中断セーブも正式セーブと同じ場所へ
-SAVE_DATA_PATH = SAVE_OFFICIAL_PATH # 後方互換性のため
+
+# [NEW] デバッグモード時はセーブファイルを分離する
+if os.environ.get("DEBUG_MODE") == "1":
+    SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_data_debug.json")
+
+SAVE_SUSPEND_PATH = SAVE_OFFICIAL_PATH # 一本化
+SAVE_DATA_PATH = SAVE_OFFICIAL_PATH # 後方互換性
 MASTER_DATA_DIR = os.path.join(_ROOT, "components/data/master")
 
 def load_master_data(filename, default=None):

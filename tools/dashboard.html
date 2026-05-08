@@ -350,17 +350,25 @@
 
                 tableHead.innerHTML = `<tr><th>Enemy ID</th><th>Name</th><th>HP</th><th>DEF</th><th>Hits to Kill</th><th>Actions</th></tr>`;
                 const rankEnemies = Object.entries(masterData.enemies).filter(([id, e]) => (e.min_rank || e.rank) === rank && !e.is_static);
+                const hasPenetration = weapon.armor_penetration === true;
+                
                 tableBody.innerHTML = rankEnemies.map(([id, e]) => {
                     const hp = liveEnemyOverrides[id]?.hp ?? e.hp;
                     const def = liveEnemyOverrides[id]?.defense ?? e.defense;
-                    const dmg = Math.max(1, totalAtk - def);
+                    
+                    // 防御力貫通の適用
+                    const effectiveDef = hasPenetration ? 0 : def;
+                    const dmg = Math.max(1, totalAtk - effectiveDef);
+                    
                     const hits = Math.ceil(hp / dmg);
                     const cls = hits <= 1 ? 'hit-1' : (hits === 2 ? 'hit-2' : (hits === 3 ? 'hit-3' : 'hit-danger'));
+                    const penBadge = hasPenetration ? `<span class="badge" style="background: rgba(255,255,0,0.1); color: yellow; border: 1px solid yellow; margin-left: 4px;">貫通!</span>` : "";
+                    
                     return `
                         <tr>
-                            <td class="row-id">${id}</td><td class="row-name">${e.name}</td>
+                            <td class="row-id">${id}</td><td class="row-name">${e.name}${penBadge}</td>
                             <td><input class="edit-input" type="number" value="${hp}" oninput="onEnemyInput('${id}', 'hp', this.value)" onblur="updateStat('enemies', '${id}', 'hp', this.value)"></td>
-                            <td><input class="edit-input" type="number" value="${def}" oninput="onEnemyInput('${id}', 'defense', this.value)" onblur="updateStat('enemies', '${id}', 'defense', this.value)"></td>
+                            <td><input class="edit-input" type="number" value="${def}" oninput="onEnemyInput('${id}', 'defense', this.value)" onblur="updateStat('enemies', '${id}', 'defense', this.value)" style="${hasPenetration ? 'text-decoration: line-through; opacity: 0.5;' : ''}"></td>
                             <td><span class="badge ${cls}">${hits}撃</span></td>
                             <td><button class="save-btn" onclick="updateStat('enemies', '${id}', 'hp', this.parentNode.parentNode.querySelectorAll('input')[0].value)">Save All</button></td>
                         </tr>`;

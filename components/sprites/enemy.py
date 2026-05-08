@@ -13,7 +13,6 @@ from constants import (
     WEAPON_DATA, ARMOR_DATA, SHIELD_DATA
 )
 from systems.combat_handler import deal_damage
-from components.sprites.player import EquipInstance
 
 class Enemy(Entity):
     # クラスレベルで画像をキャッシュする（同じ種類の敵で画像を共有してメモリとCPUを節約）
@@ -59,6 +58,8 @@ class Enemy(Entity):
         # 討伐時の報酬パラメータ
         self.exp = data.get("exp", 5)
         self.drops = data.get("drops", [])
+        self.is_boss = data.get("is_boss", False) # [NEW] ボスフラグ
+        self.bgm = data.get("bgm") # [NEW] ボス用BGM
         
         # 戦闘パラメータ
         self.crit_rate = data.get("crit_rate", 0.01) # 会心率
@@ -72,7 +73,9 @@ class Enemy(Entity):
         self.status_chance = data.get("status_chance", 100) # 付与確率 (0-100)
         
         # 画像の読み込み（キャッシュがあればそれを使う）
-        cache_key = (enemy_type, self.width, self.height)
+        color_hex = data.get("image_color")
+        cache_key = (enemy_type, self.width, self.height, color_hex)
+        
         if cache_key in Enemy._image_cache:
             self.images = Enemy._image_cache[cache_key]
         else:
@@ -80,11 +83,28 @@ class Enemy(Entity):
             image_path = data.get("image_path")
             folder_path = data.get("image_folder", "")
             
+            # 着色用の色を取得
+            tint_color = None
+            if color_hex:
+                try:
+                    c = color_hex.lstrip('#')
+                    tint_color = tuple(int(c[i:i+2], 16) for i in (0, 2, 4))
+                except:
+                    pass
+
+            def apply_tint(surface):
+                if tint_color:
+                    tinted = surface.copy()
+                    tinted.fill(tint_color, special_flags=pygame.BLEND_RGB_MULT)
+                    return tinted
+                return surface
+            
             # 1. 直接画像パスが指定されている場合
             if image_path:
                 try:
                     img = pygame.image.load(image_path).convert_alpha()
                     img = pygame.transform.scale(img, (self.width, self.height))
+                    img = apply_tint(img)
                     # 左右反転を適用（障害物は除外）
                     if not self.is_static:
                         self.images = {
@@ -101,6 +121,7 @@ class Enemy(Entity):
                 for d in ["up", "down", "left", "right"]:
                     try:
                         img = pygame.image.load(f"{folder_path}/{d}.png").convert_alpha()
+                        img = apply_tint(img)
                     except Exception as e:
                         # 右向き画像がない場合は左向きを反転して使う（障害物以外）
                         if d == "right" and not self.is_static and "left" in self.images:
@@ -130,106 +151,7 @@ class Enemy(Entity):
             Enemy._image_cache[cache_key] = self.images
         
         self.idle_anim_timer = 0
-        
-        # --- 装備システムの初期化 ---
-        self.weapon = None
-        # 装備するかどうかはランダム（50%の確率）
-        equip_chance = data.get("equip_chance", 0.5)
-        
-        self.equipped_weapon = data.get("equipped_weapon") if random.random() < equip_chance else None
-        self.equipped_armor = data.get("equipped_armor") if random.random() < equip_chance else None
-        self.equipped_shield = data.get("equipped_shield") if random.random() < equip_chance else None
-        
-        self.armor_inst = None
-        self.shield_inst = None
-        self._armor_images = {}
-        self._shield_images = {}
-        
-        self.update_equipment_stats()
 
-    def update_equipment_stats(self):
-        """現在の装備に基づいてステータスと画像を更新する"""
-        from components.sprites.weapon import get_weapon_instance
-        
-        # 1. 武器の設定
-        if self.equipped_weapon:
-            self.weapon = get_weapon_instance(self.equipped_weapon, 0)
-            if self.weapon:
-                # 攻撃力加算
-                self.attack += self.weapon.data.get("attack_bonus", 0)
-                # 命中補正（近接・遠隔）
-                self.accuracy_close += self.weapon.data.get("accuracy_bonus_close", self.weapon.data.get("accuracy_bonus", 0))
-                self.accuracy_ranged += self.weapon.data.get("accuracy_bonus_ranged", self.weapon.data.get("accuracy_bonus", 0))
-        
-        # 2. 鎧の設定
-        if self.equipped_armor:
-            data = ARMOR_DATA.get(self.equipped_armor)
-            if data:
-                self.armor_inst = EquipInstance("armor", self.equipped_armor)
-                self.defense += data.get("defense_bonus", 0)
-                self.hp = self.max_hp = self.max_hp + data.get("hp_bonus", 0)
-                # 命中・回避補正
-                self.accuracy_close += data.get("accuracy_bonus_close", data.get("accuracy_bonus", 0))
-                self.accuracy_ranged += data.get("accuracy_bonus_ranged", data.get("accuracy_bonus", 0))
-                self.evasion = getattr(self, "evasion", 0) + data.get("eva_bonus", 0)
-                # 画像のロード
-                self._load_armor_images(data)
-                
-        # 3. 盾の設定
-        if self.equipped_shield:
-            data = SHIELD_DATA.get(self.equipped_shield)
-            if data:
-                self.shield_inst = EquipInstance("shield", self.equipped_shield)
-                # ブロック率の設定
-                self.block_chance = data.get("block_chance", 0.0)
-                self.block_chance_close = data.get("block_chance_close", self.block_chance)
-                self.block_chance_ranged = data.get("block_chance_ranged", self.block_chance)
-                # ステータス補正
-                self.accuracy_close += data.get("accuracy_bonus_close", data.get("accuracy_bonus", 0))
-                self.accuracy_ranged += data.get("accuracy_bonus_ranged", data.get("accuracy_bonus", 0))
-                self.evasion = getattr(self, "evasion", 0) + data.get("eva_bonus", 0)
-                # 画像のロード
-                self._load_shield_images(data)
-
-    def _load_armor_images(self, data):
-        img_dir = data.get("image_dir", "")
-        if not img_dir: return
-        import os
-        for d in ("down", "left", "right", "up"):
-            path = f"{img_dir}/{d}.png"
-            if os.path.exists(path):
-                try:
-                    raw = pygame.image.load(path).convert_alpha()
-                    self._armor_images[d] = pygame.transform.scale(raw, (self.width, self.height))
-                except: pass
-
-    def _load_shield_images(self, data):
-        img_dir = data.get("image_dir", "")
-        if not img_dir: return
-        import os
-        scale = data.get("image_scale", 1.0)
-        target_w, target_h = int(self.width * scale), int(self.height * scale)
-        
-        shared_path = os.path.join(img_dir, "shield.png")
-        shared_img = None
-        if os.path.exists(shared_path):
-            try:
-                raw = pygame.image.load(shared_path).convert_alpha()
-                shared_img = pygame.transform.scale(raw, (target_w, target_h))
-            except: pass
-            
-        for d in ("down", "left", "right", "up"):
-            path = os.path.join(img_dir, f"{d}.png")
-            if os.path.exists(path):
-                try:
-                    raw = pygame.image.load(path).convert_alpha()
-                    self._shield_images[d] = pygame.transform.scale(raw, (target_w, target_h))
-                except: pass
-            elif shared_img:
-                if d == "left":
-                    self._shield_images[d] = pygame.transform.flip(shared_img, True, False)
-                else:
-                    self._shield_images[d] = shared_img
 
     def draw(self, screen, camera_x, camera_y):
         import math
@@ -317,63 +239,9 @@ class Enemy(Entity):
             final_scale_y = scale_anim_y * scale_atk
             center_x, center_y = draw_x + (current_img.get_width() / 2), draw_y + (current_img.get_height() / 2)
             
-            # 盾の重なり順
-            shield_over = {"up": False, "down": True, "left": True, "right": False}.get(self.facing, True)
-            
-            # 1. 背後の盾
-            if self.equipped_shield and not shield_over:
-                self._draw_shield_overlay(screen, draw_x, draw_y, scale_x=final_scale_x, scale_y=final_scale_y)
-            
-            # 2. 背後の武器
-            progress = 0
-            if self.is_attacking:
-                from constants import ATTACK_ANIMATION_FRAMES
-                progress = (ATTACK_ANIMATION_FRAMES - getattr(self, "attack_timer", 0)) / ATTACK_ANIMATION_FRAMES
-            
-            if self.weapon:
-                is_over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
-                if not is_over:
-                    if self.is_attacking: self.weapon.draw_attack(screen, center_x, center_y, self.facing, progress, scale_x=final_scale_x, scale_y=final_scale_y)
-                    else: self.weapon.draw_idle(screen, center_x, center_y, self.facing, scale_x=final_scale_x, scale_y=final_scale_y)
-            
-            # 3. モンスター本体
+            # モンスター本体の描画
             if is_visible:
                 screen.blit(current_img, (draw_x, draw_y))
-            
-            # 4. 鎧
-            if self.equipped_armor:
-                self._draw_armor_overlay(screen, draw_x, draw_y, scale_x=final_scale_x, scale_y=final_scale_y)
-            
-            # 5. 手前の盾
-            if self.equipped_shield and shield_over:
-                self._draw_shield_overlay(screen, draw_x, draw_y, scale_x=final_scale_x, scale_y=final_scale_y)
-            
-            # 6. 手前の武器
-            if self.weapon:
-                is_over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
-                if is_over:
-                    if self.is_attacking: self.weapon.draw_attack(screen, center_x, center_y, self.facing, progress, scale_x=final_scale_x, scale_y=final_scale_y)
-                    else: self.weapon.draw_idle(screen, center_x, center_y, self.facing, scale_x=final_scale_x, scale_y=final_scale_y)
-
-    def _draw_armor_overlay(self, screen, draw_x, draw_y, scale_x=1.0, scale_y=1.0):
-        img = self._armor_images.get(self.facing)
-        if img:
-            if scale_x != 1.0 or scale_y != 1.0:
-                w, h = img.get_size()
-                img = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
-            data = ARMOR_DATA.get(self.equipped_armor, {})
-            offsets = data.get("offsets", {}).get(self.facing, (0, 0))
-            screen.blit(img, (draw_x + offsets[0] * scale_x, draw_y + offsets[1] * scale_y))
-
-    def _draw_shield_overlay(self, screen, draw_x, draw_y, scale_x=1.0, scale_y=1.0):
-        img = self._shield_images.get(self.facing)
-        if img:
-            if scale_x != 1.0 or scale_y != 1.0:
-                w, h = img.get_size()
-                img = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
-            data = SHIELD_DATA.get(self.equipped_shield, {})
-            offsets = data.get("offsets", {}).get(self.facing, (0, 0))
-            screen.blit(img, (draw_x + offsets[0] * scale_x, draw_y + offsets[1] * scale_y))
 
 
     def _move_randomly(self, dungeon, all_entities):
@@ -478,11 +346,16 @@ class Enemy(Entity):
             sound_path = "components/sounds/sfx/enemy_attack_common.wav"
         sound_manager.play_sfx(sound_path)
 
-        # 遠距離攻撃（弾を発射するタイプ）の場合はエフェクトを発射
-        if self.current_attack_pattern.get("type") == "ranged":
-            from systems.magic_handler import ProjectileEffect
-            visual_type = self.current_attack_pattern.get("visual")
-            if visual_type:
+        # 1. 弾（visual）が設定されている場合は、エフェクトを発射
+        visual_type = self.current_attack_pattern.get("visual")
+        if visual_type:
+            if visual_type == "explosion":
+                # 爆発（イグニの流用）: プレイヤーの足元に直接火柱を出す
+                from systems.magic_handler import FireEffect
+                dungeon.magic_effects.append(FireEffect(player.x, player.y))
+            else:
+                # 通常の弾（ファイアボール等）
+                from systems.magic_handler import ProjectileEffect
                 dungeon.magic_effects.append(ProjectileEffect(
                     self.x, self.y, player.x, player.y, effect_type=visual_type, duration=ATTACK_ANIMATION_FRAMES
                 ))
