@@ -55,6 +55,42 @@ def draw_title_screen(screen, background_img, selected_idx, has_save):
             
         draw_text_wrapped(screen, font_medium, item, 0, start_y + i * 80, screen.get_width(), align_h='center', color=color)
 
+def show_loading_screen(screen, text=None):
+    """
+    重い処理（ダンジョン生成やセーブ）の前に呼び出して、
+    画面全体を少し暗くし、中央に読み込み中表示を出す。
+    """
+    if text is None: text = Text.UI.NOW_LOADING
+    
+    sw, sh = screen.get_size()
+    
+    # 1. 画面全体を少し暗くするオーバーレイ
+    overlay = pygame.Surface((sw, sh), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 180))
+    screen.blit(overlay, (0, 0))
+    
+    # 2. 中央のメッセージボックス
+    box_w, box_h = 300, 100
+    box_rect = pygame.Rect((sw - box_w) // 2, (sh - box_h) // 2, box_w, box_h)
+    
+    # 角丸のボックス
+    pygame.draw.rect(screen, (30, 30, 50), box_rect, border_radius=10)
+    # 二重線
+    pygame.draw.rect(screen, (255, 255, 255), box_rect, 2, border_radius=10)
+    inner_box = box_rect.inflate(-12, -12)
+    pygame.draw.rect(screen, (255, 255, 255), inner_box, 1, border_radius=6)
+    
+    # テキスト描画
+    draw_text_wrapped(screen, font_medium, text, box_rect.x, box_rect.y, box_w, box_h, align_h='center', align_v='center', color=(255, 255, 200))
+    
+    # 3. スピナー（静止画だが、呼び出し直後に一瞬見えるだけで安心感が出る）
+    # 円形の装飾
+    center_x, center_y = sw // 2, sh // 2 + 35
+    pygame.draw.circle(screen, (255, 255, 100), (center_x, center_y), 5)
+    
+    # 画面を強制更新（これを行わないと、直後の重い処理中に画面に反映されない）
+    pygame.display.flip()
+
 def draw_text_wrapped(screen, font, text, x, y, max_width, box_height=None, color=(255, 255, 255), align_h='left', align_v='top'):
     """指定されたボックス内でテキストを折り返し、アライメント（左・中央・右 / 上・中・下）を考慮して描画する"""
     if not text: return
@@ -126,9 +162,15 @@ def draw_dialog_frame(screen, x, y, width, height, alpha=None):
     pygame.draw.rect(s, bg_color, (0, 0, width, height), border_radius=radius)
     screen.blit(s, (x, y))
     
-    # 枠線
+    # 枠線 (二重線)
     if border_w > 0:
+        # 外枠
         pygame.draw.rect(screen, border_color, (x, y, width, height), border_w, border_radius=radius)
+        # 内枠 (4px 内側に、細い線を描画)
+        inset = 6
+        if width > inset*2 and height > inset*2:
+            inner_rect = (x + inset, y + inset, width - inset*2, height - inset*2)
+            pygame.draw.rect(screen, border_color, inner_rect, 1, border_radius=max(0, radius - inset))
 
 class Dialog:
     def __init__(self, screen_width, screen_height):
@@ -144,6 +186,7 @@ class Dialog:
         self.auto_close_timer = 0
         self.scroll_y = 0 # 現在の表示開始行
         self.max_scroll = 0
+        self.just_opened_timer = 0 # 開いた直後の入力を無視するためのタイマー
 
 
     # is_active（開閉状態）は独立した変数ではなく、中央の game_state を使うように変更！
@@ -166,9 +209,15 @@ class Dialog:
             self.scroll_y = 0
             game_state["dialog_modal"] = True # デフォルトに戻す
             game_state["dialog_just_closed"] = True # 誤爆防止
+        else:
+            # 開いた瞬間にフラグを立てる (2フレーム分無視)
+            self.just_opened_timer = 2
 
     def update(self):
         """毎フレーム呼ばれ、オートクローズタイマーのカウントダウンなどを行う"""
+        if self.just_opened_timer > 0:
+            self.just_opened_timer -= 1
+
         if self.is_active and self.auto_close_timer > 0:
             self.auto_close_timer -= 1
             if self.auto_close_timer <= 0:
@@ -176,7 +225,7 @@ class Dialog:
 
     def handle_events(self, events):
         """操作: スペース/Enterで閉じる、上下キーでスクロール"""
-        if not self.is_active: return
+        if not self.is_active or self.just_opened_timer > 0: return
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_SPACE, pygame.K_RETURN, KEY_CONFIRM):
@@ -200,8 +249,13 @@ class Dialog:
         pygame.draw.rect(s, bg_color, (0, 0, self.width, self.height), border_radius=radius)
         screen.blit(s, (self.x, self.y))
         
-        # 2. 枠線
+        # 2. 枠線 (二重線)
+        # 外枠
         pygame.draw.rect(screen, border_color, (self.x, self.y, self.width, self.height), 4, border_radius=radius)
+        # 内枠
+        inset = 8
+        inner_rect = (self.x + inset, self.y + inset, self.width - inset * 2, self.height - inset * 2)
+        pygame.draw.rect(screen, border_color, inner_rect, 1, border_radius=max(0, radius - inset))
         
         # 3. テキストのラッピングとスクロール描画
         line_height = self.font.size("あ")[1] + 8
@@ -442,6 +496,13 @@ class ItemActionDialog:
         self.on_discard = make_discard_item_callback(player, dialog, inventory_dialog, game_state)
         self.on_unequip = make_unequip_item_callback(player, dialog, inventory_dialog, game_state)
 
+    def setup_for_item(self, data, on_use, on_discard, on_unequip):
+        """[NEW] 呼び出し元のダイアログに合わせてコールバックを差し替える"""
+        self.selected_data = data
+        self.on_use = on_use
+        self.on_discard = on_discard
+        self.on_unequip = on_unequip
+
 
     @property
     def is_active(self): return game_state["item_action_active"]
@@ -577,8 +638,12 @@ class OreSelectionDialog:
         if not self.is_active: return
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if event.key == KEY_MOVE_UP: self.cursor_idx = max(0, self.cursor_idx - 1)
-                elif event.key == KEY_MOVE_DOWN: self.cursor_idx = min(len(self.available_ores)-1, self.cursor_idx + 1)
+                if event.key == KEY_MOVE_UP:
+                    if self.cursor_idx > 0: self.cursor_idx -= 1
+                    else: self.cursor_idx = len(self.available_ores) - 1
+                elif event.key == KEY_MOVE_DOWN:
+                    if self.cursor_idx < len(self.available_ores) - 1: self.cursor_idx += 1
+                    else: self.cursor_idx = 0
                 elif event.key == KEY_CANCEL: self.is_active = False
                 elif event.key == KEY_CONFIRM:
                     if 0 <= self.cursor_idx < len(self.available_ores):
@@ -723,8 +788,12 @@ class StaveSelectionDialog:
         if not self.is_active: return
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if event.key == KEY_MOVE_UP: self.cursor_idx = max(0, self.cursor_idx - 1)
-                elif event.key == KEY_MOVE_DOWN: self.cursor_idx = min(len(self.available_staves)-1, self.cursor_idx + 1)
+                if event.key == KEY_MOVE_UP:
+                    if self.cursor_idx > 0: self.cursor_idx -= 1
+                    else: self.cursor_idx = len(self.available_staves) - 1
+                elif event.key == KEY_MOVE_DOWN:
+                    if self.cursor_idx < len(self.available_staves) - 1: self.cursor_idx += 1
+                    else: self.cursor_idx = 0
                 elif event.key == KEY_CANCEL: self.is_active = False
                 elif event.key == KEY_CONFIRM:
                     if 0 <= self.cursor_idx < len(self.available_staves):
@@ -796,7 +865,7 @@ class BaseListDialog:
 
     def _close_back(self):
         """「もどる」: 親ダイアログがあればそれを再表示、なければ普通に閉じる。"""
-        game_state[self.STATE_KEY] = False
+        self.is_active = False
         if self._back_dialog:
             self._back_dialog.is_active = True
         else:
@@ -922,6 +991,8 @@ class InventoryDialog(BaseListDialog):
 
     def setup(self, player, dialog, game_state, dungeon, stave_selection_dialog, item_action_dialog):
         from systems.item_handler import make_use_item_callback
+        self.player = player
+        self.dialog = dialog
         self.dungeon = dungeon
         self.on_select = make_use_item_callback(player, dialog, self, game_state, stave_selection_dialog=stave_selection_dialog)
         self.action_dialog = item_action_dialog
@@ -1037,7 +1108,11 @@ class InventoryDialog(BaseListDialog):
                         play_sfx(SOUND_CANCEL); self._close_back(); return
                     play_sfx(SOUND_SELECT)
                     if self.action_dialog:
-                        self.action_dialog.selected_data = data; self.action_dialog.is_active = True
+                        from systems.item_handler import make_discard_item_callback, make_unequip_item_callback
+                        on_discard = make_discard_item_callback(self.player, self.dialog, self, game_state)
+                        on_unequip = make_unequip_item_callback(self.player, self.dialog, self, game_state)
+                        self.action_dialog.setup_for_item(data, self.on_select, on_discard, on_unequip)
+                        self.action_dialog.is_active = True
 
     def draw(self, screen, player=None):
         if player: self.update_items_from_player(player)
@@ -1441,50 +1516,49 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
     elif enhance_dialog.is_active:
         enhance_dialog.handle_events(events, player)
         # メッセージが出ていれば決定キーで閉じる
+        if dialog.is_active and dialog.just_opened_timer <= 0:
+            for event in events:
+                if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
+                    dialog.is_active = False
+        return
+    
+    bank_dialog = kwargs.get("bank_dialog")
+    if bank_dialog and bank_dialog.is_active:
+        bank_dialog.handle_events(events, player, dialog)
+        if dialog.is_active and dialog.just_opened_timer <= 0:
+            for event in events:
+                if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
+                    dialog.is_active = False
+        return
+
+    shop_dialog = kwargs.get("shop_dialog")
+    if shop_dialog and shop_dialog.is_active:
+        gs = getattr(dungeon, "guild_system", None)
+        shop_dialog.handle_events(events, player, dialog, confirm_dialog, gs)
+        if dialog.is_active and dialog.just_opened_timer <= 0:
+            for event in events:
+                if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
+                    dialog.is_active = False
+        return
+
+    guild_dialog = kwargs.get("guild_dialog")
+    if guild_dialog and guild_dialog.is_active:
+        guild_dialog.handle_events(events, player, dialog, confirm_dialog)
+        if dialog.is_active and dialog.just_opened_timer <= 0:
+            for event in events:
+                if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
+                    dialog.is_active = False
+        return
+
+    warehouse_dialog = kwargs.get("warehouse_dialog")
+    if warehouse_dialog and warehouse_dialog.is_active:
+        warehouse_dialog.handle_events(events, player, confirm_dialog, dialog)
         if dialog.is_active:
             for event in events:
                 if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
                     dialog.is_active = False
         return
-    elif game_state.get("bank_active"):
-        bank_dialog = kwargs.get("bank_dialog")
-        if bank_dialog:
-            bank_dialog.handle_events(events, player, dialog)
-            # メッセージが出ていれば決定キーで閉じる
-            if dialog.is_active:
-                for event in events:
-                    if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
-                        dialog.is_active = False
-        return
-    elif game_state["shop_active"]:
-        shop_dialog = kwargs.get("shop_dialog")
-        if shop_dialog:
-            gs = getattr(dungeon, "guild_system", None)
-            shop_dialog.handle_events(events, player, dialog, confirm_dialog, gs)
-            if dialog.is_active:
-                for event in events:
-                    if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
-                        dialog.is_active = False
-        return
-    elif game_state.get("guild_active"):
-        guild_dialog = kwargs.get("guild_dialog")
-        if guild_dialog:
-            guild_dialog.handle_events(events, player, dialog, confirm_dialog)
-            if dialog.is_active:
-                for event in events:
-                    if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
-                        dialog.is_active = False
-        return
-    elif game_state.get("warehouse_active"):
-        warehouse_dialog = kwargs.get("warehouse_dialog")
-        if warehouse_dialog:
-            warehouse_dialog.handle_events(events, player, confirm_dialog, dialog)
-            if dialog.is_active:
-                for event in events:
-                    if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
-                        dialog.is_active = False
-        return
-    elif dialog.is_active:
+    elif dialog.is_active and dialog.just_opened_timer <= 0:
         for event in events:
             if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
                 dialog.is_active = False
@@ -2346,9 +2420,17 @@ class ShopDialog(BaseListDialog):
             if event.type == pygame.KEYDOWN:
                 if event.key == KEY_CANCEL: play_sfx(SOUND_CANCEL); self.is_active = False; return
                 if event.key == KEY_MOVE_UP:
-                    if self.cursor_idx > 0: play_sfx(SOUND_CURSOR_MOVE); self.cursor_idx -= 1
+                    play_sfx(SOUND_CURSOR_MOVE)
+                    if self.cursor_idx > 0:
+                        self.cursor_idx -= 1
+                    else:
+                        self.cursor_idx = len(self.items) - 1
                 elif event.key == KEY_MOVE_DOWN:
-                    if self.cursor_idx < len(self.items) - 1: play_sfx(SOUND_CURSOR_MOVE); self.cursor_idx += 1
+                    play_sfx(SOUND_CURSOR_MOVE)
+                    if self.cursor_idx < len(self.items) - 1:
+                        self.cursor_idx += 1
+                    else:
+                        self.cursor_idx = 0
                 elif event.key == KEY_CONFIRM:
                     if not self.items: return
                     if self.items[self.cursor_idx][1] == "cancel": play_sfx(SOUND_CANCEL); self.is_active = False; return
@@ -2363,9 +2445,9 @@ class ShopDialog(BaseListDialog):
             catalog = {"weapon": WEAPON_DATA, "armor": ARMOR_DATA, "shield": SHIELD_DATA, "stave": STAVE_DATA, "consumable": CONSUMABLE_DATA}
             item_data = catalog.get(itype, {}).get(key_or_iid, {})
             if guild_system and not guild_system.is_rank_at_least(player.guild_rank, item_data.get("rank", "F")):
-                dialog.text = Text.Item.RANK_REQUIRED.format(rank=item_data.get("rank", "F")); dialog.is_active = True; return
-            if player.coin < price: dialog.text = Text.Item.NOT_ENOUGH_COIN; dialog.is_active = True; return
-            if player.get_total_item_count() >= 20: dialog.text = Text.Item.BAG_FULL_SHOP; dialog.is_active = True; return
+                dialog.text = Text.Items.RANK_REQUIRED.format(rank=item_data.get("rank", "F")); dialog.is_active = True; return
+            if player.coin < price: dialog.text = Text.Items.NOT_ENOUGH_COIN; dialog.is_active = True; return
+            if player.get_total_item_count() >= 20: dialog.text = Text.Items.BAG_FULL_SHOP; dialog.is_active = True; return
             if confirm_dialog:
                 confirm_dialog.text = Text.UI.SHOP_BUY_CONFIRM.format(name=name, price=price)
                 def do_buy():
@@ -2377,11 +2459,11 @@ class ShopDialog(BaseListDialog):
                     elif itype == "consumable": player.add_item_to_inventory(key_or_iid)
                     self.stock_ref[self.cursor_idx]["count"] -= 1
                     if self.stock_ref[self.cursor_idx]["count"] <= 0: self.stock_ref.pop(self.cursor_idx)
-                    play_sfx(SOUND_PURCHASE); self.refresh_items_from_stock(); self.cursor_idx = min(self.cursor_idx, len(self.items)-1); dialog.text = Text.Item.BOUGHT.format(name=name); dialog.is_active = True
+                    play_sfx(SOUND_PURCHASE); self.refresh_items_from_stock(); self.cursor_idx = min(self.cursor_idx, len(self.items)-1); dialog.text = Text.Items.BOUGHT.format(name=name); dialog.is_active = True
                 confirm_dialog.on_yes = do_buy; confirm_dialog.is_active = True
         else: # SELL
             if (itype == "weapon_inst" and key_or_iid == player.equipped_weapon) or (itype == "armor_inst" and key_or_iid == player.equipped_armor) or (itype == "shield_inst" and key_or_iid == player.equipped_shield):
-                dialog.text = Text.Item.CANT_SELL_EQUIPPED; dialog.is_active = True; return
+                dialog.text = Text.Items.CANT_SELL_EQUIPPED; dialog.is_active = True; return
             if confirm_dialog:
                 confirm_dialog.text = Text.UI.SHOP_SELL_CONFIRM.format(name=name, price=price)
                 def do_sell():
@@ -2391,7 +2473,7 @@ class ShopDialog(BaseListDialog):
                     elif itype == "shield_inst": player.remove_shield_by_iid(key_or_iid); ok = True
                     elif itype == "consumable": player.remove_item_by_key(key_or_iid); ok = True
                     elif itype == "stave_inst": player.remove_stave_by_iid(key_or_iid); ok = True
-                    if ok: player.coin += price; play_sfx(SOUND_PURCHASE); dialog.text = Text.Item.SOLD.format(name=name, price=price); dialog.auto_close_timer = 60
+                    if ok: player.coin += price; play_sfx(SOUND_PURCHASE); dialog.text = Text.Items.SOLD.format(name=name, price=price); dialog.auto_close_timer = 60
                     self.setup_sell_mode(player); self.cursor_idx = min(self.cursor_idx, len(self.items)-1); dialog.is_active = True
                 confirm_dialog.on_yes = do_sell; confirm_dialog.is_active = True
 
@@ -2552,7 +2634,7 @@ class WarehouseDialog(BaseListDialog):
             if dialog: dialog.text = Text.NPC.WAREHOUSE_NO_FEE.format(fee=WAREHOUSE_FEE); dialog.is_active = True
             return
         if player.get_total_item_count() >= 20:
-            if dialog: dialog.text = Text.Item.BAG_FULL; dialog.is_active = True
+            if dialog: dialog.text = Text.Items.BAG_FULL; dialog.is_active = True
             return
         if confirm_dialog:
             confirm_dialog.text = Text.NPC.WAREHOUSE_CONFIRM_WITHDRAW.format(fee=WAREHOUSE_FEE, name=name)

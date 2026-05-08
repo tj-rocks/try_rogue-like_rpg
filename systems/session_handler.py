@@ -29,13 +29,22 @@ def setup_ui_relations(ui_elements, player, dungeon, game_state):
 
     # セットアップ実行
     inventory_dialog.setup(player, dialog, game_state, dungeon, stave_selection_dialog, item_action_dialog)
+    inventory_dialog.menu_dialog = menu_dialog # 参照を持たせる
+    
     stave_selection_dialog.setup(player, dialog)
     enhance_dialog.setup(player, dialog, ore_selection_dialog)
     item_action_dialog.setup(player, dialog, inventory_dialog, game_state)
     ore_selection_dialog.setup(enhance_dialog, confirm_dialog=confirm_dialog, player=player, cutscene_manager=ui_elements["cutscene_manager"])
+    
     equip_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog)
+    equip_dialog.menu_dialog = menu_dialog
+    
     stave_inv_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog)
+    stave_inv_dialog.menu_dialog = menu_dialog
+    
     event_inv_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog)
+    event_inv_dialog.menu_dialog = menu_dialog
+    
     ui_elements["guild_dialog"].cutscene_manager = ui_elements["cutscene_manager"]
 
     # メニューのコールバック設定
@@ -92,13 +101,8 @@ def continue_game(ui_elements, game_state, player):
         target_path = SAVE_OFFICIAL_PATH
         
     if target_path and player.load_from_file(target_path):
-        # 中断セーブだった場合は、再開後に削除する（死んだら戻れないようにするため）
-        if is_suspend:
-            try:
-                os.remove(SAVE_SUSPEND_PATH)
-                print(f"[SESSION] Suspend save loaded and deleted: {SAVE_SUSPEND_PATH}")
-            except Exception as e:
-                print(f"[Error] Failed to delete suspend save: {e}")
+        # 永続セーブ化：再開してもファイルを消さないように変更
+        print(f"[SESSION] Game loaded from: {target_path}")
 
         floor = player.current_floor if hasattr(player, "current_floor") else 0
         dungeon = warp_to_floor(floor, player, spawn_reason="continue")

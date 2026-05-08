@@ -114,7 +114,8 @@ class DroppedWeapon(Item):
         self.is_collected = True
         if hasattr(player, "equip_weapon_by_key"):
             player.equip_weapon_by_key(self.weapon_key)
-        return f"{self.name} を 手に入れた！"
+        from wordings import Text
+        return Text.Items.GET.format(name=self.name)
 
 class DroppedConsumable(Item):
     """地面に落ちた消費アイテム。拾うとインベントリに入る。"""
@@ -153,13 +154,14 @@ class DroppedConsumable(Item):
                 if inst:
                     self.is_collected = True
                     from wordings import Text
-                    return Text.Item.GET.format(name=inst.get_name())
+                    return Text.Items.GET_LANTERN.format(name=inst.get_name())
 
         if hasattr(player, "add_item_to_inventory"):
             success = player.add_item_to_inventory(self.item_key, count=1)
             if success:
                 self.is_collected = True
-                msg = f"{self.name} を 手に入れた！"
+                from wordings import Text
+                msg = Text.Items.GET.format(name=self.name)
                 # クエスト達成チェック
                 if hasattr(player, "check_quest_completion"):
                     msg += player.check_quest_completion(self.item_key)
@@ -207,7 +209,8 @@ class DroppedArmor(Item):
         self.is_collected = True
         if hasattr(player, "equip_armor_by_key"):
             player.equip_armor_by_key(self.armor_key)
-        return f"{self.name} を 拾った！"
+        from wordings import Text
+        return Text.Items.GET.format(name=self.name)
 
 
 class DroppedShield(Item):
@@ -246,7 +249,8 @@ class DroppedShield(Item):
         self.is_collected = True
         if hasattr(player, "equip_shield_by_key"):
             player.equip_shield_by_key(self.shield_key)
-        return f"{self.name} を 拾った！"
+        from wordings import Text
+        return Text.Items.GET.format(name=self.name)
 
 
 class DroppedStave(Item):
@@ -284,7 +288,8 @@ class DroppedStave(Item):
         self.is_collected = True
         if hasattr(player, "equip_stave_by_key"):
             player.equip_stave_by_key(self.stave_key, charges=self.charges)
-        return f"{self.name} を 拾った！"
+        from wordings import Text
+        return Text.Items.GET.format(name=self.name)
 
 
 class DroppedToken(Item):

@@ -55,16 +55,9 @@ class Trap:
             msg += Text.Trap.PITFALL
             
         elif self.type == "damage_floor":
-            # ダメージ床：10ダメージ ＋ 押し戻し
+            # ダメージ床：10ダメージ
             dmg = self.data.get("damage", 10)
             player.hp = max(0, player.hp - dmg)
-            
-            # 座標を強制リセット
-            player.x = player.prev_x
-            player.y = player.prev_y
-            player.target_x = player.x
-            player.target_y = player.y
-            player.is_moving = False
             
             # 赤いフラッシュ演出
             dungeon.magic_effects.append(FlashEffect(color=(255, 0, 0), duration=12))

@@ -110,10 +110,12 @@ class Text:
         GUILD_REPORT_REWARD = "報酬: {gold} G / {gp} GP"
         GUILD_REPORT_RANK_UP = "報酬: ギルドランク {rank} への昇格"
         GUILD_REPORT_GUIDE = "--- [決定キー] を押して報酬を受け取る ---"
+        NOW_LOADING = "Now Loading..."
+        SAVING = "Saving..."
 
     class System:
         GAME_OVER = "死んでしまった\nアイテムや装備も全て失ってしまった"
-        DOCTOR_REVIVE = "大手術だったよ\n命があっただけでも儲け物だよ"
+        DOCTOR_REVIVE = "大手術だったよ\nアイテムは失ったけど命があっただけでも儲け物だよ\n棍棒をあげるから諦めるんじゃないよ。"
         STAIRS_CONFIRM = "次の階層へ進みますか？"
         OVERFLOW_SENSE = "モンスター氾濫の 予感がする……"
         OVERFLOW_START = "モンスター氾濫が 発生した"
@@ -125,11 +127,12 @@ class Text:
         CRITICAL = "クリティカルヒット "
         MISS = "{attacker} の 攻撃は 外れた"
 
-    class Item:
+    class Items:
+        GET = "{name} を 手に入れた！"
         USE_NOTHING = "{item} を 使った\nしかし 何も 起こらなかった"
         RECOVER_HP = "{item} を 使った\nHPが {recovered} 回復した"
         MATERIAL_DESC = "それは素材だ鍛冶屋に持っていこう"
-        GET_LANTERN = "{item} を 手に入れた\nインベントリの装備から 切り替えられます"
+        GET_LANTERN = "{name} を 手に入れた！\nインベントリの装備から 切り替えられます"
         EQUIPPED_CANT_DISCARD = "装備中なので捨てられません"
         DISCARDED = "{name} を 捨てた"
         EQUIPPED = "{name} を 装備した"

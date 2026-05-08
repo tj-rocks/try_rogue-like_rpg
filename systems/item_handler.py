@@ -3,12 +3,12 @@ from constants import CONSUMABLE_DATA
 from systems.magic_handler import execute_stave
 from wordings import Text
 
-def use_consumable(item_key, player):
+def use_consumable(item_key, player, dungeon=None):
     """
     消耗品アイテムを使用するロジック。
     """
     if item_key not in CONSUMABLE_DATA:
-        return Text.Item.USE_NOTHING.format(item=item_key)
+        return Text.Items.USE_NOTHING.format(item=item_key)
 
     data = CONSUMABLE_DATA[item_key]
     effect = data.get("effect")
@@ -23,25 +23,66 @@ def use_consumable(item_key, player):
         old_hp = player.hp
         player.hp = min(player.max_hp, player.hp + amount)
         recovered = player.hp - old_hp
-        msg = Text.Item.RECOVER_HP.format(item=data['name'], recovered=recovered)
+        msg = Text.Items.RECOVER_HP.format(item=data['name'], recovered=recovered)
     elif effect == "antidote":
         player.condition = "normal"
         msg = f"{data['name']}を使用した 毒が消えた"
+    elif effect == "poison_self":
+        player.condition = "poison"
+        msg = f"{data['name']}を使用した！ ウッ、身体が毒に侵された！"
     elif effect == "material":
-        msg = Text.Item.MATERIAL_DESC
+        msg = Text.Items.MATERIAL_DESC
         return msg
     elif effect == "lantern":
         # カンテラをインベントリに加えるだけにする（自動装備を廃止）
         lantern_key = data.get("lantern_key", "basic")
         inst = player.equip_lantern_by_key(lantern_key)
         if inst:
-            msg = Text.Item.GET.format(name=inst.get_name())
+            msg = Text.Items.GET.format(name=inst.get_name())
         else:
-            msg = Text.Item.USE_NOTHING.format(item=data['name'])
+            msg = Text.Items.USE_NOTHING.format(item=data['name'])
     elif effect == "warp_home":
         msg = f"{data['name']}を使用した 身体が光に包まれる..."
+    elif effect == "remove_trap":
+        if not dungeon:
+            return "ここでは使用できない"
+        
+        # 正面の座標を特定
+        px = int(round(player.target_x + player.width / 2) // dungeon.tile_size)
+        py = int(round(player.target_y + player.height / 2) // dungeon.tile_size)
+        
+        tx, ty = px, py
+        if player.facing == "up": ty -= 1
+        elif player.facing == "down": ty += 1
+        elif player.facing == "left": tx -= 1
+        elif player.facing == "right": tx += 1
+        
+        found = False
+        for t in list(dungeon.traps):
+            if t.x == tx and t.y == ty:
+                if t.type == "flood_switch":
+                    msg = "この仕掛けは解除できない！"
+                    return msg
+                dungeon.traps.remove(t)
+                found = True
+        
+        if found:
+            # 🎵 エフェクトとSEを追加
+            from systems.magic_handler import FlashEffect
+            from constants import SOUND_SELECT
+            if dungeon:
+                # 罠があった場所に緑色のフラッシュを出す
+                dungeon.magic_effects.append(FlashEffect(color=(100, 255, 100), duration=15))
+            
+            from systems.sound_handler import sound_manager
+            sound_manager.play_sfx(SOUND_SELECT)
+            
+            msg = f"{data['name']}を使用した 正面の罠を解除した"
+        else:
+            msg = "正面に罠は見当たらない..."
+            return msg # 消費しない
     else:
-        msg = Text.Item.USE_NOTHING.format(item=data['name'])
+        msg = Text.Items.USE_NOTHING.format(item=data['name'])
         return msg
 
     # ---- インベントリから1個消費（リストから削除） ----
@@ -61,7 +102,7 @@ def discard_item(player, item_type, iid_or_key):
     if item_type == "lantern" and getattr(player, "equipped_lantern", None) == iid_or_key: is_equipped = True
     
     if is_equipped:
-        return Text.Item.EQUIPPED_CANT_DISCARD, False
+        return Text.Items.EQUIPPED_CANT_DISCARD, False
 
     # 削除処理
     name = "アイテム"
@@ -96,7 +137,7 @@ def discard_item(player, item_type, iid_or_key):
             name = CONSUMABLE_DATA.get(iid_or_key, {}).get("name", iid_or_key)
             player.remove_item_by_key(iid_or_key)
             
-    return Text.Item.DISCARDED.format(name=name), True
+    return Text.Items.DISCARDED.format(name=name), True
 
 def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon=None, **kwargs):
     """
@@ -110,6 +151,16 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
         if item_type == "lantern" and getattr(player, "equipped_lantern", None) == item_key_or_iid: return
 
         inventory_dialog.is_active = False
+        # 「使う・捨てる」の選択ダイアログも閉じる
+        if hasattr(inventory_dialog, "action_dialog") and inventory_dialog.action_dialog:
+            inventory_dialog.action_dialog.is_active = False
+
+        # 親メニューがあればそれも閉じる
+        if hasattr(inventory_dialog, "menu_dialog") and inventory_dialog.menu_dialog:
+            inventory_dialog.menu_dialog.is_active = False
+        elif kwargs.get("menu_dialog"):
+            kwargs["menu_dialog"].is_active = False
+
         # 最新のダンジョン情報を取得
         current_dungeon = getattr(inventory_dialog, "dungeon", dungeon)
 
@@ -130,45 +181,44 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
         req_rank = item_data.get("rank") or item_data.get("min_rank") or "F"
         if current_dungeon and current_dungeon.guild_system:
             if not current_dungeon.guild_system.is_rank_at_least(player.guild_rank, req_rank):
-                dialog.text = Text.Item.RANK_REQUIRED.format(rank=req_rank)
+                dialog.text = Text.Items.RANK_REQUIRED.format(rank=req_rank)
                 dialog.is_active = True
                 return
 
         if item_type == "weapon":
             player.change_weapon(item_key_or_iid)
             inst = player._find_equip_inst(player.weapon_inventory, item_key_or_iid)
-            dialog.text = Text.Item.EQUIPPED.format(name=inst.get_name() if inst else "武器")
+            dialog.text = Text.Items.EQUIPPED.format(name=inst.get_name() if inst else "武器")
         elif item_type == "armor":
             player.change_armor(item_key_or_iid)
             inst = player._find_equip_inst(player.armor_inventory, item_key_or_iid)
-            dialog.text = Text.Item.EQUIPPED.format(name=inst.get_name() if inst else "よろい")
+            dialog.text = Text.Items.EQUIPPED.format(name=inst.get_name() if inst else "よろい")
         elif item_type == "shield":
             player.change_shield(item_key_or_iid)
             inst = player._find_equip_inst(player.shield_inventory, item_key_or_iid)
-            dialog.text = Text.Item.EQUIPPED.format(name=inst.get_name() if inst else "盾")
+            dialog.text = Text.Items.EQUIPPED.format(name=inst.get_name() if inst else "盾")
         elif item_type == "lantern":
             player.change_lantern(item_key_or_iid)
             inst = player._find_equip_inst(player.lantern_inventory, item_key_or_iid)
-            dialog.text = Text.Item.HELD.format(name=inst.get_name() if inst else "カンテラ")
+            dialog.text = Text.Items.HELD.format(name=inst.get_name() if inst else "カンテラ")
         elif item_type == "stave":
             inst = player._find_stave_inst(item_key_or_iid)
             if inst:
                 if inst.charges <= 0:
-                    dialog.text = Text.Item.STAVE_NO_POWER
+                    dialog.text = Text.Items.STAVE_NO_POWER
                 else:
-                    # 即座に効果を発動（アニメーションなし）
-                    player._perform_wave(inst, current_dungeon, dialog)
-                    # インベントリを閉じ、メッセージを表示
+                    # メッセージを表示状態にしてから、エフェクトを発動
                     dialog.is_active = True
+                    player._perform_wave(inst, current_dungeon, dialog)
                     return
             else:
-                dialog.text = Text.Item.STAVE_NOT_FOUND
+                dialog.text = Text.Items.STAVE_NOT_FOUND
         else:
             # 消耗品
             item_data = CONSUMABLE_DATA.get(item_key_or_iid, {})
             if item_data.get("effect") == "recharge":
                 if not player.stave_inventory:
-                    dialog.text = Text.Item.NO_STAVES
+                    dialog.text = Text.Items.NO_STAVES
                 else:
                     if kwargs.get("stave_selection_dialog"):
                         ssd = kwargs.get("stave_selection_dialog")
@@ -182,16 +232,16 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
                 # 帰還の道標（warp_home）の特殊処理
                 if item_data.get("effect") == "warp_home":
                     if player.is_any_quest_ready():
-                        dialog.text = Text.Item.WARP_HOME_QUEST_READY
+                        dialog.text = Text.Items.WARP_HOME_QUEST_READY
                         dialog.is_active = True
                         return
                     
                     # ワープ実行
                     from systems.dungeon import warp_to_floor
-                    dialog.text = use_consumable(item_key_or_iid, player)
+                    dialog.text = use_consumable(item_key_or_iid, player, current_dungeon)
                     inventory_dialog.next_dungeon = warp_to_floor(0, player, spawn_reason="return")
                 else:
-                    dialog.text = use_consumable(item_key_or_iid, player)
+                    dialog.text = use_consumable(item_key_or_iid, player, current_dungeon)
 
         game_state["dialog_modal"] = True
         dialog.is_active = True
@@ -218,7 +268,7 @@ def make_recharge_callback(player, dialog, stave_selection_dialog):
         from systems.sound_handler import sound_manager
         sound_manager.play_sfx(data.get("sound"))
 
-        dialog.text = Text.Item.RECHARGED.format(name=stave_inst.name, amount=amount, charges=stave_inst.charges)
+        dialog.text = Text.Items.RECHARGED.format(name=stave_inst.name, amount=amount, charges=stave_inst.charges)
         dialog.is_active = True
         stave_selection_dialog.is_active = False
 
@@ -253,7 +303,7 @@ def make_enhance_callback(player, dialog, enhance_dialog):
             player.update_equipment_stats()
             
             up_msg = f"+{bonus}" if bonus > 0 else "変化なし"
-            dialog.text = Text.Item.ENHANCED.format(name=inst.get_name())
+            dialog.text = Text.Items.ENHANCED.format(name=inst.get_name())
             dialog.is_active = True
             enhance_dialog.is_active = False
             
@@ -300,7 +350,7 @@ def unequip_item(player, item_type, iid):
             name = inst.get_name()
             player.unequip_lantern()
             
-    return Text.Item.UNEQUIPPED.format(name=name)
+    return Text.Items.UNEQUIPPED.format(name=name)
 
 def make_unequip_item_callback(player, dialog, inventory_dialog, game_state):
     """

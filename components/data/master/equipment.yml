@@ -343,7 +343,19 @@ SHIELD_CATEGORIES:
         right:
         - 11
         - 10
+
 WEAPON_DATA:
+  broken_sword:
+    name: 壊れかけの剣
+    category: onehanded_sword
+    min_rank: F
+    max_floor: 999
+    rarity: 2
+    attack_bonus: 1
+    price: 5
+    shop_buyable: false
+    image_path: components/pictures/weapon/broken_sword.png
+    describe: 刃がボロボロで、今にも折れそうな剣。
   iron_sword:
     name: 鉄の剣
     category: onehanded_sword
@@ -352,12 +364,13 @@ WEAPON_DATA:
     rarity: 2
     image_path: components/pictures/weapon/iron_sword.png
     shop_buyable: true
-    attack_bonus: 4.5
+    attack_bonus: 4
   old_sword:
     name: 古びた剣
     category: onehanded_sword
+    price: 30
     attack_bonus: 2
-    min_rank: SS
+    min_rank: F
     rarity: 8
     image_path: components/pictures/weapon/old_sword.png
     shop_buyable: false
@@ -475,7 +488,29 @@ ARMOR_DATA:
     defense_bonus: 3
     price: 1200
     shop_buyable: true
+  broken_armor:
+    name: 壊れた鎧
+    category: medium
+    min_rank: F
+    max_floor: 999
+    rarity: 2
+    defense_bonus: 1
+    price: 5
+    shop_buyable: false
+    image_dir: components/pictures/armor/adventurers_clothes
+    describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない。
 SHIELD_DATA:
+  broken_shield:
+    name: 壊れた盾
+    category: round_shield
+    min_rank: F
+    max_floor: 999
+    rarity: 2
+    eva_bonus: 1
+    price: 5
+    shop_buyable: false
+    image_dir: components/pictures/shield/wooden_round_shield
+    describe: 大きくひび割れた盾。気休め程度にはなる。
   wooden_round_shield:
     name: 木の円盾
     category: round_shield

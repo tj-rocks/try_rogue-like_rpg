@@ -148,6 +148,7 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state):
     # カットシーンの更新
     if ui_elements.get("cutscene_manager"):
         ui_elements["cutscene_manager"].update()
+
         
     # UIの描画
     if ui_elements.get("status_bar"):
@@ -163,5 +164,9 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state):
                 event_inv_dialog=ui_elements.get("event_inventory_dialog"),
                 dungeon=new_dungeon, events=events,
                 cutscene_manager=ui_elements.get("cutscene_manager"))
+    
+    # [FIX] ダイアログ誤爆防止フラグを、1フレーム経過したのでリセットする
+    if game_state.get("dialog_just_closed"):
+        game_state["dialog_just_closed"] = False
     
     return new_dungeon

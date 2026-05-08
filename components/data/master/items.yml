@@ -27,7 +27,7 @@ CONSUMABLE_DATA:
     price: 5000
     min_rank: G
     rarity: 7
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/hane.png
     sound: components/sounds/sfx/stairs.wav
     shop_buyable: true
     max_stack: 1
@@ -37,8 +37,42 @@ CONSUMABLE_DATA:
     effect: revive
     price: 3000
     min_rank: D
-    rarity: 6
-    image_path: components/pictures/icon/revive_amulet.png
+    rarity: 7
+    image_path: components/pictures/icon/omamori.png
+  expired_potion:
+    name: くさいポーション
+    effect: heal_hp
+    heal_amount: 1
+    price: 10
+    min_rank: F
+    rarity: 4
+    image_path: components/pictures/icon/potion2.png
+    sound: components/sounds/sfx/recharge.wav
+    shop_buyable: false
+    max_stack: 5
+    describe: ラベルが剥がれかけ、嫌な沈殿物が見えるポーション。飲んでもほとんど効果がないようだ。
+  rotten_potion:
+    name: 腐ったポーション
+    effect: poison_self
+    price: 5
+    min_rank: F
+    rarity: 3
+    image_path: components/pictures/icon/potion2.png
+    sound: components/sounds/sfx/recharge.wav
+    shop_buyable: false
+    max_stack: 1
+    describe: どろりと変色し、異臭を放つポーション。絶対に飲んではいけない。
+  trap_remover:
+    name: 罠解除ツール
+    effect: remove_trap
+    price: 150
+    min_rank: F
+    rarity: 3
+    image_path: components/pictures/icon/tool.png
+    sound: components/sounds/sfx/select_new.wav
+    shop_buyable: true
+    max_stack: 3
+    describe: 足元の罠を安全に解除するための道具。罠に向かって使うと、その罠を消去できる。
     sound: components/sounds/sfx/recharge.wav
     shop_buyable: true
     max_stack: 1
@@ -154,7 +188,7 @@ CONSUMABLE_DATA:
     min_rank: G
     rarity: 1
     category: event
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/certificate.png
     shop_buyable: false
     describe: E級冒険者の証。ギルドに認められた駆け出し冒険者の象徴。
   guild_cert_d:
@@ -164,7 +198,7 @@ CONSUMABLE_DATA:
     min_rank: G
     rarity: 1
     category: event
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/certificate.png
     shop_buyable: false
     describe: D級冒険者の証。一通りの経験を積んだ冒険者として認められた証。
   guild_cert_c:
@@ -174,7 +208,7 @@ CONSUMABLE_DATA:
     min_rank: G
     rarity: 1
     category: event
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/certificate.png
     shop_buyable: false
     describe: C級冒険者の証。中堅冒険者として、より危険な依頼への参加が許される。
   guild_cert_b:
@@ -184,7 +218,7 @@ CONSUMABLE_DATA:
     min_rank: G
     rarity: 1
     category: event
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/certificate.png
     shop_buyable: false
     describe: B級冒険者の証。熟練の冒険者のみが手にできる栄誉ある証。
   guild_cert_a:
@@ -194,7 +228,7 @@ CONSUMABLE_DATA:
     min_rank: G
     rarity: 1
     category: event
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/certificate.png
     shop_buyable: false
     describe: 'A級冒険者の証。一流の証であり、多くの冒険者の憧れの大。 '
   guild_cert_s:
@@ -204,7 +238,7 @@ CONSUMABLE_DATA:
     min_rank: G
     rarity: 1
     category: event
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/certificate.png
     shop_buyable: false
     describe: S級冒険者の証。英雄に等しい実力を持つ者だけに授与される。
   guild_cert_ss:
@@ -214,7 +248,7 @@ CONSUMABLE_DATA:
     min_rank: G
     rarity: 1
     category: event
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/certificate.png
     shop_buyable: false
     describe: SS級冒険者の証。伝説に名を刻む、至高の冒険者の証。
   adventurer_proof:
@@ -224,7 +258,7 @@ CONSUMABLE_DATA:
     min_rank: "-"
     rarity: 1
     category: event
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/certificate.png
     shop_buyable: false
     min_floor: 5
     max_floor: 5
@@ -246,7 +280,7 @@ STAVE_DATA:
     name: 吹き飛ばしの杖
     effect_type: knockback
     min_rank: F
-    rarity: 1
+    rarity: 5
     price: 800
     charges: 5
     sound: components/sounds/sfx/knockback.wav
@@ -257,6 +291,17 @@ STAVE_DATA:
     max_distance: 10
     shop_buyable: true
     describe: 前方の敵を激しく弾き飛ばす魔法の杖。囲まれた時の脱出に役立つ。
+  broken_stave:
+    name: 壊れた杖
+    effect_type: none
+    min_rank: F
+    max_floor: 999
+    rarity: 5
+    price: 1
+    charges: 0
+    image_path: components/pictures/icon/stave.png
+    shop_buyable: false
+    describe: 完全に魔力が枯渇し、折れ曲がった杖。何の役にも立たない。
   fire_stave:
     name: 火炎の杖
     effect_type: fire
@@ -270,8 +315,13 @@ STAVE_DATA:
     - 100
     - 0
     damage_mult: 1.5
+    range_offsets:
+      up: [[-1, -1], [0, -1], [1, -1], [-1, -2], [0, -2], [1, -2]]
+      down: [[-1, 1], [0, 1], [1, 1], [-1, 2], [0, 2], [1, 2]]
+      left: [[-1, -1], [-1, 0], [-1, 1], [-2, -1], [-2, 0], [-2, 1]]
+      right: [[1, -1], [1, 0], [1, 1], [2, -1], [2, 0], [2, 1]]
     shop_buyable: true
-    describe: 燃え盛る火炎を放つ魔法の杖。遠距離から敵に大ダメージを与える。
+    describe: 燃え盛る火炎を放つ魔法の杖。自分前方の広範囲（2x3）を焼き尽くし、敵に大ダメージを与える。
   heal_stave:
     name: 回復の杖
     effect_type: heal
@@ -280,6 +330,7 @@ STAVE_DATA:
     price: 1000
     charges: 5
     sound: components/sounds/sfx/heal.wav
+    image_path: components/pictures/icon/stave.png
     effect_color:
     - 100
     - 255
@@ -295,11 +346,12 @@ STAVE_DATA:
     price: 3000
     charges: 5
     sound: components/sounds/sfx/invincible.wav
+    image_path: components/pictures/icon/stave.png
     effect_color:
     - 255
     - 255
     - 150
-    duration_turns: 5
+    duration_turns: 10
     shop_buyable: false
     describe: 一時的にあらゆる攻撃を無効化する聖なる杖。ここぞという時の切り札。
   light_stave:
@@ -310,6 +362,7 @@ STAVE_DATA:
     price: 1500
     charges: 5
     sound: components/sounds/sfx/light.wav
+    image_path: components/pictures/icon/stave.png
     effect_color:
     - 255
     - 255

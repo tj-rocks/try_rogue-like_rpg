@@ -36,7 +36,7 @@ def load_data_file(filepath, default=None):
 # パス設定
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_official.json")
-SAVE_SUSPEND_PATH = os.path.join(_ROOT, "components/data/savefile/save_suspend.json")
+SAVE_SUSPEND_PATH = SAVE_OFFICIAL_PATH # 一本化：中断セーブも正式セーブと同じ場所へ
 SAVE_DATA_PATH = SAVE_OFFICIAL_PATH # 後方互換性のため
 MASTER_DATA_DIR = os.path.join(_ROOT, "components/data/master")
 
@@ -56,13 +56,21 @@ def generate_rank_floor_map(guild_ranks):
         rk = r_info.get("rank")
         if not rk: continue
         limit = r_info.get("limit_floor", prev_limit + 5)
+        
+        # チュートリアルランク(-)の場合は、便宜上 F ランク(1階〜)と同じ開始地点にする
+        current_min = prev_limit + 1
+        if rk == "-":
+            current_min = 1
+            
         floor_map[rk] = {
-            "min": prev_limit + 1,
+            "min": current_min,
             "max": limit + 2, # 少しオーバーラップさせる
             "limit": limit,
             "prev_limit": prev_limit,
             "rank_up_item": r_info.get("rank_up_item")
         }
+        # ランク F 以降の計算のために prev_limit を更新
+        # ただしランク - は limit 0 なので、実質 F の prev_limit は 0 のまま維持される
         prev_limit = limit
     return floor_map
 
@@ -87,15 +95,22 @@ def apply_rank_floor_logic(data_dict, floor_map):
                 v["max_floor"] = rank_up_items_map[key]
             continue
             
-        rank = v.get("rank") or v.get("min_rank") or "F"
-        if rank not in floor_map:
-            rank = "F"
+        min_rk = v.get("min_rank") or v.get("rank") or "F"
+        max_rk = v.get("max_rank")
         
-        f_range = floor_map[rank]
+        # チュートリアルランク(-)の場合は F ランク相当として扱う
+        if min_rk == "-" or min_rk not in floor_map:
+            min_rk = "F"
+        
+        f_range_min = floor_map[min_rk]
         if v.get("min_floor") is None:
-            v["min_floor"] = f_range["min"]
+            v["min_floor"] = f_range_min["min"]
+            
         if v.get("max_floor") is None:
-            v["max_floor"] = f_range["max"]
+            if max_rk and max_rk in floor_map:
+                v["max_floor"] = floor_map[max_rk]["max"]
+            else:
+                v["max_floor"] = f_range_min["max"]
 
 import math
 from systems.math_utils import hardcore_round
@@ -166,10 +181,13 @@ def get_normalized_equipment_data(floor_map):
 
 def get_normalized_item_data(floor_map):
     """消費アイテム・杖などのデータを読み込み、階層設定を適用して返す"""
-    items = load_master_data("items.json")
+    items = load_master_data("items.yml")
     consumables = items.get("CONSUMABLE_DATA", {})
     staves = items.get("STAVE_DATA", {})
     lanterns = items.get("LANTERN_DATA", {})
+    
+    # [DEBUG] 読み込み確認
+    print(f"[DataLoader] Items loaded: Consumables={len(consumables)}, Staves={len(staves)}, Lanterns={len(lanterns)}")
     
     for d in [consumables, staves, lanterns]:
         apply_rank_floor_logic(d, floor_map)

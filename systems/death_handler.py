@@ -85,6 +85,12 @@ def handle_death_sequence(player, dungeon, dialog, game_state):
 
             # 診療所へワープ
             dungeon = warp_to_floor(0, player, spawn_reason="continue")
+            
+            # [FIX] 絶望感を確定させるため、医者が話し始める前に即座にセーブする
+            from systems.data_loader import SAVE_OFFICIAL_PATH
+            player.save_to_file(SAVE_OFFICIAL_PATH)
+            print(f"[DEATH] Progress saved with penalty to: {SAVE_OFFICIAL_PATH}")
+
             dialog.text = Text.System.DOCTOR_REVIVE
             game_state["dialog_modal"] = True
             dialog.is_active = True
@@ -95,15 +101,5 @@ def handle_death_sequence(player, dungeon, dialog, game_state):
         if not dialog.is_active:
             play_bgm(BGM_VILLAGE)
             game_state["death_sequence_step"] = 0
-            from systems.data_loader import SAVE_OFFICIAL_PATH, SAVE_SUSPEND_PATH
-            # 死亡時は中断セーブを削除し、ペナルティ後の状態を永続セーブに上書きする
-            if os.path.exists(SAVE_SUSPEND_PATH):
-                try:
-                    os.remove(SAVE_SUSPEND_PATH)
-                    print(f"[DEATH] Suspend save deleted on death: {SAVE_SUSPEND_PATH}")
-                except Exception as e:
-                    print(f"[Error] Failed to delete suspend save: {e}")
-            
-            player.save_to_file(SAVE_OFFICIAL_PATH)
             
     return dungeon

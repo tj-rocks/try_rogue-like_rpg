@@ -1,19 +1,30 @@
+# stupidity: 10 の場合 → 10/10 = 100% の確率でボケる（完全にランダム移動）
+# stupidity: 1 の場合 → 1/10 = 10% の確率でボケる（たまにボケる）
+# stupidity: 0 の場合 → 0%（常に完璧に動く）
+# 
+# attack_priority: 攻撃の優先思考スタイル
+#   - close: インファイター。射程に関わらず隣接（距離1）することを最優先する。
+#   - ranged: アウトボクサー。理想の間合い（射程-1）を保ちながら戦うことを優先する。
+# 
+# attack_range: 隣接攻撃は 1。遠距離はそれ以上の数値を設定。
+
+
 ENEMY_CATEGORIES:
   slime: {name: スライム種, hp: 10, attack: 7, defense: 1, evasion: 5, exp: 5, reward_gold: 20,
-    accuracy_close: 100, accuracy_ranged: 100, attack_range: 0, stupidity: 3, image_scale: 1.0,
-    close_attack_effect: physical_light, ranged_attack_effect: strange_mucus}
+    accuracy_close: 100, accuracy_ranged: 100, attack_range: 1, stupidity: 3, image_scale: 1.0,
+    close_attack_effect: physical_light, ranged_attack_effect: strange_mucus, attack_priority: close}
   animal: {name: 獣種, hp: 15, attack: 10, defense: 2, evasion: 0, exp: 8, reward_gold: 25,
-    accuracy_close: 80, accuracy_ranged: 80, attack_range: 1, stupidity: 5, image_scale: 1.0,
-    close_attack_effect: physical_heavy, ranged_attack_effect: sonic_wave}
+    accuracy_close: 100, accuracy_ranged: 100, attack_range: 1, stupidity: 3, image_scale: 1.0,
+    close_attack_effect: physical_heavy, ranged_attack_effect: sonic_wave, attack_priority: close}
   monster: {name: 魔物種, hp: 22, attack: 12, defense: 0, evasion: 25, exp: 10, reward_gold: 100,
-    accuracy_close: 85, accuracy_ranged: 85, attack_range: 4, stupidity: 0, image_scale: 1.0,
-    close_attack_effect: physical_heavy, ranged_attack_effect: dark_bolt}
+    accuracy_close: 100, accuracy_ranged: 100, attack_range: 4, stupidity: 5, image_scale: 1.0,
+    close_attack_effect: physical_heavy, ranged_attack_effect: dark_bolt, attack_priority: ranged}
   humanoid: {name: 亜人種, hp: 30, attack: 10, defense: 5, evasion: 5, exp: 15, reward_gold: 150,
-    accuracy_close: 100, accuracy_ranged: 100, attack_range: 1, stupidity: 2, image_scale: 1.0,
-    close_attack_effect: physical_light, ranged_attack_effect: arrow}
+    accuracy_close: 100, accuracy_ranged: 100, attack_range: 1, stupidity: 5, image_scale: 1.0,
+    close_attack_effect: physical_light, ranged_attack_effect: arrow, attack_priority: ranged}
   undead: {name: 不死種, hp: 25, attack: 15, defense: 3, evasion: 0, exp: 12, reward_gold: 200,
-    accuracy_close: 90, accuracy_ranged: 90, attack_range: 2, stupidity: 1, image_scale: 1.0,
-    close_attack_effect: physical_heavy, ranged_attack_effect: dark_bolt}
+    accuracy_close: 90, accuracy_ranged: 90, attack_range: 2, stupidity: 5, image_scale: 1.0,
+    close_attack_effect: physical_heavy, ranged_attack_effect: dark_bolt, attack_priority: close}
 ENEMY_DATA:
   slime:
     name: スライム
@@ -22,8 +33,7 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/slime
     crit_rate: 0.05
     drops:
-    - {item: hp_potion, rate: 0.1}
-    - {item: wooden_stick, rate: 0.05}
+    - {item: hp_potion}
     hp: 9
     defense: 1
     attack: 6
@@ -35,7 +45,8 @@ ENEMY_DATA:
     attack_range: 1
     crit_rate: 0.05
     drops:
-    - {item: hp_potion, rate: 0.05}
+    - {item: rotten_potion}
+    - {item: wooden_stick}
     hp: 15
     defense: 3
   normal_tako:
@@ -45,12 +56,14 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/tako_doku
     image_scale: 0.8
     status: poison
+    attack_priority: close
     attack_range: 2
     status_chance: 0
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
     drops:
-    - {item: hp_potion, rate: 0.05}
+    - {item: expired_potion}
+    - {item: broken_sword}
     hp: 11
     defense: 3
   doku_tako:
@@ -60,10 +73,11 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/tako_doku
     image_scale: 0.8
     status: poison
+    attack_priority: close
     attack_range: 2
     status_chance: 15
     drops:
-    - {item: hp_potion, rate: 0.05}
+    - {item: hp_potion}
     hp: 11
     defense: 0
   ghost:
@@ -84,7 +98,7 @@ ENEMY_DATA:
     equipped_weapon: iron_sword
     equipped_shield: wooden_shield
     drops:
-    - {item: iron_sword, rate: 0.05}
+    - {item: iron_sword}
   dragon_boss:
     name: レッドドラゴン
     category: animal
@@ -92,12 +106,14 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/dragon
     image_scale: 0.5
     attack: 10
+    attack_range: 5
+    attack_priority: ranged
     min_floor: 10
     max_floor: 10
     max_concurrent: 1
     max_spawns: 1
     drops:
-    - {item: invincible_stave, rate: 1.0}
+    - {item: invincible_stave}
     crit_rate: 0.2
     close_attack_effect: physical_heavy
     ranged_attack_effect: fireball

@@ -7,7 +7,9 @@ os.environ['SDL_VIDEODRIVER'] = 'dummy'
 
 pygame.init()
 size = 60
-base_path = "/Users/tj/Desktop/2DGame/components/pictures/dungeon"
+# プロジェクトルートを取得して、相対パスで設定
+current_dir = os.path.dirname(os.path.abspath(__file__))
+base_path = os.path.join(current_dir, "../components/pictures/dungeon")
 
 def add_noise(surf, amount=10):
     """表面にザラザラした質感を追加する"""

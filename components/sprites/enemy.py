@@ -53,6 +53,7 @@ class Enemy(Entity):
         self.stupidity = data.get("stupidity", 0) # [MOD] 省略時は0（賢い）
         self.dash_distance = data.get("dash_distance", 50)
         self.is_long_range = False # 遠距離攻撃フラグ
+        self.attack_priority = data.get("attack_priority", "close")
         # self.is_static は上部で判定済み
         
         # 討伐時の報酬パラメータ
@@ -543,8 +544,11 @@ class Enemy(Entity):
                 game_state["dialog_modal"] = False
                 dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
 
-    def _move_smartly(self, player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells=None):
-        """プレイヤーの位置を予測し、障害物を迂回して最適な間合いを目指す高度な追跡AI"""
+    def _move_smartly_check_success(self, player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells=None, ideal_dist=None):
+        """プレイヤーの位置を予測し、指定された理想の間合い（ideal_dist）を目指して移動を試みる。"""
+        if ideal_dist is None:
+            ideal_dist = max(0, self.attack_range - 1)
+            
         p_face_dx, p_face_dy = 0, 0
         if player.facing == "right": p_face_dx = 1
         elif player.facing == "left": p_face_dx = -1
@@ -554,85 +558,61 @@ class Enemy(Entity):
         predicted_px = px_grid + p_face_dx
         predicted_py = py_grid + p_face_dy
         
-        dist_x = px_grid - my_grid_x
-        dist_y = py_grid - my_grid_y
-        pred_dist_x = predicted_px - my_grid_x
-        pred_dist_y = predicted_py - my_grid_y
+        # 4方向全てのスコアを計算して、最も ideal_dist に近づくルートを探す
+        directions = [
+            ("right", dungeon.tile_size, 0),
+            ("left", -dungeon.tile_size, 0),
+            ("down", 0, dungeon.tile_size),
+            ("up", 0, -dungeon.tile_size)
+        ]
         
-        # 予測地点と現在地点が完全に一致した場合は主人公本体へ向かう
-        if pred_dist_x == 0 and pred_dist_y == 0:
-            pred_dist_x = dist_x
-            pred_dist_y = dist_y
-
-        # 【一番素直な進行方向】をチェック
-        best_naive_dx, best_naive_dy = 0, 0
-        best_naive_facing = self.facing
+        current_grid_dist_to_pred = abs(predicted_px - my_grid_x) + abs(predicted_py - my_grid_y)
+        current_score = abs(current_grid_dist_to_pred - ideal_dist)
         
-        if abs(pred_dist_x) > abs(pred_dist_y):
-            best_naive_dx = dungeon.tile_size if pred_dist_x > 0 else -dungeon.tile_size
-            best_naive_facing = "right" if pred_dist_x > 0 else "left"
-        elif pred_dist_y != 0:
-            best_naive_dy = dungeon.tile_size if pred_dist_y > 0 else -dungeon.tile_size
-            best_naive_facing = "down" if pred_dist_y > 0 else "up"
-        elif pred_dist_x != 0:
-            best_naive_dx = dungeon.tile_size if pred_dist_x > 0 else -dungeon.tile_size
-            best_naive_facing = "right" if pred_dist_x > 0 else "left"
-        
-        target_x = self.x + best_naive_dx
-        target_y = self.y + best_naive_dy
-        
-        # 障害物がなければ直進
-        if (best_naive_dx != 0 or best_naive_dy != 0) and self.can_move_grid(target_x, target_y, dungeon, all_entities, occupied_cells):
-            self.target_x = target_x
-            self.target_y = target_y
-            self.facing = best_naive_facing
-            self.is_moving = True
-            self.step_toggle = not self.step_toggle
-        else:
-            # 障害物があれば、4方向全てのスコアを計算して迂回ルートを探す
-            directions = [
-                ("right", dungeon.tile_size, 0),
-                ("left", -dungeon.tile_size, 0),
-                ("down", 0, dungeon.tile_size),
-                ("up", 0, -dungeon.tile_size)
-            ]
-            valid_moves = []
-            ideal_offset = max(0, self.attack_range - 1)
-            
-            for facing, dx, dy in directions:
-                test_x = self.x + dx
-                test_y = self.y + dy
-                if self.can_move_grid(test_x, test_y, dungeon, all_entities, occupied_cells):
-                    test_grid_x = int((test_x + self.width / 2) // dungeon.tile_size)
-                    test_grid_y = int((test_y + self.height / 2) // dungeon.tile_size)
-                    
-                    dist_to_predicted = abs(predicted_px - test_grid_x) + abs(predicted_py - test_grid_y)
-                    dist_to_current = abs(px_grid - test_grid_x) + abs(py_grid - test_grid_y)
-                    
+        valid_moves = []
+        for facing, dx, dy in directions:
+            test_x = self.x + dx
+            test_y = self.y + dy
+            if self.can_move_grid(test_x, test_y, dungeon, all_entities, occupied_cells):
+                test_grid_x = int((test_x + self.width / 2) // dungeon.tile_size)
+                test_grid_y = int((test_y + self.height / 2) // dungeon.tile_size)
+                
+                dist_to_predicted = abs(predicted_px - test_grid_x) + abs(predicted_py - test_grid_y)
+                dist_to_current = abs(px_grid - test_grid_x) + abs(py_grid - test_grid_y)
+                
+                # スコア計算: ideal_dist との差が小さいほど良い
+                score = abs(dist_to_predicted - ideal_dist)
+                
+                # 今よりスコアが改善されるか、または同等なら候補に入れる
+                if score <= current_score:
                     valid_moves.append({
                         "facing": facing,
                         "dx": dx,
                         "dy": dy,
-                        "dist_to_predicted": abs(dist_to_predicted - ideal_offset),
-                        "dist_to_current": abs(dist_to_current - self.attack_range)
+                        "score": score,
+                        "dist_to_current": abs(dist_to_current - self.attack_range) # 予備の評価軸
                     })
-                    
-            if valid_moves:
-                # 目標間合い（スコア0）に一番近いルートを選ぶ
-                valid_moves.sort(key=lambda m: (m["dist_to_predicted"], m["dist_to_current"]))
-                best_predicted = valid_moves[0]["dist_to_predicted"]
-                best_current = valid_moves[0]["dist_to_current"]
-                
-                best_moves = [m for m in valid_moves 
-                              if m["dist_to_predicted"] == best_predicted 
-                              and m["dist_to_current"] == best_current]
-                              
-                chosen_move = random.choice(best_moves)
+        
+        if valid_moves:
+            # スコアが最小（ideal_distに最も近い）の移動を選択
+            valid_moves.sort(key=lambda m: (m["score"], m["dist_to_current"]))
+            best_score = valid_moves[0]["score"]
+            
+            # 同じベストスコアが複数あればランダムに（回り込み等の自然な動きのため）
+            best_moves = [m for m in valid_moves if m["score"] == best_score]
+            chosen_move = random.choice(best_moves)
+            
+            # ただし、現在のスコアと同じで、かつ移動しなくても良い状況なら留まることもある
+            # (移動したほうが predicted に対して良くなる場合のみ移動する)
+            if chosen_move["score"] < current_score or random.random() < 0.5:
                 self.target_x = self.x + chosen_move["dx"]
                 self.target_y = self.y + chosen_move["dy"]
                 self.facing = chosen_move["facing"]
                 self.is_moving = True
                 self.step_toggle = not self.step_toggle
+                return True
+                
+        return False
 
     def take_turn(self, player, dungeon, all_entities, dialog=None, occupied_cells=None):
         """トルネコ風の厳密な1ターン（1アクション）を決定するAIロジック（スッキリリファクタ版）"""
@@ -662,25 +642,60 @@ class Enemy(Entity):
             return
         
         # 2. 【頭の悪さ（うっかり度）】 発見していても確率でランダム行動を起こす
+        # 1-10 のスケールで、設定値の確率でボケるように調整 (1/10 〜 10/10)
         if self.stupidity > 0 and random.randint(1, 10) <= self.stupidity:
+            print(f"[AI] {self.name} はぼーっとしている... (Stupidity: {self.stupidity})")
             self._move_randomly(dungeon, all_entities)
             return
             
-        # 3. 【攻撃判定】 自分の射程距離内にいれば、攻撃（または振り向き）を実行
-        if self._is_in_attack_range(dist_x, dist_y):
-            # 遠距離攻撃の場合は射線チェックを行う
-            if abs(dist_x) + abs(dist_y) > 1:
-                if self._is_line_of_sight_clear(dist_x, dist_y, dungeon, all_entities):
-                    self._handle_attack(dist_x, dist_y, player, dialog)
-                else:
-                    # 射線が通らない場合は賢く移動する（回り込みなど）
-                    self._move_smartly(player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells)
+        # 3. 【インテリジェンス：間合い管理】
+        # 賢い敵（stupidity < 7）の挙動調整
+        if self.stupidity < 7:
+            # 理想の間合いを性格から決定
+            # [MOD] ranged の場合、射程2なら間合い2を保つように修正（そうしないと隣接してしまい遠距離攻撃にならないため）
+            if self.attack_priority == "close":
+                ideal_dist = 1
             else:
-                # 隣接時は常に攻撃
+                if self.attack_range == 2:
+                    ideal_dist = 2
+                else:
+                    ideal_dist = max(1, self.attack_range - 1)
+            
+            # 射線が通っているか確認
+            has_los = self._is_in_attack_range(dist_x, dist_y) and self._is_line_of_sight_clear(dist_x, dist_y, dungeon, all_entities)
+            grid_dist = abs(dist_x) + abs(dist_y)
+            
+            # --- 優先度判定 ---
+            
+            # A. すでに理想的な位置にいる場合
+            if grid_dist == ideal_dist:
+                if has_los:
+                    self._handle_attack(dist_x, dist_y, player, dialog)
+                    return
+                # 射線が通らない（障害物越し等）なら移動を試みる
+                if self._move_smartly_check_success(player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells, ideal_dist):
+                    return
+            
+            # B. 隣接（距離1）されている場合（アウトボクサーは逃げたい）
+            elif grid_dist == 1 and self.attack_priority == "ranged" and self.attack_range > 1:
+                # 70% の確率で距離を取ろうとする
+                if random.random() < 0.7:
+                    if self._move_smartly_check_success(player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells, ideal_dist):
+                        return
+                # 逃げない、または逃げられなかった場合は攻撃
                 self._handle_attack(dist_x, dist_y, player, dialog)
-        # 4. 【追跡AI】 攻撃範囲外なら、目標間合いを目指して賢く移動する
-        else:
-            self._move_smartly(player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells)
+                return
+
+            # C. それ以外（理想の間合いではないが、攻撃または移動が必要な場合）
+            else:
+                # 攻撃可能（射程内かつ射線が通っている）なら、移動よりも攻撃を優先する
+                if has_los:
+                    self._handle_attack(dist_x, dist_y, player, dialog)
+                    return
+                
+                # 攻撃できない場合は理想の間合いへ向けて移動する
+                if self._move_smartly_check_success(player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells, ideal_dist):
+                    return
                 
     def update(self, dungeon):
         """毎フレームの更新（アニメーションの進行など）"""
@@ -713,23 +728,30 @@ class Enemy(Entity):
         
     def update_animation(self):
         self.idle_anim_timer = (self.idle_anim_timer + 1) % 60
-        """溜め期間中・およびダッシュ頂点での停止処理"""
-        # 溜め期間中は attack_timer は0なので、親クラスのupdate_animationを呼ぶと is_attacking が False になってしまう不具合を防止
+        
+        # 溜め期間中・およびダッシュ頂点での停止処理中は、個別に移動処理を行いリターンする
+        # （この期間は通常の歩行アニメーションを行わないため）
         if getattr(self, "attack_pre_delay_timer", 0) > 0:
             if getattr(self, "damage_flash_timer", 0) > 0:
                 self.damage_flash_timer -= 1
-            self.process_movement() 
+            if self.process_movement():
+                self.move_speed = 4
             return
 
-        # 頂点での0.5秒停止
         if getattr(self, "peak_hold_timer", 0) > 0:
             self.peak_hold_timer -= 1
             if getattr(self, "damage_flash_timer", 0) > 0:
                 self.damage_flash_timer -= 1
-            self.process_movement()
+            if self.process_movement():
+                self.move_speed = 4
             return
             
+        # 通常の更新（この中で process_movement も呼ばれる）
         super().update_animation()
+        
+        # 移動が終わっていたら速度をリセット（念のためのガード）
+        if not self.is_moving:
+            self.move_speed = 4
                 
     @classmethod
     def spawn_enemies(cls, dungeon, player=None):
