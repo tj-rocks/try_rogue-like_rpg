@@ -8,7 +8,7 @@ game_state = {
     "opening_timer": 0,          # 次の画像までのタイマー
     "opening_alpha": 0,          # フェードイン用の不透明度
     "opening_seen": False,       # オープニングを既に見たか
-    "title_selected_idx": 0,     # タイトル画面での選択項目 (0: New Game, 1: Continue)
+    "title_selected_idx": 1,     # タイトル画面での選択項目 (0: Continue, 1: New Game)
     
     "dialog_active": False,
     "dialog_modal": True,   # ボタン入力を待つ（ポーズする）かどうか

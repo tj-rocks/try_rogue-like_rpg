@@ -1619,11 +1619,8 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                 def on_inn_done():
                                                     player.coin -= INN_FEE
                                                     player.hp = player.max_hp
-                                                    from systems.data_loader import SAVE_OFFICIAL_PATH, SAVE_SUSPEND_PATH
+                                                    from systems.data_loader import SAVE_OFFICIAL_PATH
                                                     player.save_to_file(SAVE_OFFICIAL_PATH)
-                                                    if os.path.exists(SAVE_SUSPEND_PATH):
-                                                        try: os.remove(SAVE_SUSPEND_PATH)
-                                                        except: pass
                                                     dialog.text = Text.NPC.INN_RECOVERED
                                                     dialog.is_active = True
                                                     print(f"[INN] Rest Complete. Official save created. HP: {player.hp}, Coin: {player.coin}")
@@ -1668,9 +1665,12 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             shop_dialog.open_shop("道具屋", dungeon.item_shop_stock)
                                             return
                                     elif npc.name == "大魔導士":
-                                        dialog.text = "フォッフォッフォ、お主、なかなか良い目をしておるな。修行に励むが良いぞ。"
-                                        dialog.is_active = True
-                                        return
+                                        shop_dialog = kwargs.get("shop_dialog")
+                                        if shop_dialog and dungeon:
+                                            dialog.text = "フォッフォッフォ、杖のことならわしに任せるがよいぞ。"
+                                            dialog.is_active = True
+                                            shop_dialog.open_shop("魔法屋", dungeon.magic_shop_stock)
+                                            return
                                     elif npc.name == "商人":
                                         shop_dialog = kwargs.get("shop_dialog")
                                         if shop_dialog:

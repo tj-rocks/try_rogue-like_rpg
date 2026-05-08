@@ -59,9 +59,11 @@ def main():
             # BGMの切り替え管理
             if scene != last_scene:
                 if scene == "opening": play_bgm(BGM_OPENING)
-                elif scene == "title": play_bgm(BGM_TITLE)
+                elif scene == "title":
+                    play_bgm(BGM_TITLE)
+                    game_state["title_auto_selected"] = False # タイトルに戻るたびにリセット
                 last_scene = scene
-
+ 
             # 2. シーン別の処理
             if scene == "opening":
                 from systems.resources import opening_imgs, story_data
@@ -70,7 +72,15 @@ def main():
             elif scene == "title":
                 from systems.resources import title_bg
                 from systems.data_loader import SAVE_OFFICIAL_PATH, SAVE_SUSPEND_PATH
-                has_save = os.path.exists(SAVE_OFFICIAL_PATH) or os.path.exists(SAVE_SUSPEND_PATH)
+                has_save = os.path.exists(SAVE_OFFICIAL_PATH)
+                
+                # セーブがある場合は、最初にタイトルに入った時だけ「つづきから(0)」に自動で合わせる
+                if has_save and not game_state.get("title_auto_selected"):
+                    game_state["title_selected_idx"] = 0
+                    game_state["title_auto_selected"] = True
+                elif not has_save:
+                    game_state["title_selected_idx"] = 1
+                
                 handle_title(screen, events, game_state, title_bg, has_save, start_new_game, continue_game)
 
             elif scene == "game":
