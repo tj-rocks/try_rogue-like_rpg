@@ -6,7 +6,7 @@ from systems.game_state import is_paused
 from systems.entity_handler import update_dungeon_entities
 from systems.death_handler import handle_death_sequence
 
-def handle_opening(screen, events, game_state, opening_imgs, start_new_game_func):
+def handle_opening(screen, events, game_state, opening_imgs, start_new_game_func, ui_elements, story_data=None):
     """
     オープニング演出を処理する。
     """
@@ -14,26 +14,56 @@ def handle_opening(screen, events, game_state, opening_imgs, start_new_game_func
     game_state["opening_alpha"] = min(255, game_state["opening_alpha"] + 2)
     idx = game_state["opening_index"]
     
+    # 1. 画像の描画
     if idx < len(opening_imgs):
         from systems.ui import draw_opening_scene
-        draw_opening_scene(screen, opening_imgs[idx], idx, game_state["opening_alpha"])
-    
+        draw_opening_scene(screen, opening_imgs[idx], game_state["opening_alpha"])
+
+    # 2. テキストとBGMの管理
+    dialog = ui_elements["dialog"]
+    text = ""
+    if story_data and "opening" in story_data:
+        page_data = story_data["opening"].get(idx + 1) or story_data["opening"].get(str(idx + 1))
+        if page_data:
+            text = page_data.get("text", "")
+            # まだダイアログにこのテキストが設定されていなければ設定
+            if dialog.text != text:
+                dialog.text = text
+                dialog.is_active = True
+                game_state["dialog_modal"] = False # オープニング中は入力を強制ポーズさせない
+            
+            bgm = page_data.get("bgm")
+            if bgm and game_state.get("current_bgm") != bgm:
+                from systems.audio_manager import play_bgm
+                play_bgm(bgm)
+                game_state["current_bgm"] = bgm
+
+    # 3. ダイアログの更新と描画
+    dialog.handle_events(events)
+    dialog.update()
+    if dialog.is_active:
+        dialog.draw(screen)
+
     game_state["opening_timer"] += 1
     
+    # ダイアログが閉じられたか、一定時間経過か、スキップキーで次へ
     skip = False
     for event in events:
         if event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_z):
-            skip = True
+            # ダイアログが表示中なら、ダイアログ側でイベントが処理されて非表示になる
+            if not dialog.is_active:
+                skip = True
     
     if game_state["opening_timer"] > 600 or skip:
         game_state["opening_timer"] = 0
         game_state["opening_alpha"] = 0
         game_state["opening_index"] += 1
+        dialog.is_active = False # 次のシーンのために一度閉じる
         
         if game_state["opening_index"] >= len(opening_imgs):
             game_state["opening_index"] = 0
             game_state["opening_seen"] = True
-            from constants import SAVE_DATA_PATH
+            from systems.data_loader import SAVE_DATA_PATH
             if not os.path.exists(SAVE_DATA_PATH):
                 game_state["current_scene"] = "title"
             else:
@@ -41,7 +71,7 @@ def handle_opening(screen, events, game_state, opening_imgs, start_new_game_func
     
     return game_state["current_scene"]
     
-def handle_ending(screen, events, game_state, ending_imgs):
+def handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_data=None):
     """
     エンディング演出を処理する。
     """
@@ -49,21 +79,48 @@ def handle_ending(screen, events, game_state, ending_imgs):
     game_state["ending_alpha"] = min(255, game_state.get("ending_alpha", 0) + 2)
     idx = game_state.get("ending_index", 0)
     
+    # 1. 画像の描画
     if idx < len(ending_imgs):
         from systems.ui import draw_opening_scene
-        draw_opening_scene(screen, ending_imgs[idx], idx, game_state["ending_alpha"])
-    
+        draw_opening_scene(screen, ending_imgs[idx], game_state["ending_alpha"])
+
+    # 2. テキストとBGMの管理
+    dialog = ui_elements["dialog"]
+    text = ""
+    if story_data and "ending" in story_data:
+        page_data = story_data["ending"].get(idx + 1) or story_data["ending"].get(str(idx + 1))
+        if page_data:
+            text = page_data.get("text", "")
+            if dialog.text != text:
+                dialog.text = text
+                dialog.is_active = True
+                game_state["dialog_modal"] = False
+            
+            bgm = page_data.get("bgm")
+            if bgm and game_state.get("current_bgm") != bgm:
+                from systems.audio_manager import play_bgm
+                play_bgm(bgm)
+                game_state["current_bgm"] = bgm
+
+    # 3. ダイアログの更新と描画
+    dialog.handle_events(events)
+    dialog.update()
+    if dialog.is_active:
+        dialog.draw(screen)
+
     game_state["ending_timer"] = game_state.get("ending_timer", 0) + 1
     
     skip = False
     for event in events:
         if event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_z):
-            skip = True
+            if not dialog.is_active:
+                skip = True
     
     if game_state["ending_timer"] > 600 or skip:
         game_state["ending_timer"] = 0
         game_state["ending_alpha"] = 0
         game_state["ending_index"] = idx + 1
+        dialog.is_active = False
         
         if game_state["ending_index"] >= len(ending_imgs):
             game_state["ending_index"] = 0
@@ -80,12 +137,15 @@ def handle_title(screen, events, game_state, title_bg, has_save, start_new_game_
     
     for event in events:
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
+            if event.key == pygame.K_UP and has_save:
                 game_state["title_selected_idx"] = 0
-            elif event.key == pygame.K_DOWN and has_save:
+            elif event.key == pygame.K_DOWN:
                 game_state["title_selected_idx"] = 1
             elif event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_z):
                 if game_state["title_selected_idx"] == 0:
+                    if has_save:
+                        continue_game_func()
+                else:
                     from systems.game_state import game_state as gs
                     if gs["opening_seen"]:
                         start_new_game_func()
@@ -94,8 +154,6 @@ def handle_title(screen, events, game_state, title_bg, has_save, start_new_game_
                         game_state["opening_timer"] = 0
                         game_state["opening_alpha"] = 0
                         game_state["current_scene"] = "opening"
-                else:
-                    continue_game_func()
     
     return game_state["current_scene"]
 

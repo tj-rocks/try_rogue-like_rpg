@@ -69,10 +69,13 @@ def scale_image_aspect(img, max_w, max_h):
     return pygame.transform.smoothscale(img, (int(w * ratio), int(h * ratio)))
 
 # --- ゲーム共通リソースの読み込み ---
+from systems.data_loader import get_story_data
+story_data = get_story_data()
+
 title_bg = load_scale_img("components/pictures/ui/title_background.png", SCREEN_WIDTH, SCREEN_HEIGHT)
 opening_imgs = [
     load_scale_img(f"components/pictures/opening/opening_{i}.png", SCREEN_WIDTH, SCREEN_HEIGHT)
-    for i in range(1, 4) # ファイル名が 1 から始まっているため
+    for i in range(1, 8) # 7ページ構成に対応
 ]
 ending_imgs = [
     load_scale_img(f"components/pictures/ending/ending_{i}.png", SCREEN_WIDTH, SCREEN_HEIGHT)

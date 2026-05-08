@@ -42,6 +42,7 @@ def main():
             play_bgm(BGM_OPENING)
         else:
             game_state["current_scene"] = "title"
+            game_state["title_selected_idx"] = 0 if has_save else 1
             play_bgm(BGM_TITLE)
 
         # --- メインループ ---
@@ -63,8 +64,8 @@ def main():
 
             # 2. シーン別の処理
             if scene == "opening":
-                from systems.resources import opening_imgs
-                handle_opening(screen, events, game_state, opening_imgs, start_new_game)
+                from systems.resources import opening_imgs, story_data
+                handle_opening(screen, events, game_state, opening_imgs, start_new_game, ui_elements, story_data)
                 
             elif scene == "title":
                 from systems.resources import title_bg
@@ -80,8 +81,8 @@ def main():
                     game_state["current_scene"] = "title"
 
             elif scene == "ending":
-                from systems.resources import ending_imgs
-                handle_ending(screen, events, game_state, ending_imgs)
+                from systems.resources import ending_imgs, story_data
+                handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_data)
 
             # 3. 画面更新
             pygame.display.flip()

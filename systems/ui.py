@@ -13,7 +13,7 @@ from constants import (
 import os
 from wordings import Text
 
-def draw_opening_scene(screen, image, text_idx, alpha):
+def draw_opening_scene(screen, image, alpha):
     """オープニング画像をフェードインしながら描画する"""
     if not image: return
     
@@ -39,13 +39,13 @@ def draw_title_screen(screen, background_img, selected_idx, has_save):
     draw_text_wrapped(screen, font_large, title_text, 0, 150, screen.get_width(), align_h='center', color=logo_color)
     
     # メニュー
-    menu_items = [Text.UI.NEW_GAME, Text.UI.CONTINUE]
+    menu_items = [Text.UI.CONTINUE, Text.UI.NEW_GAME]
     start_y = 500
     
     for i, item in enumerate(menu_items):
         color = (255, 255, 255)
-        if i == 1 and not has_save:
-            color = (100, 100, 100) # Saveがない場合はグレーアウト
+        if i == 0 and not has_save:
+            color = (100, 100, 100) # Saveがない場合はContinueをグレーアウト
             
         if i == selected_idx:
             color = (255, 255, 100) # 選択中は黄色
@@ -91,7 +91,7 @@ def show_loading_screen(screen, text=None):
     # 画面を強制更新（これを行わないと、直後の重い処理中に画面に反映されない）
     pygame.display.flip()
 
-def draw_text_wrapped(screen, font, text, x, y, max_width, box_height=None, color=(255, 255, 255), align_h='left', align_v='top'):
+def draw_text_wrapped(screen, font, text, x, y, max_width, box_height=None, color=(255, 255, 255), align_h='left', align_v='top', alpha=255):
     """指定されたボックス内でテキストを折り返し、アライメント（左・中央・右 / 上・中・下）を考慮して描画する"""
     if not text: return
     
@@ -126,6 +126,9 @@ def draw_text_wrapped(screen, font, text, x, y, max_width, box_height=None, colo
     # 段階3: 描画
     for i, line in enumerate(lines):
         line_surf = font.render(line, True, color)
+        if alpha < 255:
+            line_surf.set_alpha(alpha)
+            
         line_w = line_surf.get_width()
         
         line_x = x
