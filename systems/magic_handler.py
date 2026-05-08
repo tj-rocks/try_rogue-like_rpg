@@ -29,7 +29,7 @@ class MagicEffect:
 
 class FireEffect(MagicEffect):
     def __init__(self, x, y, size=60, color=(255, 100, 0)):
-        super().__init__(x, y, duration=20)
+        super().__init__(x, y, duration=40)
         self.size = size
         self.color = color
 
@@ -49,7 +49,7 @@ class FireEffect(MagicEffect):
             screen.blit(s, (draw_x + rx - rs//2 + 30, draw_y + ry - rs//2 + 30))
 
 class FlashEffect(MagicEffect):
-    def __init__(self, color=(255, 255, 255), duration=10):
+    def __init__(self, color=(255, 255, 255), duration=20):
         super().__init__(0, 0, duration)
         self.color = color
 
@@ -149,7 +149,7 @@ class ProjectileEffect(MagicEffect):
         screen.blit(s, (curr_x - radius*1.5, curr_y - radius*1.5))
 
 class KnockbackEffect(MagicEffect):
-    def __init__(self, x1, y1, x2, y2, color=(200, 200, 255), duration=15):
+    def __init__(self, x1, y1, x2, y2, color=(200, 200, 255), duration=25):
         super().__init__(x1, y1, duration=duration)
         self.x1, self.y1 = x1, y1
         self.x2, self.y2 = x2, y2
@@ -158,17 +158,22 @@ class KnockbackEffect(MagicEffect):
     def draw(self, screen, camera_x, camera_y):
         t = 1.0 - (self.duration / self.max_duration)
         
-        # 衝撃波の軌跡を描画
-        for i in range(3):
-            trail_t = max(0, t - i * 0.1)
-            curr_x = self.x1 + (self.x2 - self.x1) * trail_t - camera_x + 30
-            curr_y = self.y1 + (self.y2 - self.y1) * trail_t - camera_y + 30
+        # 衝撃波の軌跡を描画 (より大きく、明るく)
+        for i in range(4):
+            trail_t = max(0, t - i * 0.08)
+            curr_x = self.x1 + (self.x2 - self.x1) * trail_t - camera_x + 32
+            curr_y = self.y1 + (self.y2 - self.y1) * trail_t - camera_y + 32
             
-            for r in range(1, 4):
-                radius = r * (8 - i * 2) * (1.1 - t)
-                alpha = int(200 * (self.duration / self.max_duration) / (i + 1))
-                s = pygame.Surface((radius * 2 + 1, radius * 2 + 1), pygame.SRCALPHA)
-                pygame.draw.circle(s, (*self.color, alpha), (int(radius), int(radius)), int(radius), max(1, 3 - i))
+            for r in range(1, 5):
+                # 半径を大きくし、広がるような演出にする
+                radius = r * (15 - i * 3) * (1.2 - t)
+                if radius <= 0: continue
+                alpha = int(220 * (self.duration / self.max_duration) / (i + 1))
+                s = pygame.Surface((radius * 2 + 2, radius * 2 + 2), pygame.SRCALPHA)
+                # 外側の光
+                pygame.draw.circle(s, (*self.color, alpha // 2), (int(radius), int(radius)), int(radius))
+                # 内側の芯
+                pygame.draw.circle(s, (255, 255, 255, alpha), (int(radius), int(radius)), int(radius // 2))
                 screen.blit(s, (curr_x - radius, curr_y - radius))
 
 class DirectionalFlashEffect(MagicEffect):
@@ -200,6 +205,7 @@ def execute_stave(player, stave, dungeon, dialog):
 
     stave.charges -= 1
     effect_type = settings.get("effect_type")
+    print(f"[MAGIC] Execute Stave: {stave.name} (Key: {stave.key}, Effect: {effect_type})")
 
     # 🎵 効果音再生
     sound_path = settings.get("sound")
@@ -266,10 +272,11 @@ def _effect_knockback(player, settings, dungeon, dialog):
         cur_gx += dx
         cur_gy += dy
 
-    # 演出1: プレイヤー位置からターゲット位置まで衝撃波が飛ぶ (少し速め)
+    # 演出1: プレイヤー位置からターゲット位置まで衝撃波が飛ぶ
+    print(f"[MAGIC] Knockback Effect added: From ({gx},{gy}) to ({target_gx},{target_gy})")
     dungeon.magic_effects.append(KnockbackEffect(gx * dungeon.tile_size, gy * dungeon.tile_size, 
                                                 target_gx * dungeon.tile_size, target_gy * dungeon.tile_size,
-                                                color=(220, 220, 255), duration=10))
+                                                color=(220, 220, 255), duration=15))
 
     if not target_enemy:
         return "まばゆい衝撃波を 放った！"
@@ -304,17 +311,18 @@ def _effect_knockback(player, settings, dungeon, dialog):
             
         final_gx, final_gy = next_gx, next_gy
  
-    # 敵を移動させる
-    target_enemy.x = final_gx * dungeon.tile_size
-    target_enemy.y = final_gy * dungeon.tile_size
-    target_enemy.target_x = target_enemy.x
-    target_enemy.target_y = target_enemy.y
+    # 敵を移動させる（ワープさせず、高速スライディング移動させる）
+    target_enemy.target_x = final_gx * dungeon.tile_size
+    target_enemy.target_y = final_gy * dungeon.tile_size
+    target_enemy.is_moving = True
+    target_enemy.move_speed = 24 # 吹き飛ばし用の高速移動
     
     # ダメージ計算（攻撃力の半分、必中）
     msg_dmg, damage, is_crit, is_miss = deal_damage(player, target_enemy, is_magic=True, damage_mult=0.5)
     msg = f"{target_enemy.name} を 吹き飛ばした！\n" + msg_dmg
     
-    # 演出2: 敵の吹き飛ばし移動
+    # 演出2: 衝撃波エフェクトを追加
+    print(f"[MAGIC] Knockback Slide added: From ({target_gx},{target_gy}) to ({final_gx},{final_gy})")
     dungeon.magic_effects.append(KnockbackEffect(target_gx * dungeon.tile_size, target_gy * dungeon.tile_size, 
                                                 final_gx * dungeon.tile_size, final_gy * dungeon.tile_size,
                                                 duration=20))
@@ -347,9 +355,11 @@ def _effect_fire(player, settings, dungeon, dialog):
         offsets = settings.get("range_offsets", {}).get(player.facing, [])
     
     targets = []
+    print(f"[MAGIC] Fire Offsets: {offsets}")
     for ox, oy in offsets:
         tgx, tgy = gx + ox, gy + oy
         tx, ty = tgx * dungeon.tile_size, tgy * dungeon.tile_size
+        print(f"[MAGIC] Add FireEffect at Tile ({tgx}, {tgy})")
         dungeon.magic_effects.append(FireEffect(tx, ty, color=settings.get("effect_color", [255, 100, 0])))
         
         for e in dungeon.enemies:

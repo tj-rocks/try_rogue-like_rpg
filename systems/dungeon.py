@@ -25,6 +25,12 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
         elif floor_level < player.current_floor:
             sound_manager.play_sfx(SOUND_STAIRS_UP)
             
+    # 読み込み中画面を表示 (重い処理の前に強制描画)
+    screen = pygame.display.get_surface()
+    if screen:
+        from systems.ui import show_loading_screen
+        show_loading_screen(screen)
+            
     player.current_floor = floor_level
     new_dungeon = Dungeon(level=floor_level, player=player, debug_overflow=debug_overflow)
     
@@ -46,14 +52,19 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
     new_dungeon.play_floor_bgm()
     
     # --- [AUTO-SAVE] 階層移動時に自動セーブ ---
-    if floor_level != old_floor:
-        from systems.data_loader import SAVE_SUSPEND_PATH
-        print(f"[AUTO-SAVE] Floor transition ({old_floor} -> {floor_level}). Saving to suspend: {SAVE_SUSPEND_PATH}")
-        player.save_to_file(SAVE_SUSPEND_PATH)
+    # 「続きから(continue)」や「死亡時(is_death)」はセーブ不要
+    if floor_level != old_floor and spawn_reason != "continue" and not is_death:
+        from systems.data_loader import SAVE_DATA_PATH
+        print(f"[AUTO-SAVE] Floor transition ({old_floor} -> {floor_level}). Saving to persistent file: {SAVE_DATA_PATH}")
+        player.save_to_file(SAVE_DATA_PATH)
 
     return new_dungeon
 
 class Dungeon:
+    # --- [NEW] クラスレベルのキャッシュ ---
+    _texture_cache = {} # {theme_folder: {key: surface}}
+    _variant_lists = {} # {theme_folder: {category: [keys]}}
+
     def __init__(self, level=1, player=None, debug_overflow=False):
         from constants import (
             DUNGEON_MIN_ROOMS, DUNGEON_MAX_ROOMS, DUNGEON_ROOM_INCREASE_INTERVAL,
@@ -179,80 +190,116 @@ class Dungeon:
                 print(f"[\033[93mWARNING\033[0m] Invalid 'wall_decoration_ratio' in floor {current_level}: {ratio} (Expected number)")
 
         print(f"Floor {current_level} theme: {folder}")
-        img_dir = main_path + "/" + folder
-        keys_to_load = ["floor", "wall_top", "wall_bottom", "wall_side", "wall_none", 
-                        "wall_corner", "corridor", "wall_single", "wall_base"]
         def load_and_scale(path):
             img = pygame.image.load(path).convert_alpha()
             if img.get_size() != (self.tile_size, self.tile_size):
                 return pygame.transform.scale(img, (self.tile_size, self.tile_size))
             return img
 
-        for key in keys_to_load:
-            p = f"{img_dir}/{key}.png"
-            if os.path.exists(p):
-                self.textures[key] = load_and_scale(p)
-        
-        self.available_floor_variants = []
-        self.available_wall_variants = []
-        self.available_wall_top_variants = []
-        self.available_wall_none_variants = []
-        self.available_wall_decoration_variants = []
-        if os.path.exists(img_dir):
-            for f in os.listdir(img_dir):
-                if f.endswith(".png"):
-                    key = f[:-4]
-                    path = f"{img_dir}/{f}"
-                    if f.startswith("floor"):
-                        self.textures[key] = load_and_scale(path)
-                        self.available_floor_variants.append(key)
-                    elif f.startswith("wall_single"):
-                        self.textures[key] = load_and_scale(path)
-                        self.available_wall_variants.append(key)
-                    elif f.startswith("wall_top"):
-                        self.textures[key] = load_and_scale(path)
-                        self.available_wall_top_variants.append(key)
-                    elif f.startswith("wall_none"):
-                        self.textures[key] = load_and_scale(path)
-                        self.available_wall_none_variants.append(key)
-                    elif f.startswith("corridor"):
-                        self.textures[key] = load_and_scale(path)
-                    elif f.startswith("wall_decoration"):
-                        self.textures[key] = load_and_scale(path)
-                        self.available_wall_decoration_variants.append(key)
-        # --- バリデーションログ ---
-        if not os.path.exists(img_dir):
-            print(f"[\033[91mERROR\033[0m] Dungeon theme directory NOT FOUND: {img_dir}")
+        # --- [NEW] キャッシュチェック ---
+        if folder in Dungeon._texture_cache:
+            self.textures = Dungeon._texture_cache[folder].copy()
+            v_data = Dungeon._variant_lists[folder]
+            self.available_floor_variants = v_data["floor"].copy()
+            self.available_wall_variants = v_data["wall"].copy()
+            self.available_wall_top_variants = v_data["wall_top"].copy()
+            self.available_wall_none_variants = v_data["wall_none"].copy()
+            self.available_wall_decoration_variants = v_data["wall_decoration"].copy()
+            print(f"[DUNGEON] Theme '{folder}' loaded from cache.")
         else:
-            if not self.available_floor_variants:
-                print(f"[\033[91mERROR\033[0m] No 'floor' textures found in: {img_dir}")
-            if not self.available_wall_top_variants:
-                print(f"[\033[91mERROR\033[0m] No 'wall_top' textures found in: {img_dir}")
+            img_dir = main_path + "/" + folder
+            keys_to_load = ["floor", "wall_top", "wall_bottom", "wall_side", "wall_none", 
+                            "wall_corner", "corridor", "wall_single", "wall_base"]
 
-        for base_key, variant_list in [("floor", self.available_floor_variants), 
-                                       ("wall_top", self.available_wall_top_variants),
-                                       ("wall_none", self.available_wall_none_variants)]:
-            has_real = os.path.exists(f"{img_dir}/{base_key}.png")
-            if not has_real:
-                # ファイル本体がない場合、バリエーションがあればそれを基本にする
-                actual_v = [v for v in variant_list if v != base_key]
-                if actual_v:
-                    self.textures[base_key] = self.textures[actual_v[0]]
+            for key in keys_to_load:
+                p = f"{img_dir}/{key}.png"
+                if os.path.exists(p):
+                    self.textures[key] = load_and_scale(p)
+            
+            self.available_floor_variants = []
+            self.available_wall_variants = []
+            self.available_wall_top_variants = []
+            self.available_wall_none_variants = []
+            self.available_wall_decoration_variants = []
+            if os.path.exists(img_dir):
+                for f in os.listdir(img_dir):
+                    if f.endswith(".png"):
+                        key = f[:-4]
+                        path = f"{img_dir}/{f}"
+                        if f.startswith("floor"):
+                            self.textures[key] = load_and_scale(path)
+                            self.available_floor_variants.append(key)
+                        elif f.startswith("wall_single"):
+                            self.textures[key] = load_and_scale(path)
+                            self.available_wall_variants.append(key)
+                        elif f.startswith("wall_top"):
+                            self.textures[key] = load_and_scale(path)
+                            self.available_wall_top_variants.append(key)
+                        elif f.startswith("wall_none"):
+                            self.textures[key] = load_and_scale(path)
+                            self.available_wall_none_variants.append(key)
+                        elif f.startswith("corridor"):
+                            self.textures[key] = load_and_scale(path)
+                        elif f.startswith("wall_decoration"):
+                            self.textures[key] = load_and_scale(path)
+                            self.available_wall_decoration_variants.append(key)
+            
+            # バリデーションとベースキーの補完
+            for base_key, variant_list in [("floor", self.available_floor_variants), 
+                                           ("wall_top", self.available_wall_top_variants),
+                                           ("wall_none", self.available_wall_none_variants)]:
+                has_real = os.path.exists(f"{img_dir}/{base_key}.png")
+                if not has_real and variant_list:
+                    self.textures[base_key] = self.textures[variant_list[0]]
                     if base_key not in variant_list: variant_list.append(base_key)
-            else:
-                # ファイル本体がある場合、リストに追加
-                if base_key not in variant_list: variant_list.append(base_key)
+                elif has_real and base_key not in variant_list:
+                    variant_list.append(base_key)
+
+            # 階段の読み込みもキャッシュに含める
+            stairs_dir = main_path + "/stairs"
+            for key in ["stairs_up", "stairs_down"]:
+                if os.path.exists(f"{stairs_dir}/{key}.png"):
+                    self.textures[key] = load_and_scale(f"{stairs_dir}/{key}.png")
+
+            # キャッシュに保存
+            Dungeon._texture_cache[folder] = self.textures.copy()
+            Dungeon._variant_lists[folder] = {
+                "floor": self.available_floor_variants.copy(),
+                "wall": self.available_wall_variants.copy(),
+                "wall_top": self.available_wall_top_variants.copy(),
+                "wall_none": self.available_wall_none_variants.copy(),
+                "wall_decoration": self.available_wall_decoration_variants.copy()
+            }
+            print(f"[DUNGEON] Theme '{folder}' cached.")
 
         self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
         
+        def build_weight_list(variants):
+            if not variants: return []
+            import re
+            weights = []
+            for v in variants:
+                m = re.search(r'(\d+)$', v)
+                weights.append(0.5 ** int(m.group(1)) if m else 1.0)
+            return weights
+
+        floor_weights = build_weight_list(self.available_floor_variants)
+        wall_weights = build_weight_list(self.available_wall_variants)
+        top_weights = build_weight_list(self.available_wall_top_variants)
+        none_weights = build_weight_list(self.available_wall_none_variants)
+
         def get_rand_floor():
-            return random.choice(self.available_floor_variants) if self.available_floor_variants else "floor"
+            if not self.available_floor_variants: return "floor"
+            return random.choices(self.available_floor_variants, weights=floor_weights, k=1)[0]
         def get_rand_wall():
-            return random.choice(self.available_wall_variants) if self.available_wall_variants else "wall_single"
+            if not self.available_wall_variants: return "wall_single"
+            return random.choices(self.available_wall_variants, weights=wall_weights, k=1)[0]
         def get_rand_wall_top():
-            return random.choice(self.available_wall_top_variants) if self.available_wall_top_variants else "wall_top"
+            if not self.available_wall_top_variants: return "wall_top"
+            return random.choices(self.available_wall_top_variants, weights=top_weights, k=1)[0]
         def get_rand_wall_none():
-            return random.choice(self.available_wall_none_variants) if self.available_wall_none_variants else "wall_none"
+            if not self.available_wall_none_variants: return "wall_none"
+            return random.choices(self.available_wall_none_variants, weights=none_weights, k=1)[0]
         
         self.floor_variants = [[get_rand_floor() for _ in range(self.map_width)] for _ in range(self.map_height)]
         self.base_floor_variants = [[get_rand_floor() for _ in range(self.map_width)] for _ in range(self.map_height)]
@@ -272,10 +319,7 @@ class Dungeon:
             surface.blit(side_flip, (self.tile_size//2, 0), (self.tile_size//2, 0, self.tile_size//2, self.tile_size))
             self.textures["wall_single"] = surface
         
-        stairs_dir = main_path + "/stairs"
-        for key in ["stairs_up", "stairs_down"]:
-            if os.path.exists(f"{stairs_dir}/{key}.png"):
-                self.textures[key] = load_and_scale(f"{stairs_dir}/{key}.png")
+        # stairs_dir 処理は上に移動済み
             
         # [NEW] 固定マップの読み込み判定
         map_file = self.floor_info.get("map")
@@ -292,6 +336,8 @@ class Dungeon:
         
         # 描画前の最終調整（外部からマップデータを整える）
         self._adjust_wall_rendering_logic()
+        # [NEW] 3方向置換で新たに発生した孤立壁を最終クリーニング
+        self._remove_lone_walls()
         
         # 壁の装飾を配置
         self._add_wall_decorations()
@@ -790,11 +836,19 @@ class Dungeon:
 
     def spawn_floor_items(self, player):
         from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, ITEM_DROP_RATES
+        from constants import FLOOR_ITEM_SPAWN_MIN, FLOOR_ITEM_SPAWN_MAX, FLOOR_ITEM_ROOM_RATIO, FLOOR_ITEM_SCALE_EVERY, FLOOR_ITEM_SCALE_ADD
         from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave
+        
         floor = self.current_floor
-        scale_steps = (floor - 1) // FLOOR_ITEM_SCALE_EVERY
-        max_count = min(FLOOR_ITEM_SPAWN_MAX + scale_steps * FLOOR_ITEM_SCALE_ADD, FLOOR_ITEM_SCALE_LIMIT)
-        count = random.randint(FLOOR_ITEM_SPAWN_MIN, max_count)
+        rooms = len(self.rooms)
+        
+        # 部屋数に対する比率でアイテム数を決定 (例: 4部屋 * 0.7 = 2.8 -> 2個)
+        # 階層が進むとさらに微増させるスケーリングも加味
+        scale_add = (floor // FLOOR_ITEM_SCALE_EVERY) * FLOOR_ITEM_SCALE_ADD
+        base_count = int(rooms * FLOOR_ITEM_ROOM_RATIO) + scale_add
+        
+        # 最終的な個数を Min/Max の範囲内に収める
+        count = max(FLOOR_ITEM_SPAWN_MIN, min(FLOOR_ITEM_SPAWN_MAX + scale_add, base_count))
         
         # ランクアップアイテムのチェック
         cert_to_spawn = None
@@ -809,44 +863,62 @@ class Dungeon:
         candidates = []
         # Consumable
         for key, data in CONSUMABLE_DATA.items():
-            if data.get("category", "common") == "common":
+            if data.get("category") != "event":
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "consumable", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         # Weapon, Armor, Shield, Stave (default to common)
         for key, data in WEAPON_DATA.items():
-            if data.get("category", "common") == "common":
+            if data.get("category") != "event":
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "weapon", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         for key, data in ARMOR_DATA.items():
-            if data.get("category", "common") == "common":
+            if data.get("category") != "event":
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "armor", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         for key, data in SHIELD_DATA.items():
-            if data.get("category", "common") == "common":
+            if data.get("category") != "event":
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "shield", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         for key, data in STAVE_DATA.items():
-            if data.get("category", "common") == "common":
+            if data.get("category") != "event":
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "stave", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
-        if not candidates: return
-        player_gx, player_gy = int((player.x + self.tile_size / 2) // self.tile_size), int((player.y + self.tile_size / 2) // self.tile_size)
-        floor_tiles = [(c, r) for r in range(self.map_height) for c in range(self.map_width) if self.map_data[r][c] == 1 and (abs(c - player_gx) > 4 or abs(r - player_gy) > 4)]
-        random.shuffle(floor_tiles)
-        placed = 0
-        for tile_pos in floor_tiles:
-            if placed >= count: break
-            weights = [c[3] for c in candidates]
-            chosen_key, chosen_type, chosen_data, _ = random.choices(candidates, weights=weights, k=1)[0]
-            px, py = tile_pos[0] * self.tile_size, tile_pos[1] * self.tile_size
-            if chosen_type == "weapon": item = DroppedWeapon(px, py, chosen_key, chosen_data)
-            elif chosen_type == "consumable": item = DroppedConsumable(px, py, chosen_key, chosen_data)
-            elif chosen_type == "armor": item = DroppedArmor(px, py, chosen_key, chosen_data)
-            elif chosen_type == "shield": item = DroppedShield(px, py, chosen_key, chosen_data)
-            elif chosen_type == "stave": item = DroppedStave(px, py, chosen_key, chosen_data)
-            else: continue
-            self.dropped_items.append(item)
-            placed += 1
+        if not candidates:
+            print(f"[Dungeon] WARNING: No item candidates for Floor {floor}!")
+            return
+        
+        try:
+            print(f"[Dungeon] Floor {floor} | Item Candidates: {len(candidates)} | Spawning: {count}")
+            player_gx, player_gy = int((player.x + self.tile_size / 2) // self.tile_size), int((player.y + self.tile_size / 2) // self.tile_size)
+            floor_tiles = [(c, r) for r in range(self.map_height) for c in range(self.map_width) if self.map_data[r][c] == 1 and (abs(c - player_gx) > 1 or abs(r - player_gy) > 1)]
+            random.shuffle(floor_tiles)
+            placed = 0
+            
+            print(f"[Dungeon] Floor {floor} | Potential Tiles: {len(floor_tiles)}")
+            for tile_pos in floor_tiles:
+                if placed >= count: break
+                weights = [c[3] for c in candidates]
+                chosen_key, chosen_type, chosen_data, _ = random.choices(candidates, weights=weights, k=1)[0]
+                gx, gy = tile_pos
+                px, py = gx * self.tile_size, gy * self.tile_size
+                
+                item = None
+                if chosen_type == "weapon": item = DroppedWeapon(px, py, chosen_key, chosen_data)
+                elif chosen_type == "consumable": item = DroppedConsumable(px, py, chosen_key, chosen_data)
+                elif chosen_type == "armor": item = DroppedArmor(px, py, chosen_key, chosen_data)
+                elif chosen_type == "shield": item = DroppedShield(px, py, chosen_key, chosen_data)
+                elif chosen_type == "stave": item = DroppedStave(px, py, chosen_key, chosen_data)
+                else: continue
+                
+                self.dropped_items.append(item)
+                placed += 1
+                print(f"  - Item {placed}: {item.name} at ({gx}, {gy})")
+                
+            print(f"[Dungeon] Floor {floor} | Total Items Placed: {placed}/{count}")
+        except Exception as e:
+            print(f"[Dungeon] Error in spawn_floor_items: {e}")
+            import traceback
+            traceback.print_exc()
             
         # 2. イベントアイテムの強制配置（カテゴリ: event かつ条件合致）
         event_candidates = []
@@ -1358,11 +1430,12 @@ class Dungeon:
             dx, dy = (e["x"] * self.tile_size) + e["ox"] - camera_x, (e["y"] * self.tile_size) + e["oy"] - camera_y
             if -self.tile_size <= dx <= sw and -self.tile_size <= dy <= sh: screen.blit(e["img"], (dx, dy))
         for t in self.traps: t.draw(screen, camera_x, camera_y, self.tile_size)
-        for f in self.magic_effects: f.draw(screen, camera_x, camera_y)
-        for i in self.dropped_items:
-            if camera_x - self.tile_size <= i.x <= camera_x + sw and camera_y - self.tile_size <= i.y <= camera_y + sh: i.draw(screen, camera_x, camera_y)
+        for i in self.dropped_items: i.draw(screen, camera_x, camera_y)
         for n in self.npcs:
             if camera_x - n.width <= n.x <= camera_x + sw and camera_y - n.height <= n.y <= camera_y + sh: n.draw(screen, camera_x, camera_y)
+        
+        # マジックエフェクトを最前面（UI除く）に描画
+        for f in self.magic_effects: f.draw(screen, camera_x, camera_y)
         
         # デバッグ: 氾濫トリガー位置の可視化（スイッチが配置されるので不要）
         pass

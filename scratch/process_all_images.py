@@ -31,7 +31,7 @@ mapping = {
 }
 
 brain_dir = "/Users/tj/.gemini/antigravity/brain/dcd6a06b-91f4-4353-9ea0-6ff2c23a00c5"
-npc_dir = "/Users/tj/Desktop/2DGame/components/pictures/npc"
+npc_dir = "components/pictures/npc"
 
 for src_name, dst_folder in mapping.items():
     src_path = os.path.join(brain_dir, src_name)

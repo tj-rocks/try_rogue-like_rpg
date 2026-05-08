@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append("/Users/tj/Desktop/2DGame")
+sys.path.append(".")
 import pygame
 pygame.init()
 pygame.display.set_mode((1, 1))

@@ -33,9 +33,9 @@ PLAYER:
 # 🏰 DUNGEON (ダンジョン生成)
 # ------------------------------------------------------------------------------
 DUNGEON:
-  DUNGEON_MIN_ROOMS: 3              # 1階層あたりの初期最小部屋数
-  DUNGEON_MAX_ROOMS: 6              # 1階層あたりの初期最大部屋数
-  DUNGEON_ROOM_INCREASE_INTERVAL: 5 # 何階ごとに部屋数を増やすか (5階ごと)
+  DUNGEON_MIN_ROOMS: 4              # 1階層あたりの初期最小部屋数
+  DUNGEON_MAX_ROOMS: 8              # 1階層あたりの初期最大部屋数
+  DUNGEON_ROOM_INCREASE_INTERVAL: 3 # 何階ごとに部屋数を増やすか (5階ごと)
   
   # 指数成長とハードキャップ設定
   DUNGEON_ROOM_MAX_CAP: 20          # 最大部屋数の絶対上限 (深層でもこれを超えない)
@@ -103,17 +103,18 @@ COMBAT:
   COMBAT_LOG_WAIT_FRAMES: 60        # ログが表示されてから消えるまでの待機時間
   INTER_ACTION_BREATHER: 1          # 連続行動の間のわずかな静止時間
 
-# 💎 ITEMS (ドロップアイテム)
+  # 💎 ITEMS (ドロップアイテム)
 # ------------------------------------------------------------------------------
 ITEMS:
-  FLOOR_ITEM_SPAWN_MIN: 0           # 1部屋に落ちているアイテムの最小数
-  FLOOR_ITEM_SPAWN_MAX: 2           # 1部屋に落ちているアイテムの最大数
+  FLOOR_ITEM_SPAWN_MIN: 1           # 1フロアに落ちているアイテムの最小数
+  FLOOR_ITEM_SPAWN_MAX: 5           # 1フロアに落ちているアイテムの最大数
+  FLOOR_ITEM_ROOM_RATIO: 0.4        # 部屋数に対するアイテム数の比率（部屋数 * この値 = アイテム数）
   FLOOR_ITEM_SCALE_LIMIT: 30        # アイテム数増加のスケーリング上限階層
   FLOOR_ITEM_SCALE_EVERY: 10        # 何階ごとにアイテムを増やすか
   FLOOR_ITEM_SCALE_ADD: 1           # 増やす数
 
   # ドロップ率の調整（ここを変えると敵や障害物からのドロップが一括で変わります！）
-  DROP_RATE_MULTIPLIER: 0.8         # 全体のドロップ率倍率 (0.5 = 半分, 1.0 = 標準)
+  DROP_RATE_MULTIPLIER: 1.0         # 全体のドロップ率倍率 (0.5 = 半分, 1.0 = 標準)
 
 # 🧱 OBSTACLES (障害物 - 壊せる壁や樽など)
 # ------------------------------------------------------------------------------

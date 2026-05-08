@@ -29,44 +29,38 @@ class EquipInstance:
     同名の装備が複数あっても iid で区別できる。
     入手時にステータスが ±20% 変動する個体差システムを搭載。
     """
-    def __init__(self, equip_type, key, randomize=True):
+    def __init__(self, equip_type, key, randomize=False):
         self.iid = _new_equip_id()
         self.equip_type = equip_type
         self.key = key
         self.enhance = 0
-        self.stats = {} # 個体差が反映されたベースステータス
-        
-        if randomize:
-            self._randomize_stats()
+        self.stats = {} # 個体差システムは廃止されました
 
-    def _randomize_stats(self):
-        import random
-        # マスターデータの取得
-        data = {}
-        if self.equip_type == "weapon": data = WEAPON_DATA.get(self.key, {})
-        elif self.equip_type == "armor": data = ARMOR_DATA.get(self.key, {})
-        elif self.equip_type == "shield": data = SHIELD_DATA.get(self.key, {})
-        
-        # 変動させたいパラメータ一覧
-        target_keys = ["attack_bonus", "defense_bonus", "hp_bonus", "dex_bonus", "eva_bonus", "crit_bonus", "stave_bonus", "block_chance"]
-        
-        for k in target_keys:
-            if k in data:
-                val = data[k]
-                if isinstance(val, (int, float)):
-                    # ±20% の変動（最小値/最大値のガードは適宜）
-                    variance = random.uniform(0.8, 1.2)
-                    new_val = val * variance
-                    if isinstance(val, int):
-                        self.stats[k] = int(new_val)
-                    else:
-                        self.stats[k] = round(new_val, 3)
+    # def _randomize_stats(self):
+    #     import random
+    #     # マスターデータの取得
+    #     data = {}
+    #     if self.equip_type == "weapon": data = WEAPON_DATA.get(self.key, {})
+    #     elif self.equip_type == "armor": data = ARMOR_DATA.get(self.key, {})
+    #     elif self.equip_type == "shield": data = SHIELD_DATA.get(self.key, {})
+    #     
+    #     # 変動させたいパラメータ一覧
+    #     target_keys = ["attack_bonus", "defense_bonus", "hp_bonus", "dex_bonus", "eva_bonus", "crit_bonus", "stave_bonus", "block_chance"]
+    #     
+    #     for k in target_keys:
+    #         if k in data:
+    #             val = data[k]
+    #             if isinstance(val, (int, float)):
+    #                 # ±20% の変動
+    #                 variance = random.uniform(0.8, 1.2)
+    #                 new_val = val * variance
+    #                 if isinstance(val, int):
+    #                     self.stats[k] = int(new_val)
+    #                 else:
+    #                     self.stats[k] = round(new_val, 3)
 
     def get_stat(self, stat_key, default=0):
-        """個体差込みのステータスを返す。存在しなければマスターデータ、それもなければデフォルト値を返す"""
-        if stat_key in self.stats:
-            return self.stats[stat_key]
-        
+        """常にマスターデータを返す（個体差システム廃止）"""
         # フォールバック：マスターデータ
         data = {}
         if self.equip_type == "weapon": data = WEAPON_DATA.get(self.key, {})
@@ -116,6 +110,11 @@ class EquipInstance:
         else:
             bonus = growth_room + (self.enhance - times_limit) * over_per_step
 
+        # 攻撃・防御・HPなどの主要ステータスは整数で返す（切り捨て）
+        if stat_key in ["attack_bonus", "defense_bonus", "hp_bonus"]:
+            import math
+            return math.floor(bonus)
+            
         return round(bonus, 3)
 
     def get_name(self):
@@ -141,20 +140,20 @@ class EquipInstance:
 
     @classmethod
     def from_dict(cls, data):
+        # randomize=False にして、保存されている stats をそのまま使う
         inst = cls(data["type"], data["key"], randomize=False)
         inst.iid = data.get("iid", inst.iid)
         inst.enhance = data.get("enhance", 0)
-        inst.stats = data.get("stats", {})
-        global _equip_id_counter
-        if inst.iid > _equip_id_counter:
-            _equip_id_counter = inst.iid
-        return inst
-
-    @classmethod
-    def from_dict(cls, data):
-        inst = cls(data["type"], data["key"])
-        inst.iid = data.get("iid", inst.iid)
-        inst.enhance = data.get("enhance", 0)
+        
+        # 読み込んだ stats を整数にキャストして保持（小数の混入を防ぐ）
+        raw_stats = data.get("stats", {})
+        inst.stats = {}
+        for k, v in raw_stats.items():
+            if k in ["attack_bonus", "defense_bonus", "hp_bonus"]:
+                inst.stats[k] = int(v)
+            else:
+                inst.stats[k] = v
+                
         global _equip_id_counter
         if inst.iid > _equip_id_counter:
             _equip_id_counter = inst.iid
@@ -234,7 +233,8 @@ class Player(Entity):
         if shield_inst:
             bonus += shield_inst.get_stat("attack_bonus", 0)
             
-        return self.attack + bonus
+        # 最終的に整数にキャストして返す（HUD表示対策）
+        return int(self.attack + bonus)
 
     @property
     def max_hp(self):
@@ -246,7 +246,7 @@ class Player(Entity):
         shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
         if shield_inst:
             bonus += shield_inst.get_stat("hp_bonus", 0)
-        return self._base_max_hp + bonus
+        return int(self._base_max_hp + bonus)
 
     @max_hp.setter
     def max_hp(self, value):
@@ -264,7 +264,7 @@ class Player(Entity):
         if armor_inst: bonus += armor_inst.get_stat("accuracy_bonus_close", armor_inst.get_stat("accuracy_bonus", 0))
         shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
         if shield_inst: bonus += shield_inst.get_stat("accuracy_bonus_close", shield_inst.get_stat("accuracy_bonus", 0))
-        return base + bonus
+        return int(base + bonus)
 
     @property
     def total_accuracy_ranged(self):
@@ -278,7 +278,7 @@ class Player(Entity):
         if armor_inst: bonus += armor_inst.get_stat("accuracy_bonus_ranged", armor_inst.get_stat("accuracy_bonus", 0))
         shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
         if shield_inst: bonus += shield_inst.get_stat("accuracy_bonus_ranged", shield_inst.get_stat("accuracy_bonus", 0))
-        return base + bonus
+        return int(base + bonus)
 
     @property
     def eva_bonus(self):
@@ -292,7 +292,7 @@ class Player(Entity):
         if armor_inst: bonus += armor_inst.get_stat("eva_bonus", 0)
         shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
         if shield_inst: bonus += shield_inst.get_stat("eva_bonus", 0)
-        return base + bonus
+        return int(base + bonus)
 
     @property
     def crit_bonus(self):
@@ -346,7 +346,7 @@ class Player(Entity):
         shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
         if shield_inst: bonus += shield_inst.get_stat("defense_bonus", 0) + shield_inst.get_enhance_bonus("defense_bonus")
         
-        return self.defense + bonus
+        return int(self.defense + bonus)
 
     @property
     def block_chance_close(self):
@@ -863,7 +863,7 @@ class Player(Entity):
         if dialog:
             from systems.game_state import game_state
             dialog.text = msg
-            dialog.is_active = True
+            # is_active は呼び出し側で制御するのでここではセットしない
             game_state["dialog_modal"] = False
             from constants import COMBAT_LOG_WAIT_FRAMES
             dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
@@ -882,6 +882,11 @@ class Player(Entity):
                 img = img.copy()
                 img.fill((*tint_color, 255), special_flags=pygame.BLEND_RGBA_MULT)
             
+            # スケーリングによる座標補正（プレイヤー本体の 984-985行目と同様の計算が必要）
+            # 渡された draw_x, draw_y は「キャラの基本枠(self.width, self.height)の左上」であると定義し直す
+            render_x = draw_x + (self.width - img.get_width()) / 2
+            render_y = draw_y + (self.height - img.get_height())
+            
             inst = self._find_equip_inst(self.armor_inventory, self.equipped_armor)
             armor_data = ARMOR_DATA.get(inst.key, {}) if inst else {}
             pos_config = armor_data.get("position", {})
@@ -890,7 +895,7 @@ class Player(Entity):
             
             # オフセットもスケーリング
             off_x, off_y = offsets[0] * scale_x, offsets[1] * scale_y
-            screen.blit(img, (draw_x + off_x, draw_y + off_y))
+            screen.blit(img, (render_x + off_x, render_y + off_y))
             return
         # 代替描画（四角形）は簡易化のためスケーリング非対応（または別途実装）
         inst = self._find_equip_inst(self.armor_inventory, self.equipped_armor)
@@ -977,9 +982,13 @@ class Player(Entity):
             frame_index = (self.walk_anim_timer // step_duration) % total_frames
             img = self.walk_images[self.facing][frame_index]
 
-        # スケーリングの適用
+        # スケーリングの適用 (攻撃時の拡大は廃止、呼吸エフェクトのみ適用)
+        final_scale_x = scale_x
+        final_scale_y = scale_y
+        
         orig_w, orig_h = img.get_size()
-        img = pygame.transform.smoothscale(img, (int(orig_w * scale_x), int(orig_h * scale_y)))
+        img = pygame.transform.smoothscale(img, (int(orig_w * final_scale_x), int(orig_h * final_scale_y)))
+        
         # 足元を基準に位置を調整
         draw_x += (self.width - img.get_width()) / 2
         draw_y += (self.height - img.get_height())
@@ -1009,8 +1018,7 @@ class Player(Entity):
             elif self.facing == "left": draw_x -= offset
             elif self.facing == "right": draw_x += offset
         
-        final_scale_x = scale_x * (1.2 if self.is_attacking else 1.0)
-        final_scale_y = scale_y * (1.2 if self.is_attacking else 1.0)
+        # 攻撃時のスケーリング値は上で計算済み
         center_x, center_y = draw_x + (img.get_width() / 2), draw_y + (img.get_height() / 2)
         
         shield_over = {"up": False, "down": True, "left": True, "right": False}.get(self.facing, True)
@@ -1022,8 +1030,18 @@ class Player(Entity):
             poison_tint = STATUS_EFFECTS.get("poison", {}).get("color_tint", [180, 100, 255])
 
         # --- 2. 描画実行 ---
+        # オーバーレイ描画（鎧・盾）
+        # 这里で渡す draw_x, draw_y は、スケーリング補正前の「ベースの左上座標」である必要がある
+        base_draw_x = self.x - camera_x
+        base_draw_y = self.y - camera_y
+        if self.is_attacking:
+            if self.facing == "up": base_draw_y -= offset
+            elif self.facing == "down": base_draw_y += offset
+            elif self.facing == "left": base_draw_x -= offset
+            elif self.facing == "right": base_draw_x += offset
+
         if self.equipped_shield and not shield_over:
-            self._draw_shield_overlay(screen, draw_x, draw_y, scale_x=final_scale_x, scale_y=final_scale_y, tint_color=poison_tint)
+            self._draw_shield_overlay(screen, base_draw_x, base_draw_y, scale_x=final_scale_x, scale_y=final_scale_y, tint_color=poison_tint)
             
         if self.is_attacking and self.weapon:
             is_over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
@@ -1044,9 +1062,23 @@ class Player(Entity):
             else:
                 screen.blit(img, (draw_x, draw_y))
         
-        if self.equipped_armor: self._draw_armor_overlay(screen, draw_x, draw_y, scale_x=final_scale_x, scale_y=final_scale_y, tint_color=poison_tint)
+        # 鎧の描画には補正前の base_draw_x を渡す（関数内で再計算するため）。
+        if self.equipped_armor: self._draw_armor_overlay(screen, base_draw_x, base_draw_y, scale_x=final_scale_x, scale_y=final_scale_y, tint_color=poison_tint)
         if self.equipped_shield and shield_over:
-            self._draw_shield_overlay(screen, draw_x, draw_y, scale_x=final_scale_x, scale_y=final_scale_y, tint_color=poison_tint)
+            self._draw_shield_overlay(screen, base_draw_x, base_draw_y, scale_x=final_scale_x, scale_y=final_scale_y, tint_color=poison_tint)
+        
+        # --- [NEW] 無敵状態の発光演出 ---
+        if self.invincible_turns > 0:
+            import math
+            # 鼓動するような光の輪
+            pulse = (math.sin(pygame.time.get_ticks() / 150) + 1) / 2 # 0.0 to 1.0
+            glow_size = int(self.width * (1.1 + pulse * 0.3))
+            glow_surf = pygame.Surface((glow_size * 2, glow_size * 2), pygame.SRCALPHA)
+            alpha = int(100 + pulse * 100)
+            pygame.draw.circle(glow_surf, (255, 215, 0, alpha), (glow_size, glow_size), glow_size, 3)
+            # 中心の光
+            pygame.draw.circle(glow_surf, (255, 255, 200, alpha // 2), (glow_size, glow_size), glow_size // 2)
+            screen.blit(glow_surf, (draw_x + self.width // 2 - glow_size, draw_y + self.height // 2 - glow_size))
         
         if self.is_attacking:
             is_over = (self.weapon.DRAW_OVER_PLAYER.get(self.facing, False) if self.weapon else False)
@@ -1383,14 +1415,15 @@ class Player(Entity):
             "warehouse_items": getattr(self, "warehouse_items", []),
             "event_items": getattr(self, "event_items", []),
             "current_floor": getattr(self, "current_floor", 0),
+            "equip_id_counter": globals().get("_equip_id_counter", 0),
         }
 
     def load_dict(self, data):
-        self.hp = data.get("hp", self.hp)
-        self.max_hp = data.get("max_hp", self.max_hp)
-        self.coin = data.get("coin", self.coin)
-        self.bank_coin = data.get("bank_coin", 0)
-        self.attack = data.get("attack", self.attack)
+        self.hp = int(data.get("hp", self.hp))
+        self.max_hp = int(data.get("max_hp", self.max_hp))
+        self.coin = int(data.get("coin", self.coin))
+        self.bank_coin = int(data.get("bank_coin", 0))
+        self.attack = int(data.get("attack", self.attack))
         raw_items = data.get("items", [])
         self.items = []
         if isinstance(raw_items, list):
@@ -1431,8 +1464,8 @@ class Player(Entity):
             el = data["equipped_lantern"]
             if el is not None: self.change_lantern(el)
             else: self.unequip_lantern()
-        self.invincible_turns = data.get("invincible_turns", 0)
-        self.guild_point = data.get("guild_point", 0)
+        self.invincible_turns = int(data.get("invincible_turns", 0))
+        self.guild_point = int(data.get("guild_point", 0))
         self.guild_rank = data.get("guild_rank", "F")
         self.active_quests = data.get("active_quests", [])
         self.quest_tokens = data.get("quest_tokens", {})
@@ -1441,6 +1474,11 @@ class Player(Entity):
         self.warehouse_items = data.get("warehouse_items", [])
         self.event_items = data.get("event_items", [])
         self.current_floor = data.get("current_floor", 0)
+        
+        # 装備IDカウンタの復元
+        if "equip_id_counter" in data:
+            global _equip_id_counter
+            _equip_id_counter = max(_equip_id_counter, data["equip_id_counter"])
 
     def remove_quest(self, quest):
         """[NEW] クエストを破棄し、関連する証(トークン)もリセットする"""
@@ -1469,6 +1507,14 @@ class Player(Entity):
             filepath = SAVE_DATA_PATH
         import json
         print(f"[SYSTEM] Saving progress to {filepath}...")
+        
+        # セーブ中表示
+        screen = pygame.display.get_surface()
+        if screen:
+            from systems.ui import show_loading_screen
+            from wordings import Text
+            show_loading_screen(screen, text=Text.UI.SAVING)
+
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, ensure_ascii=False, indent=2)
 

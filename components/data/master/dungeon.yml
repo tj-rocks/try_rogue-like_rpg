@@ -1,6 +1,16 @@
 # ==============================================================================
 # ダンジョン・罠 データ (dungeon.yml)
 # ==============================================================================
+# 【リファレンス：ランク別 到達可能階層】(guild.yml 定義)
+# - F ランク: 〜 11F
+# - E ランク: 〜 21F
+# - D ランク: 〜 30F
+# - C ランク: 〜 35F
+# - B ランク: 〜 55F
+# - A ランク: 〜 70F
+# - S ランク: 〜 80F
+# - SS ランク: 〜 99F
+#
 # 【TRAP_DATA パラメータ】
 # - name       : 罠の名前
 # - weight     : 出現確率の重み（大きいほど出やすい）
@@ -93,7 +103,7 @@ DUNGEON_IMAGES:
   '4':
     image: standard
     sound: goto_unknown_area.mp3
-    brightness: 5
+    brightness: 3
     map: null
     wall_decoration_ratio: 0.3
   '5':
@@ -110,19 +120,19 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
   '7':
     image: standard
-    sound: just_move.mp3
+    sound: goto_unknown_area.mp3
     brightness: 3
     map: null
     wall_decoration_ratio: 0.3
   '8':
     image: standard
-    sound: just_move.mp3
+    sound: goto_unknown_area.mp3
     brightness: 3
     map: null
     wall_decoration_ratio: 0.3
   '9':
     image: standard
-    sound: just_move.mp3
+    sound: goto_unknown_area.mp3
     brightness: 3
     map: null
     wall_decoration_ratio: 0.3

@@ -6,7 +6,7 @@ os.environ['SDL_VIDEODRIVER'] = 'dummy'
 
 pygame.init()
 size = 60
-target_dir = "/Users/tj/Desktop/2DGame/components/pictures/dungeon/hard"
+target_dir = "components/pictures/dungeon/hard"
 os.makedirs(target_dir, exist_ok=True)
 
 def save_tex(name, color, label, border=True):

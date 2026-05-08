@@ -19,11 +19,14 @@ def update_dungeon_entities(dungeon, player, dialog=None):
             # 敵の撃破処理
             # 経験値システムは廃止されたため、ドロップ判定のみ行います。
             
-            # 各アイテムのカテゴリとレアリティを取得
+            # 各アイテムのカテゴリ、レアリティ、および設定されたドロップ率を取得
             drops = getattr(enemy, "drops", [])
             drop_infos = []
             for drop in drops:
                 item_key = drop.get("item")
+                # YAML で設定された個別確率を優先的に取得
+                specific_rate = drop.get("rate") 
+                
                 rarity = 1
                 if item_key in WEAPON_DATA: rarity = WEAPON_DATA[item_key].get("rarity", 1)
                 elif item_key in ARMOR_DATA: rarity = ARMOR_DATA[item_key].get("rarity", 1)
@@ -31,7 +34,12 @@ def update_dungeon_entities(dungeon, player, dialog=None):
                 elif item_key in CONSUMABLE_DATA: rarity = CONSUMABLE_DATA[item_key].get("rarity", 1)
                 elif item_key in STAVE_DATA: rarity = STAVE_DATA[item_key].get("rarity", 1)
                 
-                drop_infos.append({"item": item_key, "rarity": rarity, "rank_val": rarity})
+                drop_infos.append({
+                    "item": item_key, 
+                    "rarity": rarity, 
+                    "rank_val": rarity,
+                    "rate": specific_rate
+                })
             
             # 高レアリティ順（降順）にソート
             drop_infos.sort(key=lambda x: x["rank_val"], reverse=True)
@@ -40,23 +48,21 @@ def update_dungeon_entities(dungeon, player, dialog=None):
             dropped_token = False
             active_quests = getattr(player, "active_quests", [])
             for q in active_quests:
-                # デバッグ用ログ
-                # print(f"[Debug] Checking Drop: Enemy={enemy.type}, QuestTarget={q.get('target_key')}")
                 if q.get("type") == "hunt" and q.get("target_key") == enemy.type:
                     grid_x = int((enemy.x + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size
                     grid_y = int((enemy.y + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size
-                    
-                    # 証のドロップを試行（occupied判定はここでは甘めにするか、既存アイテムを消すなど検討）
                     dungeon.dropped_items.append(DroppedToken(grid_x, grid_y, enemy.type, ENEMY_DATA[enemy.type]["name"]))
                     dropped_token = True
-                    # print(f"[Debug] Dropped Token for {enemy.type}")
                     break
             
             # 2. 通常のドロップ判定 (証を落とした場合は確実にスキップ)
             if not dropped_token:
-                dropped_any = False
+                from constants import DROP_RATE_MULTIPLIER
                 for dinfo in drop_infos:
-                    target_rate = ITEM_DROP_RATES.get(dinfo["rank_val"], 0.30)
+                    # YAML の個別確率があればそれを使用、なければレアリティ別テーブルから取得
+                    base_rate = dinfo["rate"] if dinfo["rate"] is not None else ITEM_DROP_RATES.get(dinfo["rank_val"], 0.30)
+                    target_rate = base_rate * DROP_RATE_MULTIPLIER
+                    
                     if random.random() <= target_rate:
                         grid_x = int((enemy.x + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size
                         grid_y = int((enemy.y + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size

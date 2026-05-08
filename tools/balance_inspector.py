@@ -39,7 +39,6 @@ def inspect_balance():
 
         # 2. ランクごとに表示
         for rank in rank_order:
-            if rank == "-": continue
             
             # そのランクの最強武器
             rank_weapons = [w for (wid, w) in weapons.items() if (w.get("min_rank") or w.get("rank")) == rank]
