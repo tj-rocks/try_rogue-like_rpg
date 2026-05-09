@@ -255,7 +255,7 @@ class Enemy(Entity):
         facing, dx, dy = random.choice(directions)
         test_x = self.x + dx
         test_y = self.y + dy
-        if self.can_move_grid(test_x, test_y, dungeon, all_entities):
+        if self.can_move_grid(test_x, test_y, dungeon):
             self.target_x = test_x
             self.target_y = test_y
             self.facing = facing
@@ -454,7 +454,7 @@ class Enemy(Entity):
         for facing, dx, dy in directions:
             test_x = self.x + dx
             test_y = self.y + dy
-            if self.can_move_grid(test_x, test_y, dungeon, all_entities, occupied_cells):
+            if self.can_move_grid(test_x, test_y, dungeon):
                 test_grid_x = int((test_x + self.width / 2) // dungeon.tile_size)
                 test_grid_y = int((test_y + self.height / 2) // dungeon.tile_size)
                 
