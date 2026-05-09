@@ -101,6 +101,23 @@ class Entity:
         else:
             self.walk_anim_timer = 0
 
+    def process_movement(self):
+        """スムーズな移動処理（target_x, target_y に向かって移動）"""
+        if not self.is_moving:
+            return
+
+        dx = self.target_x - self.x
+        dy = self.target_y - self.y
+        dist = (dx**2 + dy**2)**0.5
+
+        if dist < self.move_speed:
+            self.x = self.target_x
+            self.y = self.target_y
+            self.is_moving = False
+        else:
+            self.x += (dx / dist) * self.move_speed
+            self.y += (dy / dist) * self.move_speed
+
     def get_breathing_scale(self):
         """呼吸のようなスケーリング効果を計算する（共通処理）"""
         import math
