@@ -69,4 +69,5 @@ FIXED_QUESTS:
   title: スイスイスライムの討伐
   repeatable: true
   chance: 1.0
+  ending: true
 
