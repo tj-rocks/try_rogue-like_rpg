@@ -644,6 +644,12 @@ class Player(Entity):
             self.equipped_weapon = inst.iid
             self.weapon = new_weapon
 
+    def set_facing(self, direction):
+        """向きを設定し、必要ならアニメーションをリセットする"""
+        if self.facing != direction:
+            self.facing = direction
+            self.walk_anim_timer = 0
+
     def equip_weapon_by_key(self, weapon_key):
         if weapon_key not in WEAPON_DATA: return None
         from constants import MAX_EQUIP_SLOTS
