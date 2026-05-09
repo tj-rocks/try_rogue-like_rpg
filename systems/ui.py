@@ -2051,6 +2051,16 @@ class GuildDialog:
                 
                 dialog.is_active = True
 
+            if q.get("ending"):
+                # エンディングフラグがある場合は、特別演出へ
+                from systems.game_state import game_state
+                game_state["current_scene"] = "ending"
+                game_state["ending_index"] = 0
+                game_state["ending_timer"] = 0
+                game_state["ending_alpha"] = 0
+                self.is_active = False # ギルド画面を閉じる
+                return
+
             player.active_quests.remove(q)
             self.setup(player, self.dungeon_ref)
         else:

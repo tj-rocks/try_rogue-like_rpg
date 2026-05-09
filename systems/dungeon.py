@@ -1570,12 +1570,12 @@ class Dungeon:
 
             max_f = guild.get_max_floor(player.guild_rank)
             if target_floor > max_f:
-                req_rank = guild.get_required_rank_for_floor(target_floor)
-                if dialog:
+                if dialog and not dialog.is_active:
+                    req_rank = guild.get_required_rank_for_floor(target_floor)
                     dialog.text = Text.UI.RANK_LIMIT_REACHED.format(rank=req_rank)
                     dialog.is_active = True
                 
-                # 階段の上で止まらないように押し戻す
+                # 階段の上で止まらないように一歩押し戻す
                 player.x, player.y = player.prev_x, player.prev_y
                 player.target_x, player.target_y = player.x, player.y
                 return self

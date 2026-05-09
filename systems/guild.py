@@ -35,24 +35,15 @@ class GuildSystem:
         return None
 
     def get_max_floor(self, rank_name):
-        """指定されたランクから、潜れる最大階層を算出する (均等割)"""
-        from constants import RANK_ORDER
-        if rank_name not in RANK_ORDER:
-            return 10 # 基本Fランク相当
-            
-        rank_idx = RANK_ORDER.index(rank_name)
-        # 99階までを8ランクで均等割 (math.ceil((idx+1)*99/8))
-        import math
-        return math.ceil((rank_idx + 1) * 99 / 8)
+        """指定されたランクから、潜れる最大階層を返す（マスタデータ参照）"""
+        rank_data = self.get_current_rank(rank_name)
+        return rank_data.get("limit_floor", 0)
 
     def get_required_rank_for_floor(self, floor):
         """特定の階層に潜るために必要な最小ランク名を返す"""
-        from constants import RANK_ORDER
-        import math
-        # floor <= math.ceil((idx+1)*99/8) を満たす最小の idx を探す
-        for idx, name in enumerate(RANK_ORDER):
-            if floor <= math.ceil((idx + 1) * 99 / 8):
-                return name
+        for rank_data in GUILD_RANKS:
+            if floor <= rank_data.get("limit_floor", 0):
+                return rank_data["rank"]
         return "SS"
 
     def is_rank_at_least(self, player_rank_name, req_rank_name):
