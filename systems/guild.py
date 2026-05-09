@@ -159,10 +159,19 @@ class GuildSystem:
         target_key, target_data = random.choice(candidates)
         amount = random.randint(min_amt, max_amt)
         
-        # 売値（購入価格の1/3）の1.2倍 * 数量 * 倍率（ランクによる追加）
-        base_sell = target_data.get("price", 100) // 3
+        # 売値の1.2倍 * 数量 * 倍率（ランクによる追加）
+        if "selling_price" in target_data:
+            base_sell = int(target_data["selling_price"])
+        else:
+            base_sell = target_data.get("price", 100) // 3
+        
+        # 壊れた杖などのために最低1Gを保証
+        base_sell = max(1, base_sell)
+        
         from systems.math_utils import hardcore_round
         reward_gold = hardcore_round(base_sell * 1.2 * amount * multiplier, is_hp=True)
+        reward_gold = max(1, reward_gold) # 最終的な報酬も最低1Gを保証
+
         reward_gp = amount * 3 # 納品は討伐よりGP低め
         
         target_rank = target_data.get("min_rank", "F")
