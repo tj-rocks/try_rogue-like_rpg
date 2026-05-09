@@ -1111,7 +1111,6 @@ class Player(Entity):
             return
         if not is_paused() and game_state["turn_state"] == "player":
             self.operate(dungeon, dialog, events) 
-        self.process_movement()
         self.update_animation(dungeon, dialog) 
         # 攻撃・移動アニメーション、ダイアログ表示、および敵のダメージ演出がすべて終わってから敵のターンを開始する
         is_any_enemy_damaged = any(e.damage_flash_timer > 0 for e in dungeon.enemies)

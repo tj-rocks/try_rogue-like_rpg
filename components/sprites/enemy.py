@@ -608,22 +608,11 @@ class Enemy(Entity):
         self.update_animation()
         
     def update_animation(self):
-        self.idle_anim_timer = (self.idle_anim_timer + 1) % 60
-        
-        # 溜め期間中・およびダッシュ頂点での停止処理中は、個別に移動処理を行いリターンする
-        # （この期間は通常の歩行アニメーションを行わないため）
-        if getattr(self, "attack_pre_delay_timer", 0) > 0:
-            if getattr(self, "damage_flash_timer", 0) > 0:
-                self.damage_flash_timer -= 1
-            if self.process_movement():
-                self.move_speed = 4
-            return
-
-        if getattr(self, "peak_hold_timer", 0) > 0:
-            self.peak_hold_timer -= 1
-            if getattr(self, "damage_flash_timer", 0) > 0:
-                self.damage_flash_timer -= 1
-            if self.process_movement():
+        # 溜め期間中・およびダッシュ頂点での停止処理中は、通常の歩行アニメーションを行わない
+        if getattr(self, "attack_pre_delay_timer", 0) > 0 or getattr(self, "peak_hold_timer", 0) > 0:
+            # 基底クラスの更新（ダメージタイマー、移動処理）のみ行う
+            super().update_animation()
+            if not self.is_moving:
                 self.move_speed = 4
             return
             

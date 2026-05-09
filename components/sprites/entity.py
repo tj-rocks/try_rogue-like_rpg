@@ -94,8 +94,16 @@ class Entity:
         return True
 
     def update_animation(self):
-        """アニメーションタイマーの更新（共通処理）"""
+        """アニメーションタイマー・移動・ダメージ演出の更新（共通処理）"""
         self.idle_anim_timer = (self.idle_anim_timer + 1) % 60
+        
+        # ダメージ時の点滅タイマー
+        if getattr(self, "damage_flash_timer", 0) > 0:
+            self.damage_flash_timer -= 1
+
+        # 移動処理
+        self.process_movement()
+
         if self.is_moving:
             self.walk_anim_timer = (self.walk_anim_timer + 1) % 40
         else:
