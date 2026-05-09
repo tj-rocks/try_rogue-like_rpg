@@ -561,6 +561,11 @@ class Player(Entity):
                     # ミニマップの探索範囲を更新
                     dungeon.reveal_area(target_x // dungeon.tile_size, target_y // dungeon.tile_size)
                     
+                    import time
+                    t = time.perf_counter()
+                    key_name = {KEY_MOVE_UP: "UP", KEY_MOVE_DOWN: "DOWN", KEY_MOVE_LEFT: "LEFT", KEY_MOVE_RIGHT: "RIGHT"}.get(latest_key, "UNKNOWN")
+                    print(f"[TIME][{t:.4f}] Player Move Start: ({self.x // dungeon.tile_size}, {self.y // dungeon.tile_size}) -> ({target_x // dungeon.tile_size}, {target_y // dungeon.tile_size}) | Key: {key_name}")
+                    
                     # 移動後のグリッド座標でログを出力 (階層、HP、状態異常、入力キーも付加)
                     key_name = {KEY_MOVE_UP: "UP", KEY_MOVE_DOWN: "DOWN", KEY_MOVE_LEFT: "LEFT", KEY_MOVE_RIGHT: "RIGHT"}.get(latest_key, "UNKNOWN")
                     print(f"[DUNGEON] Floor {self.current_floor} | Player Move: ({target_x // dungeon.tile_size}, {target_y // dungeon.tile_size}) | Key: {key_name} | HP: {self.hp}/{self.max_hp}, Cond: {self.condition}")
@@ -1037,7 +1042,7 @@ class Player(Entity):
 
         # --- 2. 描画実行 ---
         # オーバーレイ描画（鎧・盾）
-        # 这里で渡す draw_x, draw_y は、スケーリング補正前の「ベースの左上座標」である必要がある
+        # ここで渡す draw_x, draw_y は、スケーリング補正前の「ベースの左上座標」である必要がある
         base_draw_x = self.x - camera_x
         base_draw_y = self.y - camera_y
         if self.is_attacking:
@@ -1093,10 +1098,17 @@ class Player(Entity):
             is_over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
             if is_over: self.weapon.draw_idle(screen, center_x, center_y, self.facing, scale_x=final_scale_x, scale_y=final_scale_y)
 
-    def update_animation(self, dungeon, dialog):
+    def update_animation(self, dungeon, dialog=None):
+        """アニメーション（移動・攻撃）の更新のみを行う"""
+        if self.is_falling:
+            self.falling_timer -= 1
+            return
+            
+        from constants import ATTACK_ANIMATION_FRAMES
         prev_progress = 0
         if self.is_attacking:
             prev_progress = (ATTACK_ANIMATION_FRAMES - self.attack_timer) / ATTACK_ANIMATION_FRAMES
+            
         super().update_animation()
         
         if self.is_attacking:
@@ -1104,20 +1116,12 @@ class Player(Entity):
             if prev_progress < 0.1 <= new_progress:
                 self._execute_strike(dungeon, dialog)
 
-    def update(self, screen, camera_x, camera_y, dungeon, dialog=None, events=[]):
-        from systems.game_state import game_state
-        if self.is_falling:
-            self.falling_timer -= 1
-            return
+    def update(self, dungeon, dialog=None, events=[]):
+        """旧来の互換性、および単体更新用のメソッド"""
+        self.update_animation(dungeon, dialog)
+        from systems.game_state import is_paused, game_state
         if not is_paused() and game_state["turn_state"] == "player":
-            self.operate(dungeon, dialog, events) 
-        self.update_animation(dungeon, dialog) 
-        # 攻撃・移動アニメーション、ダイアログ表示、および敵のダメージ演出がすべて終わってから敵のターンを開始する
-        is_any_enemy_damaged = any(e.damage_flash_timer > 0 for e in dungeon.enemies)
-        if not self.is_attacking and not self.is_moving and not (dialog and dialog.is_active) and not is_any_enemy_damaged and getattr(self, "enemy_turn_pending", False):
-            self.start_enemy_turn(dungeon)
-
-        self.draw(screen, camera_x, camera_y)
+            self.operate(dungeon, dialog, events)
         game_state["dialog_just_closed"] = False
 
     def get_item_count(self):

@@ -15,8 +15,14 @@ from wordings import Text
 
 def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spawn_reason="normal"):
     """指定した階層へ移動するための新しいダンジョンオブジェクトを生成する"""
+    # --- [MEMORY OPTIMIZATION] 階層移動時にキャッシュをクリーンアップ ---
+    import gc
+    from components.sprites.enemy import Enemy
     from systems.sound_handler import sound_manager
     from constants import SOUND_STAIRS_UP, SOUND_STAIRS_DOWN
+    Dungeon.clear_cache()
+    Enemy.clear_cache()
+    gc.collect() # 未使用メモリを強制解放
     
     # 階層移動音の再生
     if hasattr(player, "current_floor"):
@@ -64,6 +70,15 @@ class Dungeon:
     # --- [NEW] クラスレベルのキャッシュ ---
     _texture_cache = {} # {theme_folder: {key: surface}}
     _variant_lists = {} # {theme_folder: {category: [keys]}}
+
+    @classmethod
+    def clear_cache(cls):
+        """蓄積されたダンジョンテクスチャのキャッシュを解放する"""
+        count = len(cls._texture_cache)
+        cls._texture_cache = {}
+        cls._variant_lists = {}
+        if count > 0:
+            print(f"[MEMORY] Dungeon texture cache cleared ({count} themes)")
 
     def __init__(self, level=1, player=None, debug_overflow=False):
         from constants import (
@@ -1537,17 +1552,16 @@ class Dungeon:
 
     def check_stairs(self, player, confirm_dialog, dialog=None):
         if self.next_dungeon: return self.next_dungeon
-        if is_paused() or getattr(player, "is_moving", False): return self
+        from systems.game_state import game_state
+        if is_paused() or game_state.get("dialog_just_closed"): return self
         tx, ty = int((player.x + player.width / 2) // self.tile_size), int((player.y + player.height / 2) // self.tile_size)
         
-        # ワープ直後の地点にいる場合は、一度動くまで反応させない
+        # ワープ直後の地点にいる場合は、そのタイルから完全に出るまで反応させない
         if hasattr(self, "spawn_pos") and self.spawn_pos == (tx, ty):
-            # まだその場から一歩も動いていない（prevと同じ）ならスキップ
-            if player.x == player.prev_x and player.y == player.prev_y:
-                return self
-            else:
-                # 一度でも動いたら制限解除
-                self.spawn_pos = (-1, -1)
+            return self
+        else:
+            # 一度でもそのタイルから出たら制限解除
+            self.spawn_pos = (-1, -1)
 
         if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): return self
         ct = self.map_data[ty][tx]
@@ -1587,12 +1601,24 @@ class Dungeon:
 
             confirm_dialog.text = Text.UI.CONFIRM_DUNGEON_START if self.current_floor == 0 else Text.UI.CONFIRM_GO_DEEPER
             confirm_dialog.on_yes = lambda: setattr(self, "next_dungeon", warp_to_floor(self.current_floor + 1, player, debug_overflow=self.debug_overflow))
-            confirm_dialog.on_no = lambda: (setattr(player, "x", player.prev_x), setattr(player, "y", player.prev_y))
+            def on_no():
+                # 元の仕様通り、一歩押し戻す
+                player.x, player.y = player.prev_x, player.prev_y
+                player.target_x, player.target_y = player.x, player.y
+                player.is_moving = False
+                # かつ、そのマスから出るまで再判定しない
+                self.spawn_pos = (tx, ty)
+            confirm_dialog.on_no = on_no
             confirm_dialog.is_active = True
         elif ct == 2 and self.current_floor >= 1:
             confirm_dialog.text = Text.UI.CONFIRM_RETURN_VILLAGE if self.current_floor == 1 else Text.UI.CONFIRM_GO_UPPER
             confirm_dialog.on_yes = lambda: setattr(self, "next_dungeon", warp_to_floor(self.current_floor - 1, player, debug_overflow=self.debug_overflow, spawn_reason="return" if self.current_floor == 1 else "normal"))
-            confirm_dialog.on_no = lambda: (setattr(player, "x", player.prev_x), setattr(player, "y", player.prev_y))
+            def on_no_upper():
+                player.x, player.y = player.prev_x, player.prev_y
+                player.target_x, player.target_y = player.x, player.y
+                player.is_moving = False
+                self.spawn_pos = (tx, ty)
+            confirm_dialog.on_no = on_no_upper
             confirm_dialog.is_active = True
         return self
 

@@ -43,9 +43,35 @@ def test_enemy_to_enemy_collision():
         
         # 4. 検証
         print(f"移動判定結果: {can_move}")
-        assert not can_move, "敵Aが敵Bのいるマスへ移動可能と判定されました（衝突判定漏れ）"
+        if not can_move:
+            print("[OK] 敵同士の衝突判定テスト合格！")
+        else:
+            print("[FAILED] 敵同士が重なっています")
+            sys.exit(1)
+
+        # --- [NEW] 移動中のすり抜け（Phasing）テスト ---
+        print("\n--- 移動中のすり抜け防止テスト開始 ---")
+        enemy_a.x = 2 * 64
+        enemy_a.y = 2 * 64
+        enemy_a.target_x = 3 * 64
+        enemy_a.target_y = 2 * 64
+        enemy_a.is_moving = True
         
-        print("[OK] 敵同士の衝突判定テスト合格！")
+        # 敵Bが、敵Aの「移動先」に入ろうとする
+        enemy_b.x = 3 * 64
+        enemy_b.y = 1 * 64
+        enemy_b.target_x = 3 * 64
+        enemy_b.target_y = 1 * 64
+        can_move_phasing = enemy_b.can_move_grid(3 * 64, 2 * 64, dungeon)
+        print(f"移動中マスへの進入判定結果: {can_move_phasing}")
+        
+        if not can_move_phasing:
+            print("[OK] 移動中のすり抜け防止テスト合格！")
+        else:
+            print("[FAILED] 移動中の敵のターゲットマスに進入できてしまいました")
+            sys.exit(1)
+
+        pygame.quit()
         
     except Exception as e:
         print(f"テスト失敗: {e}")

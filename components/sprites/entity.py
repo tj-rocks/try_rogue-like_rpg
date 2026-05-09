@@ -28,18 +28,13 @@ class Entity:
         self.idle_anim_timer = 0 # 呼吸などの待機アニメーション用
 
     def get_occupied_grids(self, tile_size):
-        """キャラクターが占有しているグリッド座標のリストを返す（巨大キャラ対応）"""
-        # 左上と右下のグリッドを計算
-        start_gx = int(self.x // tile_size)
-        start_gy = int(self.y // tile_size)
-        end_gx = int((self.x + self.width - 1) // tile_size)
-        end_gy = int((self.y + self.height - 1) // tile_size)
+        """現在の (x, y) および目標 (target_x, target_y) に基づいて、占有している全グリッド座標リストを返す"""
+        # 現在位置と目標位置の両方を占有中とみなすことで、移動中のすり抜けを防止する
+        grids_current = self.get_occupied_grids_at(self.x, self.y, tile_size)
+        grids_target = self.get_occupied_grids_at(self.target_x, self.target_y, tile_size)
         
-        grids = []
-        for gy in range(start_gy, end_gy + 1):
-            for gx in range(start_gx, end_gx + 1):
-                grids.append((gx, gy))
-        return grids
+        # 重複を除去してリストで返す
+        return list(set(grids_current + grids_target))
 
     def get_occupied_grids_at(self, tx, ty, tile_size):
         """指定した座標(tx, ty)にいると仮定した時の占有グリッドを返す"""
@@ -125,7 +120,7 @@ class Entity:
     def take_damage(self, amount):
         """ダメージを受ける（共通処理）"""
         self.hp = max(0, self.hp - amount)
-        self.damage_flash_timer = 20 # 20フレーム点滅
+        self.damage_flash_timer = 40 # 40フレーム点滅 (以前は20)
         if self.hp <= 0:
             self.is_dead = True
 
@@ -134,14 +129,20 @@ class Entity:
         if not self.is_moving:
             return
 
+        import time
+        t = time.perf_counter()
+
         dx = self.target_x - self.x
         dy = self.target_y - self.y
         dist = (dx**2 + dy**2)**0.5
 
-        if dist < self.move_speed:
+        if dist <= self.move_speed:
             self.x = self.target_x
             self.y = self.target_y
             self.is_moving = False
+            # 移動完了ログ (Playerのみ)
+            if hasattr(self, "name") and self.name == "自分":
+                print(f"[TIME][{t:.4f}] Player Move Finished: at ({int(self.x)}, {int(self.y)})")
         else:
             self.x += (dx / dist) * self.move_speed
             self.y += (dy / dist) * self.move_speed

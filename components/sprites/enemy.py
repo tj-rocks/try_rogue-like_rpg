@@ -17,6 +17,14 @@ from systems.combat_handler import deal_damage
 class Enemy(Entity):
     # クラスレベルで画像をキャッシュする（同じ種類の敵で画像を共有してメモリとCPUを節約）
     _image_cache = {}
+    
+    @classmethod
+    def clear_cache(cls):
+        """蓄積された敵画像のキャッシュを解放する（メモリ節約用）"""
+        count = len(cls._image_cache)
+        cls._image_cache = {}
+        if count > 0:
+            print(f"[MEMORY] Enemy image cache cleared ({count} items)")
 
     def __init__(self, x, y, enemy_type, width=None, height=None, player=None):
         if enemy_type not in ENEMY_DATA:
