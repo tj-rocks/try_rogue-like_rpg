@@ -210,6 +210,16 @@ player_settings = {
 }
 
 class Player(Entity):
+    _player_scaled_cache = {} # {(img_obj, phase, tint, is_back): surface}
+
+    @classmethod
+    def clear_cache(cls):
+        """蓄積されたプレイヤー関連のスケーリング済み画像をクリアする"""
+        count = len(cls._player_scaled_cache)
+        cls._player_scaled_cache = {}
+        if count > 0:
+            print(f"[MEMORY] Player scaled image cache cleared ({count} items)")
+
     @property
     def total_attack(self):
         """基本攻撃力 + 装備ボーナス(武器・鎧・盾)の合計"""
@@ -885,13 +895,23 @@ class Player(Entity):
     def _draw_armor_overlay(self, screen, draw_x, draw_y, scale_x=1.0, scale_y=1.0, tint_color=None):
         img = getattr(self, "_armor_images", {}).get(self.facing)
         if img:
-            if scale_x != 1.0 or scale_y != 1.0:
-                w, h = img.get_size()
-                img = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
+            # --- [OPTIMIZED] 鎧のスケーリングキャッシュ利用 ---
+            # 呼吸フェーズを取得
+            _, phase = self.get_breathing_scale()
+            cache_key = (img, phase, tint_color, "armor")
+            cached_img = Player._player_scaled_cache.get(cache_key)
             
-            if tint_color:
-                img = img.copy()
-                img.fill((*tint_color, 255), special_flags=pygame.BLEND_RGBA_MULT)
+            if cached_img is None:
+                # スケーリング
+                w, h = img.get_size()
+                scaled = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
+                # 着色
+                if tint_color:
+                    scaled.fill((*tint_color, 255), special_flags=pygame.BLEND_RGBA_MULT)
+                cached_img = scaled
+                Player._player_scaled_cache[cache_key] = cached_img
+            
+            img = cached_img
             
             # スケーリングによる座標補正（プレイヤー本体の 984-985行目と同様の計算が必要）
             # 渡された draw_x, draw_y は「キャラの基本枠(self.width, self.height)の左上」であると定義し直す
@@ -922,20 +942,30 @@ class Player(Entity):
         
         img = getattr(self, "_shield_images", {}).get(self.facing)
         if img:
-            if scale_x != 1.0 or scale_y != 1.0:
+            # --- [OPTIMIZED] 盾のスケーリングキャッシュ利用 ---
+            _, phase = self.get_breathing_scale()
+            cache_key = (img, phase, tint_color, "shield", is_back)
+            cached_img = Player._player_scaled_cache.get(cache_key)
+            
+            if cached_img is None:
+                # スケーリング
                 w, h = img.get_size()
-                img = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
+                scaled = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
+                # 背面なら暗くする
+                if is_back:
+                    scaled.fill((150, 150, 150), special_flags=pygame.BLEND_RGBA_MULT)
+                # 毒などの着色
+                if tint_color:
+                    scaled.fill((*tint_color, 255), special_flags=pygame.BLEND_RGBA_MULT)
+                cached_img = scaled
+                Player._player_scaled_cache[cache_key] = cached_img
+            
+            draw_img = cached_img
             
             shield_data = SHIELD_DATA.get(shield_key, {})
             pos_config = shield_data.get("position", {})
             offsets_dict = pos_config.get("offsets", shield_data.get("offsets", {}))
             offsets = offsets_dict.get(self.facing, (0, 0))
-            draw_img = img.copy()
-            if is_back:
-                draw_img.fill((150, 150, 150), special_flags=pygame.BLEND_RGBA_MULT)
-            
-            if tint_color:
-                draw_img.fill((*tint_color, 255), special_flags=pygame.BLEND_RGBA_MULT)
             
             off_x, off_y = offsets[0] * scale_x, offsets[1] * scale_y
             screen.blit(draw_img, (draw_x + off_x, draw_y + off_y))
@@ -993,13 +1023,31 @@ class Player(Entity):
             frame_index = (self.walk_anim_timer // step_duration) % total_frames
             img = self.walk_images[self.facing][frame_index]
 
+        # 毒状態のカラー設定
+        poison_tint = None
+        if self.condition == "poison":
+            from constants import STATUS_EFFECTS
+            poison_tint = STATUS_EFFECTS.get("poison", {}).get("color_tint", [180, 100, 255])
+
         # スケーリングの適用 (攻撃時の拡大は廃止、呼吸エフェクトのみ適用)
-        final_scale_x = scale_x
-        final_scale_y = scale_y
+        (final_scale_x, final_scale_y), phase = self.get_breathing_scale()
         
-        orig_w, orig_h = img.get_size()
-        img = pygame.transform.smoothscale(img, (int(orig_w * final_scale_x), int(orig_h * final_scale_y)))
+        # --- [OPTIMIZED] プレイヤー本体のキャッシュ利用 ---
+        cache_key = (img, phase, poison_tint, False)
+        cached_img = Player._player_scaled_cache.get(cache_key)
         
+        if cached_img is None:
+            # スケーリング
+            w, h = img.get_size()
+            scaled = pygame.transform.smoothscale(img, (int(w * final_scale_x), int(h * final_scale_y)))
+            # 着色
+            if poison_tint:
+                scaled.fill((*poison_tint, 255), special_flags=pygame.BLEND_RGBA_MULT)
+            cached_img = scaled
+            Player._player_scaled_cache[cache_key] = cached_img
+        
+        img = cached_img # キャッシュされた画像（スケーリング＆着色済み）を使用
+
         # 足元を基準に位置を調整
         draw_x += (self.width - img.get_width()) / 2
         draw_y += (self.height - img.get_height())
@@ -1034,11 +1082,7 @@ class Player(Entity):
         
         shield_over = {"up": False, "down": True, "left": True, "right": False}.get(self.facing, True)
         
-        # 毒状態のカラー設定
-        poison_tint = None
-        if self.condition == "poison":
-            from constants import STATUS_EFFECTS
-            poison_tint = STATUS_EFFECTS.get("poison", {}).get("color_tint", [180, 100, 255])
+        # 毒状態のカラー設定は冒頭へ移動しました
 
         # --- 2. 描画実行 ---
         # オーバーレイ描画（鎧・盾）

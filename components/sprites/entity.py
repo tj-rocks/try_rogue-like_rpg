@@ -148,13 +148,12 @@ class Entity:
             self.y += (dy / dist) * self.move_speed
 
     def get_breathing_scale(self):
-        """呼吸のようなスケーリング効果を計算する（共通処理）"""
-        # 移動中や死亡中は呼吸を止める（ガタつき防止）
+        """呼吸のようなスケーリング効果を計算する。スケール値と現在のフェーズ(0-59)を返す"""
         if self.is_moving or getattr(self, "is_dead", False):
-            return (1.0, 1.0)
+            return (1.0, 1.0), 0
             
         import math
-        # 60フレームで1周期のサインカーブ
-        # 1.0 〜 1.02 の間で変動させる
-        scale = 1.0 + math.sin(self.idle_anim_timer * (2 * math.pi / 60)) * 0.02
-        return (1.0, scale) # 縦方向にのみ伸縮
+        # 60フレームで1周期
+        phase = self.idle_anim_timer % 60
+        scale = 1.0 + math.sin(phase * (2 * math.pi / 60)) * 0.02
+        return (1.0, scale), phase

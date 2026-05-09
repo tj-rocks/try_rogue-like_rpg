@@ -59,6 +59,9 @@ class Weapon:
         self.WEAPON_ANGLES    = pos_config.get("weapon_angles", self.data.get("weapon_angles", type_config.get("weapon_angles", def_angle)))
         self.DRAW_OVER_PLAYER = pos_config.get("draw_over_player", self.data.get("draw_over_player", type_config.get("draw_over_player", def_over)))
 
+        # [NEW] キャッシュ
+        self._weapon_cache = {} # {(angle, sx, sy): surface}
+
         # 画像の読み込み
         img_path = self.data.get("image_path")
         try:
@@ -113,13 +116,21 @@ class OneHanded(Weapon):
             # 1. 角度を決定
             angle = self.WEAPON_ANGLES.get(facing, [0, 0])[idx]
             
-            # 2. 画像を回転・スケール
-            w_img = self.image
-            if scale_x != 1.0 or scale_y != 1.0:
-                w, h = w_img.get_size()
-                w_img = pygame.transform.scale(w_img, (int(w * scale_x), int(h * scale_y)))
+            # --- [OPTIMIZED] 武器のキャッシュ利用 ---
+            cache_key = (angle, scale_x, scale_y)
+            cached_img = self._weapon_cache.get(cache_key)
             
-            rotated_sword = pygame.transform.rotate(w_img, angle)
+            if cached_img is None:
+                w_img = self.image
+                # スケール
+                if scale_x != 1.0 or scale_y != 1.0:
+                    w, h = w_img.get_size()
+                    w_img = pygame.transform.scale(w_img, (int(w * scale_x), int(h * scale_y)))
+                # 回転
+                cached_img = pygame.transform.rotate(w_img, angle)
+                self._weapon_cache[cache_key] = cached_img
+            
+            rotated_sword = cached_img
             
             # 3. 手の位置（中心基準のオフセット）から描画座標を計算
             offset = self.HAND_OFFSETS.get(facing, [(0, 0), (0, 0)])[idx]
@@ -151,12 +162,19 @@ class OneHanded(Weapon):
         if self.image:
             angle = self.WEAPON_ANGLES.get(facing, [0, 0])[0]
             
-            w_img = self.image
-            if scale_x != 1.0 or scale_y != 1.0:
-                w, h = w_img.get_size()
-                w_img = pygame.transform.scale(w_img, (int(w * scale_x), int(h * scale_y)))
+            # --- [OPTIMIZED] 武器のキャッシュ利用 ---
+            cache_key = (angle, scale_x, scale_y)
+            cached_img = self._weapon_cache.get(cache_key)
+            
+            if cached_img is None:
+                w_img = self.image
+                if scale_x != 1.0 or scale_y != 1.0:
+                    w, h = w_img.get_size()
+                    w_img = pygame.transform.scale(w_img, (int(w * scale_x), int(h * scale_y)))
+                cached_img = pygame.transform.rotate(w_img, angle)
+                self._weapon_cache[cache_key] = cached_img
                 
-            rotated = pygame.transform.rotate(w_img, angle)
+            rotated = cached_img
             offset = self.HAND_OFFSETS.get(facing, [(0, 0), (0, 0)])[0]
             # スケール分、オフセットも拡大
             off_x, off_y = offset[0] * scale_x, offset[1] * scale_y

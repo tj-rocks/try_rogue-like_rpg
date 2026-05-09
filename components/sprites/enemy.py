@@ -17,12 +17,14 @@ from systems.combat_handler import deal_damage
 class Enemy(Entity):
     # クラスレベルで画像をキャッシュする（同じ種類の敵で画像を共有してメモリとCPUを節約）
     _image_cache = {}
+    _scaled_image_cache = {} # {(img_obj, phase): surface}
     
     @classmethod
     def clear_cache(cls):
         """蓄積された敵画像のキャッシュを解放する（メモリ節約用）"""
-        count = len(cls._image_cache)
+        count = len(cls._image_cache) + len(cls._scaled_image_cache)
         cls._image_cache = {}
+        cls._scaled_image_cache = {}
         if count > 0:
             print(f"[MEMORY] Enemy image cache cleared ({count} items)")
 
@@ -207,33 +209,37 @@ class Enemy(Entity):
         
         # アニメーション（呼吸）の計算（[NEW] 障害物は呼吸しない）
         scale_anim_x, scale_anim_y = 1.0, 1.0
+        phase = 0
         if not self.is_attacking and not self.is_static:
-            scale_anim_x, scale_anim_y = self.get_breathing_scale()
+            (scale_anim_x, scale_anim_y), phase = self.get_breathing_scale()
         
         # 画面に映っている範囲にある時だけ描画する
         if -self.width <= draw_x <= screen.get_width() and -self.height <= draw_y <= screen.get_height():
             # 画像の取得
-            current_img = self.images.get(self.facing)
-            if not current_img:
-                current_img = pygame.Surface((self.width, self.height))
-                current_img.fill((255, 0, 255))
+            base_img = self.images.get(self.facing)
+            if not base_img:
+                base_img = pygame.Surface((self.width, self.height))
+                base_img.fill((255, 0, 255))
             
-            # スケーリング（待機時呼吸）
-            orig_w, orig_h = current_img.get_size()
-            current_img = pygame.transform.smoothscale(current_img, (int(orig_w * scale_anim_x), int(orig_h * scale_anim_y)))
+            # --- [OPTIMIZED] スケーリングキャッシュの利用 ---
+            cache_key = (base_img, "attack" if self.is_attacking else phase)
+            current_img = Enemy._scaled_image_cache.get(cache_key)
             
-            # 足元を基準に位置を調整（浮かないようにする）
-            draw_x += (self.width - current_img.get_width()) / 2
-            draw_y += (self.height - current_img.get_height()) 
+            if current_img is None:
+                if self.is_attacking:
+                    w, h = base_img.get_size()
+                    current_img = pygame.transform.scale(base_img, (int(w * 1.2), int(h * 1.2)))
+                elif not self.is_static:
+                    w, h = base_img.get_size()
+                    current_img = pygame.transform.smoothscale(base_img, (int(w * scale_anim_x), int(h * scale_anim_y)))
+                else:
+                    current_img = base_img
+                Enemy._scaled_image_cache[cache_key] = current_img
 
-            # 攻撃中はさらに拡大
-            scale_atk = 1.0
-            if self.is_attacking:
-                scale_atk = 1.2
-                w, h = current_img.get_size()
-                current_img = pygame.transform.scale(current_img, (int(w * scale_atk), int(h * scale_atk)))
-                draw_x -= (current_img.get_width() - w) // 2
-                draw_y -= (current_img.get_height() - h) // 2
+            # 足元を基準に位置を調整
+            img_w, img_h = current_img.get_size()
+            draw_x += (self.width - img_w) / 2
+            draw_y += (self.height - img_h)
                 
             # ダメージを受けた時は赤くしてチカチカ点滅させる！
             is_visible = True

@@ -18,10 +18,14 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
     # --- [MEMORY OPTIMIZATION] 階層移動時にキャッシュをクリーンアップ ---
     import gc
     from components.sprites.enemy import Enemy
+    from components.sprites.player import Player
+    from components.sprites.npc import NPC
     from systems.sound_handler import sound_manager
     from constants import SOUND_STAIRS_UP, SOUND_STAIRS_DOWN
     Dungeon.clear_cache()
     Enemy.clear_cache()
+    Player.clear_cache()
+    NPC.clear_cache()
     gc.collect() # 未使用メモリを強制解放
     
     # 階層移動音の再生
