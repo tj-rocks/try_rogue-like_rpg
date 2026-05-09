@@ -1569,6 +1569,11 @@ class Dungeon:
                     return self
 
             max_f = guild.get_max_floor(player.guild_rank)
+            
+            # --- [FIX] 入会試験中はB1F（Fランク範囲）への入場を許可する ---
+            if player.guild_rank == "-" and any(q.get("id") == "rank_up_F" for q in player.active_quests):
+                max_f = guild.get_max_floor("F")
+                
             if target_floor > max_f:
                 if dialog and not dialog.is_active:
                     req_rank = guild.get_required_rank_for_floor(target_floor)
