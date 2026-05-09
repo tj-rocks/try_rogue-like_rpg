@@ -1,0 +1,292 @@
+WEAPON_CATEGORIES:
+  onehanded_sword:
+    name: 片手剣
+    type: onehanded_sword
+    attack_bonus: 5
+    accuracy_bonus_close: 5
+    accuracy_bonus_ranged: 0
+    crit_rate: 0.05
+    price: 100
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.2
+    describe: 標準的な近接武器。扱いやすくバランスが良い。
+    position:
+      hand_offsets:
+        down:
+        - - -19
+          - -9
+        - - -8
+          - 31
+        left:
+        - - -22
+          - -2
+        - - -28
+          - 24
+        right:
+        - - -7
+          - -4
+        - - 25
+          - 24
+        up:
+        - - 17
+          - -4
+        - - 36
+          - 13
+      weapon_angles:
+        down:
+        - 0
+        - 210
+        left:
+        - -343
+        - 106
+        right:
+        - 26
+        - -111
+        up:
+        - 0
+        - -81
+      draw_over_player:
+        down: true
+        left: false
+        right: true
+        up: false
+  axe:
+    name: 斧
+    type: axe
+    attack_bonus: 15
+    accuracy_bonus_close: 0
+    accuracy_bonus_ranged: 0
+    crit_rate: 0.08
+    price: 600
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.3
+    describe: 重量級の武器。命中に難があるが、高い攻撃力を誇る。
+    position:
+      hand_offsets:
+        down:
+        - - -19
+          - -9
+        - - -8
+          - 31
+        left:
+        - - -22
+          - -2
+        - - -28
+          - 24
+        right:
+        - - -7
+          - -4
+        - - 25
+          - 24
+        up:
+        - - 17
+          - -4
+        - - 36
+          - 13
+      weapon_angles:
+        down:
+        - 0
+        - 210
+        left:
+        - -343
+        - 106
+        right:
+        - 26
+        - -111
+        up:
+        - 0
+        - -81
+      draw_over_player:
+        down: true
+        left: false
+        right: true
+        up: false
+  dagger:
+    name: 短剣
+    type: dagger
+    attack_bonus: 5
+    accuracy_bonus_close: 20
+    accuracy_bonus_ranged: 10
+    crit_rate: 0.15
+    price: 400
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.0
+    describe: 軽量で扱いやすい武器。攻撃力は低いが命中と会心率が高い。
+    position:
+      hand_offsets:
+        down:
+        - - -19
+          - -9
+        - - -8
+          - 31
+        left:
+        - - -22
+          - -2
+        - - -28
+          - 24
+        right:
+        - - -7
+          - -4
+        - - 25
+          - 24
+        up:
+        - - 17
+          - -4
+        - - 36
+          - 13
+      weapon_angles:
+        down:
+        - 0
+        - 210
+        left:
+        - -343
+        - 106
+        right:
+        - 26
+        - -111
+        up:
+        - 0
+        - -81
+      draw_over_player:
+        down: true
+        left: false
+        right: true
+        up: false
+  greatsword:
+    name: 大剣
+    type: twohanded_sword
+    attack_bonus: 20
+    accuracy_bonus_close: -5
+    accuracy_bonus_ranged: 0
+    crit_rate: 0.1
+    price: 800
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.5
+    describe: 両手で扱う巨大な剣。圧倒的な破壊力で敵を粉砕する。
+    position:
+      hand_offsets:
+        down:
+        - - -19
+          - -9
+        - - -8
+          - 31
+        left:
+        - - -22
+          - -2
+        - - -28
+          - 24
+        right:
+        - - -7
+          - -4
+        - - 25
+          - 24
+        up:
+        - - 17
+          - -4
+        - - 36
+          - 13
+      weapon_angles:
+        down:
+        - 0
+        - 210
+        left:
+        - -343
+        - 106
+        right:
+        - 26
+        - -111
+        up:
+        - 0
+        - -81
+      draw_over_player:
+        down: true
+        left: false
+        right: true
+        up: false
+WEAPON_DATA:
+  broken_sword:
+    name: 壊れかけの剣
+    category: onehanded_sword
+    min_rank: F
+    max_floor: 999
+    rarity: 2
+    attack_bonus: 5
+    price: 5
+    armor_penetration: false
+    image_path: components/pictures/weapon/broken_sword.png
+    shop_buyable: false
+    describe: 刃がボロボロで、今にも折れそうな剣。
+  iron_sword:
+    name: 鉄の剣
+    category: onehanded_sword
+    min_rank: F
+    max_rank: E
+    rarity: 2
+    attack_bonus: 11
+    price: 100
+    armor_penetration: false
+    image_path: components/pictures/weapon/iron_sword.png
+    shop_buyable: true
+    describe: 鉄製の標準的な剣。丈夫で扱いやすい。
+  old_sword:
+    name: 古びた剣
+    category: onehanded_sword
+    min_rank: F
+    max_rank: D
+    rarity: 8
+    attack_bonus: 6
+    price: 30
+    armor_penetration: false
+    image_path: components/pictures/weapon/old_sword.png
+    shop_buyable: false
+    describe: 長年放置され、刃がこぼれた古い剣。戦うには心もとない。
+  wooden_stick:
+    name: 木の棍棒
+    category: axe
+    min_rank: F
+    max_rank: E
+    rarity: 1
+    attack_bonus: 6
+    price: 10
+    armor_penetration: false
+    image_path: components/pictures/weapon/wooden_stick.png
+    sound: components/sounds/sfx/wood_swing.wav
+    shop_buyable: true
+    describe: その辺の枝を削って作った粗末な武器。素手よりはマシな程度。
+  fullmetal_sword:
+    name: 鋼の剣
+    category: onehanded_sword
+    min_rank: E
+    max_rank: D
+    rarity: 3
+    attack_bonus: 15
+    price: 200
+    armor_penetration: false
+    image_path: components/pictures/weapon/fullmetal_sword.png
+    shop_buyable: false
+    describe: 鉄を鍛え上げて打った剣。鉄より鋭く重い。
+  damascus_sword:
+    name: ダマスカス鋼の剣
+    category: onehanded_sword
+    min_rank: E
+    max_rank: D
+    rarity: 3
+    attack_bonus: 20
+    price: 300
+    armor_penetration: false
+    image_path: components/pictures/weapon/tempered_sword.png
+    shop_buyable: false
+    describe: 職人が鉄を何層にも重ねて打った剣。波打つような文様が特徴。
+  thiefs_knife:
+    name: 盗賊のダガー
+    category: dagger
+    min_rank: E
+    rarity: 3
+    attack_bonus: 11
+    crit_rate: 0.2
+    aggro_mod: -3
+    price: 400
+    armor_penetration: true
+    image_path: components/pictures/weapon/thiefs_knife.png
+    shop_buyable: true
+    describe: 音もなく獲物を屠るための特殊な刀。装備するとモンスターに気づかれにくくなる。

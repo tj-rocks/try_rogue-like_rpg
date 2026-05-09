@@ -1,0 +1,169 @@
+ARMOR_CATEGORIES:
+  light:
+    name: 軽装
+    defense_bonus: 3
+    hp_bonus: 0
+    accuracy_bonus: 0
+    eva_bonus: 0
+    price: 200
+    image_dir: components/pictures/armor/leather_breastplate
+    describe: 動きやすさを重視した軽量防具。
+    position:
+      offsets:
+        down:
+        - 0
+        - 0
+        up:
+        - 0
+        - 0
+        left:
+        - 0
+        - 0
+        right:
+        - 0
+        - 0
+  medium:
+    name: 中装
+    defense_bonus: 5
+    hp_bonus: 0
+    accuracy_bonus: 0
+    eva_bonus: 0
+    price: 400
+    image_dir: components/pictures/armor/iron_breastplate
+    describe: 防御力と重量のバランスが取れた標準的な防具。
+    position:
+      offsets:
+        down:
+        - 0
+        - 0
+        up:
+        - 0
+        - 0
+        left:
+        - 0
+        - 0
+        right:
+        - 0
+        - 0
+  heavy:
+    name: 重装
+    defense_bonus: 12
+    hp_bonus: 0
+    accuracy_bonus: 0
+    eva_bonus: 0
+    aggro_mod: 0
+    price: 800
+    image_dir: components/pictures/armor/plate_armor
+    describe: 防御を最優先した重厚な鎧。物音がするため敵に気づかれやすい。
+    position:
+      offsets:
+        down:
+        - 0
+        - 0
+        up:
+        - 0
+        - 0
+        left:
+        - 0
+        - 0
+        right:
+        - 0
+        - 0
+  robe:
+    name: 法衣
+    defense_bonus: 2
+    hp_bonus: 0
+    attack_bonus: 5
+    stave_bonus: 2
+    eva_bonus: 5
+    price: 300
+    image_dir: components/pictures/armor/leather_armor
+    describe: 魔力を高める効果のある布製の防具。
+    position:
+      offsets:
+        down:
+        - 0
+        - 0
+        up:
+        - 0
+        - 0
+        left:
+        - 0
+        - 0
+        right:
+        - 0
+        - 0
+ARMOR_DATA:
+  broken_armor:
+    name: 壊れた鎧
+    category: medium
+    min_rank: F
+    max_floor: 999
+    rarity: 2
+    defense_bonus: 1
+    price: 5
+    image_dir: components/pictures/armor/adventurers_clothes
+    shop_buyable: false
+    describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない。
+  adventurers_clothes:
+    name: 冒険者の服
+    category: robe
+    min_rank: F
+    rarity: 1
+    defense_bonus: 4.5
+    attack_bonus: 0
+    stave_bonus: 0
+    price: 50
+    image_dir: components/pictures/armor/adventurers_clothes
+    shop_buyable: false
+    describe: 丈夫な布で作られた一般的な服。
+    hp_bonus: 0
+  leather_breastplate:
+    name: 皮の胸当て
+    category: light
+    min_rank: F
+    rarity: 1
+    defense_bonus: 10
+    price: 150
+    eva_bonus: 5
+    aggro_mod: -1
+    image_dir: components/pictures/armor/leather_armor
+    shop_buyable: true
+    describe: なめし革を重ねて作られた防具。
+    hp_bonus: 0
+  iron_breastplate:
+    name: 鉄の胸当て
+    category: medium
+    min_rank: F
+    rarity: 2
+    defense_bonus: 12
+    price: 180
+    image_dir: components/pictures/armor/iron_armor
+    shop_buyable: true
+    describe: 鉄板を胸部に当てた実戦的な防具。
+    hp_bonus: 0
+  fullmetal_breastplate:
+    name: 鋼の胸当て
+    category: medium
+    min_rank: E
+    rarity: 3
+    defense_bonus: 15
+    price: 450
+    image_dir: components/pictures/armor/fullmetal_armor
+    shop_buyable: false
+    describe: 硬い鋼で作られた胸当て。
+    hp_bonus: 0
+  hard_leather_armor:
+    name: 堅牢な革鎧
+    category: light
+    min_rank: E
+    max_rank: D
+    rarity: 4
+    defense_bonus: 13
+    price: 350
+    eva_bonus: 5
+    aggro_mod: -1
+    image_dir: components/pictures/armor/leather_armor
+    shop_buyable: true
+    describe: なめし革を重ねて作られた防具。
+    hp_bonus: 0
