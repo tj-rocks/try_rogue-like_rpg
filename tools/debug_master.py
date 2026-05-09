@@ -246,7 +246,8 @@ def main():
         dungeon = setup_gungeon_mode(dungeon, player)
         
         ui_elements = init_ui_elements(SCREEN_WIDTH, SCREEN_HEIGHT)
-        game_state = {"dialog_modal": False, "current_scene": "game", "is_debug_mode": True}
+        from systems.game_state import game_state
+        game_state.update({"dialog_modal": False, "current_scene": "game", "is_debug_mode": True})
         setup_ui_relations(ui_elements, player, dungeon, game_state)
 
         clock = pygame.time.Clock()

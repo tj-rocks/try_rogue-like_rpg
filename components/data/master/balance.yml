@@ -156,6 +156,16 @@ VILLAGE_SERVICES:
   WAREHOUSE_FEE: 10      # 預かり屋の利用料
   BANK_INTEREST: 0.0     # 銀行の利息（将来用）
 
+# 🤝 GUILD_QUEST (ギルド依頼)
+# ------------------------------------------------------------------------------
+GUILD_QUEST:
+  BOARD_QUEST_COUNT: [3, 5]     # 掲示板に並ぶランダムクエストの数 [最小, 最大]
+  GP_PER_HUNT: 5                # 討伐クエスト：1体あたりの獲得GP
+  GP_PER_DELIVERY: 3            # 納品クエスト：1個あたりの獲得GP
+  BOUNTY_BASE_MULTIPLIER: 5     # 討伐報酬の計算係数 (HP+ATK) * この値
+  ITEM_PRICE_RATIO: 0.33        # 納品報酬の基準価格比率 (購入価格 * この値)
+  DELIVERY_REWARD_BONUS: 1.2    # 納品報酬のボーナス倍率 (基準価格 * この値)
+
 # 📈 GLOBAL_SCALING (ランクによる自動スケーリング倍率)
 # ------------------------------------------------------------------------------
 GLOBAL_SCALING:

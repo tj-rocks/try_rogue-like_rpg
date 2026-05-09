@@ -1286,9 +1286,9 @@ class Player(Entity):
 
             for e in dungeon.enemies:
                 if getattr(e, "is_dead", False): continue
-                ex = int((e.x + dungeon.tile_size / 2) // dungeon.tile_size)
-                egy = int((e.y + dungeon.tile_size / 2) // dungeon.tile_size)
-                if ex == tgx and egy == tgy:
+                # 敵が占有している全マスを取得
+                enemy_grids = e.get_occupied_grids(dungeon.tile_size)
+                if (tgx, tgy) in enemy_grids:
                     msg, damage, is_crit, is_miss = deal_damage(self, e)
                     
                     from systems.sound_handler import sound_manager

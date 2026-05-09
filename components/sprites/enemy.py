@@ -363,13 +363,21 @@ class Enemy(Entity):
         # 突進距離の自動計算
         if self.current_attack_pattern.get("type") == "close":
             from constants import TILE_SIZE
+            # 自分に近い方の端のマスを基準にするのではなく、中心同士の距離で計算（タイル単位）
             my_gx = int((self.x + self.width / 2) // TILE_SIZE)
             my_gy = int((self.y + self.height / 2) // TILE_SIZE)
             p_gx = int((player.x + player.width / 2) // TILE_SIZE)
             p_gy = int((player.y + player.height / 2) // TILE_SIZE)
+            
+            # 距離からお互いの半径（タイル数）を引く
             grid_dist = abs(p_gx - my_gx) + abs(p_gy - my_gy)
-            # ターゲットの目の前まで突進（タイルサイズ分を考慮）
-            self.dash_distance = grid_dist * TILE_SIZE
+            # 半径（1タイルなら0.5、2タイルなら1.0）
+            my_radius = (self.width / TILE_SIZE) / 2
+            p_radius = (player.width / TILE_SIZE) / 2
+            
+            # 実質的な隙間タイル数
+            gap = max(0, grid_dist - (my_radius + p_radius))
+            self.dash_distance = (gap + 1) * TILE_SIZE # 1タイル分踏み込む
         else:
             self.dash_distance = 0
 
@@ -682,8 +690,7 @@ class Enemy(Entity):
                     
                     if 0 <= ey < dungeon.map_height and 0 <= ex < dungeon.map_width:
                         if dungeon.map_data[ey][ex] == 1:
-                            if not any(int((e.x + e.width/2)//dungeon.tile_size) == ex and 
-                                       int((e.y + e.height/2)//dungeon.tile_size) == ey for e in enemies):
+                            if not any((ex, ey) in e.get_occupied_grids(dungeon.tile_size) for e in enemies):
                                 valid_m = [m for m in monster_types if ENEMY_DATA[m].get("min_floor", 1) <= floor <= ENEMY_DATA[m].get("max_floor", 999)]
                                 if valid_m:
                                     m_type = random.choice(valid_m)
@@ -780,8 +787,7 @@ class Enemy(Entity):
                 if (1 <= t <= 3 or 10 <= t <= 14):
                     # 【追加】すでに何かがいるマスは避ける
                     all_entities = [player] + dungeon.enemies + dungeon.npcs
-                    if any(int((e.target_x + e.width/2) // dungeon.tile_size) == ex and 
-                           int((e.target_y + e.height/2) // dungeon.tile_size) == ey for e in all_entities):
+                    if any((ex, ey) in e.get_occupied_grids(dungeon.tile_size) for e in all_entities):
                         continue
 
                     # 制限を満たす敵だけを抽出

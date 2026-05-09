@@ -1711,7 +1711,9 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             guild_dialog.setup(player, dungeon)
                                             
                                             # 達成済みがある場合はセリフをお祝いにする
-                                            if guild_dialog.mode == "AUTO_REPORT":
+                                            # ただし、エンディング対象だった場合はシーンが切り替わっているので何もしない
+                                            from systems.game_state import game_state
+                                            if guild_dialog.mode == "AUTO_REPORT" and game_state.get("current_scene") != "ending":
                                                 dialog.text = "おお、見事に依頼を達成しましたね！\nおめでとうございます！"
                                                 dialog.is_active = True
                                             return
@@ -2043,15 +2045,16 @@ class GuildDialog:
                     self.cutscene_manager.start_rank_up(callback=on_done)
                 else:
                     on_done()
-            else:
-                player.coin += q["reward_gold"]
-                player.guild_point += q["reward_gp"]
-                dialog.text = "見事に依頼を達成しましたね！\nおめでとうございます！"
-                if q.get("id"): player.completed_fixed_quests.append(q["id"])
-                
-                dialog.is_active = True
+            # マスターデータからもエンディング対象かチェック（セーブデータにフラグがない場合への対策）
+            is_ending_quest = q.get("ending", False)
+            if not is_ending_quest and q.get("id"):
+                from constants import FIXED_QUEST_DATA
+                for fq in FIXED_QUEST_DATA:
+                    if fq.get("id") == q.get("id") and fq.get("ending"):
+                        is_ending_quest = True
+                        break
 
-            if q.get("ending"):
+            if is_ending_quest:
                 # エンディングフラグがある場合は、特別演出へ
                 from systems.game_state import game_state
                 game_state["current_scene"] = "ending"
@@ -2060,6 +2063,13 @@ class GuildDialog:
                 game_state["ending_alpha"] = 0
                 self.is_active = False # ギルド画面を閉じる
                 return
+
+            else:
+                player.coin += q["reward_gold"]
+                player.guild_point += q["reward_gp"]
+                dialog.text = "見事に依頼を達成しましたね！\nおめでとうございます！"
+                if q.get("id"): player.completed_fixed_quests.append(q["id"])
+                dialog.is_active = True
 
             player.active_quests.remove(q)
             self.setup(player, self.dungeon_ref)

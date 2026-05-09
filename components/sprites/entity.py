@@ -16,118 +16,95 @@ class Entity:
         self.prev_x = x
         self.prev_y = y
         self.is_moving = False
+        self.is_attacking = False
+        self.attack_timer = 0
+        self.damage_flash_timer = 0
+        self.is_dead = False
+        self.is_falling = False
         self.move_speed = 4
         self.facing = "down"
         self.step_toggle = False
         self.walk_anim_timer = 0 # 歩行アニメーション用のタイマー
         self.idle_anim_timer = 0 # 呼吸などの待機アニメーション用
-        
-        # 攻撃アニメーションの共通ステータス
-        self.is_attacking = False
-        self.attack_timer = 0
-        self.is_dead = False
-        self.damage_flash_timer = 0 # 攻撃を受けた時の点滅演出用
-        self.status_to_inflict = None # 攻撃時に相手に付与する状態
-        self.has_acted = False        # ターン内での行動済みフラグ
 
-    def take_damage(self, amount):
-        """他者から攻撃を受けてHPを減らす共通処理"""
-        from constants import HIT_STUN_DURATION
-        self.hp -= amount
-        if self.hp <= 0:
-            self.hp = 0
-            self.is_dead = True
-        # ダメージを受けたことを知らせるために1秒間（60フレーム）+ 硬直時間点滅させる演出！
-        self.damage_flash_timer = 60 + HIT_STUN_DURATION
-        print(f"[{type(self).__name__}] ダメージ{amount}を受けた！残りHP: {self.hp}")
-
-    def set_facing(self, direction):
-        self.facing = direction
-
-    def can_move_grid(self, target_x, target_y, dungeon, entities=[], occupied_cells=None):
-        """1マス単位でのシンプルで確実な当たり判定（主人公・敵すべてのキャラクター共通関数！）"""
-        center_x = target_x + self.width / 2
-        center_y = target_y + self.height / 2
+    def get_occupied_grids(self, tile_size):
+        """キャラクターが占有しているグリッド座標のリストを返す（巨大キャラ対応）"""
+        # 左上と右下のグリッドを計算
+        start_gx = int(self.x // tile_size)
+        start_gy = int(self.y // tile_size)
+        end_gx = int((self.x + self.width - 1) // tile_size)
+        end_gy = int((self.y + self.height - 1) // tile_size)
         
-        grid_x = int(center_x // dungeon.tile_size)
-        grid_y = int(center_y // dungeon.tile_size)
+        grids = []
+        for gy in range(start_gy, end_gy + 1):
+            for gx in range(start_gx, end_gx + 1):
+                grids.append((gx, gy))
+        return grids
+
+    def get_occupied_grids_at(self, tx, ty, tile_size):
+        """指定した座標(tx, ty)にいると仮定した時の占有グリッドを返す"""
+        start_gx = int(tx // tile_size)
+        start_gy = int(ty // tile_size)
+        end_gx = int((tx + self.width - 1) // tile_size)
+        end_gy = int((ty + self.height - 1) // tile_size)
         
-        # マップの範囲外には出られない
-        if not (0 <= grid_x < dungeon.map_width and 0 <= grid_y < dungeon.map_height):
-            return False
-            
-        # マス目が壁(0)だった場合は移動不可！
-        if dungeon.map_data[grid_y][grid_x] == 0:
-            return False
-            
-        # ★ 他のキャラクターとの衝突判定（最適化：occupied_cells があれば高速判定）
-        if occupied_cells is not None:
-            if (grid_x, grid_y) in occupied_cells:
-                # 自分自身が占有しているマスなら移動可能
-                my_grid_x = int(round(self.target_x + self.width / 2) // dungeon.tile_size)
-                my_grid_y = int(round(self.target_y + self.height / 2) // dungeon.tile_size)
-                if grid_x == my_grid_x and grid_y == my_grid_y:
-                    return True
+        grids = []
+        for gy in range(start_gy, end_gy + 1):
+            for gx in range(start_gx, end_gx + 1):
+                grids.append((gx, gy))
+        return grids
+
+    def can_move_grid(self, tx, ty, dungeon):
+        """
+        指定したピクセル座標 (tx, ty) へ、自分のサイズ（矩形）を維持したまま移動可能か判定する。
+        """
+        # 1. 占有する全グリッドを取得
+        occupied_grids = self.get_occupied_grids_at(tx, ty, dungeon.tile_size)
+        
+        # 2. 全てのグリッドが通行可能かチェック
+        for gx, gy in occupied_grids:
+            # マップ範囲外チェック
+            if not (0 <= gx < dungeon.map_width and 0 <= gy < dungeon.map_height):
                 return False
-        else:
-            # 従来通りのループ判定（フォールバック用）
-            for entity in entities:
-                if getattr(entity, "is_dead", False): continue
-                if entity is not self:
-                    # 座標を四捨五入してグリッド位置を特定（浮動小数点の誤差対策）
-                    other_grid_x = int(round(entity.target_x + entity.width / 2) // dungeon.tile_size)
-                    other_grid_y = int(round(entity.target_y + entity.height / 2) // dungeon.tile_size)
-                    
-                    if grid_x == other_grid_x and grid_y == other_grid_y:
+            
+            # 壁チェック (tile ID 0 は壁)
+            if dungeon.map_data[gy][gx] == 0:
+                # [NEW] wall_single（壺や樽などの障害物）は Entity が通行不可とする
+                # _get_wall_texture_key を利用して判定
+                wall_type = dungeon._get_wall_texture_key(gx, gy)
+                if wall_type == "wall_single":
+                    return False
+                # 通常の壁も当然不可
+                return False
+
+            # 他のエンティティ（自分以外）との衝突チェック
+            # プレイヤー
+            if hasattr(dungeon, "player") and dungeon.player != self:
+                p_grids = dungeon.player.get_occupied_grids(dungeon.tile_size)
+                if (gx, gy) in p_grids:
+                    return False
+            
+            # 他の敵
+            for e in dungeon.enemies:
+                if e != self and not getattr(e, "is_dead", False):
+                    e_grids = e.get_occupied_grids(dungeon.tile_size)
+                    if (gx, gy) in e_grids:
                         return False
-                    
+                        
         return True
 
-    def process_movement(self):
-        """スライディング移動の共通処理。目的地のマスへ滑るように移動し、ピタッと止まる"""
-        if self.is_moving:
-            if self.x < self.target_x: self.x = min(self.x + self.move_speed, self.target_x)
-            elif self.x > self.target_x: self.x = max(self.x - self.move_speed, self.target_x)
-            
-            if self.y < self.target_y: self.y = min(self.y + self.move_speed, self.target_y)
-            elif self.y > self.target_y: self.y = max(self.y - self.move_speed, self.target_y)
-            
-            if self.x == self.target_x and self.y == self.target_y:
-                self.is_moving = False
-                return True # 移動がちょうど完了した瞬間であることを返す
-        return False
-
-    def get_breathing_scale(self):
-        """呼吸のようななめらかな伸縮スケールを計算して返す (scale_x, scale_y)"""
-        import math
-        from constants import BREATHING_SCALE
-        # 0.0〜1.0の間をなめらかに動く係数
-        breath_val = (math.sin(self.idle_anim_timer * math.pi / 30) + 1) / 2
-        # BREATHING_SCALE 〜 1.0 の間で伸縮
-        scale_y = 1.0 - (1.0 - BREATHING_SCALE) * breath_val
-        scale_x = 1.0 + (1.0 - BREATHING_SCALE) * breath_val * 0.5 # 横は少し広がる
-        return scale_x, scale_y
-
     def update_animation(self):
-        """すべてのエンティティに共通するフレームごとのアニメーション進行処理（毎フレーム呼ばれる）"""
-        self.process_movement()
-        
-        # 移動中は歩行タイマーを進める（アニメーション用）
+        """アニメーションタイマーの更新（共通処理）"""
+        self.idle_anim_timer = (self.idle_anim_timer + 1) % 60
         if self.is_moving:
-            from constants import WALK_ANIMATION_SPEED
-            self.walk_anim_timer = (self.walk_anim_timer + 1) % (WALK_ANIMATION_SPEED * 2)
+            self.walk_anim_timer = (self.walk_anim_timer + 1) % 40
         else:
             self.walk_anim_timer = 0
-            
-        if self.is_attacking:
-            self.attack_timer -= 1 # Keep decrementing attack_timer
-            # 攻撃アニメーションが終わったら元の画像に戻す
-            if self.attack_timer <= 0:
-                self.is_attacking = False
-                
-        # 点滅タイマーの消化
-        if getattr(self, "damage_flash_timer", 0) > 0:
-            self.damage_flash_timer -= 1
-            
-        # 待機アニメーション（呼吸）タイマーの更新
-        self.idle_anim_timer = (self.idle_anim_timer + 1) % 60
+
+    def get_breathing_scale(self):
+        """呼吸のようなスケーリング効果を計算する（共通処理）"""
+        import math
+        # 60フレームで1周期のサインカーブ
+        # 1.0 〜 1.05 の間で変動させる
+        scale = 1.0 + math.sin(self.idle_anim_timer * (2 * math.pi / 60)) * 0.02
+        return (1.0, scale) # 縦方向にのみ伸縮
