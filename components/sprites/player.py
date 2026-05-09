@@ -552,7 +552,7 @@ class Player(Entity):
                 target_y = self.y + dy
                 
                 all_entities = [self] + dungeon.enemies + dungeon.npcs
-                if self.can_move_grid(target_x, target_y, dungeon, all_entities):
+                if self.can_move_grid(target_x, target_y, dungeon):
                     self.prev_x = self.x
                     self.prev_y = self.y
                     self.target_x = target_x
