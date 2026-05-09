@@ -2470,21 +2470,28 @@ class ShopDialog(BaseListDialog):
     def setup_sell_mode(self, player):
         self.mode = "SELL"; self.cursor_idx = 0; self.items = []
         from constants import CONSUMABLE_DATA, WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, STAVE_DATA
+        
+        def get_sell_price(data):
+            """selling_price が設定されていればそれを、なければ price // 3 を返す"""
+            if "selling_price" in data:
+                return int(data["selling_price"])
+            return int(data.get("price", 0) // 3)
+
         for item in player.items:
             info = CONSUMABLE_DATA.get(item["key"], {})
-            self.items.append((item["key"], "consumable", info.get("name", item["key"]), int(info.get("price", 0) // 3), item["count"]))
+            self.items.append((item["key"], "consumable", info.get("name", item["key"]), get_sell_price(info), item["count"]))
         for eq in player.weapon_inventory:
-            price = int(WEAPON_DATA.get(eq.key, {}).get("price", 0) // 3)
-            self.items.append((eq.iid, "weapon_inst", eq.get_name(), price, 1, eq.key))
+            data = WEAPON_DATA.get(eq.key, {})
+            self.items.append((eq.iid, "weapon_inst", eq.get_name(), get_sell_price(data), 1, eq.key))
         for eq in player.armor_inventory:
-            price = int(ARMOR_DATA.get(eq.key, {}).get("price", 0) // 3)
-            self.items.append((eq.iid, "armor_inst", eq.get_name(), price, 1, eq.key))
+            data = ARMOR_DATA.get(eq.key, {})
+            self.items.append((eq.iid, "armor_inst", eq.get_name(), get_sell_price(data), 1, eq.key))
         for eq in player.shield_inventory:
-            price = int(SHIELD_DATA.get(eq.key, {}).get("price", 0) // 3)
-            self.items.append((eq.iid, "shield_inst", eq.get_name(), price, 1, eq.key))
+            data = SHIELD_DATA.get(eq.key, {})
+            self.items.append((eq.iid, "shield_inst", eq.get_name(), get_sell_price(data), 1, eq.key))
         for st in player.stave_inventory:
-            price = int(STAVE_DATA.get(st.key, {}).get("price", 0) // 3)
-            self.items.append((st.iid, "stave_inst", st.get_name_with_charges(), price, 1, st.key))
+            data = STAVE_DATA.get(st.key, {})
+            self.items.append((st.iid, "stave_inst", st.get_name_with_charges(), get_sell_price(data), 1, st.key))
         self.items.append(("cancel", "cancel", Text.UI.SHOP_CANCEL, 0, 1))
 
 

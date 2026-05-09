@@ -8,7 +8,8 @@
 # - effect / effect_type : アイテムの効果（heal_hp, antidote, fire など）
 # - heal_amount     : HPの回復量 (効果が回復の場合)
 # - recharge_amount : 杖の使用回数回復量
-# - price           : ショップでの購入価格 (売値はこの半額)
+# - price           : ショップでの購入価格
+# - selling_price   : ショップでの売却価格（未設定の場合は price // 3）
 # - min_rank        : 対象となるギルドランク基準（自動で出現階層が算出されます）
 # - rarity          : ドロップ率・出現率 (1〜8)
 #                     1(20%), 2(15%), 3(10%), 4(7.5%), 5(5%), 6(3.5%), 7(0.2%), 8(0.1%)
@@ -282,6 +283,7 @@ STAVE_DATA:
     min_rank: F
     rarity: 5
     price: 800
+    selling_price: 80   # 買値800の1/10
     charges: 5
     sound: components/sounds/sfx/knockback.wav
     effect_color:
@@ -298,6 +300,7 @@ STAVE_DATA:
     max_floor: 999
     rarity: 5
     price: 1
+    selling_price: 1    # 売れない奇杀の束の杖
     charges: 0
     image_path: components/pictures/icon/stave.png
     shop_buyable: false
@@ -308,6 +311,7 @@ STAVE_DATA:
     min_rank: F
     rarity: 1
     price: 1200
+    selling_price: 100  # 買値1200の約1/12
     charges: 5
     sound: components/sounds/sfx/fire.wav
     effect_color:
@@ -328,6 +332,7 @@ STAVE_DATA:
     min_rank: F
     rarity: 1
     price: 1000
+    selling_price: 80   # 買値1000の約1/12
     charges: 5
     sound: components/sounds/sfx/heal.wav
     image_path: components/pictures/icon/stave.png
@@ -344,6 +349,7 @@ STAVE_DATA:
     min_rank: S
     rarity: 7
     price: 3000
+    selling_price: 200  # 買値3000の約1/15・レア度合いの渋い売値
     charges: 5
     sound: components/sounds/sfx/invincible.wav
     image_path: components/pictures/icon/stave.png
@@ -360,6 +366,7 @@ STAVE_DATA:
     min_rank: F
     rarity: 1
     price: 1500
+    selling_price: 100  # 買値1500の約1/15
     charges: 5
     sound: components/sounds/sfx/light.wav
     image_path: components/pictures/icon/stave.png
