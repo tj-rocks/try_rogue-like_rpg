@@ -422,7 +422,10 @@ class Dungeon:
             
         else: # ダンジョン
             # 登り階段(2)か下り階段(3)を探す
-            target_tile = 2 if self.current_floor > getattr(player, "prev_floor", 0) else 3
+            if spawn_reason == "continue":
+                target_tile = 2 # 再開時はその階の入口(上り階段)から
+            else:
+                target_tile = 2 if self.current_floor > getattr(player, "prev_floor", 0) else 3
             found = False
             for y in range(self.map_height):
                 for x in range(self.map_width):

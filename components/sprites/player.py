@@ -1477,6 +1477,7 @@ class Player(Entity):
             "warehouse_items": getattr(self, "warehouse_items", []),
             "event_items": getattr(self, "event_items", []),
             "current_floor": getattr(self, "current_floor", 0),
+            "prev_floor": getattr(self, "prev_floor", 0),
             "equip_id_counter": globals().get("_equip_id_counter", 0),
         }
 
@@ -1544,6 +1545,7 @@ class Player(Entity):
         self.warehouse_items = data.get("warehouse_items", [])
         self.event_items = data.get("event_items", [])
         self.current_floor = data.get("current_floor", 0)
+        self.prev_floor = data.get("prev_floor", 0)
         
         # 装備IDカウンタの復元
         if "equip_id_counter" in data:
