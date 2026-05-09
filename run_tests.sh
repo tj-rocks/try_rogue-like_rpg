@@ -20,6 +20,7 @@ TEST_FILES=(
     "tests/test_quest.py"
     "tests/test_blacksmith.py"
     "tests/test_game_flow.py"
+    "tests/test_combat_sim.py"
 )
 
 SUCCESS_COUNT=0

@@ -115,6 +115,13 @@ class Entity:
         else:
             self.walk_anim_timer = 0
 
+    def take_damage(self, amount):
+        """ダメージを受ける（共通処理）"""
+        self.hp = max(0, self.hp - amount)
+        self.damage_flash_timer = 20 # 20フレーム点滅
+        if self.hp <= 0:
+            self.is_dead = True
+
     def process_movement(self):
         """スムーズな移動処理（target_x, target_y に向かって移動）"""
         if not self.is_moving:
