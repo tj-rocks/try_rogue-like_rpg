@@ -90,6 +90,13 @@ class Entity:
                     e_grids = e.get_occupied_grids(dungeon.tile_size)
                     if (gx, gy) in e_grids:
                         return False
+            
+            # NPC
+            if hasattr(dungeon, "npcs"):
+                for n in dungeon.npcs:
+                    n_grids = n.get_occupied_grids(dungeon.tile_size)
+                    if (gx, gy) in n_grids:
+                        return False
                         
         return True
 
