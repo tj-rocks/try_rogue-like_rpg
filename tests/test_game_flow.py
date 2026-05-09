@@ -39,15 +39,25 @@ def test_floor_navigation():
     assert player.current_floor == 1
     assert dungeon.current_floor == 1
     
-    # 階段（上り・下り）のモック動作確認
+    # 降りた直後は上り階段(2)の上にいるべき
+    tx, ty = int(player.x // TILE_SIZE), int(player.y // TILE_SIZE)
+    print(f"1階移動直後の位置: ({tx}, {ty}), タイル: {dungeon.map_data[ty][tx]}")
+    assert dungeon.map_data[ty][tx] == 2, "深い階へ移動した後は上り階段(2)の上にいるべきです"
+    
     # 1階から2階へ
     dungeon_f2 = warp_to_floor(2, player, spawn_reason="test")
     assert player.current_floor == 2
+    tx, ty = int(player.x // TILE_SIZE), int(player.y // TILE_SIZE)
+    print(f"2階移動直後の位置: ({tx}, {ty}), タイル: {dungeon_f2.map_data[ty][tx]}")
+    assert dungeon_f2.map_data[ty][tx] == 2, "深い階へ移動した後は上り階段(2)の上にいるべきです"
     print(f"[OK] 階層移動(1->2)成功")
     
     # 2階から1階へ（逆送）
     dungeon_f1 = warp_to_floor(1, player, spawn_reason="test")
     assert player.current_floor == 1
+    tx, ty = int(player.x // TILE_SIZE), int(player.y // TILE_SIZE)
+    print(f"1階(逆送)移動直後の位置: ({tx}, {ty}), タイル: {dungeon_f1.map_data[ty][tx]}")
+    assert dungeon_f1.map_data[ty][tx] == 3, "浅い階へ移動した後は下り階段(3)の上にいるべきです"
     print(f"[OK] 階層移動(2->1)成功")
 
 def test_item_interaction():
