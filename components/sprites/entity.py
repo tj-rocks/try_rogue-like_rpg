@@ -101,6 +101,12 @@ class Entity:
         if getattr(self, "damage_flash_timer", 0) > 0:
             self.damage_flash_timer -= 1
 
+        # 攻撃タイマーの更新
+        if self.is_attacking and getattr(self, "attack_timer", 0) > 0:
+            self.attack_timer -= 1
+            if self.attack_timer == 0:
+                self.is_attacking = False
+
         # 移動処理
         self.process_movement()
 
