@@ -148,9 +148,8 @@ class Entity:
 
     def get_breathing_scale(self):
         """呼吸のようなスケーリング効果を計算する（共通処理）"""
-        # 移動中、歩行アニメーション中、または死亡中は呼吸を止める（ガタつき防止）
-        is_walking = getattr(self, "walk_timer", 0) > 0
-        if self.is_moving or is_walking or getattr(self, "is_dead", False):
+        # 移動中や死亡中は呼吸を止める（ガタつき防止）
+        if self.is_moving or getattr(self, "is_dead", False):
             return (1.0, 1.0)
             
         import math

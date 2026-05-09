@@ -1112,6 +1112,7 @@ class Player(Entity):
         if not is_paused() and game_state["turn_state"] == "player":
             self.operate(dungeon, dialog, events) 
         self.update_animation(dungeon, dialog) 
+        self.process_movement()
         # 攻撃・移動アニメーション、ダイアログ表示、および敵のダメージ演出がすべて終わってから敵のターンを開始する
         is_any_enemy_damaged = any(e.damage_flash_timer > 0 for e in dungeon.enemies)
         if not self.is_attacking and not self.is_moving and not (dialog and dialog.is_active) and not is_any_enemy_damaged and getattr(self, "enemy_turn_pending", False):
