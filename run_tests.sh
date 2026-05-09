@@ -23,6 +23,7 @@ TEST_FILES=(
     "tests/test_combat_sim.py"
     "tests/test_npc_collision.py"
     "tests/test_enemy_collision.py"
+    "tests/test_rank_up_entrance.py"
 )
 
 SUCCESS_COUNT=0
