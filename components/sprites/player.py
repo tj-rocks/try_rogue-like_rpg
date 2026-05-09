@@ -1273,12 +1273,17 @@ class Player(Entity):
         return ""
     def is_quest_reportable(self, q):
         """指定された依頼が報告可能（達成済み）かチェックする"""
+        target_key = q.get("target_key")
+        if not target_key:
+            # target_key が設定されていないクエストは報告不可（データ不備への安全対策）
+            return False
+            
         if q.get("type") == "hunt":
-            return getattr(self, "quest_tokens", {}).get(q["target_key"], 0) >= q.get("amount", 1)
+            return getattr(self, "quest_tokens", {}).get(target_key, 0) >= q.get("amount", 1)
         elif q.get("type") == "delivery":
             # 通常アイテムとイベントアイテムの両方をチェック
-            normal_count = sum(item["count"] for item in self.items if item["key"] == q["target_key"])
-            event_count = sum(item["count"] for item in self.event_items if item["key"] == q["target_key"])
+            normal_count = sum(item["count"] for item in self.items if item["key"] == target_key)
+            event_count = sum(item["count"] for item in self.event_items if item["key"] == target_key)
             return (normal_count + event_count) >= q.get("amount", 1)
         return False
 
@@ -1525,6 +1530,12 @@ class Player(Entity):
         self.guild_point = int(data.get("guild_point", 0))
         self.guild_rank = data.get("guild_rank", "F")
         self.active_quests = data.get("active_quests", [])
+        # [COMPAT] 古いセーブデータに報酬情報が欠けている場合にデフォルト値で補正する
+        for q in self.active_quests:
+            if "reward_gold" not in q:
+                q["reward_gold"] = 1
+            if "reward_gp" not in q:
+                q["reward_gp"] = 1
         self.quest_tokens = data.get("quest_tokens", {})
         self.completed_fixed_quests = data.get("completed_fixed_quests", [])
         self.has_seen_ending = data.get("has_seen_ending", False)

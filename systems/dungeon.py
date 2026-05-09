@@ -13,7 +13,7 @@ from systems.game_state import is_paused
 from wordings import Text
 
 
-def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spawn_reason="normal"):
+def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spawn_reason="normal", old_dungeon=None):
     """指定した階層へ移動するための新しいダンジョンオブジェクトを生成する"""
     # --- [MEMORY OPTIMIZATION] 階層移動時にキャッシュをクリーンアップ ---
     import gc
@@ -26,6 +26,8 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
     Enemy.clear_cache()
     Player.clear_cache()
     NPC.clear_cache()
+    if old_dungeon:
+        old_dungeon.cleanup_instance()
     gc.collect() # 未使用メモリを強制解放
     
     # 階層移動音の再生
@@ -83,6 +85,23 @@ class Dungeon:
         cls._variant_lists = {}
         if count > 0:
             print(f"[MEMORY] Dungeon texture cache cleared ({count} themes)")
+
+    def cleanup_instance(self):
+        """インスタンスに紐付く巨大なデータ配列の参照を明示的に断ち切り、GCを促進する"""
+        self.map_data = None
+        self.rooms = []
+        self.room_info = []
+        self.room_rects = []
+        self.enemies = []
+        self.npcs = []
+        self.dropped_items = []
+        self.traps = []
+        self.magic_effects = []
+        self.weapon_shop_stock = []
+        self.item_shop_stock = []
+        self.magic_shop_stock = []
+        if self.player:
+            self.player = None
 
     def __init__(self, level=1, player=None, debug_overflow=False):
         from constants import (
@@ -1386,7 +1405,7 @@ class Dungeon:
         # [NEW] 落とし穴の落下待ち処理
         if self.player and self.player.is_falling and self.player.falling_timer <= 0:
             self.player.is_falling = False
-            self.next_dungeon = warp_to_floor(self.current_floor + 1, self.player)
+            self.next_dungeon = warp_to_floor(self.current_floor + 1, self.player, old_dungeon=self)
         
         # [NEW] フラッシュタイマーの更新
         if self.flash_timer > 0:
@@ -1439,6 +1458,11 @@ class Dungeon:
         return self
 
     def draw(self, screen, camera_x, camera_y):
+        # [SAFETY] クリーンアップ済みのダンジョンの場合は描画をスキップ
+        if self.map_data is None:
+            screen.fill((0, 0, 0))
+            return
+
         sw, sh = screen.get_size()
         sx, ex = max(0, int(camera_x // self.tile_size)), min(self.map_width, int((camera_x + sw) // self.tile_size) + 1)
         sy, ey = max(0, int(camera_y // self.tile_size)), min(self.map_height, int((camera_y + sh) // self.tile_size) + 1)
@@ -1604,7 +1628,7 @@ class Dungeon:
                 return self
 
             confirm_dialog.text = Text.UI.CONFIRM_DUNGEON_START if self.current_floor == 0 else Text.UI.CONFIRM_GO_DEEPER
-            confirm_dialog.on_yes = lambda: setattr(self, "next_dungeon", warp_to_floor(self.current_floor + 1, player, debug_overflow=self.debug_overflow))
+            confirm_dialog.on_yes = lambda: setattr(self, "next_dungeon", warp_to_floor(self.current_floor + 1, player, debug_overflow=self.debug_overflow, old_dungeon=self))
             def on_no():
                 # 元の仕様通り、一歩押し戻す
                 player.x, player.y = player.prev_x, player.prev_y
@@ -1616,7 +1640,7 @@ class Dungeon:
             confirm_dialog.is_active = True
         elif ct == 2 and self.current_floor >= 1:
             confirm_dialog.text = Text.UI.CONFIRM_RETURN_VILLAGE if self.current_floor == 1 else Text.UI.CONFIRM_GO_UPPER
-            confirm_dialog.on_yes = lambda: setattr(self, "next_dungeon", warp_to_floor(self.current_floor - 1, player, debug_overflow=self.debug_overflow, spawn_reason="return" if self.current_floor == 1 else "normal"))
+            confirm_dialog.on_yes = lambda: setattr(self, "next_dungeon", warp_to_floor(self.current_floor - 1, player, debug_overflow=self.debug_overflow, spawn_reason="return" if self.current_floor == 1 else "normal", old_dungeon=self))
             def on_no_upper():
                 player.x, player.y = player.prev_x, player.prev_y
                 player.target_x, player.target_y = player.x, player.y

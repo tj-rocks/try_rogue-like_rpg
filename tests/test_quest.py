@@ -61,9 +61,59 @@ def test_quest_lifecycle():
 
     print("[OK] クエスト受注・達成テスト合格！")
 
+
+def test_quest_generation_integrity():
+    """GuildSystem が生成するクエストに必須フィールドが必ず含まれることを確認する"""
+    print("--- クエスト生成データ整合性テスト開始 ---")
+    from systems.guild import GuildSystem
+
+    player = Player()
+    player.guild_rank = "F"
+    guild = GuildSystem()
+
+    # 複数回生成してすべてのクエストを検査
+    REQUIRED_FIELDS = ["type", "target_key", "title", "amount", "reward_gold", "reward_gp"]
+    for trial in range(10):
+        guild.generate_quests(player)
+        all_quests = guild.available_quests + guild.fixed_quests
+        assert len(all_quests) > 0, f"Trial {trial}: クエストが1件も生成されませんでした"
+        
+        for q in all_quests:
+            for field in REQUIRED_FIELDS:
+                assert field in q, f"Trial {trial}: クエスト '{q.get('title', '不明')}' に必須フィールド '{field}' がありません"
+            assert q["reward_gold"] >= 1, f"Trial {trial}: reward_gold が 0 以下です: {q}"
+            assert q["reward_gp"] >= 1, f"Trial {trial}: reward_gp が 0 以下です: {q}"
+            assert q["target_key"], f"Trial {trial}: target_key が空です: {q}"
+
+    print(f"[OK] 10回の生成で全クエストの必須フィールドを確認しました")
+    print("[OK] クエスト生成データ整合性テスト合格！")
+
+
+def test_fixed_quest_integrity():
+    """固定クエスト(FIXED_QUEST_DATA)のマスターデータに必須フィールドが揃っていることを確認する"""
+    print("--- 固定クエストマスターデータ整合性テスト開始 ---")
+
+    if not FIXED_QUEST_DATA:
+        print("[SKIP] FIXED_QUEST_DATA が空のためスキップします")
+        return
+
+    REQUIRED_FIELDS = ["id", "type", "target_key", "title", "amount", "reward_gold", "reward_gp"]
+    for q in FIXED_QUEST_DATA:
+        for field in REQUIRED_FIELDS:
+            assert field in q, f"固定クエスト '{q.get('id', '不明')}' に必須フィールド '{field}' がありません"
+        assert q["reward_gold"] >= 1, f"固定クエスト '{q['id']}' の reward_gold が 0 以下です"
+        assert q["reward_gp"] >= 1, f"固定クエスト '{q['id']}' の reward_gp が 0 以下です"
+        assert q["target_key"], f"固定クエスト '{q['id']}' の target_key が空です"
+        print(f"  [OK] {q['id']}: reward_gold={q['reward_gold']}, reward_gp={q['reward_gp']}, target_key={q['target_key']}")
+
+    print("[OK] 固定クエストマスターデータ整合性テスト合格！")
+
+
 if __name__ == "__main__":
     try:
         test_quest_lifecycle()
+        test_quest_generation_integrity()
+        test_fixed_quest_integrity()
     except Exception as e:
         print(f"テスト失敗: {e}")
         import traceback

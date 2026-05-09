@@ -2218,9 +2218,9 @@ class GuildDialog:
             elif status in ("cancel", "back"):
                 desc_text = "前の画面に戻ります。"
             else:
-                # 依頼詳細
+                # 依頼詳細 (データ不備に備えて .get() で安全にアクセス)
                 q = selected_item[1]
-                desc_text = f"【依頼タイトル】\n{q['title']}\n\n"
+                desc_text = f"【依頼タイトル】\n{q.get('title', '不明な依頼')}\n\n"
                 
                 t = q.get("type", "")
                 target = q.get("target_name", "???")
@@ -2230,7 +2230,9 @@ class GuildDialog:
                 elif t == "delivery":
                     desc_text += f"【内容】\n{target} を {amount} 個納品する。"
                 
-                desc_text += f"\n\n【報酬】\n{q['reward_gold']} G / {q['reward_gp']} GP"
+                reward_gold = q.get("reward_gold", 0)
+                reward_gp = q.get("reward_gp", 0)
+                desc_text += f"\n\n【報酬】\n{reward_gold} G / {reward_gp} GP"
 
             draw_text_wrapped(screen, self.font, desc_text, desc_x, desc_y, desc_width, color=(220, 230, 240))
         # 右下は余白または別の情報を置くために空けておく

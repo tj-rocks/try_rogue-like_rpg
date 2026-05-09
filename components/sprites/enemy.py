@@ -248,10 +248,7 @@ class Enemy(Entity):
                 # 4フレーム周期で点滅 (2フレーム表示、2フレーム非表示)
                 if (self.damage_flash_timer - HIT_STUN_DURATION) % 4 < 2:
                     is_visible = False
-
-            final_scale_x = scale_anim_x * scale_atk
-            final_scale_y = scale_anim_y * scale_atk
-            center_x, center_y = draw_x + (current_img.get_width() / 2), draw_y + (current_img.get_height() / 2)
+            
             
             # モンスター本体の描画
             if is_visible:
