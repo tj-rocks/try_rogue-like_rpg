@@ -1027,7 +1027,9 @@ class Player(Entity):
         poison_tint = None
         if self.condition == "poison":
             from constants import STATUS_EFFECTS
-            poison_tint = STATUS_EFFECTS.get("poison", {}).get("color_tint", [180, 100, 255])
+            tint_data = STATUS_EFFECTS.get("poison", {}).get("color_tint", [180, 100, 255])
+            if tint_data:
+                poison_tint = tuple(tint_data)
 
         # スケーリングの適用 (攻撃時の拡大は廃止、呼吸エフェクトのみ適用)
         (final_scale_x, final_scale_y), phase = self.get_breathing_scale()
