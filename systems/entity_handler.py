@@ -5,7 +5,7 @@ from constants import WEAPON_DATA, CONSUMABLE_DATA, ARMOR_DATA, SHIELD_DATA, STA
 from constants import ENEMY_DATA, ITEM_DROP_RATES
 from systems.game_state import game_state
 
-def update_dungeon_entities(dungeon, player, dialog=None):
+def update_dungeon_entities(dungeon, player, dt, dialog=None):
     """
     ダンジョン内の動的なエンティティ（敵・アイテム・NPC）の状態を更新する。
     main.py のメインループをスッキリさせるためのハンドラ関数。
@@ -15,7 +15,7 @@ def update_dungeon_entities(dungeon, player, dialog=None):
         if enemy.is_dead:
             # 敵が死んでも点滅中は少し待つ（痛そうな顔を見せるため）
             if enemy.damage_flash_timer > 0:
-                enemy.update_animation()
+                enemy.update_animation(dt)
                 continue
 
             # 敵の撃破処理
@@ -119,7 +119,7 @@ def update_dungeon_entities(dungeon, player, dialog=None):
 
         
         # ★ 全ての敵のアニメーション（滑らかな移動や攻撃）を毎フレーム更新する
-        moved = enemy.update(dungeon)
+        moved = enemy.update(dungeon, dt)
         if moved:
             # 敵が移動を完了した瞬間に足元の罠をチェック
             egx = int((enemy.x + enemy.width / 2) // dungeon.tile_size)

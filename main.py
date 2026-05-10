@@ -65,6 +65,8 @@ def main():
                 last_scene = scene
  
             # 2. シーン別の処理
+            dt = clock.tick(60) / 1000.0 # 1フレームの経過時間（秒）を計算
+            
             if scene == "opening":
                 from systems.resources import opening_imgs, story_data
                 handle_opening(screen, events, game_state, opening_imgs, start_new_game, ui_elements, story_data)
@@ -85,7 +87,7 @@ def main():
 
             elif scene == "game":
                 if dungeon:
-                    dungeon = handle_game(screen, events, player, dungeon, ui_elements, game_state)
+                    dungeon = handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=dt)
                 else:
                     # ダンジョンが未初期化の場合はタイトルに戻す
                     game_state["current_scene"] = "title"
@@ -96,7 +98,6 @@ def main():
 
             # 3. 画面更新
             pygame.display.flip()
-            clock.tick(60)
 
     except Exception as e:
         print(f"[Fatal Error] {e}")

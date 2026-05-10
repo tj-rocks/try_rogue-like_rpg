@@ -254,6 +254,7 @@ def main():
         running = True
 
         while running:
+            dt = clock.tick(60) / 1000.0 # [NEW] Delta Time calculation
             success, events = handle_events()
             if not success: running = False
             
@@ -318,7 +319,7 @@ def main():
             
             if scene == "game":
                 guild_was_active = ui_elements["guild_dialog"].is_active
-                dungeon = handle_game(screen, events, player, dungeon, ui_elements, game_state)
+                dungeon = handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=dt)
                 
                 # ギルドメニューが閉じられたらマップを最新化（クエスト対象反映のため）
                 if guild_was_active and not ui_elements["guild_dialog"].is_active:
@@ -334,7 +335,7 @@ def main():
                 handle_opening(screen, events, game_state, opening_imgs, dummy_start, ui_elements, story_data)
 
             pygame.display.flip()
-            clock.tick(60)
+            # clock.tick(60) is moved to the top of the loop to calculate dt
 
     except Exception as e:
         print(f"[Fatal Error] {e}")

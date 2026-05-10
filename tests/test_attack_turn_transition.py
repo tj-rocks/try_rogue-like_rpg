@@ -65,11 +65,15 @@ def test_attack_turn_transition():
     # 攻撃アニメーションが終わるまで update を回す
     from constants import ATTACK_ANIMATION_FRAMES
     # 複数フレーム回して、is_attacking が False になるのを待つ
-    for i in range(ATTACK_ANIMATION_FRAMES + 10):
+    for i in range(ATTACK_ANIMATION_FRAMES + 100): # 十分なフレーム数回す
         # update 内で is_paused() をチェックしているので、モックのダイアログは非アクティブにしておく
         dialog_mock = MagicMock()
         dialog_mock.is_active = False 
-        player.update(dungeon, dialog=dialog_mock, events=[])
+        player.update(dungeon, dt=1/60, dialog=dialog_mock, events=[])
+        # 敵の点滅タイマーを減らすために更新を呼ぶ
+        for e in dungeon.enemies:
+            e.update_animation(dt=1/60)
+            
         if not player.is_attacking and game_state["turn_state"] == "enemies":
             break
         
