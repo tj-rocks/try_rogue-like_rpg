@@ -82,6 +82,7 @@ _p = _balance.get("PLAYER", {})
 PLAYER_HP           = _p.get("max_hp", 100)
 PLAYER_ATTACK       = _p.get("attack", 5)
 PLAYER_DEFENSE      = _p.get("defense", 5)
+PLAYER_MOVE_SPEED   = 300 # 1秒あたりの移動ピクセル数（フレームレートに依存しなくなりました）
 PLAYER_COIN         = _p.get("initial_coin", 100)
 PLAYER_ORE          = _p.get("initial_ore", 0)
 MAX_ITEM_SLOTS      = _p.get("max_item_slots", 20)
@@ -248,7 +249,8 @@ RANK_FLOOR_MAP = generate_rank_floor_map(GUILD_RANKS)
 # --- 各種データの正規化読み込み ---
 # Data Source: components/data/master/ (enemies.json, obstacles.yml, equipment.json, items.json)
 ENEMY_DATA = get_normalized_enemy_data(RANK_FLOOR_MAP)
-WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, WEAPON_TYPES = get_normalized_equipment_data(RANK_FLOOR_MAP)
+WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, WEAPON_CATEGORIES, ARMOR_CATEGORIES, SHIELD_CATEGORIES = get_normalized_equipment_data(RANK_FLOOR_MAP)
+WEAPON_TYPES = WEAPON_CATEGORIES # 後方互換性
 CONSUMABLE_DATA, STAVE_DATA, LANTERN_DATA = get_normalized_item_data(RANK_FLOOR_MAP)
 
 # --- その他のマスタデータ ---

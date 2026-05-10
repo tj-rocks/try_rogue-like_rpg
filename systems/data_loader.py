@@ -35,9 +35,11 @@ def load_data_file(filepath, default=None):
 
 # パス設定
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# パス設定（他のPCでも動くよう、実行ファイルからの相対パスで算出）
-_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_official.json")
+SAVE_DIR = os.path.join(_ROOT, "components/data/savefile")
+if not os.path.exists(SAVE_DIR):
+    os.makedirs(SAVE_DIR, exist_ok=True)
+
+SAVE_OFFICIAL_PATH = os.path.join(SAVE_DIR, "save_official.json")
 
 # [NEW] テストモード時はさらに優先して別ファイルにする
 if os.environ.get("TEST_MODE") == "1":
@@ -189,7 +191,7 @@ def get_normalized_equipment_data(floor_map):
     apply_rank_floor_logic(normalized_armor, floor_map)
     apply_rank_floor_logic(normalized_shields, floor_map)
     
-    return normalized_weapons, normalized_armor, normalized_shields, raw_weapons.get("WEAPON_TYPES", {})
+    return normalized_weapons, normalized_armor, normalized_shields, weapon_categories, armor_categories, shield_categories
 
 def get_normalized_item_data(floor_map):
     """消費アイテム・杖などのデータを読み込み、階層設定を適用して返す"""

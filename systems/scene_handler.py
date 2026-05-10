@@ -19,14 +19,13 @@ def handle_opening(screen, events, game_state, opening_imgs, start_new_game_func
         from systems.ui import draw_opening_scene
         draw_opening_scene(screen, opening_imgs[idx], game_state["opening_alpha"])
 
-    # 2. テキストとBGMの管理
+    # 2. テキストとBGM의 管理
     dialog = ui_elements["dialog"]
     text = ""
     if story_data and "opening" in story_data:
         page_data = story_data["opening"].get(idx + 1) or story_data["opening"].get(str(idx + 1))
         if page_data:
             text = page_data.get("text", "")
-            # まだダイアログにこのテキストが設定されていなければ設定
             if dialog.text != text:
                 dialog.text = text
                 dialog.is_active = True
@@ -50,7 +49,6 @@ def handle_opening(screen, events, game_state, opening_imgs, start_new_game_func
     skip = False
     for event in events:
         if event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_z):
-            # ダイアログが表示中なら、ダイアログ側でイベントが処理されて非表示になる
             if not dialog.is_active:
                 skip = True
     
@@ -156,7 +154,7 @@ def handle_title(screen, events, game_state, title_bg, has_save, start_new_game_
     
     return game_state["current_scene"]
 
-def handle_game(screen, events, player, dungeon, ui_elements, game_state):
+def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
     """
     ゲーム本編（探索・戦闘）のロジックを処理する。
     """
@@ -174,18 +172,17 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state):
     
     screen.fill((0, 0, 0))
     
-    # --- 1. ロジック更新フェーズ (全ての座標確定をここで行う) ---
+    # --- 1. ロジック更新フェーズ ---
     
     # 1-1. プレイヤーの基本更新 (移動、入力、攻撃)
-    player.update(dungeon, ui_elements["dialog"], events)
+    player.update(dungeon, dt, ui_elements["dialog"], events)
     
     # 1-2. エンティティ更新（敵の思考、アイテム取得、罠判定など）
-    # ポーズ中や死亡演出中でなければ実行
     new_dungeon = dungeon
     is_death_active = game_state.get("death_sequence_step", 0) > 0
-    if not is_paused() and not is_death_active:
+    if not is_paused() and not is_death_active and not player.is_dead:
         # 敵の更新、アイテム取得判定
-        update_dungeon_entities(dungeon, player, ui_elements["dialog"])
+        update_dungeon_entities(dungeon, player, dt, ui_elements["dialog"])
         
         # 罠・階段・特殊イベントの判定
         if not player.is_falling:
@@ -198,9 +195,9 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state):
     if ui_elements.get("cutscene_manager"):
         ui_elements["cutscene_manager"].update()
 
-    # --- 2. 描画フェーズ (確定した座標に基づいてカメラを固定) ---
+    # --- 2. 描画フェーズ ---
 
-    # 2-1. 最新の座標に基づいてカメラを計算 (ここがズレるとガタつく)
+    # 2-1. 最新の座標に基づいてカメラを計算
     camera_x = int(player.x - (SCREEN_WIDTH / 2) + (player.width / 2) + dungeon.shake_offset[0])
     camera_y = int(player.y - (SCREEN_HEIGHT / 2) + (player.height / 2) + dungeon.shake_offset[1])
     
@@ -215,7 +212,6 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state):
     # 2-3. プレイヤーと視界の描画
     player.draw(screen, camera_x, camera_y)
     draw_vision_overlay(screen, player, new_dungeon)
-
         
     # UIの描画
     if ui_elements.get("status_bar"):
@@ -232,7 +228,7 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state):
                 dungeon=new_dungeon, events=events,
                 cutscene_manager=ui_elements.get("cutscene_manager"))
     
-    # [FIX] ダイアログ誤爆防止フラグを、1フレーム経過したのでリセットする
+    # [FIX] ダイアログ誤爆防止フラグのリセット
     if game_state.get("dialog_just_closed"):
         game_state["dialog_just_closed"] = False
     
