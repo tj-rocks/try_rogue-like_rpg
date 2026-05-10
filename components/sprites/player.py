@@ -1169,16 +1169,35 @@ class Player(Entity):
                 self._execute_strike(dungeon, dialog)
 
     def update(self, dungeon, dialog=None, events=[]):
-        """旧来の互換性、および単体更新用のメソッド"""
-        self.update_animation(dungeon, dialog)
+        """プレイヤーの状態更新（入力、アニメーション、移動、ターン管理）を行う"""
         from systems.game_state import is_paused, game_state
         
-        # 攻撃や杖の使用などのアニメーション終了を待ってから敵のターンを開始する
-        if not is_paused() and not self.is_attacking and getattr(self, "enemy_turn_pending", False):
+        if self.is_falling:
+            self.falling_timer -= 1
+            return
+
+        # 1. 入力処理（プレイヤーのターン中のみ）
+        if not is_paused() and game_state["turn_state"] == "player":
+            self.operate(dungeon, dialog, events) 
+
+        # 2. アニメーション更新
+        self.update_animation(dungeon, dialog) 
+
+        # 3. 移動処理（グリッド間移動の補間など）
+        self.process_movement()
+
+        # 4. 敵のターンへの遷移判定
+        # 攻撃・移動アニメーション、ダイアログ表示、および敵のダメージ演出がすべて終わってから開始する
+        is_any_enemy_damaged = any(e.damage_flash_timer > 0 for e in dungeon.enemies)
+        if (not is_paused() and 
+            not self.is_attacking and 
+            not self.is_moving and 
+            not (dialog and dialog.is_active) and 
+            not is_any_enemy_damaged and 
+            getattr(self, "enemy_turn_pending", False)):
+            
             self.start_enemy_turn(dungeon)
 
-        if not is_paused() and game_state["turn_state"] == "player":
-            self.operate(dungeon, dialog, events)
         game_state["dialog_just_closed"] = False
 
     def get_item_count(self):
