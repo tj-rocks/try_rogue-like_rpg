@@ -62,7 +62,11 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 "armor": armor,
                 "shields": shields,
                 "raw_enemies": load_master_data("enemies.yml"),
-                "raw_equipment": load_master_data("equipment.yml")
+                "raw_equipment": {
+                    **load_master_data("weapons.yml"),
+                    **load_master_data("armors.yml"),
+                    **load_master_data("shields.yml")
+                }
             }
             self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
         else:
@@ -81,7 +85,28 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             param = post_data.get("param")
             value = post_data.get("value")
             
-            filename = f"{file_type}.yml"
+            if file_type == "equipment":
+                weapons_raw = load_master_data("weapons.yml")
+                armors_raw = load_master_data("armors.yml")
+                shields_raw = load_master_data("shields.yml")
+                
+                if "WEAPON_DATA" in weapons_raw and target_id in weapons_raw["WEAPON_DATA"]:
+                    filename = "weapons.yml"
+                elif "WEAPON_CATEGORIES" in weapons_raw and target_id in weapons_raw["WEAPON_CATEGORIES"]:
+                    filename = "weapons.yml"
+                elif "ARMOR_DATA" in armors_raw and target_id in armors_raw["ARMOR_DATA"]:
+                    filename = "armors.yml"
+                elif "ARMOR_CATEGORIES" in armors_raw and target_id in armors_raw["ARMOR_CATEGORIES"]:
+                    filename = "armors.yml"
+                elif "SHIELD_DATA" in shields_raw and target_id in shields_raw["SHIELD_DATA"]:
+                    filename = "shields.yml"
+                elif "SHIELD_CATEGORIES" in shields_raw and target_id in shields_raw["SHIELD_CATEGORIES"]:
+                    filename = "shields.yml"
+                else:
+                    filename = "equipment.yml"
+            else:
+                filename = f"{file_type}.yml"
+                
             raw_data = load_master_data(filename)
             
             # 数値変換
@@ -102,7 +127,16 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 updated = False
                 in_data_section = False
                 in_target_block = False
-                section_key = "ENEMY_DATA:" if file_type == "enemies" else "WEAPON_DATA:" if file_type == "weapons" else None
+                if filename == "enemies.yml":
+                    section_key = "ENEMY_DATA:"
+                elif filename == "weapons.yml":
+                    section_key = "WEAPON_DATA:"
+                elif filename == "armors.yml":
+                    section_key = "ARMOR_DATA:"
+                elif filename == "shields.yml":
+                    section_key = "SHIELD_DATA:"
+                else:
+                    section_key = None
                 
                 new_lines = []
                 for line in lines:
@@ -155,7 +189,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                         raw_data[section][target_id][param] = value
                         updated = True; break
             elif file_type == "equipment":
-                for section in ["WEAPON_DATA", "ARMOR_DATA", "SHIELD_DATA", "WEAPON_CATEGORIES", "ARMOR_CATEGORIES"]:
+                for section in ["WEAPON_DATA", "WEAPON_CATEGORIES", "ARMOR_DATA", "ARMOR_CATEGORIES", "SHIELD_DATA", "SHIELD_CATEGORIES"]:
                     if section in raw_data and target_id in raw_data[section]:
                         raw_data[section][target_id][param] = value
                         updated = True; break

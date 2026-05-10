@@ -14,7 +14,7 @@ from constants import *
 from components.sprites.player import Player, EquipInstance
 from components.sprites.enemy import Enemy
 from systems.dungeon import warp_to_floor
-from systems.scene_handler import handle_game
+from systems.scene_handler import handle_game, handle_ending, handle_opening
 from systems.session_handler import init_ui_elements, setup_ui_relations
 from systems.resources import font_small, font_medium
 from systems.events import handle_events, active_direction_keys
@@ -246,7 +246,8 @@ def main():
         dungeon = setup_gungeon_mode(dungeon, player)
         
         ui_elements = init_ui_elements(SCREEN_WIDTH, SCREEN_HEIGHT)
-        game_state = {"dialog_modal": False, "current_scene": "game", "is_debug_mode": True}
+        from systems.game_state import game_state
+        game_state.update({"dialog_modal": False, "current_scene": "game", "is_debug_mode": True})
         setup_ui_relations(ui_elements, player, dungeon, game_state)
 
         clock = pygame.time.Clock()
@@ -313,15 +314,25 @@ def main():
             # 常に全表示
             dungeon.is_lighted = True
             
-            # ゲーム本編
-            guild_was_active = ui_elements["guild_dialog"].is_active
-            dungeon = handle_game(screen, events, player, dungeon, ui_elements, game_state)
+            scene = game_state.get("current_scene", "game")
             
-            # ギルドメニューが閉じられたらマップを最新化（クエスト対象反映のため）
-            if guild_was_active and not ui_elements["guild_dialog"].is_active:
-                dungeon = setup_gungeon_mode(dungeon, player)
-            
-            draw_debug_overlay(screen, dungeon, player)
+            if scene == "game":
+                guild_was_active = ui_elements["guild_dialog"].is_active
+                dungeon = handle_game(screen, events, player, dungeon, ui_elements, game_state)
+                
+                # ギルドメニューが閉じられたらマップを最新化（クエスト対象反映のため）
+                if guild_was_active and not ui_elements["guild_dialog"].is_active:
+                    dungeon = setup_gungeon_mode(dungeon, player)
+                
+                draw_debug_overlay(screen, dungeon, player)
+            elif scene == "ending":
+                from systems.resources import ending_imgs, story_data
+                handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_data)
+            elif scene == "opening":
+                from systems.resources import opening_imgs, story_data
+                def dummy_start(): pass
+                handle_opening(screen, events, game_state, opening_imgs, dummy_start, ui_elements, story_data)
+
             pygame.display.flip()
             clock.tick(60)
 

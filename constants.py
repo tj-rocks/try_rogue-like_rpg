@@ -14,10 +14,13 @@ from systems.data_loader import (
 # 🎮 1. システム・操作設定 (System & Input)
 # ==============================================================================
 
-GAME_TITLE = "Rogue-like Expedition"
+GAME_TITLE = "泰時の大冒険"
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 900
 TILE_SIZE = 64
+
+# --- デバッグ・ログ設定 ---
+ENABLE_DEBUG_LOGGING = True  # Falseにすると全print出力がミュートされ、パフォーマンスが向上します
 
 # --- BGM設定 ---
 BGM_TITLE   = "components/sounds/bgm/winding_adventure.mp3"

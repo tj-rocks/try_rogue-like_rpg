@@ -38,35 +38,17 @@
 # quests.yml の FIXED_QUESTS に、そのボスのIDを target_key とした討伐（hunt）クエストを追加する。
 
 FIXED_QUESTS:
-# - id: tutorial_hunt
-#   min_rank: F
-#   max_rank: D
-#   type: hunt
-#   target_key: slime
-#   amount: 3
-#   reward_gold: 150
-#   reward_gp: 15
-#   title: 【常設】スライムの間引き依頼
-# - id: iron_delivery
-#   min_rank: E
-#   max_rank: C
-#   type: delivery
-#   target_key: iron_ore
-#   amount: 2
-#   reward_gold: 800
-#   reward_gp: 30
-#   title: 【常設】鉄鉱石の緊急調達
-
-# --- 以下、ボス討伐クエストのテンプレート ---
-- id: boss_hunt_suisui_slime
-  min_rank: F
-  max_rank: D
-  type: hunt
-  target_key: suisui_slime
-  amount: 1
-  reward_gold: 500
-  reward_gp: 5
-  title: スイスイスライムの討伐
-  repeatable: true
-  chance: 1.0
+  # --- 以下、ボス討伐クエスト ---
+  - id: boss_hunt_suisui_slime
+    min_rank: F
+    max_rank: D
+    type: hunt
+    target_key: suisui_slime
+    amount: 1
+    reward_gold: 500
+    reward_gp: 5
+    title: スイスイスライムの討伐
+    repeatable: true
+    chance: 1.0
+    ending: true
 

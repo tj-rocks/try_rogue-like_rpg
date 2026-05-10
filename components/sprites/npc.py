@@ -3,6 +3,16 @@ from components.sprites.entity import Entity
 from wordings import Text
 
 class NPC(Entity):
+    _npc_scaled_cache = {} # {(img_obj, phase): surface}
+
+    @classmethod
+    def clear_cache(cls):
+        """蓄積されたNPC画像キャッシュをクリアする"""
+        count = len(cls._npc_scaled_cache)
+        cls._npc_scaled_cache = {}
+        if count > 0:
+            print(f"[MEMORY] NPC scaled image cache cleared ({count} items)")
+
     def __init__(self, name, x, y, sprite_type="villager", dialogue=[], image_path=None, base_image_path=None):
         # NPCもEntityを継承して移動や描画の基本機能を持たせる
         # とりあえず固定位置にいるので move_speed=0
@@ -79,11 +89,18 @@ class NPC(Entity):
             pygame.draw.rect(img, self.color, (4, 4, self.width - 8, self.height - 8))
 
         # 3. 呼吸（スケーリング）の計算（共通メソッドを使用）
-        scale_x, scale_y = self.get_breathing_scale()
+        (scale_x, scale_y), phase = self.get_breathing_scale()
         
-        # スケーリングの適用
-        orig_w, orig_h = img.get_size()
-        img = pygame.transform.smoothscale(img, (int(orig_w * scale_x), int(orig_h * scale_y)))
+        # --- [OPTIMIZED] NPCのスケーリングキャッシュ利用 ---
+        cache_key = (img, phase)
+        cached_img = NPC._npc_scaled_cache.get(cache_key)
+        
+        if cached_img is None:
+            w, h = img.get_size()
+            cached_img = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
+            NPC._npc_scaled_cache[cache_key] = cached_img
+            
+        img = cached_img
         
         # 足元を基準に位置を調整（浮かないようにする）
         draw_x_scaled = draw_x + (self.width - img.get_width()) / 2

@@ -22,3 +22,14 @@ from constants import (
 from components.sprites.enemy import Enemy
 from components.sprites.player import Player
 from systems.dungeon import Dungeon, warp_to_floor
+
+# --- グローバル・ログ出力の制御 ---
+import builtins
+from constants import ENABLE_DEBUG_LOGGING
+
+if not ENABLE_DEBUG_LOGGING:
+    # デバッグログが無効な場合、print関数を空の関数に置き換えて出力と負荷をゼロにする
+    _original_print = builtins.print
+    def _dummy_print(*args, **kwargs):
+        pass
+    builtins.print = _dummy_print

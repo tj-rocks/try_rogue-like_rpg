@@ -11,7 +11,8 @@ from constants import (
     PLAYER_WEAPON, WEAPON_DATA, PLAYER_DEFENSE, PLAYER_ARMOR, ARMOR_DATA, ARMOR_COLORS,
     PLAYER_SHIELD, SHIELD_DATA, SHIELD_COLORS, PLAYER_ORE,
     MAX_ITEM_SLOTS, MAX_EQUIP_SLOTS, MAX_STAVE_SLOTS,
-    STAVE_DATA, HIT_STUN_DURATION, SOUND_ATTACK_HIT, SOUND_ATTACK_MISS
+    STAVE_DATA, HIT_STUN_DURATION, SOUND_ATTACK_HIT, SOUND_ATTACK_MISS,
+    ENABLE_DEBUG_LOGGING
 )
 
 # 装備品インスタンス管理用カウンター（ゲーム全体でユニークなID）
@@ -110,11 +111,7 @@ class EquipInstance:
         else:
             bonus = growth_room + (self.enhance - times_limit) * over_per_step
 
-        # 攻撃・防御・HPなどの主要ステータスは整数で返す（切り捨て）
-        if stat_key in ["attack_bonus", "defense_bonus", "hp_bonus"]:
-            import math
-            return math.floor(bonus)
-            
+        # 強化ボーナスをそのまま返す (UI側で表示を制御)
         return round(bonus, 3)
 
     def get_name(self):
@@ -210,6 +207,16 @@ player_settings = {
 }
 
 class Player(Entity):
+    _player_scaled_cache = {} # {(img_obj, phase, tint, is_back): surface}
+
+    @classmethod
+    def clear_cache(cls):
+        """蓄積されたプレイヤー関連のスケーリング済み画像をクリアする"""
+        count = len(cls._player_scaled_cache)
+        cls._player_scaled_cache = {}
+        if count > 0:
+            print(f"[MEMORY] Player scaled image cache cleared ({count} items)")
+
     @property
     def total_attack(self):
         """基本攻撃力 + 装備ボーナス(武器・鎧・盾)の合計"""
@@ -233,8 +240,8 @@ class Player(Entity):
         if shield_inst:
             bonus += shield_inst.get_stat("attack_bonus", 0)
             
-        # 最終的に整数にキャストして返す（HUD表示対策）
-        return int(self.attack + bonus)
+        # 小数点第1位まで有効にする
+        return round(self.attack + bonus, 1)
 
     @property
     def max_hp(self):
@@ -341,12 +348,20 @@ class Player(Entity):
         """基本防御力 + 装備ボーナスの合計"""
         bonus = 0
         armor_inst = self._find_equip_inst(self.armor_inventory, self.equipped_armor)
-        if armor_inst: bonus += armor_inst.get_stat("defense_bonus", 0) + armor_inst.get_enhance_bonus("defense_bonus")
+        if armor_inst: 
+            a_stat = armor_inst.get_stat("defense_bonus", 0)
+            a_enh = armor_inst.get_enhance_bonus("defense_bonus")
+            bonus += a_stat + a_enh
         
         shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
-        if shield_inst: bonus += shield_inst.get_stat("defense_bonus", 0) + shield_inst.get_enhance_bonus("defense_bonus")
+        if shield_inst: 
+            s_stat = shield_inst.get_stat("defense_bonus", 0)
+            s_enh = shield_inst.get_enhance_bonus("defense_bonus")
+            bonus += s_stat + s_enh
         
-        return int(self.defense + bonus)
+        return round(self.defense + bonus, 1)
+
+
 
     @property
     def block_chance_close(self):
@@ -552,7 +567,7 @@ class Player(Entity):
                 target_y = self.y + dy
                 
                 all_entities = [self] + dungeon.enemies + dungeon.npcs
-                if self.can_move_grid(target_x, target_y, dungeon, all_entities):
+                if self.can_move_grid(target_x, target_y, dungeon):
                     self.prev_x = self.x
                     self.prev_y = self.y
                     self.target_x = target_x
@@ -560,6 +575,11 @@ class Player(Entity):
                     self.is_moving = True
                     # ミニマップの探索範囲を更新
                     dungeon.reveal_area(target_x // dungeon.tile_size, target_y // dungeon.tile_size)
+                    
+                    import time
+                    t = time.perf_counter()
+                    key_name = {KEY_MOVE_UP: "UP", KEY_MOVE_DOWN: "DOWN", KEY_MOVE_LEFT: "LEFT", KEY_MOVE_RIGHT: "RIGHT"}.get(latest_key, "UNKNOWN")
+                    print(f"[TIME][{t:.4f}] Player Move Start: ({self.x // dungeon.tile_size}, {self.y // dungeon.tile_size}) -> ({target_x // dungeon.tile_size}, {target_y // dungeon.tile_size}) | Key: {key_name}")
                     
                     # 移動後のグリッド座標でログを出力 (階層、HP、状態異常、入力キーも付加)
                     key_name = {KEY_MOVE_UP: "UP", KEY_MOVE_DOWN: "DOWN", KEY_MOVE_LEFT: "LEFT", KEY_MOVE_RIGHT: "RIGHT"}.get(latest_key, "UNKNOWN")
@@ -590,6 +610,7 @@ class Player(Entity):
     def start_enemy_turn(self, dungeon):
         """敵のターン（思考・行動）を初期化して開始する。同時行動時と通常時で共通。"""
         from systems.game_state import game_state
+        print(f"[TURN] Starting Enemy Turn (Player action finished)")
         game_state["turn_state"] = "enemies"
         game_state["current_enemy_idx"] = 0
         self.enemy_turn_pending = False
@@ -644,6 +665,12 @@ class Player(Entity):
             self.equipped_weapon = inst.iid
             self.weapon = new_weapon
 
+    def set_facing(self, direction):
+        """向きを設定し、必要ならアニメーションをリセットする"""
+        if self.facing != direction:
+            self.facing = direction
+            self.walk_anim_timer = 0
+
     def equip_weapon_by_key(self, weapon_key):
         if weapon_key not in WEAPON_DATA: return None
         from constants import MAX_EQUIP_SLOTS
@@ -690,7 +717,7 @@ class Player(Entity):
             return
             
         bonus = data.get("defense_bonus", 0) + inst.enhance
-        self.defense = PLAYER_DEFENSE + bonus
+        # self.defense = PLAYER_DEFENSE + bonus  <-- REMOVED: Rely on total_defense property
         
         # 防具画像のロード
         self._armor_images = {}
@@ -729,12 +756,12 @@ class Player(Entity):
 
     def unequip_armor(self):
         self.equipped_armor = None
-        self.defense = PLAYER_DEFENSE
+        # self.defense = PLAYER_DEFENSE  <-- REMOVED: Rely on total_defense property
         self._armor_images = {}
 
     def unequip_shield(self):
         self.equipped_shield = None
-        self.block_chance = 0.0
+        # self.block_chance = 0.0  <-- REMOVED: Rely on block_chance_close/ranged properties
         self._shield_images = {}
 
     def change_lantern(self, iid):
@@ -824,7 +851,7 @@ class Player(Entity):
     def _apply_shield(self, inst):
         self.equipped_shield = inst.iid
         data = SHIELD_DATA[inst.key]
-        self.block_chance = data.get("block_chance", 0.0)
+        # self.block_chance = data.get("block_chance", 0.0)  <-- REMOVED: Rely on properties
         self._shield_images = {}
         import os
         img_dir = data.get("image_dir", "")
@@ -874,13 +901,23 @@ class Player(Entity):
     def _draw_armor_overlay(self, screen, draw_x, draw_y, scale_x=1.0, scale_y=1.0, tint_color=None):
         img = getattr(self, "_armor_images", {}).get(self.facing)
         if img:
-            if scale_x != 1.0 or scale_y != 1.0:
-                w, h = img.get_size()
-                img = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
+            # --- [OPTIMIZED] 鎧のスケーリングキャッシュ利用 ---
+            # 呼吸フェーズを取得
+            _, phase = self.get_breathing_scale()
+            cache_key = (img, phase, tint_color, "armor")
+            cached_img = Player._player_scaled_cache.get(cache_key)
             
-            if tint_color:
-                img = img.copy()
-                img.fill((*tint_color, 255), special_flags=pygame.BLEND_RGBA_MULT)
+            if cached_img is None:
+                # スケーリング
+                w, h = img.get_size()
+                scaled = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
+                # 着色
+                if tint_color:
+                    scaled.fill((*tint_color, 255), special_flags=pygame.BLEND_RGBA_MULT)
+                cached_img = scaled
+                Player._player_scaled_cache[cache_key] = cached_img
+            
+            img = cached_img
             
             # スケーリングによる座標補正（プレイヤー本体の 984-985行目と同様の計算が必要）
             # 渡された draw_x, draw_y は「キャラの基本枠(self.width, self.height)の左上」であると定義し直す
@@ -911,20 +948,30 @@ class Player(Entity):
         
         img = getattr(self, "_shield_images", {}).get(self.facing)
         if img:
-            if scale_x != 1.0 or scale_y != 1.0:
+            # --- [OPTIMIZED] 盾のスケーリングキャッシュ利用 ---
+            _, phase = self.get_breathing_scale()
+            cache_key = (img, phase, tint_color, "shield", is_back)
+            cached_img = Player._player_scaled_cache.get(cache_key)
+            
+            if cached_img is None:
+                # スケーリング
                 w, h = img.get_size()
-                img = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
+                scaled = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
+                # 背面なら暗くする
+                if is_back:
+                    scaled.fill((150, 150, 150), special_flags=pygame.BLEND_RGBA_MULT)
+                # 毒などの着色
+                if tint_color:
+                    scaled.fill((*tint_color, 255), special_flags=pygame.BLEND_RGBA_MULT)
+                cached_img = scaled
+                Player._player_scaled_cache[cache_key] = cached_img
+            
+            draw_img = cached_img
             
             shield_data = SHIELD_DATA.get(shield_key, {})
             pos_config = shield_data.get("position", {})
             offsets_dict = pos_config.get("offsets", shield_data.get("offsets", {}))
             offsets = offsets_dict.get(self.facing, (0, 0))
-            draw_img = img.copy()
-            if is_back:
-                draw_img.fill((150, 150, 150), special_flags=pygame.BLEND_RGBA_MULT)
-            
-            if tint_color:
-                draw_img.fill((*tint_color, 255), special_flags=pygame.BLEND_RGBA_MULT)
             
             off_x, off_y = offsets[0] * scale_x, offsets[1] * scale_y
             screen.blit(draw_img, (draw_x + off_x, draw_y + off_y))
@@ -982,13 +1029,33 @@ class Player(Entity):
             frame_index = (self.walk_anim_timer // step_duration) % total_frames
             img = self.walk_images[self.facing][frame_index]
 
+        # 毒状態のカラー設定
+        poison_tint = None
+        if self.condition == "poison":
+            from constants import STATUS_EFFECTS
+            tint_data = STATUS_EFFECTS.get("poison", {}).get("color_tint", [180, 100, 255])
+            if tint_data:
+                poison_tint = tuple(tint_data)
+
         # スケーリングの適用 (攻撃時の拡大は廃止、呼吸エフェクトのみ適用)
-        final_scale_x = scale_x
-        final_scale_y = scale_y
+        (final_scale_x, final_scale_y), phase = self.get_breathing_scale()
         
-        orig_w, orig_h = img.get_size()
-        img = pygame.transform.smoothscale(img, (int(orig_w * final_scale_x), int(orig_h * final_scale_y)))
+        # --- [OPTIMIZED] プレイヤー本体のキャッシュ利用 ---
+        cache_key = (img, phase, poison_tint, False)
+        cached_img = Player._player_scaled_cache.get(cache_key)
         
+        if cached_img is None:
+            # スケーリング
+            w, h = img.get_size()
+            scaled = pygame.transform.smoothscale(img, (int(w * final_scale_x), int(h * final_scale_y)))
+            # 着色
+            if poison_tint:
+                scaled.fill((*poison_tint, 255), special_flags=pygame.BLEND_RGBA_MULT)
+            cached_img = scaled
+            Player._player_scaled_cache[cache_key] = cached_img
+        
+        img = cached_img # キャッシュされた画像（スケーリング＆着色済み）を使用
+
         # 足元を基準に位置を調整
         draw_x += (self.width - img.get_width()) / 2
         draw_y += (self.height - img.get_height())
@@ -1023,15 +1090,11 @@ class Player(Entity):
         
         shield_over = {"up": False, "down": True, "left": True, "right": False}.get(self.facing, True)
         
-        # 毒状態のカラー設定
-        poison_tint = None
-        if self.condition == "poison":
-            from constants import STATUS_EFFECTS
-            poison_tint = STATUS_EFFECTS.get("poison", {}).get("color_tint", [180, 100, 255])
+        # 毒状態のカラー設定は冒頭へ移動しました
 
         # --- 2. 描画実行 ---
         # オーバーレイ描画（鎧・盾）
-        # 这里で渡す draw_x, draw_y は、スケーリング補正前の「ベースの左上座標」である必要がある
+        # ここで渡す draw_x, draw_y は、スケーリング補正前の「ベースの左上座標」である必要がある
         base_draw_x = self.x - camera_x
         base_draw_y = self.y - camera_y
         if self.is_attacking:
@@ -1087,10 +1150,17 @@ class Player(Entity):
             is_over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
             if is_over: self.weapon.draw_idle(screen, center_x, center_y, self.facing, scale_x=final_scale_x, scale_y=final_scale_y)
 
-    def update_animation(self, dungeon, dialog):
+    def update_animation(self, dungeon, dialog=None):
+        """アニメーション（移動・攻撃）の更新のみを行う"""
+        if self.is_falling:
+            self.falling_timer -= 1
+            return
+            
+        from constants import ATTACK_ANIMATION_FRAMES
         prev_progress = 0
         if self.is_attacking:
             prev_progress = (ATTACK_ANIMATION_FRAMES - self.attack_timer) / ATTACK_ANIMATION_FRAMES
+            
         super().update_animation()
         
         if self.is_attacking:
@@ -1098,20 +1168,36 @@ class Player(Entity):
             if prev_progress < 0.1 <= new_progress:
                 self._execute_strike(dungeon, dialog)
 
-    def update(self, screen, camera_x, camera_y, dungeon, dialog=None, events=[]):
-        from systems.game_state import game_state
+    def update(self, dungeon, dialog=None, events=[]):
+        """プレイヤーの状態更新（入力、アニメーション、移動、ターン管理）を行う"""
+        from systems.game_state import is_paused, game_state
+        
         if self.is_falling:
             self.falling_timer -= 1
             return
+
+        # 1. 入力処理（プレイヤーのターン中のみ）
         if not is_paused() and game_state["turn_state"] == "player":
             self.operate(dungeon, dialog, events) 
+
+        # 2. アニメーション更新
         self.update_animation(dungeon, dialog) 
-        # 攻撃・移動アニメーション、ダイアログ表示、および敵のダメージ演出がすべて終わってから敵のターンを開始する
+
+        # 3. 移動処理（グリッド間移動の補間など）
+        self.process_movement()
+
+        # 4. 敵のターンへの遷移判定
+        # 攻撃・移動アニメーション、ダイアログ表示、および敵のダメージ演出がすべて終わってから開始する
         is_any_enemy_damaged = any(e.damage_flash_timer > 0 for e in dungeon.enemies)
-        if not self.is_attacking and not self.is_moving and not (dialog and dialog.is_active) and not is_any_enemy_damaged and getattr(self, "enemy_turn_pending", False):
+        if (not is_paused() and 
+            not self.is_attacking and 
+            not self.is_moving and 
+            not (dialog and dialog.is_active) and 
+            not is_any_enemy_damaged and 
+            getattr(self, "enemy_turn_pending", False)):
+            
             self.start_enemy_turn(dungeon)
 
-        self.draw(screen, camera_x, camera_y)
         game_state["dialog_just_closed"] = False
 
     def get_item_count(self):
@@ -1219,12 +1305,17 @@ class Player(Entity):
         return ""
     def is_quest_reportable(self, q):
         """指定された依頼が報告可能（達成済み）かチェックする"""
+        target_key = q.get("target_key")
+        if not target_key:
+            # target_key が設定されていないクエストは報告不可（データ不備への安全対策）
+            return False
+            
         if q.get("type") == "hunt":
-            return getattr(self, "quest_tokens", {}).get(q["target_key"], 0) >= q.get("amount", 1)
+            return getattr(self, "quest_tokens", {}).get(target_key, 0) >= q.get("amount", 1)
         elif q.get("type") == "delivery":
             # 通常アイテムとイベントアイテムの両方をチェック
-            normal_count = sum(item["count"] for item in self.items if item["key"] == q["target_key"])
-            event_count = sum(item["count"] for item in self.event_items if item["key"] == q["target_key"])
+            normal_count = sum(item["count"] for item in self.items if item["key"] == target_key)
+            event_count = sum(item["count"] for item in self.event_items if item["key"] == target_key)
             return (normal_count + event_count) >= q.get("amount", 1)
         return False
 
@@ -1286,9 +1377,9 @@ class Player(Entity):
 
             for e in dungeon.enemies:
                 if getattr(e, "is_dead", False): continue
-                ex = int((e.x + dungeon.tile_size / 2) // dungeon.tile_size)
-                egy = int((e.y + dungeon.tile_size / 2) // dungeon.tile_size)
-                if ex == tgx and egy == tgy:
+                # 敵が占有している全マスを取得
+                enemy_grids = e.get_occupied_grids(dungeon.tile_size)
+                if (tgx, tgy) in enemy_grids:
                     msg, damage, is_crit, is_miss = deal_damage(self, e)
                     
                     from systems.sound_handler import sound_manager
@@ -1395,7 +1486,7 @@ class Player(Entity):
     def to_dict(self):
         return {
             "x": self.x, "y": self.y,
-            "hp": self.hp, "max_hp": self.max_hp, "coin": self.coin, "bank_coin": getattr(self, "bank_coin", 0), "attack": self.attack,
+            "hp": self.hp, "max_hp": self.max_hp, "coin": self.coin, "bank_coin": getattr(self, "bank_coin", 0), "attack": self.attack, "defense": self.defense,
             "items": [dict(it) for it in self.items],
             "weapon_inventory": [eq.to_dict() for eq in getattr(self, "weapon_inventory", [])],
             "armor_inventory": [eq.to_dict() for eq in getattr(self, "armor_inventory", [])],
@@ -1416,6 +1507,7 @@ class Player(Entity):
             "warehouse_items": getattr(self, "warehouse_items", []),
             "event_items": getattr(self, "event_items", []),
             "current_floor": getattr(self, "current_floor", 0),
+            "prev_floor": getattr(self, "prev_floor", 0),
             "equip_id_counter": globals().get("_equip_id_counter", 0),
         }
 
@@ -1427,6 +1519,7 @@ class Player(Entity):
         self.coin = int(data.get("coin", self.coin))
         self.bank_coin = int(data.get("bank_coin", 0))
         self.attack = int(data.get("attack", self.attack))
+        self.defense = int(data.get("defense", self.defense))
         raw_items = data.get("items", [])
         self.items = []
         if isinstance(raw_items, list):
@@ -1471,12 +1564,19 @@ class Player(Entity):
         self.guild_point = int(data.get("guild_point", 0))
         self.guild_rank = data.get("guild_rank", "F")
         self.active_quests = data.get("active_quests", [])
+        # [COMPAT] 古いセーブデータに報酬情報が欠けている場合にデフォルト値で補正する
+        for q in self.active_quests:
+            if "reward_gold" not in q:
+                q["reward_gold"] = 1
+            if "reward_gp" not in q:
+                q["reward_gp"] = 1
         self.quest_tokens = data.get("quest_tokens", {})
         self.completed_fixed_quests = data.get("completed_fixed_quests", [])
         self.has_seen_ending = data.get("has_seen_ending", False)
         self.warehouse_items = data.get("warehouse_items", [])
         self.event_items = data.get("event_items", [])
         self.current_floor = data.get("current_floor", 0)
+        self.prev_floor = data.get("prev_floor", 0)
         
         # 装備IDカウンタの復元
         if "equip_id_counter" in data:

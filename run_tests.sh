@@ -1,0 +1,52 @@
+#!/bin/bash
+# run_tests.sh - 全ての自動テストを実行する
+
+# VENV_PYTHON が未定義ならデフォルト値を設定
+if [ -z "$PYTHON_EXE" ]; then
+    PYTHON_EXE="./venv/bin/python"
+fi
+VENV_PYTHON=$PYTHON_EXE
+
+echo "========================================"
+echo "🚀 2DGame テストスイート実行中..."
+echo "========================================"
+
+TEST_FILES=(
+    "tests/test_boot.py"
+    "tests/test_hitbox.py"
+    "tests/test_save_load.py"
+    "tests/test_death.py"
+    "tests/test_shopping.py"
+    "tests/test_quest.py"
+    "tests/test_blacksmith.py"
+    "tests/test_game_flow.py"
+    "tests/test_combat_sim.py"
+    "tests/test_npc_collision.py"
+    "tests/test_enemy_collision.py"
+    "tests/test_rank_up_entrance.py"
+)
+
+SUCCESS_COUNT=0
+TOTAL_COUNT=${#TEST_FILES[@]}
+
+for test in "${TEST_FILES[@]}"; do
+    echo "----------------------------------------"
+    echo "Running: $test"
+    $VENV_PYTHON "$test"
+    if [ $? -eq 0 ]; then
+        echo "✅ $test: PASSED"
+        SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+    else
+        echo "❌ $test: FAILED"
+    fi
+done
+
+echo "========================================"
+echo "📊 テスト結果報告: $SUCCESS_COUNT / $TOTAL_COUNT 合格"
+echo "========================================"
+
+if [ $SUCCESS_COUNT -eq $TOTAL_COUNT ]; then
+    exit 0
+else
+    exit 1
+fi

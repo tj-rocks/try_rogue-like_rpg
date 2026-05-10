@@ -174,37 +174,47 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state):
     
     screen.fill((0, 0, 0))
     
-    # カメラ計算 (端数が出ないように整数に変換)
-    camera_x = int(player.x - (SCREEN_WIDTH / 2) + (player.width / 2) + dungeon.shake_offset[0])
-    camera_y = int(player.y - (SCREEN_HEIGHT / 2) + (player.height / 2) + dungeon.shake_offset[1])
+    # --- 1. ロジック更新フェーズ (全ての座標確定をここで行う) ---
     
-    # 描画と更新
-    dungeon.draw(screen, camera_x, camera_y)
-    dungeon.update(dialog=ui_elements["dialog"])
-    if getattr(dungeon, "next_dungeon", None):
-        dungeon = dungeon.next_dungeon
+    # 1-1. プレイヤーの基本更新 (移動、入力、攻撃)
+    player.update(dungeon, ui_elements["dialog"], events)
     
-    player.update(screen, camera_x, camera_y, dungeon, ui_elements["dialog"], events)
-    draw_vision_overlay(screen, player, dungeon)
-    
-    # エンティティ更新（ポーズ中や死亡演出中は停止）
-    if not is_paused() and game_state.get("death_sequence_step", 0) == 0:
-        update_dungeon_entities(dungeon, player, ui_elements["dialog"])
- 
-    # 死亡演出の更新
-    new_dungeon = handle_death_sequence(player, dungeon, ui_elements["dialog"], game_state)
+    # 1-2. エンティティ更新（敵の思考、アイテム取得、罠判定など）
+    # ポーズ中や死亡演出中でなければ実行
+    new_dungeon = dungeon
     is_death_active = game_state.get("death_sequence_step", 0) > 0
+    if not is_paused() and not is_death_active:
+        # 敵の更新、アイテム取得判定
+        update_dungeon_entities(dungeon, player, ui_elements["dialog"])
         
-    # 死亡演出中以外は罠や階段、モンスター氾濫をチェック
-    if not is_death_active:
+        # 罠・階段・特殊イベントの判定
         if not player.is_falling:
             new_dungeon = new_dungeon.check_traps(player, ui_elements["dialog"])
             new_dungeon = new_dungeon.check_overflow(player, ui_elements["dialog"])
         new_dungeon = new_dungeon.check_stairs(player, ui_elements["confirm_dialog"], ui_elements["dialog"])
-    
-    # カットシーンの更新
+
+    # 1-3. 死亡演出、カットシーンなどの更新
+    new_dungeon = handle_death_sequence(player, dungeon, ui_elements["dialog"], game_state)
     if ui_elements.get("cutscene_manager"):
         ui_elements["cutscene_manager"].update()
+
+    # --- 2. 描画フェーズ (確定した座標に基づいてカメラを固定) ---
+
+    # 2-1. 最新の座標に基づいてカメラを計算 (ここがズレるとガタつく)
+    camera_x = int(player.x - (SCREEN_WIDTH / 2) + (player.width / 2) + dungeon.shake_offset[0])
+    camera_y = int(player.y - (SCREEN_HEIGHT / 2) + (player.height / 2) + dungeon.shake_offset[1])
+    
+    screen.fill((0, 0, 0))
+    
+    # 2-2. ダンジョンの描画
+    dungeon.draw(screen, camera_x, camera_y)
+    dungeon.update(dialog=ui_elements["dialog"])
+    if getattr(dungeon, "next_dungeon", None):
+        new_dungeon = dungeon.next_dungeon
+    
+    # 2-3. プレイヤーと視界の描画
+    player.draw(screen, camera_x, camera_y)
+    draw_vision_overlay(screen, player, new_dungeon)
 
         
     # UIの描画

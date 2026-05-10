@@ -713,24 +713,6 @@ class OreSelectionDialog:
                                         display_before = before
                                         display_after = after
                                         stat_label = "能力ボーナス"
-                                    # キャップ情報
-                                    data = {}
-                                    from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA
-                                    if item_type == "weapon": data = WEAPON_DATA.get(inst.key, {})
-                                    elif item_type == "armor": data = ARMOR_DATA.get(inst.key, {})
-                                    else: data = SHIELD_DATA.get(inst.key, {})
-                                    growth = data.get("growth")
-                                    if growth:
-                                        tl = growth.get("times_limit", 50)
-                                        if inst.enhance < tl:
-                                            remaining = tl - inst.enhance
-                                            cap_info = f"ソフトキャップまであと {remaining} 回"
-                                        elif inst.enhance == tl:
-                                            cap_info = "ソフトキャップ到達。以降は完全に微小な変化になる"
-                                        else:
-                                            cap_info = "ソフトキャップ超過中。変化は極小"
-                                    else:
-                                        cap_info = ""
                                     from wordings import Text
                                     cd.text = Text.NPC.BLACKSMITH_ENHANCE_PREVIEW.format(
                                         name=inst.get_name(),
@@ -738,8 +720,7 @@ class OreSelectionDialog:
                                         unit=unit,
                                         before=display_before, after=display_after,
                                         enhance=inst.enhance + ore_bonus,
-                                        ore_bonus=ore_bonus,
-                                        cap_info=cap_info
+                                        ore_bonus=ore_bonus
                                     )
                                     stored_type, stored_iid, stored_key = item_type, iid, ore_key
                                     def do_enhance():
@@ -1711,7 +1692,9 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             guild_dialog.setup(player, dungeon)
                                             
                                             # 達成済みがある場合はセリフをお祝いにする
-                                            if guild_dialog.mode == "AUTO_REPORT":
+                                            # ただし、エンディング対象だった場合はシーンが切り替わっているので何もしない
+                                            from systems.game_state import game_state
+                                            if guild_dialog.mode == "AUTO_REPORT" and game_state.get("current_scene") != "ending":
                                                 dialog.text = "おお、見事に依頼を達成しましたね！\nおめでとうございます！"
                                                 dialog.is_active = True
                                             return
@@ -2043,12 +2026,30 @@ class GuildDialog:
                     self.cutscene_manager.start_rank_up(callback=on_done)
                 else:
                     on_done()
+            # マスターデータからもエンディング対象かチェック（セーブデータにフラグがない場合への対策）
+            is_ending_quest = q.get("ending", False)
+            if not is_ending_quest and q.get("id"):
+                from constants import FIXED_QUEST_DATA
+                for fq in FIXED_QUEST_DATA:
+                    if fq.get("id") == q.get("id") and fq.get("ending"):
+                        is_ending_quest = True
+                        break
+
+            if is_ending_quest:
+                # エンディングフラグがある場合は、特別演出へ
+                from systems.game_state import game_state
+                game_state["current_scene"] = "ending"
+                game_state["ending_index"] = 0
+                game_state["ending_timer"] = 0
+                game_state["ending_alpha"] = 0
+                self.is_active = False # ギルド画面を閉じる
+                return
+
             else:
                 player.coin += q["reward_gold"]
                 player.guild_point += q["reward_gp"]
                 dialog.text = "見事に依頼を達成しましたね！\nおめでとうございます！"
                 if q.get("id"): player.completed_fixed_quests.append(q["id"])
-                
                 dialog.is_active = True
 
             player.active_quests.remove(q)
@@ -2198,9 +2199,9 @@ class GuildDialog:
             elif status in ("cancel", "back"):
                 desc_text = "前の画面に戻ります。"
             else:
-                # 依頼詳細
+                # 依頼詳細 (データ不備に備えて .get() で安全にアクセス)
                 q = selected_item[1]
-                desc_text = f"【依頼タイトル】\n{q['title']}\n\n"
+                desc_text = f"【依頼タイトル】\n{q.get('title', '不明な依頼')}\n\n"
                 
                 t = q.get("type", "")
                 target = q.get("target_name", "???")
@@ -2210,7 +2211,9 @@ class GuildDialog:
                 elif t == "delivery":
                     desc_text += f"【内容】\n{target} を {amount} 個納品する。"
                 
-                desc_text += f"\n\n【報酬】\n{q['reward_gold']} G / {q['reward_gp']} GP"
+                reward_gold = q.get("reward_gold", 0)
+                reward_gp = q.get("reward_gp", 0)
+                desc_text += f"\n\n【報酬】\n{reward_gold} G / {reward_gp} GP"
 
             draw_text_wrapped(screen, self.font, desc_text, desc_x, desc_y, desc_width, color=(220, 230, 240))
         # 右下は余白または別の情報を置くために空けておく
@@ -2342,11 +2345,20 @@ class StatusDialog:
                 for q in player.active_quests:
                     prog = ""
                     if q.get("type") == "hunt":
-                        prog = f"({player.quest_tokens.get(q.get('target_key'), 0)}/{q.get('amount')})"
+                        prog = f"({player.quest_tokens.get(q.get('target_key'), 0)}/{q.get('amount') or 0})"
                     elif q.get("type") == "delivery":
                         count = sum(item["count"] for item in player.items if item["key"] == q.get("target_key"))
-                        prog = f"({count}/{q.get('amount')})"
-                    lines.append(f"・{q.get('title')}\n  {prog} {q.get('target_name', '')}")
+                        prog = f"({count}/{q.get('amount') or 0})"
+                    
+                    # 昇級試験の場合は進捗を「未達成/達成」のような形にするか、あるいはprogを隠す
+                    if q.get("is_rank_up"):
+                        prog = "" # タイトルに「冒険者の証の回収」とあるので、進捗数値は不要
+                    
+                    reward = q.get("reward_gold", 0)
+                    lines.append(f"・{q.get('title')}")
+                    if prog:
+                        lines.append(f"  進捗: {prog} {q.get('target_name', '')}")
+                    lines.append(f"  報酬: {reward} G")
             
             draw_text_wrapped(screen, self.font, "\n".join(lines), content_x, content_y, cw)
         
@@ -2439,21 +2451,28 @@ class ShopDialog(BaseListDialog):
     def setup_sell_mode(self, player):
         self.mode = "SELL"; self.cursor_idx = 0; self.items = []
         from constants import CONSUMABLE_DATA, WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, STAVE_DATA
+        
+        def get_sell_price(data):
+            """selling_price が設定されていればそれを、なければ price // 3 を返す"""
+            if "selling_price" in data:
+                return int(data["selling_price"])
+            return int(data.get("price", 0) // 3)
+
         for item in player.items:
             info = CONSUMABLE_DATA.get(item["key"], {})
-            self.items.append((item["key"], "consumable", info.get("name", item["key"]), int(info.get("price", 0) // 3), item["count"]))
+            self.items.append((item["key"], "consumable", info.get("name", item["key"]), get_sell_price(info), item["count"]))
         for eq in player.weapon_inventory:
-            price = int(WEAPON_DATA.get(eq.key, {}).get("price", 0) // 3)
-            self.items.append((eq.iid, "weapon_inst", eq.get_name(), price, 1, eq.key))
+            data = WEAPON_DATA.get(eq.key, {})
+            self.items.append((eq.iid, "weapon_inst", eq.get_name(), get_sell_price(data), 1, eq.key))
         for eq in player.armor_inventory:
-            price = int(ARMOR_DATA.get(eq.key, {}).get("price", 0) // 3)
-            self.items.append((eq.iid, "armor_inst", eq.get_name(), price, 1, eq.key))
+            data = ARMOR_DATA.get(eq.key, {})
+            self.items.append((eq.iid, "armor_inst", eq.get_name(), get_sell_price(data), 1, eq.key))
         for eq in player.shield_inventory:
-            price = int(SHIELD_DATA.get(eq.key, {}).get("price", 0) // 3)
-            self.items.append((eq.iid, "shield_inst", eq.get_name(), price, 1, eq.key))
+            data = SHIELD_DATA.get(eq.key, {})
+            self.items.append((eq.iid, "shield_inst", eq.get_name(), get_sell_price(data), 1, eq.key))
         for st in player.stave_inventory:
-            price = int(STAVE_DATA.get(st.key, {}).get("price", 0) // 3)
-            self.items.append((st.iid, "stave_inst", st.get_name_with_charges(), price, 1, st.key))
+            data = STAVE_DATA.get(st.key, {})
+            self.items.append((st.iid, "stave_inst", st.get_name_with_charges(), get_sell_price(data), 1, st.key))
         self.items.append(("cancel", "cancel", Text.UI.SHOP_CANCEL, 0, 1))
 
 

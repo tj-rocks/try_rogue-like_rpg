@@ -17,6 +17,16 @@ from systems.combat_handler import deal_damage
 class Enemy(Entity):
     # クラスレベルで画像をキャッシュする（同じ種類の敵で画像を共有してメモリとCPUを節約）
     _image_cache = {}
+    _scaled_image_cache = {} # {(img_obj, phase): surface}
+    
+    @classmethod
+    def clear_cache(cls):
+        """蓄積された敵画像のキャッシュを解放する（メモリ節約用）"""
+        count = len(cls._image_cache) + len(cls._scaled_image_cache)
+        cls._image_cache = {}
+        cls._scaled_image_cache = {}
+        if count > 0:
+            print(f"[MEMORY] Enemy image cache cleared ({count} items)")
 
     def __init__(self, x, y, enemy_type, width=None, height=None, player=None):
         if enemy_type not in ENEMY_DATA:
@@ -199,33 +209,37 @@ class Enemy(Entity):
         
         # アニメーション（呼吸）の計算（[NEW] 障害物は呼吸しない）
         scale_anim_x, scale_anim_y = 1.0, 1.0
+        phase = 0
         if not self.is_attacking and not self.is_static:
-            scale_anim_x, scale_anim_y = self.get_breathing_scale()
+            (scale_anim_x, scale_anim_y), phase = self.get_breathing_scale()
         
         # 画面に映っている範囲にある時だけ描画する
         if -self.width <= draw_x <= screen.get_width() and -self.height <= draw_y <= screen.get_height():
             # 画像の取得
-            current_img = self.images.get(self.facing)
-            if not current_img:
-                current_img = pygame.Surface((self.width, self.height))
-                current_img.fill((255, 0, 255))
+            base_img = self.images.get(self.facing)
+            if not base_img:
+                base_img = pygame.Surface((self.width, self.height))
+                base_img.fill((255, 0, 255))
             
-            # スケーリング（待機時呼吸）
-            orig_w, orig_h = current_img.get_size()
-            current_img = pygame.transform.smoothscale(current_img, (int(orig_w * scale_anim_x), int(orig_h * scale_anim_y)))
+            # --- [OPTIMIZED] スケーリングキャッシュの利用 ---
+            cache_key = (base_img, "attack" if self.is_attacking else phase)
+            current_img = Enemy._scaled_image_cache.get(cache_key)
             
-            # 足元を基準に位置を調整（浮かないようにする）
-            draw_x += (self.width - current_img.get_width()) / 2
-            draw_y += (self.height - current_img.get_height()) 
+            if current_img is None:
+                if self.is_attacking:
+                    w, h = base_img.get_size()
+                    current_img = pygame.transform.scale(base_img, (int(w * 1.2), int(h * 1.2)))
+                elif not self.is_static:
+                    w, h = base_img.get_size()
+                    current_img = pygame.transform.smoothscale(base_img, (int(w * scale_anim_x), int(h * scale_anim_y)))
+                else:
+                    current_img = base_img
+                Enemy._scaled_image_cache[cache_key] = current_img
 
-            # 攻撃中はさらに拡大
-            scale_atk = 1.0
-            if self.is_attacking:
-                scale_atk = 1.2
-                w, h = current_img.get_size()
-                current_img = pygame.transform.scale(current_img, (int(w * scale_atk), int(h * scale_atk)))
-                draw_x -= (current_img.get_width() - w) // 2
-                draw_y -= (current_img.get_height() - h) // 2
+            # 足元を基準に位置を調整
+            img_w, img_h = current_img.get_size()
+            draw_x += (self.width - img_w) / 2
+            draw_y += (self.height - img_h)
                 
             # ダメージを受けた時は赤くしてチカチカ点滅させる！
             is_visible = True
@@ -234,10 +248,7 @@ class Enemy(Entity):
                 # 4フレーム周期で点滅 (2フレーム表示、2フレーム非表示)
                 if (self.damage_flash_timer - HIT_STUN_DURATION) % 4 < 2:
                     is_visible = False
-
-            final_scale_x = scale_anim_x * scale_atk
-            final_scale_y = scale_anim_y * scale_atk
-            center_x, center_y = draw_x + (current_img.get_width() / 2), draw_y + (current_img.get_height() / 2)
+            
             
             # モンスター本体の描画
             if is_visible:
@@ -255,12 +266,15 @@ class Enemy(Entity):
         facing, dx, dy = random.choice(directions)
         test_x = self.x + dx
         test_y = self.y + dy
-        if self.can_move_grid(test_x, test_y, dungeon, all_entities):
+        if self.can_move_grid(test_x, test_y, dungeon):
             self.target_x = test_x
             self.target_y = test_y
             self.facing = facing
             self.is_moving = True
             self.step_toggle = not self.step_toggle
+            print(f"[AI] {self.name} はランダムに移動を選択: {facing}")
+        else:
+            print(f"[AI] {self.name} はランダム移動を試みたが壁に阻まれた")
 
     def _is_in_attack_range(self, dist_x, dist_y):
         """自身の攻撃射程内にプレイヤーがいるか判定する（十字方向のみ）"""
@@ -363,13 +377,21 @@ class Enemy(Entity):
         # 突進距離の自動計算
         if self.current_attack_pattern.get("type") == "close":
             from constants import TILE_SIZE
+            # 自分に近い方の端のマスを基準にするのではなく、中心同士の距離で計算（タイル単位）
             my_gx = int((self.x + self.width / 2) // TILE_SIZE)
             my_gy = int((self.y + self.height / 2) // TILE_SIZE)
             p_gx = int((player.x + player.width / 2) // TILE_SIZE)
             p_gy = int((player.y + player.height / 2) // TILE_SIZE)
+            
+            # 距離からお互いの半径（タイル数）を引く
             grid_dist = abs(p_gx - my_gx) + abs(p_gy - my_gy)
-            # ターゲットの目の前まで突進（タイルサイズ分を考慮）
-            self.dash_distance = grid_dist * TILE_SIZE
+            # 半径（1タイルなら0.5、2タイルなら1.0）
+            my_radius = (self.width / TILE_SIZE) / 2
+            p_radius = (player.width / TILE_SIZE) / 2
+            
+            # 実質的な隙間タイル数
+            gap = max(0, grid_dist - (my_radius + p_radius))
+            self.dash_distance = (gap + 1) * TILE_SIZE # 1タイル分踏み込む
         else:
             self.dash_distance = 0
 
@@ -446,7 +468,7 @@ class Enemy(Entity):
         for facing, dx, dy in directions:
             test_x = self.x + dx
             test_y = self.y + dy
-            if self.can_move_grid(test_x, test_y, dungeon, all_entities, occupied_cells):
+            if self.can_move_grid(test_x, test_y, dungeon):
                 test_grid_x = int((test_x + self.width / 2) // dungeon.tile_size)
                 test_grid_y = int((test_y + self.height / 2) // dungeon.tile_size)
                 
@@ -512,10 +534,12 @@ class Enemy(Entity):
 
         if abs(dist_x) > effective_radius or abs(dist_y) > effective_radius:
             # 遠距離にいる敵は一切動かない
+            # ログが埋まりすぎないよう10%の確率で出力（停止していることを確認するため）
+            if random.random() < 0.1: 
+                print(f"[AI] {self.name} は遠すぎるため停止中 (Dist: {max(abs(dist_x), abs(dist_y))}, Aggro: {effective_radius})")
             return
         
         # 2. 【頭の悪さ（うっかり度）】 発見していても確率でランダム行動を起こす
-        # 1-10 のスケールで、設定値の確率でボケるように調整 (1/10 〜 10/10)
         if self.stupidity > 0 and random.randint(1, 10) <= self.stupidity:
             print(f"[AI] {self.name} はぼーっとしている... (Stupidity: {self.stupidity})")
             self._move_randomly(dungeon, all_entities)
@@ -543,10 +567,12 @@ class Enemy(Entity):
             # A. すでに理想的な位置にいる場合
             if grid_dist == ideal_dist:
                 if has_los:
+                    print(f"[AI] {self.name} は理想的な間合い({ideal_dist})にいるため攻撃を選択")
                     self._handle_attack(dist_x, dist_y, player, dialog)
                     return
                 # 射線が通らない（障害物越し等）なら移動を試みる
                 if self._move_smartly_check_success(player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells, ideal_dist):
+                    print(f"[AI] {self.name} は間合い({ideal_dist})にいるが射線が通らないため移動を試行")
                     return
             
             # B. 隣接（距離1）されている場合（アウトボクサーは逃げたい）
@@ -554,8 +580,10 @@ class Enemy(Entity):
                 # 70% の確率で距離を取ろうとする
                 if random.random() < 0.7:
                     if self._move_smartly_check_success(player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells, ideal_dist):
+                        print(f"[AI] {self.name} は遠距離型のため隣接状態からの離脱(理想:{ideal_dist})を試行")
                         return
                 # 逃げない、または逃げられなかった場合は攻撃
+                print(f"[AI] {self.name} は隣接されているが逃げずに(または逃げられず)攻撃を選択")
                 self._handle_attack(dist_x, dist_y, player, dialog)
                 return
 
@@ -563,11 +591,13 @@ class Enemy(Entity):
             else:
                 # 攻撃可能（射程内かつ射線が通っている）なら、移動よりも攻撃を優先する
                 if has_los:
+                    print(f"[AI] {self.name} は射程内のため攻撃を選択 (Dist: {grid_dist})")
                     self._handle_attack(dist_x, dist_y, player, dialog)
                     return
                 
                 # 攻撃できない場合は理想の間合いへ向けて移動する
                 if self._move_smartly_check_success(player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells, ideal_dist):
+                    print(f"[AI] {self.name} は理想の間合い({ideal_dist})へ向けて移動 (現在Dist: {grid_dist})")
                     return
                 
     def update(self, dungeon):
@@ -600,22 +630,11 @@ class Enemy(Entity):
         self.update_animation()
         
     def update_animation(self):
-        self.idle_anim_timer = (self.idle_anim_timer + 1) % 60
-        
-        # 溜め期間中・およびダッシュ頂点での停止処理中は、個別に移動処理を行いリターンする
-        # （この期間は通常の歩行アニメーションを行わないため）
-        if getattr(self, "attack_pre_delay_timer", 0) > 0:
-            if getattr(self, "damage_flash_timer", 0) > 0:
-                self.damage_flash_timer -= 1
-            if self.process_movement():
-                self.move_speed = 4
-            return
-
-        if getattr(self, "peak_hold_timer", 0) > 0:
-            self.peak_hold_timer -= 1
-            if getattr(self, "damage_flash_timer", 0) > 0:
-                self.damage_flash_timer -= 1
-            if self.process_movement():
+        # 溜め期間中・およびダッシュ頂点での停止処理中は、通常の歩行アニメーションを行わない
+        if getattr(self, "attack_pre_delay_timer", 0) > 0 or getattr(self, "peak_hold_timer", 0) > 0:
+            # 基底クラスの更新（ダメージタイマー、移動処理）のみ行う
+            super().update_animation()
+            if not self.is_moving:
                 self.move_speed = 4
             return
             
@@ -682,8 +701,7 @@ class Enemy(Entity):
                     
                     if 0 <= ey < dungeon.map_height and 0 <= ex < dungeon.map_width:
                         if dungeon.map_data[ey][ex] == 1:
-                            if not any(int((e.x + e.width/2)//dungeon.tile_size) == ex and 
-                                       int((e.y + e.height/2)//dungeon.tile_size) == ey for e in enemies):
+                            if not any((ex, ey) in e.get_occupied_grids(dungeon.tile_size) for e in enemies):
                                 valid_m = [m for m in monster_types if ENEMY_DATA[m].get("min_floor", 1) <= floor <= ENEMY_DATA[m].get("max_floor", 999)]
                                 if valid_m:
                                     m_type = random.choice(valid_m)
@@ -780,8 +798,7 @@ class Enemy(Entity):
                 if (1 <= t <= 3 or 10 <= t <= 14):
                     # 【追加】すでに何かがいるマスは避ける
                     all_entities = [player] + dungeon.enemies + dungeon.npcs
-                    if any(int((e.target_x + e.width/2) // dungeon.tile_size) == ex and 
-                           int((e.target_y + e.height/2) // dungeon.tile_size) == ey for e in all_entities):
+                    if any((ex, ey) in e.get_occupied_grids(dungeon.tile_size) for e in all_entities):
                         continue
 
                     # 制限を満たす敵だけを抽出

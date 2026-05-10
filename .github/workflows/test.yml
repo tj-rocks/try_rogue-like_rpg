@@ -1,0 +1,37 @@
+name: Python Automated Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pygame PyYAML
+        # Linux環境でSDLのダミードライバーを動かすための最小限のパッケージ
+        sudo apt-get update
+        sudo apt-get install -y libsdl2-dev
+
+    - name: Run Tests
+      env:
+        SDL_VIDEODRIVER: dummy
+        SDL_AUDIODRIVER: dummy
+        PYTHON_EXE: python
+      run: |
+        chmod +x run_tests.sh
+        ./run_tests.sh

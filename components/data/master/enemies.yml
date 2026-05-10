@@ -15,6 +15,7 @@ ENEMY_CATEGORIES:
     accuracy_close: 90, accuracy_ranged: 90, attack_range: 2, stupidity: 5, image_scale: 1.0,
     close_attack_effect: physical_heavy, ranged_attack_effect: dark_bolt, attack_priority: close}
 ENEMY_DATA:
+# Fランクーーーーーーーーーー
   slime:
     name: スライム
     category: slime
@@ -23,9 +24,9 @@ ENEMY_DATA:
     crit_rate: 0.05
     drops:
     - {item: hp_potion}
-    hp: 9
+    hp: 11
     defense: 1
-    attack: 11
+    attack: 23
   mawaru_kame:
     name: まわるがめ
     category: animal
@@ -38,8 +39,8 @@ ENEMY_DATA:
     - {item: rotten_potion}
     - {item: broken_armor}
     hp: 15
-    defense: 3
-    attack: 12
+    defense: 4
+    attack: 23
   normal_tako:
     name: ふつうたこ
     category: animal
@@ -55,9 +56,10 @@ ENEMY_DATA:
     drops:
     - {item: expired_potion}
     - {item: broken_sword}
-    hp: 11
-    defense: 3
-    attack: 13
+    hp: 15
+    defense: 2
+    attack: 22
+# Eランクーーーーーーーーーー
   kowai_kusa:
     name: こわいくさ
     category: monster
@@ -73,8 +75,9 @@ ENEMY_DATA:
     drops:
     - {item: expired_potion}
     - {item: broken_sword}
-    hp: 11
+    hp: 19
     defense: 3
+    attack: 26
   slime_red:
     name: あかいスライム
     category: slime
@@ -84,9 +87,9 @@ ENEMY_DATA:
     crit_rate: 0.05
     drops:
     - {item: broken_stave}
-    hp: 9
+    hp: 16
     defense: 1
-    attack: 6
+    attack: 23
   bakudan_man:
     name: バクダンマン
     category: monster
@@ -95,9 +98,9 @@ ENEMY_DATA:
     crit_rate: 0.05
     drops:
     - {item: hp_potion}
-    hp: 9
-    defense: 1
-    attack: 6
+    hp: 20
+    defense: 4
+    attack: 26
     attack_range: 3
     close_attack_effect: explosion
     ranged_attack_effect: explosion
@@ -115,9 +118,10 @@ ENEMY_DATA:
     drops:
     - {item: rotten_potion}
     - {item: broken_armor}
-    hp: 15
-    defense: 3
-    attack: 14
+    hp: 20
+    defense: 4
+    attack: 24
+# Dランクーーーーーーーーーー
   skeleton:
     name: スケルトン
     category: undead
@@ -131,7 +135,7 @@ ENEMY_DATA:
     hp: 25
     defense: 3
     attack: 15
-#BOSS--------------
+# BOSS------------------------------
   suisui_slime:
     name: スイスイスライム
     category: slime
@@ -144,11 +148,27 @@ ENEMY_DATA:
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/suisui_slime
     image_scale: 2.0
-    hp: 40
-    attack: 16
+    hp: 55
+    attack: 22
     defense: 4
     exp: 50
     reward_gold: 500
     drops:
     - {item: hp_potion}
     - {item: iron_sword}
+  undead_father:
+    name: 父の亡霊
+    category: undead
+    min_rank: B
+    min_floor: 50
+    max_floor: 50
+    max_concurrent: 1
+    is_boss: true
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/skeleton
+    image_scale: 1.5
+    hp: 250
+    attack: 55
+    defense: 25
+    drops:
+    - {item: fathers_keepsake, rate: 1.0}

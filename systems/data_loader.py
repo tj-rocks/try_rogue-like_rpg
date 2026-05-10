@@ -39,8 +39,11 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_official.json")
 
+# [NEW] テストモード時はさらに優先して別ファイルにする
+if os.environ.get("TEST_MODE") == "1":
+    SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_data_test.json")
 # [NEW] デバッグモード時はセーブファイルを分離する
-if os.environ.get("DEBUG_MODE") == "1":
+elif os.environ.get("DEBUG_MODE") == "1":
     SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_data_debug.json")
 
 SAVE_SUSPEND_PATH = SAVE_OFFICIAL_PATH # 一本化
@@ -155,13 +158,17 @@ def get_normalized_enemy_data(floor_map):
 
 def get_normalized_equipment_data(floor_map):
     """武器・防具・盾のデータを読み込み、カテゴリベースの継承を適用して返す（自動スケーリング無効化版）"""
-    raw_equip = load_master_data("equipment.yml")
-    weapon_categories = raw_equip.get("WEAPON_CATEGORIES", {})
-    armor_categories = raw_equip.get("ARMOR_CATEGORIES", {})
+    raw_weapons = load_master_data("weapons.yml")
+    raw_armors = load_master_data("armors.yml")
+    raw_shields = load_master_data("shields.yml")
     
-    weapons = raw_equip.get("WEAPON_DATA", {})
-    armor = raw_equip.get("ARMOR_DATA", {})
-    shields = raw_equip.get("SHIELD_DATA", {})
+    weapon_categories = raw_weapons.get("WEAPON_CATEGORIES", {})
+    armor_categories = raw_armors.get("ARMOR_CATEGORIES", {})
+    shield_categories = raw_shields.get("SHIELD_CATEGORIES", {})
+    
+    weapons = raw_weapons.get("WEAPON_DATA", {})
+    armor = raw_armors.get("ARMOR_DATA", {})
+    shields = raw_shields.get("SHIELD_DATA", {})
     
     def normalize_no_scaling(data_dict, category_map):
         normalized = {}
@@ -176,15 +183,13 @@ def get_normalized_equipment_data(floor_map):
 
     normalized_weapons = normalize_no_scaling(weapons, weapon_categories)
     normalized_armor = normalize_no_scaling(armor, armor_categories)
-    
-    shield_categories = raw_equip.get("SHIELD_CATEGORIES", {})
     normalized_shields = normalize_no_scaling(shields, shield_categories)
     
     apply_rank_floor_logic(normalized_weapons, floor_map)
     apply_rank_floor_logic(normalized_armor, floor_map)
     apply_rank_floor_logic(normalized_shields, floor_map)
     
-    return normalized_weapons, normalized_armor, normalized_shields, raw_equip.get("WEAPON_TYPES", {})
+    return normalized_weapons, normalized_armor, normalized_shields, raw_weapons.get("WEAPON_TYPES", {})
 
 def get_normalized_item_data(floor_map):
     """消費アイテム・杖などのデータを読み込み、階層設定を適用して返す"""

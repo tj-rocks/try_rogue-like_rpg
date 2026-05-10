@@ -35,24 +35,15 @@ class GuildSystem:
         return None
 
     def get_max_floor(self, rank_name):
-        """指定されたランクから、潜れる最大階層を算出する (均等割)"""
-        from constants import RANK_ORDER
-        if rank_name not in RANK_ORDER:
-            return 10 # 基本Fランク相当
-            
-        rank_idx = RANK_ORDER.index(rank_name)
-        # 99階までを8ランクで均等割 (math.ceil((idx+1)*99/8))
-        import math
-        return math.ceil((rank_idx + 1) * 99 / 8)
+        """指定されたランクから、潜れる最大階層を返す（マスタデータ参照）"""
+        rank_data = self.get_current_rank(rank_name)
+        return rank_data.get("limit_floor", 0)
 
     def get_required_rank_for_floor(self, floor):
         """特定の階層に潜るために必要な最小ランク名を返す"""
-        from constants import RANK_ORDER
-        import math
-        # floor <= math.ceil((idx+1)*99/8) を満たす最小の idx を探す
-        for idx, name in enumerate(RANK_ORDER):
-            if floor <= math.ceil((idx + 1) * 99 / 8):
-                return name
+        for rank_data in GUILD_RANKS:
+            if floor <= rank_data.get("limit_floor", 0):
+                return rank_data["rank"]
         return "SS"
 
     def is_rank_at_least(self, player_rank_name, req_rank_name):
@@ -168,10 +159,19 @@ class GuildSystem:
         target_key, target_data = random.choice(candidates)
         amount = random.randint(min_amt, max_amt)
         
-        # 売値（購入価格の1/3）の1.2倍 * 数量 * 倍率（ランクによる追加）
-        base_sell = target_data.get("price", 100) // 3
+        # 売値の1.2倍 * 数量 * 倍率（ランクによる追加）
+        if "selling_price" in target_data:
+            base_sell = int(target_data["selling_price"])
+        else:
+            base_sell = target_data.get("price", 100) // 3
+        
+        # 壊れた杖などのために最低1Gを保証
+        base_sell = max(1, base_sell)
+        
         from systems.math_utils import hardcore_round
         reward_gold = hardcore_round(base_sell * 1.2 * amount * multiplier, is_hp=True)
+        reward_gold = max(1, reward_gold) # 最終的な報酬も最低1Gを保証
+
         reward_gp = amount * 3 # 納品は討伐よりGP低め
         
         target_rank = target_data.get("min_rank", "F")

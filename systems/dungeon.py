@@ -13,10 +13,22 @@ from systems.game_state import is_paused
 from wordings import Text
 
 
-def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spawn_reason="normal"):
+def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spawn_reason="normal", old_dungeon=None):
     """指定した階層へ移動するための新しいダンジョンオブジェクトを生成する"""
+    # --- [MEMORY OPTIMIZATION] 階層移動時にキャッシュをクリーンアップ ---
+    import gc
+    from components.sprites.enemy import Enemy
+    from components.sprites.player import Player
+    from components.sprites.npc import NPC
     from systems.sound_handler import sound_manager
     from constants import SOUND_STAIRS_UP, SOUND_STAIRS_DOWN
+    Dungeon.clear_cache()
+    Enemy.clear_cache()
+    Player.clear_cache()
+    NPC.clear_cache()
+    if old_dungeon:
+        old_dungeon.cleanup_instance()
+    gc.collect() # 未使用メモリを強制解放
     
     # 階層移動音の再生
     if hasattr(player, "current_floor"):
@@ -64,6 +76,32 @@ class Dungeon:
     # --- [NEW] クラスレベルのキャッシュ ---
     _texture_cache = {} # {theme_folder: {key: surface}}
     _variant_lists = {} # {theme_folder: {category: [keys]}}
+
+    @classmethod
+    def clear_cache(cls):
+        """蓄積されたダンジョンテクスチャのキャッシュを解放する"""
+        count = len(cls._texture_cache)
+        cls._texture_cache = {}
+        cls._variant_lists = {}
+        if count > 0:
+            print(f"[MEMORY] Dungeon texture cache cleared ({count} themes)")
+
+    def cleanup_instance(self):
+        """インスタンスに紐付く巨大なデータ配列の参照を明示的に断ち切り、GCを促進する"""
+        self.map_data = None
+        self.rooms = []
+        self.room_info = []
+        self.room_rects = []
+        self.enemies = []
+        self.npcs = []
+        self.dropped_items = []
+        self.traps = []
+        self.magic_effects = []
+        self.weapon_shop_stock = []
+        self.item_shop_stock = []
+        self.magic_shop_stock = []
+        if self.player:
+            self.player = None
 
     def __init__(self, level=1, player=None, debug_overflow=False):
         from constants import (
@@ -384,7 +422,10 @@ class Dungeon:
             
         else: # ダンジョン
             # 登り階段(2)か下り階段(3)を探す
-            target_tile = 2 if self.current_floor > getattr(player, "prev_floor", 0) else 3
+            if spawn_reason == "continue":
+                target_tile = 2 # 再開時はその階の入口(上り階段)から
+            else:
+                target_tile = 2 if self.current_floor > getattr(player, "prev_floor", 0) else 3
             found = False
             for y in range(self.map_height):
                 for x in range(self.map_width):
@@ -1367,7 +1408,7 @@ class Dungeon:
         # [NEW] 落とし穴の落下待ち処理
         if self.player and self.player.is_falling and self.player.falling_timer <= 0:
             self.player.is_falling = False
-            self.next_dungeon = warp_to_floor(self.current_floor + 1, self.player)
+            self.next_dungeon = warp_to_floor(self.current_floor + 1, self.player, old_dungeon=self)
         
         # [NEW] フラッシュタイマーの更新
         if self.flash_timer > 0:
@@ -1384,6 +1425,9 @@ class Dungeon:
 
     def check_traps(self, player, dialog):
         if getattr(player, "is_moving", False): return self
+        from systems.game_state import game_state, is_paused
+        if is_paused() or game_state.get("dialog_just_closed"): return self
+        
         px, py = int((player.x + player.width / 2) // self.tile_size), int((player.y + player.height / 2) // self.tile_size)
         for trap in self.traps[:]:
             if trap.x == px and trap.y == py and not trap.is_triggered:
@@ -1391,12 +1435,26 @@ class Dungeon:
                 if trap.type == "pitfall":
                     target_floor = self.current_floor + 1
                     guild = GuildSystem()
-                    max_f = guild.get_max_floor(player.guild_point)
+                    max_f = guild.get_max_floor(player.guild_rank)
+                    
+                    # 進行中の昇格クエストがあれば、その目標ランクの制限まで緩和する
+                    for q in player.active_quests:
+                        if q.get("is_rank_up"):
+                            target_rank = q.get("next_rank")
+                            if target_rank:
+                                exam_limit = guild.get_max_floor(target_rank)
+                                max_f = max(max_f, exam_limit)
+
                     if target_floor > max_f:
                         req_rank = guild.get_required_rank_for_floor(target_floor)
                         if dialog:
                             dialog.text = Text.UI.RANK_LIMIT_REACHED.format(rank=req_rank)
                             dialog.is_active = True
+                        
+                        # 階段と同様に、一歩押し戻してメッセージがループするのを防ぐ
+                        player.x, player.y = player.prev_x, player.prev_y
+                        player.target_x, player.target_y = player.x, player.y
+                        player.is_moving = False
                         return self
 
                 msg = trap.trigger(player, self, dialog)
@@ -1420,6 +1478,11 @@ class Dungeon:
         return self
 
     def draw(self, screen, camera_x, camera_y):
+        # [SAFETY] クリーンアップ済みのダンジョンの場合は描画をスキップ
+        if self.map_data is None:
+            screen.fill((0, 0, 0))
+            return
+
         sw, sh = screen.get_size()
         sx, ex = max(0, int(camera_x // self.tile_size)), min(self.map_width, int((camera_x + sw) // self.tile_size) + 1)
         sy, ey = max(0, int(camera_y // self.tile_size)), min(self.map_height, int((camera_y + sh) // self.tile_size) + 1)
@@ -1537,57 +1600,73 @@ class Dungeon:
 
     def check_stairs(self, player, confirm_dialog, dialog=None):
         if self.next_dungeon: return self.next_dungeon
-        if is_paused() or getattr(player, "is_moving", False): return self
+        from systems.game_state import game_state
+        if is_paused() or game_state.get("dialog_just_closed"): return self
         tx, ty = int((player.x + player.width / 2) // self.tile_size), int((player.y + player.height / 2) // self.tile_size)
         
-        # ワープ直後の地点にいる場合は、一度動くまで反応させない
+        # ワープ直後の地点にいる場合は、そのタイルから完全に出るまで反応させない
         if hasattr(self, "spawn_pos") and self.spawn_pos == (tx, ty):
-            # まだその場から一歩も動いていない（prevと同じ）ならスキップ
-            if player.x == player.prev_x and player.y == player.prev_y:
-                return self
-            else:
-                # 一度でも動いたら制限解除
-                self.spawn_pos = (-1, -1)
+            return self
+        else:
+            # 一度でもそのタイルから出たら制限解除
+            self.spawn_pos = (-1, -1)
 
         if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): return self
         ct = self.map_data[ty][tx]
         if ct == 3:
-            # ランクチェック
+            # --- ランク制限チェック ---
             target_floor = self.current_floor + 1
             guild = GuildSystem()
-            
-            # --- [NEW] 入会試験チェック ---
-            if player.guild_rank == "-" and target_floor == 1:
-                has_enrollment_quest = any(q.get("id") == "rank_up_F" for q in player.active_quests)
-                if not has_enrollment_quest:
-                    if dialog:
-                        dialog.text = Text.UI.GUILD_NO_ENTRY
-                        dialog.is_active = True
-                    # 押し戻す
-                    player.x, player.y = player.prev_x, player.prev_y
-                    player.target_x, player.target_y = player.x, player.y
-                    return self
-
             max_f = guild.get_max_floor(player.guild_rank)
-            if target_floor > max_f:
-                req_rank = guild.get_required_rank_for_floor(target_floor)
+            
+            # 進行中の昇格クエストがあれば、その目標ランクの制限まで緩和する
+            for q in player.active_quests:
+                if q.get("is_rank_up"):
+                    target_rank = q.get("next_rank")
+                    if target_rank:
+                        exam_limit = guild.get_max_floor(target_rank)
+                        max_f = max(max_f, exam_limit)
+            
+            # [SPECIAL] ギルド未加入(-)かつ昇格試験も受けていない場合、B1Fへの進入を拒否する
+            if player.guild_rank == "-" and max_f == 0 and target_floor == 1:
                 if dialog:
+                    dialog.text = Text.UI.GUILD_NO_ENTRY
+                    dialog.is_active = True
+                player.x, player.y = player.prev_x, player.prev_y
+                player.target_x, player.target_y = player.x, player.y
+                return self
+                
+            if target_floor > max_f:
+                if dialog and not dialog.is_active:
+                    req_rank = guild.get_required_rank_for_floor(target_floor)
                     dialog.text = Text.UI.RANK_LIMIT_REACHED.format(rank=req_rank)
                     dialog.is_active = True
                 
-                # 階段の上で止まらないように押し戻す
+                # 階段の上で止まらないように一歩押し戻す
                 player.x, player.y = player.prev_x, player.prev_y
                 player.target_x, player.target_y = player.x, player.y
                 return self
 
             confirm_dialog.text = Text.UI.CONFIRM_DUNGEON_START if self.current_floor == 0 else Text.UI.CONFIRM_GO_DEEPER
-            confirm_dialog.on_yes = lambda: setattr(self, "next_dungeon", warp_to_floor(self.current_floor + 1, player, debug_overflow=self.debug_overflow))
-            confirm_dialog.on_no = lambda: (setattr(player, "x", player.prev_x), setattr(player, "y", player.prev_y))
+            confirm_dialog.on_yes = lambda: setattr(self, "next_dungeon", warp_to_floor(self.current_floor + 1, player, debug_overflow=self.debug_overflow, old_dungeon=self))
+            def on_no():
+                # 元の仕様通り、一歩押し戻す
+                player.x, player.y = player.prev_x, player.prev_y
+                player.target_x, player.target_y = player.x, player.y
+                player.is_moving = False
+                # かつ、そのマスから出るまで再判定しない
+                self.spawn_pos = (tx, ty)
+            confirm_dialog.on_no = on_no
             confirm_dialog.is_active = True
         elif ct == 2 and self.current_floor >= 1:
             confirm_dialog.text = Text.UI.CONFIRM_RETURN_VILLAGE if self.current_floor == 1 else Text.UI.CONFIRM_GO_UPPER
-            confirm_dialog.on_yes = lambda: setattr(self, "next_dungeon", warp_to_floor(self.current_floor - 1, player, debug_overflow=self.debug_overflow, spawn_reason="return" if self.current_floor == 1 else "normal"))
-            confirm_dialog.on_no = lambda: (setattr(player, "x", player.prev_x), setattr(player, "y", player.prev_y))
+            confirm_dialog.on_yes = lambda: setattr(self, "next_dungeon", warp_to_floor(self.current_floor - 1, player, debug_overflow=self.debug_overflow, spawn_reason="return" if self.current_floor == 1 else "normal", old_dungeon=self))
+            def on_no_upper():
+                player.x, player.y = player.prev_x, player.prev_y
+                player.target_x, player.target_y = player.x, player.y
+                player.is_moving = False
+                self.spawn_pos = (tx, ty)
+            confirm_dialog.on_no = on_no_upper
             confirm_dialog.is_active = True
         return self
 

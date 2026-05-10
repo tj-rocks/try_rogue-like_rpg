@@ -41,6 +41,8 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     攻撃者と対象のステータスからダメージを計算する。
     戻り値: (ダメージ量, クリティカルかどうか, ミスかどうか)
     """
+    from constants import ENABLE_DEBUG_LOGGING
+
     # 無敵状態のチェック
     if getattr(target, "is_god", False) or getattr(target, "invincible_turns", 0) > 0:
         return 0, False, False
@@ -87,7 +89,7 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
         
     # 攻撃力の算出
     base_atk = getattr(attacker, "total_attack", attacker.attack)
-    base_atk = int(base_atk * damage_mult)
+    base_atk = base_atk * damage_mult
     weapon = getattr(attacker, "weapon", None)
     
     # クリティカル率の決定 (基本値 1% または モンスター固有値)
@@ -114,6 +116,9 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     
     # 防御力によるベースダメージの算出 (防御力もボーナス込みを参照)
     defense = getattr(target, "total_defense", getattr(target, "defense", 0))
+    
+
+
     
     # [NEW] 武器の防御力貫通（Armor Penetration）判定
     if weapon and weapon.data.get("armor_penetration"):
