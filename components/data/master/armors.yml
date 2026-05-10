@@ -7,7 +7,7 @@ ARMOR_CATEGORIES:
     eva_bonus: 0
     price: 200
     image_dir: components/pictures/armor/leather_breastplate
-    describe: 動きやすさを重視した軽量防具。
+    describe: 動きやすさを重視した軽量防具.
     position:
       offsets:
         down:
@@ -30,7 +30,7 @@ ARMOR_CATEGORIES:
     eva_bonus: 0
     price: 400
     image_dir: components/pictures/armor/iron_breastplate
-    describe: 防御力と重量のバランスが取れた標準的な防具。
+    describe: 防御力と重量のバランスが取れた標準的な防具.
     position:
       offsets:
         down:
@@ -78,7 +78,7 @@ ARMOR_CATEGORIES:
     eva_bonus: 5
     price: 300
     image_dir: components/pictures/armor/leather_armor
-    describe: 魔力を高める効果のある布製の防具。
+    describe: 魔力を高める効果のある布製の防具.
     position:
       offsets:
         down:
@@ -101,10 +101,14 @@ ARMOR_DATA:
     max_floor: 999
     rarity: 2
     defense_bonus: 1
-    price: 5
+    price: 100
     image_dir: components/pictures/armor/adventurers_clothes
     shop_buyable: false
     describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない。
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003
   adventurers_clothes:
     name: 冒険者の服
     category: robe
@@ -113,46 +117,62 @@ ARMOR_DATA:
     defense_bonus: 4.5
     attack_bonus: 0
     stave_bonus: 0
-    price: 50
+    price: 150
     image_dir: components/pictures/armor/adventurers_clothes
     shop_buyable: false
-    describe: 丈夫な布で作られた一般的な服。
+    describe: 丈夫な布で作られた一般的な服.
     hp_bonus: 0
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003
   leather_breastplate:
     name: 皮の胸当て
     category: light
     min_rank: F
     rarity: 1
     defense_bonus: 10
-    price: 150
+    price: 200
     eva_bonus: 5
     aggro_mod: -1
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
-    describe: なめし革を重ねて作られた防具。
+    describe: なめし革を重ねて作られた防具.
     hp_bonus: 0
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003
   iron_breastplate:
     name: 鉄の胸当て
     category: medium
     min_rank: F
     rarity: 2
     defense_bonus: 12
-    price: 180
+    price: 220
     image_dir: components/pictures/armor/iron_armor
     shop_buyable: true
-    describe: 鉄板を胸部に当てた実戦的な防具。
+    describe: 鉄板を胸部に当てた実戦的な防具.
     hp_bonus: 0
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003
   fullmetal_breastplate:
     name: 鋼の胸当て
     category: medium
     min_rank: E
     rarity: 3
     defense_bonus: 15
-    price: 450
+    price: 360
     image_dir: components/pictures/armor/fullmetal_armor
     shop_buyable: false
-    describe: 硬い鋼で作られた胸当て。
+    describe: 硬い鋼で作られた胸当て.
     hp_bonus: 0
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003
   hard_leather_armor:
     name: 堅牢な革鎧
     category: light
@@ -165,5 +185,9 @@ ARMOR_DATA:
     aggro_mod: -1
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
-    describe: なめし革を重ねて作られた防具。
+    describe: なめし革を重ねて作られた防具.
     hp_bonus: 0
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003

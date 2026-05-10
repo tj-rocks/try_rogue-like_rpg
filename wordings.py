@@ -166,7 +166,7 @@ class Text:
         BLACKSMITH_WELCOME = "鉱石を持ってくれば装備を叩き直してやるぜ\n装備には成長の限界がある\n最初は効果が大きいが、鍛えすぎると変化が極小さくなるぞ"
         BLACKSMITH_NO_ORE = "武器や防具を鍛えたいなら『鉱石』を持ってきな"
         BLACKSMITH_NO_ITEM = "おいおい、その鉱石は持ってないじゃないか"
-        BLACKSMITH_ENHANCE_PREVIEW = "{name}\n{label}: {before:.1f}{unit} → {after:.1f}{unit}\n強化回数: +{enhance}回目 (+{ore_bonus})\n{cap_info}"
+        BLACKSMITH_ENHANCE_PREVIEW = "{name}\n{label}: {before:.2f}{unit} → {after:.2f}{unit}\n強化回数: +{enhance}回目 (+{ore_bonus})"
         GUILD_LIMIT = "これ以上は同時に依頼を受けられません"
         GUILD_ACCEPTED = "{title}』を受注した\n頑張ってこいよ"
         GUILD_COMPLETED = "依頼達成です\n報酬として {gold} G と {gp} GP を受け取った"

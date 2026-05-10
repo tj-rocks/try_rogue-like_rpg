@@ -14,7 +14,7 @@ from systems.data_loader import (
 # 🎮 1. システム・操作設定 (System & Input)
 # ==============================================================================
 
-GAME_TITLE = "Rogue-like Expedition"
+GAME_TITLE = "泰時の大冒険"
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 900
 TILE_SIZE = 64

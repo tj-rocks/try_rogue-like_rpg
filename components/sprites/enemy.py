@@ -272,6 +272,9 @@ class Enemy(Entity):
             self.facing = facing
             self.is_moving = True
             self.step_toggle = not self.step_toggle
+            print(f"[AI] {self.name} はランダムに移動を選択: {facing}")
+        else:
+            print(f"[AI] {self.name} はランダム移動を試みたが壁に阻まれた")
 
     def _is_in_attack_range(self, dist_x, dist_y):
         """自身の攻撃射程内にプレイヤーがいるか判定する（十字方向のみ）"""
@@ -531,10 +534,12 @@ class Enemy(Entity):
 
         if abs(dist_x) > effective_radius or abs(dist_y) > effective_radius:
             # 遠距離にいる敵は一切動かない
+            # ログが埋まりすぎないよう10%の確率で出力（停止していることを確認するため）
+            if random.random() < 0.1: 
+                print(f"[AI] {self.name} は遠すぎるため停止中 (Dist: {max(abs(dist_x), abs(dist_y))}, Aggro: {effective_radius})")
             return
         
         # 2. 【頭の悪さ（うっかり度）】 発見していても確率でランダム行動を起こす
-        # 1-10 のスケールで、設定値の確率でボケるように調整 (1/10 〜 10/10)
         if self.stupidity > 0 and random.randint(1, 10) <= self.stupidity:
             print(f"[AI] {self.name} はぼーっとしている... (Stupidity: {self.stupidity})")
             self._move_randomly(dungeon, all_entities)
@@ -562,10 +567,12 @@ class Enemy(Entity):
             # A. すでに理想的な位置にいる場合
             if grid_dist == ideal_dist:
                 if has_los:
+                    print(f"[AI] {self.name} は理想的な間合い({ideal_dist})にいるため攻撃を選択")
                     self._handle_attack(dist_x, dist_y, player, dialog)
                     return
                 # 射線が通らない（障害物越し等）なら移動を試みる
                 if self._move_smartly_check_success(player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells, ideal_dist):
+                    print(f"[AI] {self.name} は間合い({ideal_dist})にいるが射線が通らないため移動を試行")
                     return
             
             # B. 隣接（距離1）されている場合（アウトボクサーは逃げたい）
@@ -573,8 +580,10 @@ class Enemy(Entity):
                 # 70% の確率で距離を取ろうとする
                 if random.random() < 0.7:
                     if self._move_smartly_check_success(player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells, ideal_dist):
+                        print(f"[AI] {self.name} は遠距離型のため隣接状態からの離脱(理想:{ideal_dist})を試行")
                         return
                 # 逃げない、または逃げられなかった場合は攻撃
+                print(f"[AI] {self.name} は隣接されているが逃げずに(または逃げられず)攻撃を選択")
                 self._handle_attack(dist_x, dist_y, player, dialog)
                 return
 
@@ -582,11 +591,13 @@ class Enemy(Entity):
             else:
                 # 攻撃可能（射程内かつ射線が通っている）なら、移動よりも攻撃を優先する
                 if has_los:
+                    print(f"[AI] {self.name} は射程内のため攻撃を選択 (Dist: {grid_dist})")
                     self._handle_attack(dist_x, dist_y, player, dialog)
                     return
                 
                 # 攻撃できない場合は理想の間合いへ向けて移動する
                 if self._move_smartly_check_success(player, dungeon, all_entities, px_grid, py_grid, my_grid_x, my_grid_y, occupied_cells, ideal_dist):
+                    print(f"[AI] {self.name} は理想の間合い({ideal_dist})へ向けて移動 (現在Dist: {grid_dist})")
                     return
                 
     def update(self, dungeon):

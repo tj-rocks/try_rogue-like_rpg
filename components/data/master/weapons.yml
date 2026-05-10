@@ -211,11 +211,15 @@ WEAPON_DATA:
     max_floor: 999
     rarity: 2
     attack_bonus: 5
-    price: 5
+    price: 70
     armor_penetration: false
     image_path: components/pictures/weapon/broken_sword.png
     shop_buyable: false
     describe: 刃がボロボロで、今にも折れそうな剣。
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003
   iron_sword:
     name: 鉄の剣
     category: onehanded_sword
@@ -228,6 +232,10 @@ WEAPON_DATA:
     image_path: components/pictures/weapon/iron_sword.png
     shop_buyable: true
     describe: 鉄製の標準的な剣。丈夫で扱いやすい。
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003
   old_sword:
     name: 古びた剣
     category: onehanded_sword
@@ -235,11 +243,15 @@ WEAPON_DATA:
     max_rank: D
     rarity: 8
     attack_bonus: 6
-    price: 30
+    price: 75
     armor_penetration: false
     image_path: components/pictures/weapon/old_sword.png
     shop_buyable: false
     describe: 長年放置され、刃がこぼれた古い剣。戦うには心もとない。
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003
   wooden_stick:
     name: 木の棍棒
     category: axe
@@ -253,6 +265,10 @@ WEAPON_DATA:
     sound: components/sounds/sfx/wood_swing.wav
     shop_buyable: true
     describe: その辺の枝を削って作った粗末な武器。素手よりはマシな程度。
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003
   fullmetal_sword:
     name: 鋼の剣
     category: onehanded_sword
@@ -265,6 +281,10 @@ WEAPON_DATA:
     image_path: components/pictures/weapon/fullmetal_sword.png
     shop_buyable: false
     describe: 鉄を鍛え上げて打った剣。鉄より鋭く重い。
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003
   damascus_sword:
     name: ダマスカス鋼の剣
     category: onehanded_sword
@@ -277,6 +297,10 @@ WEAPON_DATA:
     image_path: components/pictures/weapon/tempered_sword.png
     shop_buyable: false
     describe: 職人が鉄を何層にも重ねて打った剣。波打つような文様が特徴。
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003
   thiefs_knife:
     name: 盗賊のダガー
     category: dagger
@@ -290,3 +314,7 @@ WEAPON_DATA:
     image_path: components/pictures/weapon/thiefs_knife.png
     shop_buyable: true
     describe: 音もなく獲物を屠るための特殊な刀。装備するとモンスターに気づかれにくくなる。
+    growth:
+      bonus_limit: 2
+      times_limit: 50
+      over_limit_growth_rate: 0.003

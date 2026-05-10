@@ -7,6 +7,8 @@ import pygame
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Pygameの初期化
+os.environ["SDL_VIDEODRIVER"] = "dummy"
+os.environ["TEST_MODE"] = "1"
 pygame.init()
 pygame.display.set_mode((1, 1))
 

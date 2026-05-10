@@ -1425,6 +1425,9 @@ class Dungeon:
 
     def check_traps(self, player, dialog):
         if getattr(player, "is_moving", False): return self
+        from systems.game_state import game_state, is_paused
+        if is_paused() or game_state.get("dialog_just_closed"): return self
+        
         px, py = int((player.x + player.width / 2) // self.tile_size), int((player.y + player.height / 2) // self.tile_size)
         for trap in self.traps[:]:
             if trap.x == px and trap.y == py and not trap.is_triggered:
@@ -1432,12 +1435,26 @@ class Dungeon:
                 if trap.type == "pitfall":
                     target_floor = self.current_floor + 1
                     guild = GuildSystem()
-                    max_f = guild.get_max_floor(player.guild_point)
+                    max_f = guild.get_max_floor(player.guild_rank)
+                    
+                    # 進行中の昇格クエストがあれば、その目標ランクの制限まで緩和する
+                    for q in player.active_quests:
+                        if q.get("is_rank_up"):
+                            target_rank = q.get("next_rank")
+                            if target_rank:
+                                exam_limit = guild.get_max_floor(target_rank)
+                                max_f = max(max_f, exam_limit)
+
                     if target_floor > max_f:
                         req_rank = guild.get_required_rank_for_floor(target_floor)
                         if dialog:
                             dialog.text = Text.UI.RANK_LIMIT_REACHED.format(rank=req_rank)
                             dialog.is_active = True
+                        
+                        # 階段と同様に、一歩押し戻してメッセージがループするのを防ぐ
+                        player.x, player.y = player.prev_x, player.prev_y
+                        player.target_x, player.target_y = player.x, player.y
+                        player.is_moving = False
                         return self
 
                 msg = trap.trigger(player, self, dialog)
@@ -1597,27 +1614,27 @@ class Dungeon:
         if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): return self
         ct = self.map_data[ty][tx]
         if ct == 3:
-            # ランクチェック
+            # --- ランク制限チェック ---
             target_floor = self.current_floor + 1
             guild = GuildSystem()
-            
-            # --- [NEW] 入会試験チェック ---
-            if player.guild_rank == "-" and target_floor == 1:
-                has_enrollment_quest = any(q.get("id") == "rank_up_F" for q in player.active_quests)
-                if not has_enrollment_quest:
-                    if dialog:
-                        dialog.text = Text.UI.GUILD_NO_ENTRY
-                        dialog.is_active = True
-                    # 押し戻す
-                    player.x, player.y = player.prev_x, player.prev_y
-                    player.target_x, player.target_y = player.x, player.y
-                    return self
-
             max_f = guild.get_max_floor(player.guild_rank)
             
-            # --- [FIX] 入会試験中はB1F（Fランク範囲）への入場を許可する ---
-            if player.guild_rank == "-" and any(q.get("id") == "rank_up_F" for q in player.active_quests):
-                max_f = guild.get_max_floor("F")
+            # 進行中の昇格クエストがあれば、その目標ランクの制限まで緩和する
+            for q in player.active_quests:
+                if q.get("is_rank_up"):
+                    target_rank = q.get("next_rank")
+                    if target_rank:
+                        exam_limit = guild.get_max_floor(target_rank)
+                        max_f = max(max_f, exam_limit)
+            
+            # [SPECIAL] ギルド未加入(-)かつ昇格試験も受けていない場合、B1Fへの進入を拒否する
+            if player.guild_rank == "-" and max_f == 0 and target_floor == 1:
+                if dialog:
+                    dialog.text = Text.UI.GUILD_NO_ENTRY
+                    dialog.is_active = True
+                player.x, player.y = player.prev_x, player.prev_y
+                player.target_x, player.target_y = player.x, player.y
+                return self
                 
             if target_floor > max_f:
                 if dialog and not dialog.is_active:

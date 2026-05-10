@@ -39,8 +39,11 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_official.json")
 
+# [NEW] テストモード時はさらに優先して別ファイルにする
+if os.environ.get("TEST_MODE") == "1":
+    SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_data_test.json")
 # [NEW] デバッグモード時はセーブファイルを分離する
-if os.environ.get("DEBUG_MODE") == "1":
+elif os.environ.get("DEBUG_MODE") == "1":
     SAVE_OFFICIAL_PATH = os.path.join(_ROOT, "components/data/savefile/save_data_debug.json")
 
 SAVE_SUSPEND_PATH = SAVE_OFFICIAL_PATH # 一本化

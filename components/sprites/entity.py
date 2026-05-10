@@ -74,7 +74,7 @@ class Entity:
 
             # 他のエンティティ（自分以外）との衝突チェック
             # プレイヤー
-            if hasattr(dungeon, "player") and dungeon.player != self:
+            if getattr(dungeon, "player", None) and dungeon.player != self:
                 p_grids = dungeon.player.get_occupied_grids(dungeon.tile_size)
                 if (gx, gy) in p_grids:
                     return False

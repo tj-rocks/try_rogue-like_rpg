@@ -11,7 +11,8 @@ from constants import (
     PLAYER_WEAPON, WEAPON_DATA, PLAYER_DEFENSE, PLAYER_ARMOR, ARMOR_DATA, ARMOR_COLORS,
     PLAYER_SHIELD, SHIELD_DATA, SHIELD_COLORS, PLAYER_ORE,
     MAX_ITEM_SLOTS, MAX_EQUIP_SLOTS, MAX_STAVE_SLOTS,
-    STAVE_DATA, HIT_STUN_DURATION, SOUND_ATTACK_HIT, SOUND_ATTACK_MISS
+    STAVE_DATA, HIT_STUN_DURATION, SOUND_ATTACK_HIT, SOUND_ATTACK_MISS,
+    ENABLE_DEBUG_LOGGING
 )
 
 # 装備品インスタンス管理用カウンター（ゲーム全体でユニークなID）
@@ -110,11 +111,7 @@ class EquipInstance:
         else:
             bonus = growth_room + (self.enhance - times_limit) * over_per_step
 
-        # 攻撃・防御・HPなどの主要ステータスは整数で返す（切り捨て）
-        if stat_key in ["attack_bonus", "defense_bonus", "hp_bonus"]:
-            import math
-            return math.floor(bonus)
-            
+        # 強化ボーナスをそのまま返す (UI側で表示を制御)
         return round(bonus, 3)
 
     def get_name(self):
@@ -243,8 +240,8 @@ class Player(Entity):
         if shield_inst:
             bonus += shield_inst.get_stat("attack_bonus", 0)
             
-        # 最終的に整数にキャストして返す（HUD表示対策）
-        return int(self.attack + bonus)
+        # 小数点第1位まで有効にする
+        return round(self.attack + bonus, 1)
 
     @property
     def max_hp(self):
@@ -351,12 +348,20 @@ class Player(Entity):
         """基本防御力 + 装備ボーナスの合計"""
         bonus = 0
         armor_inst = self._find_equip_inst(self.armor_inventory, self.equipped_armor)
-        if armor_inst: bonus += armor_inst.get_stat("defense_bonus", 0) + armor_inst.get_enhance_bonus("defense_bonus")
+        if armor_inst: 
+            a_stat = armor_inst.get_stat("defense_bonus", 0)
+            a_enh = armor_inst.get_enhance_bonus("defense_bonus")
+            bonus += a_stat + a_enh
         
         shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
-        if shield_inst: bonus += shield_inst.get_stat("defense_bonus", 0) + shield_inst.get_enhance_bonus("defense_bonus")
+        if shield_inst: 
+            s_stat = shield_inst.get_stat("defense_bonus", 0)
+            s_enh = shield_inst.get_enhance_bonus("defense_bonus")
+            bonus += s_stat + s_enh
         
-        return int(self.defense + bonus)
+        return round(self.defense + bonus, 1)
+
+
 
     @property
     def block_chance_close(self):
@@ -605,6 +610,7 @@ class Player(Entity):
     def start_enemy_turn(self, dungeon):
         """敵のターン（思考・行動）を初期化して開始する。同時行動時と通常時で共通。"""
         from systems.game_state import game_state
+        print(f"[TURN] Starting Enemy Turn (Player action finished)")
         game_state["turn_state"] = "enemies"
         game_state["current_enemy_idx"] = 0
         self.enemy_turn_pending = False
@@ -711,7 +717,7 @@ class Player(Entity):
             return
             
         bonus = data.get("defense_bonus", 0) + inst.enhance
-        self.defense = PLAYER_DEFENSE + bonus
+        # self.defense = PLAYER_DEFENSE + bonus  <-- REMOVED: Rely on total_defense property
         
         # 防具画像のロード
         self._armor_images = {}
@@ -750,12 +756,12 @@ class Player(Entity):
 
     def unequip_armor(self):
         self.equipped_armor = None
-        self.defense = PLAYER_DEFENSE
+        # self.defense = PLAYER_DEFENSE  <-- REMOVED: Rely on total_defense property
         self._armor_images = {}
 
     def unequip_shield(self):
         self.equipped_shield = None
-        self.block_chance = 0.0
+        # self.block_chance = 0.0  <-- REMOVED: Rely on block_chance_close/ranged properties
         self._shield_images = {}
 
     def change_lantern(self, iid):
@@ -845,7 +851,7 @@ class Player(Entity):
     def _apply_shield(self, inst):
         self.equipped_shield = inst.iid
         data = SHIELD_DATA[inst.key]
-        self.block_chance = data.get("block_chance", 0.0)
+        # self.block_chance = data.get("block_chance", 0.0)  <-- REMOVED: Rely on properties
         self._shield_images = {}
         import os
         img_dir = data.get("image_dir", "")
@@ -1166,6 +1172,11 @@ class Player(Entity):
         """旧来の互換性、および単体更新用のメソッド"""
         self.update_animation(dungeon, dialog)
         from systems.game_state import is_paused, game_state
+        
+        # 攻撃や杖の使用などのアニメーション終了を待ってから敵のターンを開始する
+        if not is_paused() and not self.is_attacking and getattr(self, "enemy_turn_pending", False):
+            self.start_enemy_turn(dungeon)
+
         if not is_paused() and game_state["turn_state"] == "player":
             self.operate(dungeon, dialog, events)
         game_state["dialog_just_closed"] = False
@@ -1456,7 +1467,7 @@ class Player(Entity):
     def to_dict(self):
         return {
             "x": self.x, "y": self.y,
-            "hp": self.hp, "max_hp": self.max_hp, "coin": self.coin, "bank_coin": getattr(self, "bank_coin", 0), "attack": self.attack,
+            "hp": self.hp, "max_hp": self.max_hp, "coin": self.coin, "bank_coin": getattr(self, "bank_coin", 0), "attack": self.attack, "defense": self.defense,
             "items": [dict(it) for it in self.items],
             "weapon_inventory": [eq.to_dict() for eq in getattr(self, "weapon_inventory", [])],
             "armor_inventory": [eq.to_dict() for eq in getattr(self, "armor_inventory", [])],
@@ -1489,6 +1500,7 @@ class Player(Entity):
         self.coin = int(data.get("coin", self.coin))
         self.bank_coin = int(data.get("bank_coin", 0))
         self.attack = int(data.get("attack", self.attack))
+        self.defense = int(data.get("defense", self.defense))
         raw_items = data.get("items", [])
         self.items = []
         if isinstance(raw_items, list):

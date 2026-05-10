@@ -713,24 +713,6 @@ class OreSelectionDialog:
                                         display_before = before
                                         display_after = after
                                         stat_label = "能力ボーナス"
-                                    # キャップ情報
-                                    data = {}
-                                    from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA
-                                    if item_type == "weapon": data = WEAPON_DATA.get(inst.key, {})
-                                    elif item_type == "armor": data = ARMOR_DATA.get(inst.key, {})
-                                    else: data = SHIELD_DATA.get(inst.key, {})
-                                    growth = data.get("growth")
-                                    if growth:
-                                        tl = growth.get("times_limit", 50)
-                                        if inst.enhance < tl:
-                                            remaining = tl - inst.enhance
-                                            cap_info = f"ソフトキャップまであと {remaining} 回"
-                                        elif inst.enhance == tl:
-                                            cap_info = "ソフトキャップ到達。以降は完全に微小な変化になる"
-                                        else:
-                                            cap_info = "ソフトキャップ超過中。変化は極小"
-                                    else:
-                                        cap_info = ""
                                     from wordings import Text
                                     cd.text = Text.NPC.BLACKSMITH_ENHANCE_PREVIEW.format(
                                         name=inst.get_name(),
@@ -738,8 +720,7 @@ class OreSelectionDialog:
                                         unit=unit,
                                         before=display_before, after=display_after,
                                         enhance=inst.enhance + ore_bonus,
-                                        ore_bonus=ore_bonus,
-                                        cap_info=cap_info
+                                        ore_bonus=ore_bonus
                                     )
                                     stored_type, stored_iid, stored_key = item_type, iid, ore_key
                                     def do_enhance():

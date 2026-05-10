@@ -44,7 +44,7 @@ CONSUMABLE_DATA:
     name: くさいポーション
     effect: heal_hp
     heal_amount: 1
-    price: 10
+    price: 80
     min_rank: F
     rarity: 4
     image_path: components/pictures/icon/potion2.png
@@ -55,7 +55,7 @@ CONSUMABLE_DATA:
   rotten_potion:
     name: 腐ったポーション
     effect: poison_self
-    price: 5
+    price: 80
     min_rank: F
     rarity: 3
     image_path: components/pictures/icon/potion2.png
@@ -66,7 +66,7 @@ CONSUMABLE_DATA:
   trap_remover:
     name: 罠解除ツール
     effect: remove_trap
-    price: 50
+    price: 100
     min_rank: F
     rarity: 3
     image_path: components/pictures/icon/tool.png
@@ -82,7 +82,7 @@ CONSUMABLE_DATA:
     name: ヒールポーション
     effect: heal_hp
     heal_amount: 40
-    price: 80
+    price: 100
     min_rank: F
     rarity: 1
     image_path: components/pictures/icon/hp_potion.png
@@ -94,7 +94,7 @@ CONSUMABLE_DATA:
   antidote_potion:
     name: 毒消薬
     effect: antidote
-    price: 80
+    price: 100
     min_rank: F
     rarity: 1
     image_path: components/pictures/icon/hp_potion.png
@@ -299,8 +299,8 @@ STAVE_DATA:
     min_rank: F
     max_floor: 999
     rarity: 5
-    price: 1
-    selling_price: 1    # 売れない奇杀の束の杖
+    price: 800
+    selling_price: 80    # 売れない奇杀の束の杖
     charges: 0
     image_path: components/pictures/icon/stave.png
     shop_buyable: false
@@ -311,7 +311,7 @@ STAVE_DATA:
     min_rank: F
     rarity: 1
     price: 1200
-    selling_price: 100  # 買値1200の約1/12
+    selling_price: 120  # 買値1200の約1/12
     charges: 5
     sound: components/sounds/sfx/fire.wav
     effect_color:
@@ -331,8 +331,8 @@ STAVE_DATA:
     effect_type: heal
     min_rank: F
     rarity: 1
-    price: 1000
-    selling_price: 80   # 買値1000の約1/12
+    price: 1200
+    selling_price: 120   # 買値1000の約1/12
     charges: 5
     sound: components/sounds/sfx/heal.wav
     image_path: components/pictures/icon/stave.png
@@ -340,7 +340,7 @@ STAVE_DATA:
     - 100
     - 255
     - 100
-    heal_ratio: 0.5
+    heal_ratio: 0.8
     shop_buyable: true
     describe: 癒やしの光を放つ魔法の杖。自分や仲間の傷を癒やすことができる。
   invincible_stave:
@@ -366,7 +366,7 @@ STAVE_DATA:
     min_rank: F
     rarity: 1
     price: 1500
-    selling_price: 100  # 買値1500の約1/15
+    selling_price: 150  # 買値1500の約1/15
     charges: 5
     sound: components/sounds/sfx/light.wav
     image_path: components/pictures/icon/stave.png
