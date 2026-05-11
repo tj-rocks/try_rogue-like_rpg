@@ -312,10 +312,10 @@ def _effect_knockback(player, settings, dungeon, dialog):
         final_gx, final_gy = next_gx, next_gy
  
     # 敵を移動させる（ワープさせず、高速スライディング移動させる）
+    target_enemy.move_speed = 1200
     target_enemy.target_x = final_gx * dungeon.tile_size
     target_enemy.target_y = final_gy * dungeon.tile_size
     target_enemy.is_moving = True
-    target_enemy.move_speed = 24 # 吹き飛ばし用の高速移動
     
     # ダメージ計算（攻撃力の半分、必中）
     msg_dmg, damage, is_crit, is_miss = deal_damage(player, target_enemy, is_magic=True, damage_mult=0.5)

@@ -1073,7 +1073,8 @@ class InventoryDialog(BaseListDialog):
         lines = []
         S_MAP = {"attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
                  "dex_bonus": "器用さ", "eva_bonus": "回避率", "crit_bonus": "会心率",
-                 "block_chance": "ブロック率", "stave_bonus": "杖回数"}
+                 "block_chance": "回避率", "block_chance_close": "近距離回避率", 
+                 "block_chance_ranged": "遠距離回避率", "stave_bonus": "杖回数"}
         if itype in ("weapon", "armor", "shield", "lantern", "stave"):
             inv = getattr(player, itype + "_inventory", [])
             inst = player._find_equip_inst(inv, key)
@@ -1084,7 +1085,7 @@ class InventoryDialog(BaseListDialog):
                 if k == "attack_bonus" and inst.enhance > 0: val += inst.enhance
                 if k == "defense_bonus" and inst.enhance > 0: val += inst.enhance
                 if val:
-                    is_pct = k in ("crit_bonus", "block_chance", "eva_bonus")
+                    is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged")
                     lines.append(f"{label}: +{int(val*100)}%" if is_pct else f"{label}: +{val}")
             desc = inst.get_stat("describe", "")
             if desc: lines.extend(["", desc])
@@ -2557,6 +2558,16 @@ class ShopDialog(BaseListDialog):
             if start + self.view_size > len(self.items): start = max(0, len(self.items) - self.view_size)
             for i in range(start, min(start + self.view_size, len(self.items))):
                 item = self.items[i]; y = self.y + 80 + (i - start) * self.row_height; color = (255, 255, 255)
+                # 装備中判定
+                is_eq = False
+                iid, itype = item[0], item[1]
+                if itype == "weapon_inst" and player.equipped_weapon == iid: is_eq = True
+                elif itype == "armor_inst" and player.equipped_armor == iid: is_eq = True
+                elif itype == "shield_inst" and player.equipped_shield == iid: is_eq = True
+                elif itype == "lantern_inst" and player.equipped_lantern == iid: is_eq = True
+                
+                if is_eq: color = (150, 150, 150)
+                
                 if i == self.cursor_idx:
                     color = (255, 255, 100); pygame.draw.rect(screen, (60, 70, 90), (self.x + 20, y - 5, self.width // 2 - 40, self.row_height), border_radius=5)
                     screen.blit(self.font.render(">", True, color), (self.x + 35, y))
@@ -2585,10 +2596,23 @@ class ShopDialog(BaseListDialog):
             catalog = {"weapon": WEAPON_DATA, "armor": ARMOR_DATA, "shield": SHIELD_DATA, "stave": STAVE_DATA, "consumable": CONSUMABLE_DATA}
             info = catalog.get(itype, {}).get(master_key, {})
             lines = [f"【{selected[2]}】", ""]
-            if "attack_bonus" in info: lines.append(f"攻撃力: +{info['attack_bonus']}")
-            if "defense_bonus" in info: lines.append(f"防御力: +{info['defense_bonus']}")
-            if "hp_bonus" in info: lines.append(f"最大HP: +{info['hp_bonus']}")
-            if itype == "shield" and "eva_bonus" in info: lines.append(f"回避率: +{info['eva_bonus']}%")
+            if itype == "shield":
+                if info.get("block_chance_close", 0) != 0: lines.append(f"近距離回避率: {int(info['block_chance_close']*100)}%")
+                if info.get("block_chance_ranged", 0) != 0: lines.append(f"遠距離回避率: {int(info['block_chance_ranged']*100)}%")
+                # 特定の回避率がない場合は基礎回避率を表示
+                if info.get("block_chance_close", 0) == 0 and info.get("block_chance_ranged", 0) == 0:
+                    if info.get("block_chance", 0) != 0: lines.append(f"回避率: {int(info['block_chance']*100)}%")
+                if info.get("hp_bonus", 0) != 0: lines.append(f"最大HP: +{info['hp_bonus']}")
+            elif itype == "weapon":
+                if info.get("attack_bonus", 0) != 0: lines.append(f"攻撃力: +{info['attack_bonus']}")
+                if info.get("hp_bonus", 0) != 0: lines.append(f"最大HP: +{info['hp_bonus']}")
+            elif itype == "armor":
+                if info.get("defense_bonus", 0) != 0: lines.append(f"防御力: +{info['defense_bonus']}")
+                if info.get("hp_bonus", 0) != 0: lines.append(f"最大HP: +{info['hp_bonus']}")
+            else: # その他（巻物やポーションなど）
+                if info.get("attack_bonus", 0) != 0: lines.append(f"攻撃力: +{info['attack_bonus']}")
+                if info.get("defense_bonus", 0) != 0: lines.append(f"防御力: +{info['defense_bonus']}")
+                if info.get("hp_bonus", 0) != 0: lines.append(f"最大HP: +{info['hp_bonus']}")
             lines.append(""); lines.append(info.get("describe", "詳細情報はありません。") if selected[1] != "cancel" else "店を出ます。")
             draw_text_wrapped(screen, self.font, "\n".join(lines), sep_x + 30, self.y + 80, self.width // 2 - 60, color=(220, 230, 240))
 

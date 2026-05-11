@@ -259,12 +259,12 @@ WEAPON_DATA:
     max_rank: E
     rarity: 1
     attack_bonus: 6
-    price: 10
+    price: 100
     armor_penetration: false
     image_path: components/pictures/weapon/wooden_stick.png
     sound: components/sounds/sfx/wood_swing.wav
     shop_buyable: true
-    describe: その辺の枝を削って作った粗末な武器。素手よりはマシな程度。
+    describe: その辺の木を削って作った鈍器。不恰好だが威力はそれなり？
     growth:
       bonus_limit: 2
       times_limit: 50

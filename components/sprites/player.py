@@ -735,6 +735,7 @@ class Player(Entity):
         if self.hp <= 0:
             if self.has_item("revive_amulet"):
                 self.remove_item_by_key("revive_amulet"); self.hp = self.max_hp // 2; self.is_dead = False; self.damage_flash_timer = 120
+                self.condition = "normal"; self.status_timer = 0
             else: self.hp = 0; self.is_dead = True
         else: self.damage_flash_timer = 60 + HIT_STUN_DURATION
 

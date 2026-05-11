@@ -11,10 +11,24 @@ echo "========================================"
 echo "🚀 2DGame テストスイート実行中..."
 echo "========================================"
 
+# テストモードを強制（セーブデータの汚染防止）
+export TEST_MODE=1
+
+echo "----------------------------------------"
+echo "🔍 セーブデータ隔離チェック実行中..."
+$VENV_PYTHON "tests/test_save_isolation.py"
+if [ $? -ne 0 ]; then
+    echo "❌ 警告: セーブデータの隔離に失敗しました。テストを中止します。"
+    exit 1
+fi
+echo "✅ 隔離確認完了。安全にテストを開始します。"
+
 TEST_FILES=(
     "tests/test_boot.py"
     "tests/test_hitbox.py"
+    "tests/test_lantern_pickup.py"
     "tests/test_save_load.py"
+    "tests/test_revive_cure.py"
     "tests/test_death.py"
     "tests/test_shopping.py"
     "tests/test_quest.py"

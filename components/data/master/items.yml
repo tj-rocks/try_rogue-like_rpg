@@ -379,11 +379,14 @@ STAVE_DATA:
 #以下は弄らない
 LANTERN_DATA:
   none:
+    name: なし
     radius: 1
     fade_radius: 2
   basic:
+    name: カンテラ
     radius: 2
     fade_radius: 5
   luxury:
+    name: 上等なカンテラ
     radius: 5
     fade_radius: 8
