@@ -1,0 +1,33 @@
+name: Python Test Suite
+
+on:
+  push:
+    branches: [ main, tj_dev ]
+  pull_request:
+    branches: [ main, tj_dev ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Run automated tests
+      env:
+        SDL_VIDEODRIVER: dummy
+        PYTHON_EXE: python
+        TEST_MODE: "1"
+      run: |
+        chmod +x run_tests.sh
+        ./run_tests.sh
