@@ -405,8 +405,11 @@ class Dungeon:
             # デフォルトは開始地点(P)
             tx, ty = self.start_pos
             
-            # 死亡時は宿屋(H)の右隣にスポーン
-            if is_death and self.inn_pos != (0, 0):
+            # 死亡時は診療所(R)の右隣にスポーン
+            if is_death and self.clinic_pos:
+                tx, ty = self.clinic_pos[0] + 1, self.clinic_pos[1]
+            # 宿屋(H)（後方互換/フォールバック用）
+            elif is_death and self.inn_pos != (0, 0):
                 tx, ty = self.inn_pos[0] + 1, self.inn_pos[1]
                 
             # ダンジョンからの帰還
@@ -414,8 +417,8 @@ class Dungeon:
                 # ダンジョン入口(D)の右隣にスポーン
                 tx, ty = self.dungeon_pos[0] + 1, self.dungeon_pos[1]
             
-            # 座標を適用 (再開時は player.load_dict で復元された座標を優先する)
-            if spawn_reason != "continue":
+            # 座標を適用 (再開時でも死亡時は強制的に座標を設定する)
+            if spawn_reason != "continue" or is_death:
                 player.x = tx * ts
                 player.y = ty * ts
             self.spawn_pos = (int(player.x // ts), int(player.y // ts))

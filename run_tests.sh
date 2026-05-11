@@ -23,7 +23,18 @@ TEST_FILES=(
     "tests/test_combat_sim.py"
     "tests/test_npc_collision.py"
     "tests/test_enemy_collision.py"
-    "tests/test_rank_up_entrance.py"
+    "tests/test_inn_debt.py"
+    "tests/test_stave_effects.py"
+    "tests/test_combat_damage.py"
+    "tests/test_combat_logic.py"
+    "tests/test_attack_turn_transition.py"
+    "tests/test_collision_phasing.py"
+    "tests/test_decimal_impact.py"
+    "tests/test_equipment_offsets.py"
+    "tests/test_evasion.py"
+    "tests/test_movement.py"
+    "tests/test_rank_limit.py"
+    "tests/test_trap.py"
 )
 
 SUCCESS_COUNT=0

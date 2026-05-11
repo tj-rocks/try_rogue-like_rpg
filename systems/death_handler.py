@@ -84,7 +84,7 @@ def handle_death_sequence(player, dungeon, dialog, game_state):
                     player.coin = -fee
 
             # 診療所へワープ
-            dungeon = warp_to_floor(0, player, spawn_reason="continue")
+            dungeon = warp_to_floor(0, player, is_death=True, spawn_reason="continue")
             
             # [FIX] 絶望感を確定させるため、医者が話し始める前に即座にセーブする
             from systems.data_loader import SAVE_OFFICIAL_PATH

@@ -86,10 +86,36 @@ def test_death_debt():
     assert player.coin < 0
     print("[OK] 死亡時借金テスト合格！")
 
+def test_respawn_position():
+    print("--- 復活位置検証テスト開始 ---")
+    from systems.dungeon import Dungeon
+    
+    player = Player()
+    # 0階（村）のダミーダンジョン
+    dungeon = Dungeon(level=0, player=player)
+    
+    # 医者の位置を強制設定（通常はマップ読み込み時に設定される）
+    dungeon.clinic_pos = (10, 20)
+    ts = dungeon.tile_size
+    
+    # 死亡フラグを立ててスポーン位置設定を呼び出す
+    # spawn_reason="continue" はセーブデータからの復旧時などを想定
+    dungeon.set_spawn_position(player, spawn_reason="continue", is_death=True)
+    
+    expected_x = (dungeon.clinic_pos[0] + 1) * ts
+    expected_y = dungeon.clinic_pos[1] * ts
+    
+    print(f"座標検証: 期待値 ({expected_x}, {expected_y}), 実際 ({player.x}, {player.y})")
+    assert player.x == expected_x
+    assert player.y == expected_y
+    
+    print("[OK] 復活位置検証テスト合格！")
+
 if __name__ == "__main__":
     try:
         test_death_penalty()
         test_death_debt()
+        test_respawn_position()
     except Exception as e:
         print(f"テスト失敗: {e}")
         import traceback
