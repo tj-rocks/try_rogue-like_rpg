@@ -182,7 +182,14 @@ class Player(Entity):
         bonus = 0
         for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("eva_bonus", 0)
+            if inst:
+                # eva_bonus または block_chance を取得
+                val = inst.get_stat("eva_bonus", inst.get_stat("block_chance", 0))
+                # 小数の場合は100倍してパーセントにする
+                if isinstance(val, float) and val < 1.0:
+                    bonus += val * 100
+                else:
+                    bonus += val
         return int(base + bonus)
 
     @property
@@ -190,8 +197,15 @@ class Player(Entity):
         bonus = 0
         for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("crit_bonus", 0)
-        return bonus
+            if inst:
+                # crit_bonus または crit_rate を取得
+                val = inst.get_stat("crit_bonus", inst.get_stat("crit_rate", 0))
+                # 小数の場合は100倍してパーセントにする
+                if isinstance(val, float) and val < 1.0:
+                    bonus += val * 100
+                else:
+                    bonus += val
+        return int(bonus)
 
     @property
     def stave_bonus(self):
@@ -671,17 +685,68 @@ class Player(Entity):
         return False
 
     def remove_item_by_key(self, ik, count=1):
+        # 1. 消耗品とイベントアイテムから削除
         for inv in [self.items, self.event_items]:
             for it in inv[:]:
                 if it["key"] == ik:
                     rem = min(count, it["count"]); it["count"] -= rem; count -= rem
                     if it["count"] <= 0: inv.remove(it)
                     if count <= 0: return True
-        return False
+        
+        # 2. 杖・装備品から削除
+        # インベントリに対応する属性名と解除メソッドの定義
+        mapping = [
+            (self.stave_inventory, None, None),
+            (self.weapon_inventory, "equipped_weapon", self.unequip_weapon),
+            (self.armor_inventory, "equipped_armor", self.unequip_armor),
+            (self.shield_inventory, "equipped_shield", self.unequip_shield),
+            (self.lantern_inventory, "equipped_lantern", self.unequip_lantern)
+        ]
+
+        for inv, slot_attr, unequip_method in mapping:
+            # 優先度1: 装備していないものを先に削除
+            non_equipped = []
+            for inst in inv:
+                if hasattr(inst, "key") and inst.key == ik:
+                    is_equipped = (slot_attr and getattr(self, slot_attr) == inst.iid)
+                    if not is_equipped:
+                        non_equipped.append(inst)
+            
+            for inst in non_equipped:
+                inv.remove(inst); count -= 1
+                if count <= 0: return True
+            
+            # 優先度2: それでも足りない場合は装備中のものを削除
+            for inst in inv[:]:
+                if hasattr(inst, "key") and inst.key == ik:
+                    # ここに来るのは装備中のものだけ
+                    if unequip_method: unequip_method()
+                    inv.remove(inst); count -= 1
+                    if count <= 0: return True
+                    
+        return count <= 0
 
     def add_quest_token(self, ek):
         self.quest_tokens[ek] = self.quest_tokens.get(ek, 0) + 1
         return self.check_quest_completion(ek)
+
+    def _count_owned_items(self, tk):
+        # 消耗品とイベントアイテムをカウント
+        cnt = sum(i["count"] for i in self.items if i["key"] == tk)
+        cnt += sum(i["count"] for i in self.event_items if i["key"] == tk)
+        # 杖・装備品をカウント (これらは単体のリストなので要素数を数える)
+        # 装備中のものは納品対象外とするため除外
+        def get_slot_attr(target_inv):
+            if target_inv is self.weapon_inventory: return "equipped_weapon"
+            if target_inv is self.armor_inventory: return "equipped_armor"
+            if target_inv is self.shield_inventory: return "equipped_shield"
+            if target_inv is self.lantern_inventory: return "equipped_lantern"
+            return None
+
+        for inv in [self.stave_inventory, self.weapon_inventory, self.armor_inventory, self.shield_inventory, self.lantern_inventory]:
+            slot_attr = get_slot_attr(inv)
+            cnt += sum(1 for i in inv if i.key == tk and (not slot_attr or getattr(self, slot_attr) != i.iid))
+        return cnt
 
     def check_quest_completion(self, tk):
         for q in self.active_quests:
@@ -689,9 +754,16 @@ class Player(Entity):
                 done = False
                 if q.get("type") == "hunt": done = self.quest_tokens.get(tk, 0) >= q.get("amount", 1)
                 elif q.get("type") == "delivery":
-                    cnt = sum(i["count"] for i in self.items if i["key"] == tk) + sum(i["count"] for i in self.event_items if i["key"] == tk)
+                    cnt = self._count_owned_items(tk)
                     done = cnt >= q.get("amount", 1)
-                if done: q["_completed_notified"] = True; return f"\n【{q.get('title', '依頼')}】を達成した！\n帰還して報告しよう。"
+                
+                if done:
+                    q["_completed_notified"] = True
+                    from constants import SOUND_QUEST_COMPLETE
+                    import os
+                    if os.path.exists(SOUND_QUEST_COMPLETE):
+                        pygame.mixer.Sound(SOUND_QUEST_COMPLETE).play()
+                    return f"\n<Y>【{q.get('title', '依頼')}】の条件を達成した！</Y>\n帰還して報告しよう。"
         return ""
 
     def is_quest_reportable(self, q):
@@ -699,7 +771,7 @@ class Player(Entity):
         if not tk: return False
         if q.get("type") == "hunt": return self.quest_tokens.get(tk, 0) >= q.get("amount", 1)
         elif q.get("type") == "delivery":
-            return (sum(i["count"] for i in self.items if i["key"] == tk) + sum(i["count"] for i in self.event_items if i["key"] == tk)) >= q.get("amount", 1)
+            return self._count_owned_items(tk) >= q.get("amount", 1)
         return False
 
     def is_any_quest_ready(self):

@@ -49,6 +49,9 @@ TEST_FILES=(
     "tests/test_movement.py"
     "tests/test_rank_limit.py"
     "tests/test_trap.py"
+    "tests/test_quest_feedback.py"
+    "tests/test_quest_generation.py"
+    "tests/test_delivery_all_types.py"
 )
 
 SUCCESS_COUNT=0
