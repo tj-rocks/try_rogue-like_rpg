@@ -1811,21 +1811,22 @@ class GuildDialog:
         if self.mode == "AUTO_REPORT":
             self.mode = "MENU"
 
-        if self.mode == "MENU" and not self._skip_auto_report:
-            completed_q = None
-            for q in player.active_quests:
-                if self._is_reportable(player, q):
-                    completed_q = q
-                    break
-            
-            if completed_q:
-                # 達成済みがあれば、保留状態にする（自動遷移はしない）
-                self._pending_report = completed_q
-                # アイテムリストはMENUのまま、通常のメニュー項目を構築する（いいえの場合のため）
-            else:
-                self._pending_report = None
+        if self.mode == "MENU":
+            if not self._skip_auto_report:
+                completed_q = None
+                for q in player.active_quests:
+                    if self._is_reportable(player, q):
+                        completed_q = q
+                        break
+                
+                if completed_q:
+                    # 達成済みがあれば、保留状態にする（自動遷移はしない）
+                    self._pending_report = completed_q
+                    # アイテムリストはMENUのまま、通常のメニュー項目を構築する（いいえの場合のため）
+                else:
+                    self._pending_report = None
 
-            # 通常メニュー
+            # 通常メニュー (モードに関わらずMENUなら常に構築する)
             self.items = [
                 ("mode", "ACCEPT_DAILY", "日常依頼を受注", "ランダムに生成された日常的な依頼を受けます。"),
             ]
@@ -2177,9 +2178,16 @@ class GuildDialog:
         screen.blit(title, (self.x + 30, self.y + 20))
 
         # --- 左側：リスト ---
-        if not self.items:
-            msg = self.font.render(Text.UI.GUILD_LIST_EMPTY, True, (150, 150, 150))
+        # 戻るボタン以外の実質的な要素があるかチェック
+        has_content = any(item[0] not in ("back", "cancel") for item in self.items)
+        if not has_content:
+            msg_str = Text.UI.GUILD_LIST_EMPTY
+            if self.mode == "REPORT": msg_str = "報告できる依頼なし"
+            msg = self.font.render(msg_str, True, (150, 150, 150))
             screen.blit(msg, (self.x + 50, self.y + 100))
+        
+        if not self.items:
+            pass # items自体が空の場合は上のメッセージだけ表示（通常はsetupでbackが入る）
         else:
             start = max(0, self.cursor_idx - self.view_size // 2)
             if start + self.view_size > len(self.items):
