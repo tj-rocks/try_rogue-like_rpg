@@ -75,7 +75,7 @@ ARMOR_CATEGORIES:
     hp_bonus: 0
     attack_bonus: 5
     stave_bonus: 2
-    eva_bonus: 5
+    eva_bonus: 0.05
     price: 300
     image_dir: components/pictures/armor/leather_armor
     describe: 魔力を高める効果のある布製の防具.
@@ -133,7 +133,7 @@ ARMOR_DATA:
     rarity: 1
     defense_bonus: 10
     price: 200
-    eva_bonus: 5
+    eva_bonus: 0.05
     aggro_mod: -1
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
@@ -181,7 +181,7 @@ ARMOR_DATA:
     rarity: 4
     defense_bonus: 13
     price: 350
-    eva_bonus: 5
+    eva_bonus: 0.05
     aggro_mod: -1
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true

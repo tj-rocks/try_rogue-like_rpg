@@ -102,6 +102,12 @@ def test_knockback_stave():
     # 座標が右に移動しているか (target_x が 3*ts より大きくなっているはず)
     print(f"位置検証: 期待値 > {3 * ts}, 実際 {enemy.target_x}")
     assert enemy.target_x > 3 * ts
+    
+    # [追加] 速度と移動フラグの検証 (スローモーションバグの防止)
+    print(f"速度検証: 期待値 1200, 実際 {enemy.move_speed}")
+    assert enemy.move_speed == 1200
+    assert enemy.is_moving == True
+    
     print("[OK] 吹き飛ばしの杖テスト合格")
 
 def test_invincible_stave():

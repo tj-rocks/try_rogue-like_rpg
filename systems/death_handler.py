@@ -61,6 +61,8 @@ def handle_death_sequence(player, dungeon, dialog, game_state):
             player.block_chance = 0.0
             player.hp = player.max_hp
             player.is_dead = False
+            player.condition = "normal"
+            player.status_timer = 0
             
             # 復活時の最低限の装備（木の棍棒）を再付与
             player.equip_weapon_by_key("wooden_stick")

@@ -72,7 +72,6 @@ SHIELD_DATA:
     min_rank: F
     max_floor: 999
     rarity: 2
-    eva_bonus: 1
     block_chance: 0.01
     block_chance_close: 0.01
     block_chance_ranged: 0.01
@@ -90,7 +89,6 @@ SHIELD_DATA:
     min_rank: F
     max_rank: E
     rarity: 1
-    eva_bonus: 2
     price: 50
     block_chance: 0.05
     block_chance_close: 0.05
