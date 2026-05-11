@@ -33,6 +33,7 @@ jobs:
     - name: Run automated tests
       env:
         SDL_VIDEODRIVER: dummy
+        SDL_AUDIODRIVER: dummy
         PYTHON_EXE: python
         TEST_MODE: "1"
       run: |
