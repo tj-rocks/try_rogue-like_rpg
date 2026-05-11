@@ -1,0 +1,47 @@
+{
+  "x": 128,
+  "y": 384,
+  "hp": 200,
+  "max_hp": 200,
+  "coin": 100,
+  "bank_coin": 0,
+  "attack": 50,
+  "defense": 3,
+  "items": [],
+  "weapon_inventory": [
+    {
+      "iid": 2,
+      "type": "weapon",
+      "key": "old_sword",
+      "enhance": 0,
+      "stats": {}
+    }
+  ],
+  "armor_inventory": [
+    {
+      "iid": 1,
+      "type": "armor",
+      "key": "adventurers_clothes",
+      "enhance": 0,
+      "stats": {}
+    }
+  ],
+  "shield_inventory": [],
+  "equipped_weapon": 2,
+  "equipped_armor": 1,
+  "equipped_shield": null,
+  "stave_inventory": [],
+  "lantern_inventory": [],
+  "equipped_lantern": null,
+  "invincible_turns": 0,
+  "guild_point": 1000,
+  "guild_rank": "F",
+  "active_quests": [],
+  "quest_tokens": {},
+  "completed_fixed_quests": [],
+  "has_seen_ending": false,
+  "warehouse_items": [],
+  "event_items": [],
+  "current_floor": 1,
+  "equip_id_counter": 2
+}
