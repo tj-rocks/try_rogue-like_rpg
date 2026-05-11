@@ -134,6 +134,17 @@ class GuildSystem:
         else:
             title = Text.Guild.QUEST_HUNT_TITLE.format(rank=target_rank, name=target_data['name'], amount=amount)
 
+        if target_data.get("is_static"):
+            desc = random.choice(Text.Guild.QUEST_DESTROY_FLAVORS).format(name=target_data["name"])
+        else:
+            desc = random.choice(Text.Guild.QUEST_HUNT_FLAVORS).format(name=target_data["name"])
+
+        # 依頼主を確率で選ぶ (30% NPC, 70% その他)
+        if random.random() < 0.3:
+            requester = random.choice(Text.Guild.QUEST_REQUESTER_NPCS)
+        else:
+            requester = random.choice(Text.Guild.QUEST_REQUESTER_OTHERS)
+            
         return {
             "type": "hunt",
             "target_key": target_key,
@@ -141,7 +152,9 @@ class GuildSystem:
             "amount": amount,
             "reward_gold": reward_gold,
             "reward_gp": reward_gp,
-            "title": title
+            "title": title,
+            "description": desc,
+            "requester": requester
         }
 
     def _generate_delivery_quest(self, allowed_ranks, multiplier, min_amt, max_amt):
@@ -175,6 +188,13 @@ class GuildSystem:
         reward_gp = amount * 3 # 納品は討伐よりGP低め
         
         target_rank = target_data.get("min_rank", "F")
+        desc = random.choice(Text.Guild.QUEST_DELIVERY_FLAVORS).format(name=target_data["name"])
+        # 依頼主を確率で選ぶ (30% NPC, 70% その他)
+        if random.random() < 0.3:
+            requester = random.choice(Text.Guild.QUEST_REQUESTER_NPCS)
+        else:
+            requester = random.choice(Text.Guild.QUEST_REQUESTER_OTHERS)
+
         return {
             "type": "delivery",
             "target_key": target_key,
@@ -182,5 +202,7 @@ class GuildSystem:
             "amount": amount,
             "reward_gold": reward_gold,
             "reward_gp": reward_gp,
-            "title": Text.Guild.QUEST_DELIVERY_TITLE.format(rank=target_rank, name=target_data['name'], amount=amount)
+            "title": Text.Guild.QUEST_DELIVERY_TITLE.format(rank=target_rank, name=target_data['name'], amount=amount),
+            "description": desc,
+            "requester": requester
         }

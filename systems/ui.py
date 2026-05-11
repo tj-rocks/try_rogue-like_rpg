@@ -308,7 +308,13 @@ class Dialog:
         for i in range(visible_count):
             idx = i + self.scroll_y
             if idx < len(all_lines):
-                line_surf = self.font.render(all_lines[idx], True, (255, 255, 255))
+                line_text = all_lines[idx]
+                text_color = (255, 255, 255)
+                if "<Y>" in line_text:
+                    line_text = line_text.replace("<Y>", "").replace("</Y>", "")
+                    text_color = (255, 255, 0)
+                
+                line_surf = self.font.render(line_text, True, text_color)
                 screen.blit(line_surf, (self.x + padding_x, self.y + padding_y + i * line_height))
         
         # 4. スクロールインジケーター（▲▼）
@@ -1777,6 +1783,8 @@ class GuildDialog:
         self.cursor_idx = 0
         self.items = [] # (type, status, q_data)
         self.mode = "MENU" # MENU, REPORT, ACCEPT, ABANDON
+        self._skip_auto_report = False
+        self._pending_report = None # 確認待ちの報告クエスト
         self.dungeon_ref = None
 
     @property
@@ -1786,6 +1794,8 @@ class GuildDialog:
         game_state["guild_active"] = v
         if v:
             print(f"[UI] Open GuildDialog (Mode: {self.mode})")
+            self._skip_auto_report = False
+            self._pending_report = None
             self.cursor_idx = 0
             if self.mode != "AUTO_REPORT":
                 self.mode = "MENU"
@@ -1801,8 +1811,7 @@ class GuildDialog:
         if self.mode == "AUTO_REPORT":
             self.mode = "MENU"
 
-        # モードがMENUの場合のみ、自動報告の割り込みをチェック
-        if self.mode == "MENU":
+        if self.mode == "MENU" and not self._skip_auto_report:
             completed_q = None
             for q in player.active_quests:
                 if self._is_reportable(player, q):
@@ -1810,10 +1819,11 @@ class GuildDialog:
                     break
             
             if completed_q:
-                # 達成済みがあれば即座に報告モードへ遷移
-                self.mode = "AUTO_REPORT"
-                self.items = [("active", completed_q)]
-                return
+                # 達成済みがあれば、保留状態にする（自動遷移はしない）
+                self._pending_report = completed_q
+                # アイテムリストはMENUのまま、通常のメニュー項目を構築する（いいえの場合のため）
+            else:
+                self._pending_report = None
 
             # 通常メニュー
             self.items = [
@@ -1883,6 +1893,29 @@ class GuildDialog:
     def handle_events(self, events, player, dialog, confirm_dialog):
         from constants import KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_CANCEL, KEY_CONFIRM
         if not self.is_active: return
+        
+        # 保留中の報告があれば確認ダイアログを優先
+        if self._pending_report and not confirm_dialog.is_active:
+            q = self._pending_report
+            if q.get("type") == "delivery":
+                t_name = q.get('target_name') or q.get('target_key')
+                confirm_dialog.text = Text.UI.GUILD_REPORT_CONFIRM.format(name=t_name)
+            else:
+                confirm_dialog.text = Text.UI.GUILD_REPORT_CONFIRM_GENERIC
+            
+            def on_confirm():
+                self._report_quest(player, q, dialog)
+                # 報告処理の中で mode = AUTO_REPORT に遷移する
+                self._pending_report = None
+            def on_decline():
+                self._pending_report = None
+                self._skip_auto_report = True
+                self.setup(player, self.dungeon_ref)
+            confirm_dialog.on_yes = on_confirm
+            confirm_dialog.on_no = on_decline
+            confirm_dialog.is_active = True
+            return
+
         from systems.audio_manager import play_sfx
         from constants import SOUND_CURSOR_MOVE, SOUND_SELECT, SOUND_CANCEL
         for event in events:
@@ -1916,17 +1949,17 @@ class GuildDialog:
                         self.is_active = False
                     else:
                         self.mode = "MENU"
+                        self._skip_auto_report = True # キャンセルしたら以降はメニューを表示
                         self.cursor_idx = 0
                         self.setup(player, self.dungeon_ref)
                 elif event.key == KEY_CONFIRM:
                     if 0 <= self.cursor_idx < len(self.items):
                         item = self.items[self.cursor_idx]
                         if self.mode == "AUTO_REPORT":
-                            # 自動報告モード時は即座に実行
-                            from systems.audio_manager import play_sfx
-                            from constants import SOUND_SELECT
-                            play_sfx(SOUND_SELECT)
-                            self._report_quest(player, item[1], dialog)
+                            # AUTO_REPORT画面では決定でダイアログを閉じてMENUへ
+                            self.mode = "MENU"
+                            self._skip_auto_report = True
+                            self.setup(player, self.dungeon_ref)
                             return
 
                         title = item[2] if len(item) > 2 else (item[1].get('title', 'Unknown') if isinstance(item[1], dict) else 'Unknown')
@@ -1994,8 +2027,18 @@ class GuildDialog:
             confirm_dialog.on_yes = on_accept
             confirm_dialog.is_active = True
         elif status == "active":
-            # 達成報告
-            self._report_quest(player, q, dialog)
+            # 達成報告 (確認ダイアログを出す)
+            if q.get("type") == "delivery":
+                t_name = q.get('target_name') or q.get('target_key')
+                confirm_dialog.text = Text.UI.GUILD_REPORT_CONFIRM.format(name=t_name)
+            else:
+                confirm_dialog.text = Text.UI.GUILD_REPORT_CONFIRM_GENERIC
+            
+            def on_report_yes():
+                self._report_quest(player, q, dialog)
+            
+            confirm_dialog.on_yes = on_report_yes
+            confirm_dialog.is_active = True
         elif status == "active_to_abandon":
             # 破棄処理
             self._confirm_abandon(player, q, dialog, confirm_dialog)
@@ -2007,11 +2050,8 @@ class GuildDialog:
             if player.quest_tokens.get(q["target_key"], 0) >= q["amount"]:
                 player.quest_tokens[q["target_key"]] -= q["amount"]; success = True
         elif q["type"] == "delivery":
-            # 通常とイベントアイテムの両方を合算
-            normal_count = sum(item["count"] for item in player.items if item["key"] == q["target_key"])
-            event_count = sum(item["count"] for item in player.event_items if item["key"] == q["target_key"])
-            if (normal_count + event_count) >= q["amount"]:
-                for _ in range(q["amount"]): player.remove_item_by_key(q["target_key"])
+            if player.is_quest_reportable(q):
+                player.remove_item_by_key(q["target_key"], q["amount"])
                 success = True
         
         if success:
@@ -2055,8 +2095,11 @@ class GuildDialog:
                 if q.get("id"): player.completed_fixed_quests.append(q["id"])
                 dialog.is_active = True
 
+            # 報告完了画面（フラッシュ）のためにモードとアイテムをセット
+            self.mode = "AUTO_REPORT"
+            self.items = [("auto_report", q)]
             player.active_quests.remove(q)
-            self.setup(player, self.dungeon_ref)
+            # self.setup(player, self.dungeon_ref) # setupでmodeがリセットされるのでここでは呼ばない
         else:
             dialog.text = Text.UI.GUILD_QUEST_UNMET
             dialog.is_active = True
@@ -2163,11 +2206,11 @@ class GuildDialog:
                     display_name = Text.UI.QUIT
                 else:
                     q = item[1]
-                    label = "報告:" if status == "active" else "受注:"
+                    label = "" #"報告:" if status == "active" else "受注:"
                     if status == "active": color = (180, 255, 180) if i != self.cursor_idx else (255, 255, 100)
                     # 「【入会試験】」などの不要なタグを削除
-                    raw_title = q['title'].replace("【入会試験】", "").replace("【日常】", "")
-                    display_name = f"{label} {raw_title}"
+                    raw_title = q['title'].replace("【テスト】", "")
+                    display_name = raw_title.strip()
 
                 # はみ出し対策：長すぎる場合は省略
                 if self.font.size(display_name)[0] > max_list_w:
@@ -2204,13 +2247,43 @@ class GuildDialog:
             else:
                 # 依頼詳細 (データ不備に備えて .get() で安全にアクセス)
                 q = selected_item[1]
-                desc_text = f"【依頼タイトル】\n{q.get('title', '不明な依頼')}\n\n"
+                desc_text = ""
+                
+                # 依頼主を表示
+                if q.get("requester"):
+                    desc_text += f"【依頼主】 {q.get('requester')}\n\n"
+                else:
+                    desc_text += "\n"
+                
+                # フレーバーテキストを表示
+                if q.get("description"):
+                    desc_text += f"{q.get('description')}\n\n"
                 
                 t = q.get("type", "")
-                target = q.get("target_name", "???")
+                target = q.get("target_name")
+                if not target:
+                    # target_name が無い場合はマスターデータから取得を試みる
+                    key = q.get("target_key")
+                    if t == "hunt":
+                        from constants import ENEMY_DATA
+                        target = ENEMY_DATA.get(key, {}).get("name", "???")
+                    elif t == "delivery":
+                        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA
+                        for cat in [WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA]:
+                            if key in cat:
+                                target = cat[key].get("name", "???")
+                                break
+                    if not target: target = "???"
+
                 amount = q.get("amount", 0)
                 if t == "hunt":
-                    desc_text += f"【内容】\n{target} を {amount} 体討伐する。"
+                    # 障害物か敵かで文言を切り替える
+                    key = q.get("target_key")
+                    from constants import ENEMY_DATA
+                    is_static = ENEMY_DATA.get(key, {}).get("is_static", False)
+                    unit = "個" if is_static else "体"
+                    verb = "破壊" if is_static else "討伐"
+                    desc_text += f"【内容】\n{target} を {amount} {unit}{verb}する。"
                 elif t == "delivery":
                     desc_text += f"【内容】\n{target} を {amount} 個納品する。"
                 
@@ -2350,7 +2423,7 @@ class StatusDialog:
                     if q.get("type") == "hunt":
                         prog = f"({player.quest_tokens.get(q.get('target_key'), 0)}/{q.get('amount') or 0})"
                     elif q.get("type") == "delivery":
-                        count = sum(item["count"] for item in player.items if item["key"] == q.get("target_key"))
+                        count = player._count_owned_items(q.get('target_key'))
                         prog = f"({count}/{q.get('amount') or 0})"
                     
                     # 昇級試験の場合は進捗を「未達成/達成」のような形にするか、あるいはprogを隠す

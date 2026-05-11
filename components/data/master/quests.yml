@@ -48,6 +48,8 @@ FIXED_QUESTS:
     reward_gold: 500
     reward_gp: 5
     title: スイスイスライムの討伐
+    requester: ギルドマスター
+    description: ダンジョン深層に現れるという、驚異的な回避能力を持つスライムを討伐してください。
     repeatable: true
     chance: 1.0
     ending: true

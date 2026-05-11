@@ -110,6 +110,8 @@ class Text:
         GUILD_REPORT_REWARD = "報酬: {gold} G / {gp} GP"
         GUILD_REPORT_RANK_UP = "報酬: ギルドランク {rank} への昇格"
         GUILD_REPORT_GUIDE = "--- [決定キー] を押して報酬を受け取る ---"
+        GUILD_REPORT_CONFIRM = "{name} をすでにお持ちですね。納品しますか？"
+        GUILD_REPORT_CONFIRM_GENERIC = "クエストを報告しますか？"
         NOW_LOADING = "Now Loading..."
         SAVING = "Saving..."
 
@@ -194,10 +196,45 @@ class Text:
         GENERIC_FALLBACK = "私は {name} です"
 
     class Guild:
-        QUEST_HUNT_TITLE = "[ランク{rank}] {name}を{amount}匹討伐"
-        QUEST_DESTROY_TITLE = "[ランク{rank}] {name}を{amount}個破壊"
-        QUEST_DELIVERY_TITLE = "[ランク{rank}] {name}を{amount}個納品"
-        QUEST_RANK_UP_TITLE = "[昇格試験] {rank}ランクへの昇格"
+        QUEST_HUNT_TITLE = "[{rank}] {name}を{amount}匹討伐"
+        QUEST_DESTROY_TITLE = "[{rank}] {name}を{amount}個破壊"
+        QUEST_DELIVERY_TITLE = "[{rank}] {name}を{amount}個納品"
+        QUEST_RANK_UP_TITLE = "{rank}ランクへの昇格"
+        
+        # フレーバーテキスト用テンプレート
+        QUEST_HUNT_FLAVORS = [
+            "最近、ダンジョンの浅層で{name}が増えすぎて困っています。少し数を減らしてください。",
+            "探索中の商人が{name}に襲われました。安全確保のため討伐をお願いします。",
+            "生態系の調査のため、特定の階層における{name}の個体数調整が必要です。",
+            "深層へ向かうルートに{name}が群生しています。早急な対応を！",
+            "探索のついでに、{name}を片付けてきてくれませんか？"
+        ]
+        QUEST_DESTROY_FLAVORS = [
+            "探索路に{name}が放置されていて邪魔です。撤去をお願いします。",
+            "古びた{name}が通路を塞いでいます。破壊して進路を確保してください。",
+            "放置された{name}が探索の妨げになっています。片付けてください。",
+            "{name}の中に魔物が潜んでいるとの報告がありました。今のうちに破壊を！",
+            "探索路の整備のため、邪魔な{name}の撤去を依頼します。"
+        ]
+        QUEST_DELIVERY_FLAVORS = [
+            "魔法の研究のために{name}が必要です。分けていただけませんか？",
+            "娘の誕生日に{name}を贈りたいのですが、自分では手に入らなくて…。",
+            "お客さんから{name}の注文が入りました。至急納品をお願いします！",
+            "備蓄用の{name}が底を突いてしまいました。協力をお願いします。",
+            "珍しい{name}に興味があります。見つけたら持ってきてください。"
+        ]
+        QUEST_REQUESTER_NPCS = [
+            "ギルドマスター", "ギルドの受付嬢", "鍛冶屋の親方", "道具屋の店主", 
+            "武器屋の親父", "宿屋の女将", "銀行員", "預かり所の管理人",
+            "村の医者", "大魔導士", "見習い冒険者", "宿屋の看板娘",
+            "倉庫の管理人"
+        ]
+        QUEST_REQUESTER_OTHERS = [
+            "迷子の少女", "村の老人", "引退した冒険者", "怪しい研究者", 
+            "心配性の母親", "腕利きの料理人", "商人のギルド長", "新米の衛兵",
+            "お忍びの貴族", "近所の農夫", "旅の僧侶", "名もなき旅人",
+            "困り果てた開拓者", "異国の商人"
+        ]
 
     class Trap:
         TRIGGERED = "{name} を踏んだ\n"
