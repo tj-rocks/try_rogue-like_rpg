@@ -2588,6 +2588,7 @@ class ShopDialog(BaseListDialog):
             if "attack_bonus" in info: lines.append(f"攻撃力: +{info['attack_bonus']}")
             if "defense_bonus" in info: lines.append(f"防御力: +{info['defense_bonus']}")
             if "hp_bonus" in info: lines.append(f"最大HP: +{info['hp_bonus']}")
+            if itype == "shield" and "eva_bonus" in info: lines.append(f"回避率: +{info['eva_bonus']}%")
             lines.append(""); lines.append(info.get("describe", "詳細情報はありません。") if selected[1] != "cancel" else "店を出ます。")
             draw_text_wrapped(screen, self.font, "\n".join(lines), sep_x + 30, self.y + 80, self.width // 2 - 60, color=(220, 230, 240))
 
