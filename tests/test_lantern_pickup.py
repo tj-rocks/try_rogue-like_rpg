@@ -45,15 +45,16 @@ def test_lantern_pickup_scenario():
         print(f"❌ エラー: メッセージに内部キー 'basic' が露出しています (表示: {msg})")
         sys.exit(1)
 
-    # 5. 検証: プレイヤーの装備状態
-    if player.equipped_lantern is None:
-        print("❌ エラー: プレイヤーのカンテラが装備されていません")
+    # 5. 検証: プレイヤーの装備状態 (自動装備されないこと)
+    if player.equipped_lantern is not None:
+        print("❌ エラー: カンテラが自動装備されてしまいました")
         sys.exit(1)
     
-    lantern_inst = player._find_equip_inst(player.lantern_inventory, player.equipped_lantern)
+    # インベントリには入っていることを確認
+    lantern_inst = player._find_equip_inst(player.lantern_inventory, player.lantern_inventory[0].iid)
     if not lantern_inst or lantern_inst.key != "basic":
         key = lantern_inst.key if lantern_inst else "None"
-        print(f"❌ エラー: プレイヤーのカンテラが 'basic' になっていません (現在: {key})")
+        print(f"❌ エラー: インベントリ内のカンテラが 'basic' になっていません (現在: {key})")
         sys.exit(1)
     
     # 6. 検証: 装備インスタンスの名前

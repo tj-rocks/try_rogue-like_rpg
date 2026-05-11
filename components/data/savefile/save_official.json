@@ -1,8 +1,8 @@
 {
-  "x": 1984,
-  "y": 1216,
+  "x": 320,
+  "y": 256,
   "hp": 109,
-  "max_hp": 180,
+  "max_hp": 190,
   "coin": 1254,
   "bank_coin": 0,
   "attack": 2,
@@ -181,6 +181,6 @@
   "has_seen_ending": false,
   "warehouse_items": [],
   "event_items": [],
-  "current_floor": 0,
+  "current_floor": 1,
   "equip_id_counter": 81
 }

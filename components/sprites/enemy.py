@@ -43,9 +43,12 @@ class Enemy(Entity):
         self.type = enemy_type; self.name = data.get("name", "モンスター")
         self.defense = data.get("defense", 0); self.evasion = data.get("evasion", 0)
         self.attack_pre_delay_timer = 0; self.attack_range = data.get("attack_range", 1)
-        self.stupidity = data.get("stupidity", 0); self.dash_distance = data.get("dash_distance", 50)
-        self.is_long_range = False; self.attack_priority = data.get("attack_priority", "close")
         self.exp = data.get("exp", 5); self.drops = data.get("drops", []); self.is_boss = data.get("is_boss", False)
+        # ボスはアグレッシブに動くよう、stupidityを強制的に0にする
+        if self.is_boss: self.stupidity = 0
+        else: self.stupidity = data.get("stupidity", 0)
+        self.dash_distance = data.get("dash_distance", 50)
+        self.is_long_range = False; self.attack_priority = data.get("attack_priority", "close")
         self.bgm = data.get("bgm"); self.crit_rate = data.get("crit_rate", 0.01)
         self.accuracy_close = data.get("accuracy_close", data.get("accuracy_bonus", 100))
         self.accuracy_ranged = data.get("accuracy_ranged", data.get("accuracy_bonus", 100))
@@ -195,7 +198,20 @@ class Enemy(Entity):
         if getattr(self, "is_dead", False) or self.is_static: return
         mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
         px, py = int((player.target_x+player.width/2)//dungeon.tile_size), int((player.target_y+player.height/2)//dungeon.tile_size)
-        dx, dy = px - mx, py - my; rad = max(1, ENEMY_AGGRO_RADIUS + player.get_aggro_modifier())
+        
+        # [NEW] 大型モンスター対応: 自分の占有グリッドの中からプレイヤーに最も近いものを選ぶ
+        my_grids = self.get_occupied_grids_at(self.x, self.y, dungeon.tile_size)
+        best_dx, best_dy = px - mx, py - my
+        min_gdist = abs(best_dx) + abs(best_dy)
+        for gx, gy in my_grids:
+            tdx, tdy = px - gx, py - gy
+            tgdist = abs(tdx) + abs(tdy)
+            if tgdist < min_gdist:
+                min_gdist = tgdist
+                best_dx, best_dy = tdx, tdy
+        
+        dx, dy = best_dx, best_dy
+        rad = max(1, ENEMY_AGGRO_RADIUS + player.get_aggro_modifier())
         if getattr(self, "damage_flash_timer", 0) > 0: rad = max(rad, 100)
         if abs(dx) > rad or abs(dy) > rad: return
         if self.stupidity > 0 and random.randint(1,10) <= self.stupidity: self._move_randomly(dungeon, all_entities); return
