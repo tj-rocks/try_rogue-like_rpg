@@ -69,7 +69,7 @@ def test_inn_debt():
     assert player.coin == -INN_FEE
     # 3. 借金用のメッセージが表示されていること
     assert dialog.text == Text.NPC.INN_DEBT
-    assert dialog.text == "お金が足りないだって。しょうがない、今回はツケで泊まっていきな。"
+    assert dialog.text == "お金が足りないだって。しょうがない、今回はツケにしておいてあげるよ。"
     print(f"借金成功: 所持金 {player.coin}G")
 
     # --- 借金返済（売却）テスト ---
