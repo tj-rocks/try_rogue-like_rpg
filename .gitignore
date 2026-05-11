@@ -6,7 +6,7 @@ venv/
 .env
 
 # Save Data
-# components/data/savefile/*.json
+components/data/savefile/*.json
 
 # IDEs
 .vscode/

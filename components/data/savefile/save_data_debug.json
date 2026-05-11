@@ -1,13 +1,18 @@
 {
-  "x": 128,
-  "y": 384,
+  "x": 896,
+  "y": 1216,
   "hp": 200,
   "max_hp": 200,
   "coin": 100,
   "bank_coin": 0,
   "attack": 50,
   "defense": 3,
-  "items": [],
+  "items": [
+    {
+      "key": "hi_potion",
+      "count": 1
+    }
+  ],
   "weapon_inventory": [
     {
       "iid": 2,
@@ -42,6 +47,6 @@
   "has_seen_ending": false,
   "warehouse_items": [],
   "event_items": [],
-  "current_floor": 1,
+  "current_floor": 10,
   "equip_id_counter": 2
 }

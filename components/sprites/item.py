@@ -155,6 +155,8 @@ class DroppedConsumable(Item):
                     self.is_collected = True
                     from wordings import Text
                     return Text.Items.GET_LANTERN.format(name=inst.get_name())
+                else:
+                    return "装備がいっぱいで 拾えない！"
 
         if hasattr(player, "add_item_to_inventory"):
             success = player.add_item_to_inventory(self.item_key, count=1)

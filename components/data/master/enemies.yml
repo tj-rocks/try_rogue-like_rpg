@@ -145,11 +145,15 @@ ENEMY_DATA:
     max_concurrent: 1
     max_spawns: 1
     is_boss: true
+    stupidity: 0
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/suisui_slime
     image_scale: 2.0
-    hp: 55
+    hp: 100
     attack: 22
+    attack_range: 4
+    close_attack_effect: physical_light
+    ranged_attack_effect: strange_mucus
     defense: 4
     exp: 50
     reward_gold: 500

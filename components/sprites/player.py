@@ -413,21 +413,27 @@ class Player(Entity):
 
     def equip_weapon_by_key(self, wk):
         if wk not in WEAPON_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
-        inst = EquipInstance("weapon", wk); self.weapon_inventory.append(inst); return inst
+        inst = EquipInstance("weapon", wk)
+        self.weapon_inventory.append(inst)
+        return inst
 
     def equip_armor_by_key(self, ak):
         if ak not in ARMOR_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
-        inst = EquipInstance("armor", ak); self.armor_inventory.append(inst); return inst
+        inst = EquipInstance("armor", ak)
+        self.armor_inventory.append(inst)
+        return inst
 
     def equip_shield_by_key(self, sk):
         if sk not in SHIELD_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
-        inst = EquipInstance("shield", sk); self.shield_inventory.append(inst); return inst
+        inst = EquipInstance("shield", sk)
+        self.shield_inventory.append(inst)
+        return inst
 
     def equip_lantern_by_key(self, lk):
         from constants import LANTERN_DATA
         if lk not in LANTERN_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
-        inst = EquipInstance("lantern", lk); self.lantern_inventory.append(inst)
-        if self.equipped_lantern is None: self.change_lantern(inst.iid)
+        inst = EquipInstance("lantern", lk)
+        self.lantern_inventory.append(inst)
         return inst
 
     def _remove_from_inv(self, inv, iid):
@@ -648,7 +654,7 @@ class Player(Entity):
         game_state["dialog_just_closed"] = False
 
     def get_total_item_count(self): return len(self.items) + self.get_equipment_count() + len(self.stave_inventory)
-    def get_equipment_count(self): return len(self.weapon_inventory) + len(self.armor_inventory) + len(self.shield_inventory)
+    def get_equipment_count(self): return len(self.weapon_inventory) + len(self.armor_inventory) + len(self.shield_inventory) + len(self.lantern_inventory)
     def get_stave_count(self): return len(self.stave_inventory)
     def get_item_count(self): return len(self.items)
 
