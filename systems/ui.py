@@ -1593,24 +1593,26 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                         dialog.text = Text.NPC.INN_WELCOME
                                         confirm_dialog.text = Text.UI.INN_CONFIRM.format(fee=INN_FEE)
                                         def on_inn_yes():
-                                            if player.coin < INN_FEE:
-                                                dialog.text = Text.NPC.INN_FEE_INFO.format(fee=INN_FEE)
-                                                dialog.is_active = True
-                                            else:
-                                                def on_inn_done():
-                                                    player.coin -= INN_FEE
-                                                    player.hp = player.max_hp
-                                                    from systems.data_loader import SAVE_OFFICIAL_PATH
-                                                    player.save_to_file(SAVE_OFFICIAL_PATH)
-                                                    dialog.text = Text.NPC.INN_RECOVERED
-                                                    dialog.is_active = True
-                                                    print(f"[INN] Rest Complete. Official save created. HP: {player.hp}, Coin: {player.coin}")
-
-                                                cutscene_manager = kwargs.get("cutscene_manager")
-                                                if cutscene_manager:
-                                                    cutscene_manager.start_inn_rest(callback=on_inn_done)
+                                            def on_inn_done():
+                                                has_debt = (player.coin < INN_FEE)
+                                                player.coin -= INN_FEE
+                                                player.hp = player.max_hp
+                                                
+                                                from systems.data_loader import SAVE_OFFICIAL_PATH
+                                                player.save_to_file(SAVE_OFFICIAL_PATH)
+                                                
+                                                if has_debt:
+                                                    dialog.text = Text.NPC.INN_DEBT
                                                 else:
-                                                    on_inn_done()
+                                                    dialog.text = Text.NPC.INN_RECOVERED
+                                                dialog.is_active = True
+                                                print(f"[INN] Rest Complete. Debt: {has_debt}, New Coin: {player.coin}")
+
+                                            cutscene_manager = kwargs.get("cutscene_manager")
+                                            if cutscene_manager:
+                                                cutscene_manager.start_inn_rest(callback=on_inn_done)
+                                            else:
+                                                on_inn_done()
                                         def on_inn_no():
                                             dialog.text = Text.NPC.INN_NO
                                             dialog.is_active = True

@@ -360,10 +360,25 @@ class Player(Entity):
         if self.waving_stave_inst: sound_manager.play_sfx(STAVE_DATA.get(self.waving_stave_inst.key, {}).get("sound"))
         elif self.weapon: sound_manager.play_sfx(self.weapon.data.get("sound"))
 
+    def _perform_wave(self, inst, dungeon, dialog):
+        self.waving_stave_inst = inst
+        self.is_attacking = True
+        self.attack_timer = ATTACK_ANIMATION_FRAMES
+        # 🎵 SE再生（_perform_attack を呼んでも良いが、明示的にここで再生）
+        from systems.sound_handler import sound_manager
+        from constants import STAVE_DATA
+        sound_path = STAVE_DATA.get(inst.key, {}).get("sound")
+        if sound_path: sound_manager.play_sfx(sound_path)
+        # 杖を振った瞬間にターン消費を確定させる（operateの外で呼ばれるため）
+        self.enemy_turn_pending = True
+
     def _find_equip_inst(self, inv, iid):
-        for i in inv:
-            if i.iid == iid: return i
+        for it in inv:
+            if it.iid == iid: return it
         return None
+
+    def _find_stave_inst(self, iid):
+        return self._find_equip_inst(self.stave_inventory, iid)
 
     def update_equipment_stats(self):
         if self.equipped_weapon:
@@ -400,6 +415,17 @@ class Player(Entity):
         inst = EquipInstance("lantern", lk); self.lantern_inventory.append(inst)
         if self.equipped_lantern is None: self.change_lantern(inst.iid)
         return inst
+
+    def _remove_from_inv(self, inv, iid):
+        inst = self._find_equip_inst(inv, iid)
+        if inst: inv.remove(inst); return True
+        return False
+
+    def remove_weapon_by_iid(self, iid): return self._remove_from_inv(self.weapon_inventory, iid)
+    def remove_armor_by_iid(self, iid): return self._remove_from_inv(self.armor_inventory, iid)
+    def remove_shield_by_iid(self, iid): return self._remove_from_inv(self.shield_inventory, iid)
+    def remove_stave_by_iid(self, iid): return self._remove_from_inv(self.stave_inventory, iid)
+    def remove_lantern_by_iid(self, iid): return self._remove_from_inv(self.lantern_inventory, iid)
 
     def change_armor(self, iid):
         inst = self._find_equip_inst(self.armor_inventory, iid)
@@ -588,7 +614,15 @@ class Player(Entity):
         super().update_animation(dt)
         if self.is_attacking:
             new_prog = (ATTACK_ANIMATION_FRAMES - self.attack_timer) / ATTACK_ANIMATION_FRAMES
-            if prev_prog < 0.1 <= new_prog: self._execute_strike(dungeon, dialog)
+            if prev_prog < 0.1 <= new_prog:
+                if self.waving_stave_inst:
+                    from systems.magic_handler import execute_stave
+                    msg = execute_stave(self, self.waving_stave_inst, dungeon, dialog)
+                    if dialog:
+                        if dialog.is_active: dialog.text += "\n" + msg
+                        else: dialog.text = msg; dialog.is_active = True
+                else:
+                    self._execute_strike(dungeon, dialog)
 
     def update(self, dungeon, dt=1/60, dialog=None, events=[]):
         if self.is_falling: self.falling_timer -= 1; return
