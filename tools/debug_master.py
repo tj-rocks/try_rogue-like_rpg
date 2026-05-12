@@ -32,6 +32,8 @@ def setup_gungeon_mode(dungeon, player):
         dungeon.map_width = w + 4
         dungeon.map_height = h + 4
         dungeon.map_data = [[0 for _ in range(dungeon.map_width)] for _ in range(dungeon.map_height)]
+        # [FIX] 探索フラグを新しいサイズに合わせて再構築
+        dungeon.revealed_tiles = [[False for _ in range(dungeon.map_width)] for _ in range(dungeon.map_height)]
         
         # 中央に部屋を作成
         for y in range(2, h + 2):

@@ -338,7 +338,8 @@ class Player(Entity):
         if not turn_consumed:
             lk = active_direction_keys[-1] if active_direction_keys else None
             if lk:
-                keys = pygame.key.get_pressed(); is_turning = keys[KEY_TURN_ONLY]
+                keys = pygame.key.get_pressed()
+                is_turning = keys[KEY_TURN_ONLY] or (KEY_TURN_ONLY == pygame.K_LSHIFT and keys[pygame.K_RSHIFT])
                 dx, dy = 0, 0
                 if lk == KEY_MOVE_LEFT: self.set_facing("left"); dx = -dungeon.tile_size
                 elif lk == KEY_MOVE_RIGHT: self.set_facing("right"); dx = dungeon.tile_size

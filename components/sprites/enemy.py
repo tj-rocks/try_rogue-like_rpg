@@ -53,6 +53,7 @@ class Enemy(Entity):
         self.accuracy_close = data.get("accuracy_close", data.get("accuracy_bonus", 100))
         self.accuracy_ranged = data.get("accuracy_ranged", data.get("accuracy_bonus", 100))
         self.status_to_inflict = data.get("status"); self.status_chance = data.get("status_chance", 100)
+        self.detect_range = data.get("detect_range", ENEMY_AGGRO_RADIUS)
         
         color_hex = data.get("image_color"); cache_key = (enemy_type, self.width, self.height, color_hex)
         if cache_key in Enemy._image_cache: self.images = Enemy._image_cache[cache_key]
@@ -211,7 +212,7 @@ class Enemy(Entity):
                 best_dx, best_dy = tdx, tdy
         
         dx, dy = best_dx, best_dy
-        rad = max(1, ENEMY_AGGRO_RADIUS + player.get_aggro_modifier())
+        rad = max(1, self.detect_range + player.get_aggro_modifier())
         if getattr(self, "damage_flash_timer", 0) > 0: rad = max(rad, 100)
         if abs(dx) > rad or abs(dy) > rad: return
         if self.stupidity > 0 and random.randint(1,10) <= self.stupidity: self._move_randomly(dungeon, all_entities); return

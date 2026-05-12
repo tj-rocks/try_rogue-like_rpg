@@ -49,7 +49,7 @@ KEY_MOVE_LEFT  = pygame.K_LEFT
 KEY_MOVE_RIGHT = pygame.K_RIGHT
 
 KEY_ATTACK     = pygame.K_SPACE
-KEY_TURN_ONLY  = pygame.K_s
+KEY_TURN_ONLY  = pygame.K_LSHIFT
 
 KEY_CONFIRM     = pygame.K_SPACE
 KEY_CANCEL      = pygame.K_x

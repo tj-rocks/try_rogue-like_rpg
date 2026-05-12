@@ -151,55 +151,46 @@ DUNGEON_IMAGES:
     image: temple
     sound: just_move.mp3
     brightness: 3
-    map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '13':
     image: temple
     sound: just_move.mp3
     brightness: 3
-    map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '14':
     image: deesert_ruin
     sound: just_move.mp3
     brightness: 3
-    map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '15':
     image: deesert_ruin
     sound: just_move.mp3
     brightness: 3
-    map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '16':
     image: evil_castle
     sound: just_move.mp3
     brightness: 3
-    map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '17':
     image: evil_castle
     sound: just_move.mp3
     brightness: 3
-    map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '18':
     image: evil_castle
     sound: just_move.mp3
     brightness: 3
-    map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '19':
     image: evil_castle
     sound: just_move.mp3
     brightness: 3
-    map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '20':
     image: evil_castle
     sound: just_move.mp3
     brightness: 3
-    map: first_rest_point.txt
     wall_decoration_ratio: 0.3
 
 
