@@ -265,6 +265,33 @@ class Enemy(Entity):
         ef = min(floor, OBSTACLE_SPAWN_LIMIT); nr = len(dungeon.rooms)
         m_cap = int(nr * ENEMY_TOTAL_MAX) + (floor-1)//ENEMY_TOTAL_SCALE_EVERY * ENEMY_TOTAL_SCALE_ADD
         o_cap = int(nr * OBSTACLE_TOTAL_MAX) + (ef-1)//OBSTACLE_TOTAL_SCALE_EVERY * OBSTACLE_TOTAL_SCALE_ADD
+
+        # 1. 階層ボス(is_boss)の確定配置
+        # その階層がボスの出現開始階層(min_floor)であれば、最優先で1体配置する
+        boss_types = [t for t in mt if ENEMY_DATA[t].get("is_boss") and ENEMY_DATA[t].get("min_floor") == floor]
+        for b_type in boss_types:
+            spawned = False
+            # 全部屋（スタート部屋以外優先）を巡回して場所を探す
+            shuffled_rooms = list(enumerate(dungeon.rooms))
+            random.shuffle(shuffled_rooms)
+            for ridx, room in shuffled_rooms:
+                if ridx == getattr(dungeon, "start_room_idx", -1) and len(dungeon.rooms) > 1: continue
+                for att in range(ENEMY_SPAWN_ATTEMPTS * 2):
+                    ex, ey = random.randint(room[0]-ENEMY_SPAWN_SCATTER, room[0]+ENEMY_SPAWN_SCATTER), random.randint(room[1]-ENEMY_SPAWN_SCATTER, room[1]+ENEMY_SPAWN_SCATTER)
+                    # プレイヤーから離れているか
+                    if abs(ex-pgx) <= ENEMY_SPAWN_SAFE_RADIUS and abs(ey-pgy) <= ENEMY_SPAWN_SAFE_RADIUS: continue
+                    # 座標が有効か
+                    if 0 <= ey < dungeon.map_height and 0 <= ex < dungeon.map_width:
+                        # 仮のインスタンスを作って全占有グリッドが床かチェックする
+                        temp_enemy = Enemy(ex*dungeon.tile_size, ey*dungeon.tile_size, b_type, player=player)
+                        if temp_enemy.can_move_grid(temp_enemy.x, temp_enemy.y, dungeon):
+                            if not any(set(temp_enemy.get_occupied_grids(dungeon.tile_size)) & set(e.get_occupied_grids(dungeon.tile_size)) for e in enemies):
+                                enemies.append(temp_enemy); dungeon.spawn_counts[b_type] = dungeon.spawn_counts.get(b_type,0)+1
+                                spawned = True; break
+                if spawned: break
+            if spawned: print(f"[Dungeon] Boss {b_type} spawned guaranteed at floor {floor}.")
+
+        # 2. 通常モンスターの配置
         for idx, room in enumerate(dungeon.rooms):
             if random.random() < 0.1: continue
             isr = (idx == getattr(dungeon, "start_room_idx", -1) or idx == getattr(dungeon, "target_room_idx", -1))
@@ -274,12 +301,19 @@ class Enemy(Entity):
                 for att in range(ENEMY_SPAWN_ATTEMPTS*2):
                     ex, ey = random.randint(room[0]-ENEMY_SPAWN_SCATTER, room[0]+ENEMY_SPAWN_SCATTER), random.randint(room[1]-ENEMY_SPAWN_SCATTER, room[1]+ENEMY_SPAWN_SCATTER)
                     if abs(ex-pgx) <= ENEMY_SPAWN_SAFE_RADIUS and abs(ey-pgy) <= ENEMY_SPAWN_SAFE_RADIUS: continue
-                    if 0 <= ey < dungeon.map_height and 0 <= ex < dungeon.map_width and dungeon.map_data[ey][ex] == 1:
-                        if not any((ex, ey) in e.get_occupied_grids(dungeon.tile_size) for e in enemies):
-                            vm = [m for m in mt if ENEMY_DATA[m].get("min_floor", 1) <= floor <= ENEMY_DATA[m].get("max_floor", 999)]
-                            if vm:
-                                mtp = random.choice(vm); nm = Enemy(ex*dungeon.tile_size, ey*dungeon.tile_size, mtp, player=player)
-                                nm.x += (dungeon.tile_size-nm.width)//2; nm.y += (dungeon.tile_size-nm.height)//2; nm.target_x, nm.target_y = nm.x, nm.y; enemies.append(nm); dungeon.spawn_counts[mtp] = dungeon.spawn_counts.get(mtp,0)+1; break
+                    if 0 <= ey < dungeon.map_height and 0 <= ex < dungeon.map_width:
+                        # 出現可能なザコ敵をランダムに選ぶ
+                        vm = [m for m in mt if ENEMY_DATA[m].get("min_floor", 1) <= floor <= ENEMY_DATA[m].get("max_floor", 999) and not ENEMY_DATA[m].get("is_boss")]
+                        if not vm: break
+                        mtp = random.choice(vm)
+                        nm = Enemy(ex*dungeon.tile_size, ey*dungeon.tile_size, mtp, player=player)
+                        # 全占有タイルが床かチェック
+                        if nm.can_move_grid(nm.x, nm.y, dungeon):
+                            if not any(set(nm.get_occupied_grids(dungeon.tile_size)) & set(e.get_occupied_grids(dungeon.tile_size)) for e in enemies):
+                                nm.x += (dungeon.tile_size-nm.width)//2; nm.y += (dungeon.tile_size-nm.height)//2; nm.target_x, nm.target_y = nm.x, nm.y
+                                enemies.append(nm); dungeon.spawn_counts[mtp] = dungeon.spawn_counts.get(mtp,0)+1; break
+            
+            # 3. 障害物の配置
             for _ in range(random.randint(OBSTACLE_SPAWN_MIN, OBSTACLE_SPAWN_MAX + (ef-1)//OBSTACLE_SPAWN_SCALE_EVERY * OBSTACLE_SPAWN_SCALE_ADD)):
                 if sum(1 for e in enemies if e.is_static) >= o_cap: break
                 for att in range(ENEMY_SPAWN_ATTEMPTS):
@@ -304,6 +338,26 @@ class Enemy(Entity):
 
     @classmethod
     def spawn_one(cls, dungeon, player):
-        from constants import ENEMY_TOTAL_MAX, ENEMY_TOTAL_SCALE_EVERY, ENEMY_TOTAL_SCALE_ADD
+        from constants import (ENEMY_TOTAL_MAX, ENEMY_TOTAL_SCALE_EVERY, ENEMY_TOTAL_SCALE_ADD, ENEMY_DATA, ENEMY_SPAWN_ATTEMPTS, ENEMY_SPAWN_SAFE_RADIUS, ENEMY_SPAWN_SCATTER)
         f = getattr(dungeon, "current_floor", 1); nr = len(dungeon.rooms); mc = int(nr * ENEMY_TOTAL_MAX) + (f-1)//ENEMY_TOTAL_SCALE_EVERY * ENEMY_TOTAL_SCALE_ADD
         if sum(1 for e in dungeon.enemies if not e.is_static) >= mc: return
+        
+        pgx, pgy = (int(player.x//dungeon.tile_size), int(player.y//dungeon.tile_size)) if player else (-999,-999)
+        mt = [k for k, v in ENEMY_DATA.items() if not v.get("is_static", False) and not v.get("is_boss")]
+        vm = [m for m in mt if ENEMY_DATA[m].get("min_floor", 1) <= f <= ENEMY_DATA[m].get("max_floor", 999)]
+        if not vm: return
+
+        # プレイヤーから離れたランダムな部屋の床にスポーンを試みる
+        shuffled_rooms = list(dungeon.rooms)
+        random.shuffle(shuffled_rooms)
+        for room in shuffled_rooms:
+            for att in range(ENEMY_SPAWN_ATTEMPTS):
+                ex, ey = random.randint(room[0]-ENEMY_SPAWN_SCATTER, room[0]+ENEMY_SPAWN_SCATTER), random.randint(room[1]-ENEMY_SPAWN_SCATTER, room[1]+ENEMY_SPAWN_SCATTER)
+                if abs(ex-pgx) <= ENEMY_SPAWN_SAFE_RADIUS and abs(ey-pgy) <= ENEMY_SPAWN_SAFE_RADIUS: continue
+                if 0 <= ey < dungeon.map_height and 0 <= ex < dungeon.map_width:
+                    mtp = random.choice(vm)
+                    nm = Enemy(ex*dungeon.tile_size, ey*dungeon.tile_size, mtp, player=player)
+                    if nm.can_move_grid(nm.x, nm.y, dungeon):
+                        if not any(set(nm.get_occupied_grids(dungeon.tile_size)) & set(e.get_occupied_grids(dungeon.tile_size)) for e in dungeon.enemies):
+                            nm.x += (dungeon.tile_size-nm.width)//2; nm.y += (dungeon.tile_size-nm.height)//2; nm.target_x, nm.target_y = nm.x, nm.y
+                            dungeon.enemies.append(nm); dungeon.spawn_counts[mtp] = dungeon.spawn_counts.get(mtp,0)+1; return

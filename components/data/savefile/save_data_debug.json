@@ -1,7 +1,7 @@
 {
-  "x": 1088,
-  "y": 128,
-  "hp": 90,
+  "x": 704,
+  "y": 1024,
+  "hp": 20,
   "max_hp": 200,
   "coin": 100,
   "bank_coin": 0,
@@ -10,6 +10,14 @@
   "items": [
     {
       "key": "hp_potion",
+      "count": 3
+    },
+    {
+      "key": "expired_potion",
+      "count": 2
+    },
+    {
+      "key": "rotten_potion",
       "count": 1
     }
   ],
@@ -18,6 +26,13 @@
       "iid": 2,
       "type": "weapon",
       "key": "old_sword",
+      "enhance": 0,
+      "stats": {}
+    },
+    {
+      "iid": 5,
+      "type": "weapon",
+      "key": "iron_sword",
       "enhance": 0,
       "stats": {}
     }
@@ -31,48 +46,48 @@
       "stats": {}
     },
     {
-      "iid": 4,
-      "type": "armor",
-      "key": "broken_armor",
-      "enhance": 0,
-      "stats": {}
-    }
-  ],
-  "shield_inventory": [
-    {
       "iid": 3,
-      "type": "shield",
-      "key": "wooden_round_shield",
+      "type": "armor",
+      "key": "adventurers_clothes",
       "enhance": 0,
       "stats": {}
     }
   ],
+  "shield_inventory": [],
   "equipped_weapon": 2,
   "equipped_armor": 1,
   "equipped_shield": null,
   "stave_inventory": [
     {
-      "iid": 5,
-      "key": "broken_stave",
-      "charges": 0
+      "iid": 4,
+      "key": "heal_stave",
+      "charges": 5
     },
     {
       "iid": 6,
-      "key": "light_stave",
+      "key": "fire_stave",
       "charges": 5
     }
   ],
-  "lantern_inventory": [],
+  "lantern_inventory": [
+    {
+      "iid": 7,
+      "type": "lantern",
+      "key": "basic",
+      "enhance": 0,
+      "stats": {}
+    }
+  ],
   "equipped_lantern": null,
   "invincible_turns": 0,
   "guild_point": 1000,
-  "guild_rank": "C",
+  "guild_rank": "F",
   "active_quests": [],
   "quest_tokens": {},
   "completed_fixed_quests": [],
   "has_seen_ending": false,
   "warehouse_items": [],
   "event_items": [],
-  "current_floor": 12,
-  "equip_id_counter": 6
+  "current_floor": 10,
+  "equip_id_counter": 7
 }

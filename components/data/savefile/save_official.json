@@ -1,157 +1,47 @@
 {
-  "x": 1088,
-  "y": 1984,
-  "hp": 110,
-  "max_hp": 110,
-  "coin": 1326,
+  "x": 1472,
+  "y": 1216,
+  "hp": 100,
+  "max_hp": 100,
+  "coin": 100,
   "bank_coin": 0,
   "attack": 2,
   "defense": 3,
-  "items": [
-    {
-      "key": "hp_potion",
-      "count": 1
-    },
-    {
-      "key": "hp_potion",
-      "count": 1
-    },
-    {
-      "key": "antidote_potion",
-      "count": 3
-    },
-    {
-      "key": "trap_remover",
-      "count": 1
-    }
-  ],
+  "items": [],
   "weapon_inventory": [
     {
-      "iid": 9,
+      "iid": 4,
       "type": "weapon",
-      "key": "iron_sword",
+      "key": "old_sword",
       "enhance": 0,
       "stats": {}
     }
   ],
   "armor_inventory": [
     {
-      "iid": 5,
+      "iid": 3,
       "type": "armor",
-      "key": "leather_breastplate",
+      "key": "adventurers_clothes",
       "enhance": 0,
       "stats": {}
     }
   ],
-  "shield_inventory": [
-    {
-      "iid": 31,
-      "type": "shield",
-      "key": "leather_round_shield",
-      "enhance": 0,
-      "stats": {}
-    }
-  ],
-  "equipped_weapon": 9,
-  "equipped_armor": 5,
-  "equipped_shield": 31,
-  "stave_inventory": [
-    {
-      "iid": 14,
-      "key": "light_stave",
-      "charges": 5
-    },
-    {
-      "iid": 17,
-      "key": "fire_stave",
-      "charges": 5
-    },
-    {
-      "iid": 19,
-      "key": "light_stave",
-      "charges": 5
-    },
-    {
-      "iid": 23,
-      "key": "heal_stave",
-      "charges": 5
-    }
-  ],
-  "lantern_inventory": [
-    {
-      "iid": 18,
-      "type": "lantern",
-      "key": "basic",
-      "enhance": 0,
-      "stats": {}
-    }
-  ],
-  "equipped_lantern": 18,
+  "shield_inventory": [],
+  "equipped_weapon": 4,
+  "equipped_armor": 3,
+  "equipped_shield": null,
+  "stave_inventory": [],
+  "lantern_inventory": [],
+  "equipped_lantern": null,
   "invincible_turns": 0,
-  "guild_point": 15,
-  "guild_rank": "F",
-  "active_quests": [
-    {
-      "type": "hunt",
-      "target_key": "rubble",
-      "target_name": "瓦礫",
-      "amount": 3,
-      "reward_gold": 240,
-      "reward_gp": 15,
-      "title": "[F] 瓦礫を3個破壊",
-      "description": "探索路に瓦礫が放置されていて邪魔です。撤去をお願いします。",
-      "requester": "村の老人"
-    }
-  ],
-  "quest_tokens": {
-    "normal_tako": 2,
-    "rubble": 2
-  },
-  "completed_fixed_quests": [
-    "rank_up_F"
-  ],
+  "guild_point": 0,
+  "guild_rank": "-",
+  "active_quests": [],
+  "quest_tokens": {},
+  "completed_fixed_quests": [],
   "has_seen_ending": false,
-  "warehouse_items": [
-    {
-      "type": "consumable",
-      "data": "copper_ore"
-    },
-    {
-      "type": "lantern_inst",
-      "data": {
-        "iid": 26,
-        "type": "lantern",
-        "key": "basic",
-        "enhance": 0,
-        "stats": {}
-      }
-    },
-    {
-      "type": "stave_inst",
-      "data": {
-        "iid": 25,
-        "key": "light_stave",
-        "charges": 5
-      }
-    },
-    {
-      "type": "stave_inst",
-      "data": {
-        "iid": 16,
-        "key": "light_stave",
-        "charges": 5
-      }
-    },
-    {
-      "type": "stave_inst",
-      "data": {
-        "iid": 32,
-        "key": "fire_stave",
-        "charges": 5
-      }
-    }
-  ],
+  "warehouse_items": [],
   "event_items": [],
-  "current_floor": 0,
-  "equip_id_counter": 32
+  "current_floor": 9,
+  "equip_id_counter": 5
 }
