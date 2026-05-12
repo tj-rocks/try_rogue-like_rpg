@@ -168,6 +168,7 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
                      equip_dialog=ui_elements.get("equip_dialog"),
                      stave_inv_dialog=ui_elements.get("stave_inventory_dialog"),
                      event_inv_dialog=ui_elements.get("event_inventory_dialog"),
+                     bank_dialog=ui_elements.get("bank_dialog"),
                      cutscene_manager=ui_elements.get("cutscene_manager"))
     
     screen.fill((0, 0, 0))

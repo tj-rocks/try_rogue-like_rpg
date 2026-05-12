@@ -854,7 +854,7 @@ class BaseListDialog:
         from systems.resources import font_small
         self.font = font_small
         self.row_height = 38
-        self.view_size = 12
+        self.view_size = 10
         self.cursor_idx = 0
         self.items = []
         self._back_dialog = None
@@ -1779,7 +1779,7 @@ class GuildDialog:
         from systems.resources import font_small
         self.font = font_small
         self.row_height = 32
-        self.view_size = 12
+        self.view_size = 10
         self.cursor_idx = 0
         self.items = [] # (type, status, q_data)
         self.mode = "MENU" # MENU, REPORT, ACCEPT, ABANDON
@@ -2228,6 +2228,14 @@ class GuildDialog:
 
                 name_text = self.font.render(display_name, True, color)
                 screen.blit(name_text, (self.x + 65, y_pos))
+
+            # スクロールインジケーター
+            if len(self.items) > self.view_size:
+                indicator_x = separator_x - 30
+                if start > 0:
+                    pygame.draw.polygon(screen, (200, 200, 200), [(indicator_x, self.y + 70), (indicator_x - 8, self.y + 80), (indicator_x + 8, self.y + 80)])
+                if start + self.view_size < len(self.items):
+                    pygame.draw.polygon(screen, (200, 200, 200), [(indicator_x, self.y + self.height - 70), (indicator_x - 8, self.y + self.height - 80), (indicator_x + 8, self.y + self.height - 80)])
 
         # --- 右側：詳細解説 ---
         desc_x = separator_x + 30

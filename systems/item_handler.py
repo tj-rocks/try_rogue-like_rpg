@@ -242,6 +242,9 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
                     inventory_dialog.next_dungeon = warp_to_floor(0, player, spawn_reason="return")
                 else:
                     dialog.text = use_consumable(item_key_or_iid, player, current_dungeon)
+            
+            # アイテム使用・装備変更に成功したら敵にターンを渡す準備をする
+            player.enemy_turn_pending = True
 
         game_state["dialog_modal"] = True
         dialog.is_active = True

@@ -41,6 +41,7 @@ ENEMY_DATA:
     hp: 15
     defense: 4
     attack: 23
+    stupidity: 1
   normal_tako:
     name: ふつうたこ
     category: animal
@@ -59,6 +60,7 @@ ENEMY_DATA:
     hp: 15
     defense: 2
     attack: 22
+    stupidity: 2
 # Eランクーーーーーーーーーー
   kowai_kusa:
     name: こわいくさ
@@ -157,6 +159,29 @@ ENEMY_DATA:
     defense: 4
     exp: 50
     reward_gold: 500
+    drops:
+    - {item: hp_potion}
+    - {item: iron_sword}
+  sukewsuke_skeleton:
+    name: スケスケスケルトン
+    category: undead
+    is_boss: true
+    stupidity: 0
+    image_scale: 1
+    detect_range: 15
+    min_rank: E
+    min_floor: 20
+    max_floor: 20
+    max_concurrent: 1
+    image_folder: components/pictures/enemies/skeleton
+    bgm: components/sounds/bgm/get_hornor.mp3
+    attack_range: 1
+    close_attack_effect: physical_heavy
+    hp: 150
+    defense: 10
+    attack: 15
+    reward_gold: 1000
+    exp: 50
     drops:
     - {item: hp_potion}
     - {item: iron_sword}
