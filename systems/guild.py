@@ -91,8 +91,11 @@ class GuildSystem:
                             # コピーして追加
                             self.fixed_quests.append(dict(q_data))
 
-        # 2. ランダムクエストの生成 (常に3〜4つ生成する)
-        num_random = random.randint(3, 4)
+        # 2. ランダムクエストの生成 (balance.yml の BOARD_QUEST_COUNT に従う)
+        from constants import _balance
+        _gq = _balance.get("GUILD_QUEST", {})
+        _bqc = _gq.get("BOARD_QUEST_COUNT", [5, 10])
+        num_random = random.randint(int(_bqc[0]), int(_bqc[1]))
         for _ in range(num_random):
             q_type = random.choice(["hunt", "delivery"])
             

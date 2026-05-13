@@ -7,6 +7,9 @@ from unittest.mock import MagicMock, patch, PropertyMock
 # プロジェクトルートをパスに追加
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# テストモードを強制して本番セーブデータを保護する
+os.environ["TEST_MODE"] = "1"
+
 # Pygameの初期化（ヘッドレスモード）
 os.environ['SDL_VIDEODRIVER'] = 'dummy'
 pygame.init()

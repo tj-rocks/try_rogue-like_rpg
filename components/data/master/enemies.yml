@@ -24,6 +24,7 @@ ENEMY_DATA:
     crit_rate: 0.05
     drops:
     - {item: hp_potion}
+    - {item: rotten_potion}
     hp: 11
     defense: 1
     attack: 23
@@ -36,7 +37,7 @@ ENEMY_DATA:
     attack_range: 1
     crit_rate: 0.05
     drops:
-    - {item: rotten_potion}
+    - {item: broken_shield}
     - {item: broken_armor}
     hp: 15
     defense: 4
@@ -77,8 +78,8 @@ ENEMY_DATA:
     drops:
     - {item: expired_potion}
     - {item: broken_sword}
-    hp: 19
-    defense: 3
+    hp: 21
+    defense: 1
     attack: 26
   slime_red:
     name: あかいスライム
@@ -89,7 +90,7 @@ ENEMY_DATA:
     crit_rate: 0.05
     drops:
     - {item: broken_stave}
-    hp: 16
+    hp: 21
     defense: 1
     attack: 23
   bakudan_man:
@@ -100,7 +101,7 @@ ENEMY_DATA:
     crit_rate: 0.05
     drops:
     - {item: hp_potion}
-    hp: 20
+    hp: 30
     defense: 4
     attack: 26
     attack_range: 3
@@ -120,8 +121,8 @@ ENEMY_DATA:
     drops:
     - {item: rotten_potion}
     - {item: broken_armor}
-    hp: 20
-    defense: 4
+    hp: 30
+    defense: 6
     attack: 24
 # Dランクーーーーーーーーーー
   skeleton:
@@ -178,7 +179,7 @@ ENEMY_DATA:
     attack_range: 1
     close_attack_effect: physical_heavy
     hp: 150
-    defense: 10
+    defense: 6
     attack: 15
     reward_gold: 1000
     exp: 50

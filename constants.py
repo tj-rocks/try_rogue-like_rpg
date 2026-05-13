@@ -151,6 +151,16 @@ ENEMY_SPAWN_NEAR_RANDOM_FLOOR = _ai.get("ENEMY_SPAWN_NEAR_RANDOM_FLOOR", 20)
 ENEMY_SPAWN_NEAR_CHANCE       = _ai.get("ENEMY_SPAWN_NEAR_CHANCE", 1)
 ENEMY_SPAWN_NEAR_FLOOR        = _ai.get("ENEMY_SPAWN_NEAR_FLOOR", 50)
 
+# バカ度ごとのぼーっと確率テーブル (stupidity_level -> 0.0〜1.0)
+# balance.yml の STUPIDITY_WANDER_RATES を読み込む。キーを int に変換して使用。
+_default_wander = {0:0.00, 1:0.10, 2:0.20, 3:0.30, 4:0.40,
+                   5:0.50, 6:0.60, 7:0.70, 8:0.80, 9:0.90, 10:1.00}
+STUPIDITY_WANDER_RATES = {int(k): float(v)
+                           for k, v in _ai.get("STUPIDITY_WANDER_RATES", _default_wander).items()}
+
+# 逃げ道封鎖AI 有効フラグ (balance.yml ENEMY_ESCAPE_BLOCK_ENABLED)
+ENEMY_ESCAPE_BLOCK_ENABLED: bool = _ai.get("ENEMY_ESCAPE_BLOCK_ENABLED", True)
+
 # ------------------------------------------------------------------------------
 # ⚔️ COMBAT (戦闘システム・演出)
 # ------------------------------------------------------------------------------

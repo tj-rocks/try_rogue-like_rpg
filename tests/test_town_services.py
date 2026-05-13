@@ -5,6 +5,9 @@ import os
 # プロジェクトルートをパスに追加
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# テストモードを強制して本番セーブデータを保護する
+os.environ["TEST_MODE"] = "1"
+
 from components.sprites.player import Player
 from systems.ui import BankDialog, WarehouseDialog, Dialog, ConfirmDialog
 from wordings import Text

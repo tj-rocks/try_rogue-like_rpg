@@ -6,6 +6,9 @@ import random
 # プロジェクトルートをパスに追加
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# [IMPORTANT] テストモードを強制して本番セーブデータを保護する
+os.environ["TEST_MODE"] = "1"
+
 from systems.dungeon import warp_to_floor
 from components.sprites.player import Player
 from components.sprites.enemy import Enemy

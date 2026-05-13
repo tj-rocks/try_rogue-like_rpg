@@ -2,7 +2,7 @@ import pygame
 import random
 from components.sprites.entity import Entity
 from constants import (
-    ATTACK_ANIMATION_FRAMES, ENEMY_DATA, ENEMY_AGGRO_RADIUS, 
+    ATTACK_ANIMATION_FRAMES, ENEMY_DATA, ENEMY_AGGRO_RADIUS,
     ENEMY_WANDER_CHANCE, COMBAT_LOG_WAIT_FRAMES,
     ENEMY_SPAWN_SAFE_RADIUS, ENEMY_SPAWN_ATTEMPTS, ENEMY_SPAWN_SCATTER,
     ENEMY_SPAWN_MIN, ENEMY_SPAWN_MAX,
@@ -10,7 +10,8 @@ from constants import (
     ENEMY_TOTAL_MAX, ENEMY_TOTAL_SCALE_EVERY, ENEMY_TOTAL_SCALE_ADD,
     ENEMY_SPAWN_NEAR_FLOOR, ENEMY_SPAWN_NEAR_RANDOM_FLOOR, ENEMY_SPAWN_NEAR_CHANCE,
     SOUND_ATTACK_HIT, SOUND_ATTACK_MISS,
-    WEAPON_DATA, ARMOR_DATA, SHIELD_DATA
+    WEAPON_DATA, ARMOR_DATA, SHIELD_DATA,
+    STUPIDITY_WANDER_RATES, ENEMY_ESCAPE_BLOCK_ENABLED
 )
 from systems.combat_handler import deal_damage
 
@@ -189,10 +190,144 @@ class Enemy(Entity):
                 tgx, tgy = int((tx+self.width/2)//dungeon.tile_size), int((ty+self.height/2)//dungeon.tile_size)
                 s = abs(abs(ppx-tgx)+abs(ppy-tgy) - ideal)
                 if s <= cur_s: valid.append({"f":f, "dx":dx, "dy":dy, "s":s, "dc":abs(abs(px-tgx)+abs(py-tgy) - self.attack_range)})
+        # [FIX] cur_s==0 だが実際には攻撃できない場合（斜めなど）: プレイヤー直接位置を基準に再計算
+        if not valid:
+            cur_s2 = abs(px-mx) + abs(py-my)
+            for f, dx, dy in [("right",dungeon.tile_size,0),("left",-dungeon.tile_size,0),("down",0,dungeon.tile_size),("up",0,-dungeon.tile_size)]:
+                tx, ty = self.x+dx, self.y+dy
+                if self.can_move_grid(tx, ty, dungeon):
+                    tgx, tgy = int((tx+self.width/2)//dungeon.tile_size), int((ty+self.height/2)//dungeon.tile_size)
+                    s2 = abs(px-tgx) + abs(py-tgy)
+                    if s2 < cur_s2: valid.append({"f":f, "dx":dx, "dy":dy, "s":s2-cur_s2, "dc":abs(s2 - self.attack_range)})
         if valid:
             valid.sort(key=lambda m: (m["s"], m["dc"])); best_s = valid[0]["s"]
             chosen = random.choice([m for m in valid if m["s"] == best_s])
-            if chosen["s"] < cur_s or random.random() < 0.5: self.target_x, self.target_y, self.facing, self.is_moving, self.step_toggle = self.x+chosen["dx"], self.y+chosen["dy"], chosen["f"], True, not self.step_toggle; return True
+            if chosen["s"] < cur_s or chosen["s"] < 0 or random.random() < 0.5: self.target_x, self.target_y, self.facing, self.is_moving, self.step_toggle = self.x+chosen["dx"], self.y+chosen["dy"], chosen["f"], True, not self.step_toggle; return True
+        return False
+
+    # ════════════════════════════════════════════════════════════════
+    # [ESCAPE_BLOCK] 逃げ道封鎖AI
+    # 削除する場合: このメソッドと take_turn 内の [ESCAPE_BLOCK] ブロックをセットで消す
+    # ════════════════════════════════════════════════════════════════
+    def _get_escape_block_target(self, px, py, all_entities, dungeon):
+        """プレイヤーが逃げられる隣接タイルのうち、他の敵が向かっていないものを返す。
+        自分がプレイヤーに近い側ではなく、遠い側（退路の先）を優先する。"""
+        mx = int((self.x + self.width / 2) // dungeon.tile_size)
+        my = int((self.y + self.height / 2) // dungeon.tile_size)
+        dx_to_player = px - mx
+        dy_to_player = py - my
+
+        # プレイヤーが実際に移動できる隣接タイルを列挙（逃げ道候補）
+        escape_tiles = []
+        for ex, ey in [(px, py-1), (px, py+1), (px-1, py), (px+1, py)]:
+            if not (0 <= ex < dungeon.map_width and 0 <= ey < dungeon.map_height): continue
+            if dungeon.map_data[ey][ex] != 1: continue
+            escape_tiles.append((ex, ey))
+
+        if not escape_tiles:
+            return None
+
+        # 他の敵が既に向かっているマスを除外（全stupidity対象）
+        claimed = set()
+        for e in all_entities:
+            if e is self or not isinstance(e, Enemy) or getattr(e, "is_dead", False): continue
+            ex = int(((e.target_x if getattr(e, "is_moving", False) else e.x) + e.width / 2) // dungeon.tile_size)
+            ey = int(((e.target_y if getattr(e, "is_moving", False) else e.y) + e.height / 2) // dungeon.tile_size)
+            claimed.add((ex, ey))
+
+        # スコアリング: 自分と反対側の退路タイルを優先（挟み撃ち）
+        best, best_score = None, float("inf")
+        for ex, ey in escape_tiles:
+            if (ex, ey) in claimed: continue
+            fdx, fdy = ex - px, ey - py
+            dot = fdx * dx_to_player + fdy * dy_to_player   # 負 = 自分の反対側
+            self_dist = abs(mx - ex) + abs(my - ey)
+            score = (0 if dot <= 0 else 10) + self_dist * 0.1
+            if score < best_score:
+                best_score = score
+                best = (ex, ey)
+        return best
+    # [/ESCAPE_BLOCK] ════════════════════════════════════════════════
+
+    def _get_flank_target(self, px, py, all_entities, dungeon):
+        """包囲行動用: プレイヤー隣接マスのうち、他の敵が向かっていないマスを返す。
+        自分のグリッド位置から見てプレイヤーの「反対側」を優先する。"""
+        mx = int((self.x + self.width / 2) // dungeon.tile_size)
+        my = int((self.y + self.height / 2) // dungeon.tile_size)
+
+        # プレイヤー隣接4マス
+        adjacent = [
+            (px,     py - 1, "up"),
+            (px,     py + 1, "down"),
+            (px - 1, py,     "left"),
+            (px + 1, py,     "right"),
+        ]
+
+        # 他の敵が「向かっている」グリッドを集める（全stupidity対象）
+        claimed = set()
+        for e in all_entities:
+            if e is self or not isinstance(e, Enemy) or getattr(e, "is_dead", False): continue
+            # 移動先グリッドを推定（target_x があれば使う）
+            if getattr(e, "is_moving", False):
+                ex = int((e.target_x + e.width / 2) // dungeon.tile_size)
+                ey = int((e.target_y + e.height / 2) // dungeon.tile_size)
+            else:
+                ex = int((e.x + e.width / 2) // dungeon.tile_size)
+                ey = int((e.y + e.height / 2) // dungeon.tile_size)
+            claimed.add((ex, ey))
+
+        # 自分からプレイヤーへのベクトル
+        dx_to_player = px - mx
+        dy_to_player = py - my
+
+        def score(ax, ay, _dir):
+            if not (0 <= ax < dungeon.map_width and 0 <= ay < dungeon.map_height): return 999
+            if dungeon.map_data[ay][ax] != 1: return 999          # 壁は除外
+            if (ax, ay) in claimed: return 100                    # 被りは避ける
+            # 自分と「逆方向」にいるマスを優先（挟み撃ち）
+            flank_dx = ax - px  # プレイヤー中心から見た方向
+            flank_dy = ay - py
+            # dot product が負 = 自分と反対側 = 有利な包囲マス
+            dot = flank_dx * dx_to_player + flank_dy * dy_to_player
+            return 0 if dot <= 0 else 1
+
+        candidates = sorted(adjacent, key=lambda t: score(t[0], t[1], t[2]))
+        best = candidates[0]
+        if score(best[0], best[1], best[2]) >= 100:
+            return None   # 全マス被りまたは壁なら通常行動
+        return best[0], best[1]  # (target_gx, target_gy)
+
+    def _move_toward_grid(self, tgx, tgy, dungeon, all_entities):
+        """指定グリッドに1歩近づく。移動できた場合 True を返す。"""
+        mx = int((self.x + self.width / 2) // dungeon.tile_size)
+        my = int((self.y + self.height / 2) // dungeon.tile_size)
+        dx = tgx - mx; dy = tgy - my
+        steps = []
+        if abs(dx) >= abs(dy):
+            steps = [("right" if dx > 0 else "left",  (1 if dx > 0 else -1) * dungeon.tile_size, 0),
+                     ("down"  if dy > 0 else "up",    0, (1 if dy > 0 else -1) * dungeon.tile_size)]
+        else:
+            steps = [("down"  if dy > 0 else "up",    0, (1 if dy > 0 else -1) * dungeon.tile_size),
+                     ("right" if dx > 0 else "left",  (1 if dx > 0 else -1) * dungeon.tile_size, 0)]
+        if dx == 0: steps = steps[1:]
+        if dy == 0: steps = steps[:1]
+        for facing, sdx, sdy in steps:
+            tx, ty = self.x + sdx, self.y + sdy
+            if self.can_move_grid(tx, ty, dungeon):
+                # 他の敵と重ならないか確認
+                ngx = int((tx + self.width / 2) // dungeon.tile_size)
+                ngy = int((ty + self.height / 2) // dungeon.tile_size)
+                blocked = any(
+                    e is not self and not getattr(e, "is_dead", False) and
+                    int((e.x + e.width / 2) // dungeon.tile_size) == ngx and
+                    int((e.y + e.height / 2) // dungeon.tile_size) == ngy
+                    for e in all_entities
+                )
+                if not blocked:
+                    self.target_x = tx; self.target_y = ty
+                    self.facing = facing; self.is_moving = True
+                    self.step_toggle = not self.step_toggle
+                    return True
         return False
 
     def take_turn(self, player, dungeon, all_entities, dialog=None, occupied_cells=None):
@@ -215,7 +350,39 @@ class Enemy(Entity):
         rad = max(1, self.detect_range + player.get_aggro_modifier())
         if getattr(self, "damage_flash_timer", 0) > 0: rad = max(rad, 100)
         if abs(dx) > rad or abs(dy) > rad: return
-        if self.stupidity > 0 and random.randint(1,10) <= self.stupidity: self._move_randomly(dungeon, all_entities); return
+        # バカ度テーブルを参照してぼーっと確率を決定
+        wander_chance = STUPIDITY_WANDER_RATES.get(self.stupidity, self.stupidity / 10.0)
+        if wander_chance > 0 and random.random() < wander_chance: self._move_randomly(dungeon, all_entities); return
+
+        # ── [ESCAPE_BLOCK] 逃げ道封鎖AI + フランク (削除時はこのブロックごと除去) ──
+        if (abs(dx) + abs(dy)) > 1:
+            nearby_allies = [
+                e for e in all_entities
+                if e is not self and isinstance(e, Enemy) and not getattr(e, "is_dead", False)
+                and abs(int((e.x+e.width/2)//dungeon.tile_size) - px) <= rad
+                and abs(int((e.y+e.height/2)//dungeon.tile_size) - py) <= rad
+            ]
+            if nearby_allies:
+                my_dist = abs(mx - px) + abs(my - py)
+                min_ally_dist = min(
+                    abs(int((e.x+e.width/2)//dungeon.tile_size) - px) +
+                    abs(int((e.y+e.height/2)//dungeon.tile_size) - py)
+                    for e in nearby_allies
+                )
+                # 自分が最接近ではない → 逃げ道封鎖を優先、次いでフランク
+                if ENEMY_ESCAPE_BLOCK_ENABLED and my_dist > min_ally_dist:
+                    block = self._get_escape_block_target(px, py, all_entities, dungeon)
+                    if block and self._move_toward_grid(block[0], block[1], dungeon, all_entities):
+                        return
+                # 最接近 or 封鎖失敗 → フランク（包囲）を試みる
+                flank = self._get_flank_target(px, py, all_entities, dungeon)
+                if flank:
+                    ftx, fty = flank
+                    if (mx, my) != (ftx, fty) and abs(mx - ftx) + abs(my - fty) > 1:
+                        if self._move_toward_grid(ftx, fty, dungeon, all_entities):
+                            return
+        # ── [/ESCAPE_BLOCK] ──────────────────────────────────────────
+
         if self.stupidity < 7:
             ideal = 1 if self.attack_priority == "close" else (2 if self.attack_range == 2 else max(1, self.attack_range - 1))
             los = self._is_in_attack_range(dx, dy) and self._is_line_of_sight_clear(dx, dy, dungeon, all_entities); gdist = abs(dx)+abs(dy)
@@ -228,6 +395,9 @@ class Enemy(Entity):
             else:
                 if los: self._handle_attack(dx, dy, player, dialog); return
                 if self._move_smartly_check_success(player, dungeon, all_entities, px, py, mx, my, occupied_cells, ideal): return
+                # [FIX] 斜め位置などでスマート移動が失敗した場合のフォールバック: プレイヤーへ1歩直接接近
+                if (abs(dx) + abs(dy)) > 1:
+                    self._move_toward_grid(px, py, dungeon, all_entities)
 
     def update(self, dungeon, dt=1/60):
         if self.is_static: self.update_animation(dt); return

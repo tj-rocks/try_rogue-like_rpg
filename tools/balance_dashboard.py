@@ -50,7 +50,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             floor_map = generate_rank_floor_map(ranks_list)
             
             enemies = get_normalized_enemy_data(floor_map)
-            weapons, armor, shields, w_types = get_normalized_equipment_data(floor_map)
+            weapons, armor, shields, w_cats, a_cats, s_cats = get_normalized_equipment_data(floor_map)
             
             print(f"[API] Normalized {len(enemies)} enemies, {len(weapons)} weapons, {len(armor)} armors")
             
