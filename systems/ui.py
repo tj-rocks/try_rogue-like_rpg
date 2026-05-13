@@ -1722,6 +1722,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             bank_dialog.is_active = True
                                             return
                                     elif npc.name == "医者":
+                                        dialog.text = "\n".join(npc.get_dialogue()); dialog.is_active = True
                                         from constants import DOCTOR_FEE, POISON_CURE_FEE
                                         confirm_dialog = kwargs.get("confirm_dialog")
                                         
@@ -2100,6 +2101,9 @@ class GuildDialog:
             self.mode = "AUTO_REPORT"
             self.items = [("auto_report", q)]
             player.active_quests.remove(q)
+            # [AUTO-SAVE] クエスト達成時に自動セーブ
+            print(f"[GUILD] Quest '{q.get('title')}' completed. Auto-saving...")
+            player.save_to_file()
             # self.setup(player, self.dungeon_ref) # setupでmodeがリセットされるのでここでは呼ばない
         else:
             dialog.text = Text.UI.GUILD_QUEST_UNMET
@@ -2430,7 +2434,7 @@ class StatusDialog:
             draw_text_wrapped(screen, self.font, "\n".join(lines), content_x, content_y, cw)
         
         elif self.mode == "QUESTS":
-            lines = [f"【受注中のクエスト】 ({len(player.active_quests)}/1)"]
+            lines = [f"【受注中のクエスト】"]
             if not player.active_quests:
                 lines.append("現在受注している依頼はありません。")
             else:
@@ -2719,20 +2723,36 @@ class WarehouseDialog(BaseListDialog):
 
     def setup_main_menu(self):
         self.mode = "MAIN"; self.cursor_idx = 0
-        self.items = [("mode_deposit", "action", Text.UI.WAREHOUSE_DEPOSIT, "アイテムを預けます。"), ("mode_withdraw", "action", Text.UI.WAREHOUSE_WITHDRAW, "アイテムを引き出すます。"), ("cancel", "cancel", Text.UI.QUIT, "店を出ます。")]
+        self.items = [
+            ("mode_deposit", "action", Text.UI.WAREHOUSE_DEPOSIT, "アイテムを預けます。", False),
+            ("mode_withdraw", "action", Text.UI.WAREHOUSE_WITHDRAW, "アイテムを引き出します。", False),
+            ("cancel", "cancel", Text.UI.QUIT, "店を出ます。", False)
+        ]
 
     def setup_deposit_mode(self, player):
         from constants import CONSUMABLE_DATA
         self.mode = "DEPOSIT"; self.cursor_idx = 0; self.items = []
+        # (id/idx, type, display_name, data_obj, is_equipped)
         for idx, item in enumerate(player.items):
             info = CONSUMABLE_DATA.get(item["key"], {}); name = info.get("name", item["key"])
-            self.items.append((idx, "consumable", f"{name} x{item['count']}" if item['count'] > 1 else name, item["key"]))
-        for eq in player.weapon_inventory: self.items.append((eq.iid, "weapon_inst", eq.get_name(), eq))
-        for eq in player.armor_inventory: self.items.append((eq.iid, "armor_inst", eq.get_name(), eq))
-        for eq in player.shield_inventory: self.items.append((eq.iid, "shield_inst", eq.get_name(), eq))
-        for st in player.stave_inventory: self.items.append((st.iid, "stave_inst", st.get_name_with_charges(), st))
-        for eq in player.lantern_inventory: self.items.append((eq.iid, "lantern_inst", eq.get_name(), eq))
-        self.items.append((-1, "back", Text.UI.QUIT, None))
+            self.items.append((idx, "consumable", f"{name} x{item['count']}" if item['count'] > 1 else name, item["key"], False))
+        
+        for eq in player.weapon_inventory:
+            is_eq = (eq.iid == player.equipped_weapon)
+            self.items.append((eq.iid, "weapon_inst", eq.get_name(), eq, is_eq))
+        for eq in player.armor_inventory:
+            is_eq = (eq.iid == player.equipped_armor)
+            self.items.append((eq.iid, "armor_inst", eq.get_name(), eq, is_eq))
+        for eq in player.shield_inventory:
+            is_eq = (eq.iid == player.equipped_shield)
+            self.items.append((eq.iid, "shield_inst", eq.get_name(), eq, is_eq))
+        for st in player.stave_inventory:
+            self.items.append((st.iid, "stave_inst", st.get_name_with_charges(), st, False))
+        for eq in player.lantern_inventory:
+            is_eq = (eq.iid == player.equipped_lantern)
+            self.items.append((eq.iid, "lantern_inst", eq.get_name(), eq, is_eq))
+        
+        self.items.append((-1, "back", Text.UI.QUIT, None, False))
 
     def setup_withdraw_mode(self, player):
         self.mode = "WITHDRAW"; self.cursor_idx = 0; self.items = []
@@ -2742,8 +2762,8 @@ class WarehouseDialog(BaseListDialog):
             temp = StaveInstance.from_dict(data) if itype == "stave_inst" else EquipInstance.from_dict(data) if "inst" in itype else None
             name = temp.get_name_with_charges() if itype == "stave_inst" else temp.get_name() if temp else ""
             if not temp: from constants import CONSUMABLE_DATA; name = CONSUMABLE_DATA.get(data, {}).get("name", data)
-            self.items.append((idx, itype, name, data))
-        self.items.append((-1, "back", Text.UI.QUIT, None))
+            self.items.append((idx, itype, name, data, False))
+        self.items.append((-1, "back", Text.UI.QUIT, None, False))
 
     def handle_events(self, events, player, confirm_dialog, dialog):
         if not self.is_active: return
@@ -2782,7 +2802,13 @@ class WarehouseDialog(BaseListDialog):
                     elif self.mode == "WITHDRAW": self._handle_withdraw(player, sel, confirm_dialog, dialog)
 
     def _handle_deposit(self, player, selected, confirm_dialog, dialog):
-        _id, itype, name, obj = selected
+        _id, itype, name, obj, is_equipped = selected
+        if is_equipped:
+            if dialog:
+                dialog.text = "装備中のアイテムは預けられません。\n装備を外してから再度お試しください。"
+                dialog.is_active = True
+            return
+
         if len(player.warehouse_items) >= player.warehouse_max:
             if dialog: dialog.text = Text.NPC.WAREHOUSE_FULL; dialog.is_active = True
             return
@@ -2808,7 +2834,7 @@ class WarehouseDialog(BaseListDialog):
             confirm_dialog.on_yes = do_dep; confirm_dialog.is_active = True
 
     def _handle_withdraw(self, player, selected, confirm_dialog, dialog):
-        w_idx, itype, name, data = selected
+        w_idx, itype, name, data, is_equipped = selected
         from constants import WAREHOUSE_FEE
         if player.coin < WAREHOUSE_FEE:
             if dialog: dialog.text = Text.NPC.WAREHOUSE_NO_FEE.format(fee=WAREHOUSE_FEE); dialog.is_active = True
@@ -2854,12 +2880,24 @@ class WarehouseDialog(BaseListDialog):
             start = max(0, self.cursor_idx - self.view_size // 2)
             if start + self.view_size > len(self.items): start = max(0, len(self.items) - self.view_size)
             for i in range(start, min(start + self.view_size, len(self.items))):
-                item = self.items[i]; y_pos = self.y + 80 + (i - start) * self.row_height; color = (255, 255, 255)
+                item = self.items[i]; y_pos = self.y + 80 + (i - start) * self.row_height
+                is_equipped = item[4]
+                
+                color = (255, 255, 255)
+                if is_equipped:
+                    color = (130, 130, 130) # 装備中はグレー
+                
                 if i == self.cursor_idx:
-                    color = (255, 255, 100)
                     pygame.draw.rect(screen, (60, 70, 90), (self.x + 20, y_pos - 5, self.width // 2 - 40, self.row_height), border_radius=5)
-                    screen.blit(self.font.render(">", True, color), (self.x + 35, y_pos))
-                name = item[2]; max_w = sep_x - self.x - 100
+                    screen.blit(self.font.render(">", True, (255, 255, 100)), (self.x + 35, y_pos))
+                    if not is_equipped:
+                        color = (255, 255, 100) # 選択中は黄色（装備中でない場合）
+                
+                name = item[2]
+                if is_equipped:
+                    name = f"[E] {name}"
+                
+                max_w = sep_x - self.x - 100
                 if self.font.size(name)[0] > max_w:
                     while self.font.size(name + "...")[0] > max_w and len(name) > 0: name = name[:-1]
                     name += "..."
@@ -2870,11 +2908,17 @@ class WarehouseDialog(BaseListDialog):
         info_lines = [Text.UI.WAREHOUSE_FEE_PANEL.format(fee=WAREHOUSE_FEE, coin=player.coin), "", "【説明】"]
         if 0 <= self.cursor_idx < len(self.items):
             sel = self.items[self.cursor_idx]; status, data = sel[1], sel[3]
+            is_equipped = sel[4]
+            
             if status in ("action", "cancel", "back"):
                 if data: info_lines.append(data)
             else:
                 info_lines.append(f"品名: {sel[2]}")
-                info_lines.append("倉庫に預けます。" if self.mode == "DEPOSIT" else "倉庫から引き出します。")
+                if is_equipped:
+                    info_lines.append("※装備中のため預けられません。")
+                else:
+                    info_lines.append("倉庫に預けます。" if self.mode == "DEPOSIT" else "倉庫から引き出します。")
+                
                 desc = ""
                 if "inst" in status:
                     if hasattr(data, "get_stat"): desc = data.get_stat("describe", "")

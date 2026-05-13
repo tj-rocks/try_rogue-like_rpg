@@ -161,7 +161,7 @@ T:
   base_tile: floor_1
 
 '!':
-  name: 銀行窓口係
+  name: 村人
   image_path: components/pictures/npc/guide_bank
   base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
@@ -198,7 +198,7 @@ T:
   base_tile: floor_0
 
 '>':
-  name: 大魔導士
+  name: 魔法屋
   image_path: components/pictures/npc/wizard
   base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
