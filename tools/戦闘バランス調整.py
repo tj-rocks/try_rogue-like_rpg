@@ -153,18 +153,29 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     # ターゲット（個体）のブロックを確認
                     if in_data_section and stripped == f"{target_id}:":
                         in_target_block = True
+                        param_found = False
                     elif in_target_block and stripped.endswith(":") and line.startswith("  ") and not line.startswith("    "):
-                        # 次の個体ブロックが来たら終了
+                        # 次の個体ブロックが来たら、またはセクションが終わったら
                         if stripped != f"{target_id}:":
+                            # パラメータが見つからなかった場合、ブロックの最後に追加する
+                            if not param_found:
+                                new_lines.append(f"    {param}: {value}\n")
+                                updated = True
                             in_target_block = False
                     
                     # パラメータの書き換え
                     if in_target_block and stripped.startswith(f"{param}:"):
                         indent = line[:line.find(param)]
                         new_lines.append(f"{indent}{param}: {value}\n")
+                        param_found = True
                         updated = True
                     else:
                         new_lines.append(line)
+                
+                # ファイルの最後がターゲットブロックで終わっている場合の処理
+                if in_target_block and not param_found:
+                    new_lines.append(f"    {param}: {value}\n")
+                    updated = True
                 
                 if updated:
                     with open(path, "w", encoding="utf-8") as f:

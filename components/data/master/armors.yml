@@ -10,18 +10,10 @@ ARMOR_CATEGORIES:
     describe: 動きやすさを重視した軽量防具.
     position:
       offsets:
-        down:
-        - 0
-        - 0
-        up:
-        - 0
-        - 0
-        left:
-        - 0
-        - 0
-        right:
-        - 0
-        - 0
+        down: [0, 0]
+        up: [0, 0]
+        left: [0, 0]
+        right: [0, 0]
   medium:
     name: 中装
     defense_bonus: 5
@@ -33,18 +25,10 @@ ARMOR_CATEGORIES:
     describe: 防御力と重量のバランスが取れた標準的な防具.
     position:
       offsets:
-        down:
-        - 0
-        - 0
-        up:
-        - 0
-        - 0
-        left:
-        - 0
-        - 0
-        right:
-        - 0
-        - 0
+        down: [0, 0]
+        up: [0, 0]
+        left: [0, 0]
+        right: [0, 0]
   heavy:
     name: 重装
     defense_bonus: 12
@@ -57,18 +41,10 @@ ARMOR_CATEGORIES:
     describe: 防御を最優先した重厚な鎧。物音がするため敵に気づかれやすい。
     position:
       offsets:
-        down:
-        - 0
-        - 0
-        up:
-        - 0
-        - 0
-        left:
-        - 0
-        - 0
-        right:
-        - 0
-        - 0
+        down: [0, 0]
+        up: [0, 0]
+        left: [0, 0]
+        right: [0, 0]
   robe:
     name: 法衣
     defense_bonus: 2
@@ -81,18 +57,10 @@ ARMOR_CATEGORIES:
     describe: 魔力を高める効果のある布製の防具.
     position:
       offsets:
-        down:
-        - 0
-        - 0
-        up:
-        - 0
-        - 0
-        left:
-        - 0
-        - 0
-        right:
-        - 0
-        - 0
+        down: [0, 0]
+        up: [0, 0]
+        left: [0, 0]
+        right: [0, 0]
 ARMOR_DATA:
   broken_armor:
     name: 壊れた鎧
@@ -105,16 +73,13 @@ ARMOR_DATA:
     image_dir: components/pictures/armor/adventurers_clothes
     shop_buyable: false
     describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない。
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
   adventurers_clothes:
     name: 冒険者の服
     category: robe
     min_rank: F
     rarity: 1
-    defense_bonus: 4.5
+    defense_bonus: 7.5
     attack_bonus: 0
     stave_bonus: 0
     price: 150
@@ -122,10 +87,8 @@ ARMOR_DATA:
     shop_buyable: false
     describe: 丈夫な布で作られた一般的な服.
     hp_bonus: 0
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    evasion_bonus: 0
   leather_breastplate:
     name: 皮の胸当て
     category: light
@@ -139,25 +102,19 @@ ARMOR_DATA:
     shop_buyable: true
     describe: なめし革を重ねて作られた防具.
     hp_bonus: 0
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
   iron_breastplate:
     name: 鉄の胸当て
     category: medium
     min_rank: F
     rarity: 2
-    defense_bonus: 12
+    defense_bonus: 11
     price: 220
     image_dir: components/pictures/armor/iron_armor
     shop_buyable: true
     describe: 鉄板を胸部に当てた実戦的な防具.
     hp_bonus: 0
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
   fullmetal_breastplate:
     name: 鋼の胸当て
     category: medium
@@ -169,10 +126,7 @@ ARMOR_DATA:
     shop_buyable: false
     describe: 硬い鋼で作られた胸当て.
     hp_bonus: 0
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
   hard_leather_armor:
     name: 堅牢な革鎧
     category: light
@@ -187,7 +141,4 @@ ARMOR_DATA:
     shop_buyable: true
     describe: なめし革を重ねて作られた防具.
     hp_bonus: 0
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}

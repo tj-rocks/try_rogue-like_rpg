@@ -1,6 +1,6 @@
 {
-  "x": 300,
-  "y": 220,
+  "x": 1920,
+  "y": 2560,
   "hp": 100,
   "max_hp": 100,
   "coin": 100,
@@ -34,13 +34,11 @@
   "lantern_inventory": [],
   "equipped_lantern": null,
   "invincible_turns": 0,
-  "guild_point": 10,
+  "guild_point": 0,
   "guild_rank": "-",
   "active_quests": [],
   "quest_tokens": {},
-  "completed_fixed_quests": [
-    "test_quest_1"
-  ],
+  "completed_fixed_quests": [],
   "has_seen_ending": false,
   "warehouse_items": [],
   "event_items": [],
