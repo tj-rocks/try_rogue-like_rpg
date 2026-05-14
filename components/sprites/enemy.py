@@ -444,22 +444,61 @@ class Enemy(Entity):
             # 全部屋（スタート部屋以外優先）を巡回して場所を探す
             shuffled_rooms = list(enumerate(dungeon.rooms))
             random.shuffle(shuffled_rooms)
+            
+            # まずは通常のランダムサンプリングで試す
             for ridx, room in shuffled_rooms:
                 if ridx == getattr(dungeon, "start_room_idx", -1) and len(dungeon.rooms) > 1: continue
-                for att in range(ENEMY_SPAWN_ATTEMPTS * 2):
+                for att in range(ENEMY_SPAWN_ATTEMPTS * 3):
                     ex, ey = random.randint(room[0]-ENEMY_SPAWN_SCATTER, room[0]+ENEMY_SPAWN_SCATTER), random.randint(room[1]-ENEMY_SPAWN_SCATTER, room[1]+ENEMY_SPAWN_SCATTER)
-                    # プレイヤーから離れているか
                     if abs(ex-pgx) <= ENEMY_SPAWN_SAFE_RADIUS and abs(ey-pgy) <= ENEMY_SPAWN_SAFE_RADIUS: continue
-                    # 座標が有効か
                     if 0 <= ey < dungeon.map_height and 0 <= ex < dungeon.map_width:
-                        # 仮のインスタンスを作って全占有グリッドが床かチェックする
                         temp_enemy = Enemy(ex*dungeon.tile_size, ey*dungeon.tile_size, b_type, player=player)
                         if temp_enemy.can_move_grid(temp_enemy.x, temp_enemy.y, dungeon):
                             if not any(set(temp_enemy.get_occupied_grids(dungeon.tile_size)) & set(e.get_occupied_grids(dungeon.tile_size)) for e in enemies):
                                 enemies.append(temp_enemy); dungeon.spawn_counts[b_type] = dungeon.spawn_counts.get(b_type,0)+1
                                 spawned = True; break
                 if spawned: break
+
+            # それでも出なかった場合、全タイルを総当たりでチェックする（フォールバック）
+            if not spawned:
+                for ridx, room in shuffled_rooms:
+                    # 部屋の範囲を特定（中心からある程度の範囲を全スキャン）
+                    # rooms_raw がある場合はそれを使う
+                    target_room_obj = None
+                    if hasattr(dungeon, "rooms_raw") and ridx < len(dungeon.rooms_raw):
+                        target_room_obj = dungeon.rooms_raw[ridx]
+                    
+                    if target_room_obj:
+                        scan_range_x = range(target_room_obj.x, target_room_obj.x + target_room_obj.w)
+                        scan_range_y = range(target_room_obj.y, target_room_obj.y + target_room_obj.h)
+                    else:
+                        # 部屋オブジェクトがない場合のバックアップ（広めにスキャン）
+                        scan_range_x = range(room[0]-10, room[0]+11)
+                        scan_range_y = range(room[1]-10, room[1]+11)
+
+                    candidate_tiles = []
+                    for ey in scan_range_y:
+                        for ex in scan_range_x:
+                            if not (0 <= ey < dungeon.map_height and 0 <= ex < dungeon.map_width): continue
+                            # プレイヤーとの距離制約を一旦無視して「置ける場所」を探す
+                            temp_enemy = Enemy(ex*dungeon.tile_size, ey*dungeon.tile_size, b_type, player=player)
+                            if temp_enemy.can_move_grid(temp_enemy.x, temp_enemy.y, dungeon):
+                                if not any(set(temp_enemy.get_occupied_grids(dungeon.tile_size)) & set(e.get_occupied_grids(dungeon.tile_size)) for e in enemies):
+                                    dist = abs(ex-pgx) + abs(ey-pgy)
+                                    candidate_tiles.append((ex, ey, dist))
+                    
+                    if candidate_tiles:
+                        # プレイヤーからなるべく離れている場所を優先
+                        candidate_tiles.sort(key=lambda x: x[2], reverse=True)
+                        best_ex, best_ey, _ = candidate_tiles[0]
+                        enemies.append(Enemy(best_ex*dungeon.tile_size, best_ey*dungeon.tile_size, b_type, player=player))
+                        dungeon.spawn_counts[b_type] = dungeon.spawn_counts.get(b_type,0)+1
+                        spawned = True
+                        print(f"[Dungeon] Boss {b_type} spawned via fallback exhaustive search at ({best_ex}, {best_ey})")
+                        break
+
             if spawned: print(f"[Dungeon] Boss {b_type} spawned guaranteed at floor {floor}.")
+            else: print(f"[ERROR] Failed to spawn guaranteed boss {b_type} on floor {floor} even with fallback!")
 
         # 2. 通常モンスターの配置
         for idx, room in enumerate(dungeon.rooms):
