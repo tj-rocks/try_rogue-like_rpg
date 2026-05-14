@@ -62,7 +62,12 @@ def test_furthest_room_spawn():
     gx, gy = int(found_item.x // dungeon.tile_size), int(found_item.y // dungeon.tile_size)
     print(f"[OK] 冒険者の証を発見！ 位置: ({gx}, {gy})")
     
-    # 4. 見つかった位置が「一番遠い部屋」の周辺(3x3程度)にあるかを検証
+    # 4. 見つかった位置が「床(1)」または「下り階段(3)」であることを検証
+    tile_type = dungeon.map_data[gy][gx]
+    assert tile_type in (1, 3), f"アイテムが床ではない場所(タイル種別: {tile_type})に落ちています！"
+    print(f"[OK] 冒険者の証が有効なタイル(種別: {tile_type})の上に配置されていることを確認")
+    
+    # 5. 見つかった位置が「一番遠い部屋」の周辺(3x3程度)にあるかを検証
     dist_to_expected = max(abs(gx - expected_furthest_room[0]), abs(gy - expected_furthest_room[1]))
     assert dist_to_expected <= 2, f"アイテムが最奥の部屋({expected_furthest_room})から離れた位置({gx}, {gy})に落ちています！"
     
