@@ -1,7 +1,7 @@
 {
-  "x": 1344,
-  "y": 896,
-  "hp": 116,
+  "x": 1152,
+  "y": 1088,
+  "hp": 200,
   "max_hp": 200,
   "coin": 100,
   "bank_coin": 0,
@@ -34,27 +34,14 @@
   "lantern_inventory": [],
   "equipped_lantern": null,
   "invincible_turns": 0,
-  "guild_point": 1100,
+  "guild_point": 1000,
   "guild_rank": "F",
-  "active_quests": [
-    {
-      "id": "rank_up_E",
-      "type": "delivery",
-      "is_rank_up": true,
-      "target_key": "guild_cert_e",
-      "target_name": "E級ギルド証",
-      "amount": 1,
-      "reward_gold": 2500,
-      "reward_gp": 0,
-      "next_rank": "E",
-      "title": "Eランクへの昇格"
-    }
-  ],
+  "active_quests": [],
   "quest_tokens": {},
   "completed_fixed_quests": [],
   "has_seen_ending": false,
   "warehouse_items": [],
   "event_items": [],
-  "current_floor": 11,
+  "current_floor": 1,
   "equip_id_counter": 2
 }
