@@ -52,5 +52,19 @@ FIXED_QUESTS:
     description: ダンジョン深層に現れるという、驚異的な回避能力を持つスライムを討伐してください。
     repeatable: true
     chance: 1.0
-    ending: true
-
+    ending: false
+  # --- 以下、ボス討伐クエスト ---
+  - id: boss_hunt_sukesuketoron
+    min_rank: E
+    max_rank: C
+    type: hunt
+    target_key: sukewsuke_skeleton
+    amount: 1
+    reward_gold: 500
+    reward_gp: 5
+    title: スケスケスケルトンの討伐
+    requester: ギルドマスター
+    description: ダンジョンに現れるスケスケなモンスターを倒してください
+    repeatable: true
+    chance: 1.0
+    ending: false
