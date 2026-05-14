@@ -70,8 +70,25 @@ def test_furthest_room_spawn():
     # 5. 見つかった位置が「一番遠い部屋」の周辺(3x3程度)にあるかを検証
     dist_to_expected = max(abs(gx - expected_furthest_room[0]), abs(gy - expected_furthest_room[1]))
     assert dist_to_expected <= 2, f"アイテムが最奥の部屋({expected_furthest_room})から離れた位置({gx}, {gy})に落ちています！"
-    
     print(f"[OK] 冒険者の証が上り階段から一番遠い部屋の中心付近に配置されていることを確認")
+
+    print("\n--- E級ギルド証 (21F) の配置テスト ---")
+    player2 = Player()
+    player2.active_quests.append({
+        "id": "rank_up_E",
+        "type": "delivery",
+        "is_rank_up": True,
+        "target_key": "guild_cert_e"
+    })
+    dungeon2 = warp_to_floor(21, player2, spawn_reason="test")
+    
+    found_cert = None
+    for item in dungeon2.dropped_items:
+        if getattr(item, "item_key", None) == "guild_cert_e":
+            found_cert = item
+            break
+    assert found_cert is not None, "21階にE級ギルド証がドロップしていません！"
+    print(f"[OK] 21階でE級ギルド証を発見！")
     print("--- テスト合格 ---")
 
 if __name__ == "__main__":

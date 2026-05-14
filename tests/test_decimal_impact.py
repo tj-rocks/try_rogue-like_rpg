@@ -47,9 +47,10 @@ def test_decimal_attack_impact():
     # ケースA: 攻撃力 8.0 (1.0 -> 1ダメージ)
     # ---------------------------------------------------------
     player.total_attack = 8.0
+    enemy.facing = "up" # 正面からにすることでバックアタック(クリティカル+25%)を避ける
     
     damages_a = []
-    for _ in range(10):
+    for _ in range(100):
         msg, dmg, _, _ = deal_damage(player, enemy, is_magic=True) # 必中
         damages_a.append(dmg)
     
@@ -62,7 +63,7 @@ def test_decimal_attack_impact():
     player.total_attack = 8.2
     
     damages_b = []
-    for _ in range(10):
+    for _ in range(100):
         msg, dmg, _, _ = deal_damage(player, enemy, is_magic=True)
         damages_b.append(dmg)
         
