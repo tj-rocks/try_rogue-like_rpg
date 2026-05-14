@@ -191,6 +191,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
+    min_floor: 11
+    max_floor: 11
     describe: E級冒険者の証。ギルドに認められた駆け出し冒険者の象徴。
   guild_cert_d:
     name: D級ギルド証
@@ -201,6 +203,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
+    min_floor: 21
+    max_floor: 21
     describe: D級冒険者の証。一通りの経験を積んだ冒険者として認められた証。
   guild_cert_c:
     name: C級ギルド証
@@ -211,6 +215,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
+    min_floor: 30
+    max_floor: 30
     describe: C級冒険者の証。中堅冒険者として、より危険な依頼への参加が許される。
   guild_cert_b:
     name: B級ギルド証
@@ -221,6 +227,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
+    min_floor: 35
+    max_floor: 35
     describe: B級冒険者の証。熟練の冒険者のみが手にできる栄誉ある証。
   guild_cert_a:
     name: A級ギルド証
@@ -231,6 +239,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
+    min_floor: 55
+    max_floor: 55
     describe: 'A級冒険者の証。一流の証であり、多くの冒険者の憧れの大。 '
   guild_cert_s:
     name: S級ギルド証
@@ -241,6 +251,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
+    min_floor: 70
+    max_floor: 70
     describe: S級冒険者の証。英雄に等しい実力を持つ者だけに授与される。
   guild_cert_ss:
     name: SS級ギルド証
@@ -251,6 +263,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
+    min_floor: 80
+    max_floor: 80
     describe: SS級冒険者の証。伝説に名を刻む、至高の冒険者の証。
   adventurer_proof:
     name: 冒険者の証
