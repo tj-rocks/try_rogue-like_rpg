@@ -1,11 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Balance Master Dashboard v3.2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg-color: #0a0f1e;
@@ -19,7 +21,10 @@
             --danger: #ff4444;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             font-family: 'Outfit', sans-serif;
@@ -68,6 +73,7 @@
             border: 1px solid var(--border);
             margin-bottom: 8px;
         }
+
         .mode-btn {
             flex: 1;
             border: none;
@@ -79,8 +85,16 @@
             font-weight: 600;
             transition: all 0.2s;
         }
-        .mode-btn.active { background: var(--primary); color: black; }
-        .mode-btn.active.defense { background: var(--secondary); color: white; }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: black;
+        }
+
+        .mode-btn.active.defense {
+            background: var(--secondary);
+            color: white;
+        }
 
         /* Controls */
         .control-group {
@@ -93,7 +107,8 @@
             gap: 8px;
         }
 
-        select, input {
+        select,
+        input {
             width: 100%;
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid var(--border);
@@ -103,23 +118,45 @@
             font-family: inherit;
             font-size: 13px;
         }
-        
+
         .inline-edit {
             display: flex;
             flex-direction: column;
             gap: 4px;
             margin-top: 4px;
         }
-        .edit-row { display: flex; align-items: center; gap: 8px; }
-        .edit-row label { flex: 1; font-size: 11px; color: var(--text-dim); }
-        .edit-row input { width: 70px; padding: 4px; margin: 0; text-align: center; color: var(--primary); border-color: var(--primary); }
-        .defense-mode-input input { color: var(--secondary); border-color: var(--secondary); }
+
+        .edit-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-row label {
+            flex: 1;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .edit-row input {
+            width: 70px;
+            padding: 4px;
+            margin: 0;
+            text-align: center;
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .defense-mode-input input {
+            color: var(--secondary);
+            border-color: var(--secondary);
+        }
 
         .side-save-btn {
             width: 100%;
             margin-top: 8px;
             padding: 6px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border);
             color: var(--text);
             border-radius: 6px;
@@ -127,11 +164,26 @@
             font-weight: 700;
             cursor: pointer;
         }
-        .side-save-btn:hover { background: var(--primary); color: black; }
+
+        .side-save-btn:hover {
+            background: var(--primary);
+            color: black;
+        }
 
         /* Main Content */
-        .main { flex: 1; padding: 40px; overflow-y: auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .main {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
         .stat-card {
             background: var(--card-bg);
             padding: 12px 24px;
@@ -141,38 +193,142 @@
             display: flex;
             gap: 20px;
         }
-        .stat-val { font-weight: 700; font-family: 'JetBrains Mono'; }
-        .val-atk { color: var(--primary); }
-        .val-def { color: var(--secondary); }
-        .val-hp { color: var(--accent); }
+
+        .stat-val {
+            font-weight: 700;
+            font-family: 'JetBrains Mono';
+        }
+
+        .val-atk {
+            color: var(--primary);
+        }
+
+        .val-def {
+            color: var(--secondary);
+        }
+
+        .val-hp {
+            color: var(--accent);
+        }
 
         /* Table */
-        .table-container { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; backdrop-filter: blur(10px); }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: rgba(255, 255, 255, 0.05); padding: 16px; font-size: 11px; color: var(--text-dim); text-transform: uppercase; }
-        td { padding: 16px; border-bottom: 1px solid var(--border); }
-        .row-id { font-family: 'JetBrains Mono'; font-size: 12px; color: var(--text-dim); }
-        .row-name { font-weight: 600; }
-        .badge { padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; display: inline-block; }
-        .hit-1 { background: rgba(0, 255, 136, 0.1); color: var(--accent); border: 1px solid var(--accent); }
-        .hit-2 { background: rgba(0, 212, 255, 0.1); color: var(--primary); border: 1px solid var(--primary); }
-        .hit-3 { background: rgba(255, 0, 122, 0.1); color: var(--secondary); border: 1px solid var(--secondary); }
-        .hit-danger { background: rgba(255, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
 
-        .edit-input { width: 60px; text-align: center; background: transparent; border-bottom: 1px solid var(--border); margin: 0; padding: 4px; }
-        .edit-input:focus { border-color: var(--primary); outline: none; }
-        .save-btn { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
-        .save-btn:hover { background: var(--primary); color: black; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
 
-        .loading-overlay { position: fixed; inset: 0; background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 1000; font-size: 24px; }
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .row-id {
+            font-family: 'JetBrains Mono';
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .row-name {
+            font-weight: 600;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .hit-1 {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .hit-2 {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .hit-3 {
+            background: rgba(255, 0, 122, 0.1);
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+        }
+
+        .hit-danger {
+            background: rgba(255, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .edit-input {
+            width: 60px;
+            text-align: center;
+            background: transparent;
+            border-bottom: 1px solid var(--border);
+            margin: 0;
+            padding: 4px;
+        }
+
+        .edit-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .save-btn {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background: var(--primary);
+            color: black;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            font-size: 24px;
+        }
     </style>
 </head>
+
 <body>
     <div id="loading" class="loading-overlay">⚙️ Live Sync...</div>
 
     <div class="sidebar">
         <div class="logo">Balance Master</div>
-        
+
         <div class="mode-toggle">
             <button id="mode-atk" class="mode-btn active" onclick="setMode('atk')">Attack</button>
             <button id="mode-def" class="mode-btn" onclick="setMode('def')">Defense</button>
@@ -189,11 +345,16 @@
             <select id="weapon-select" onchange="updateUI()"></select>
             <div class="inline-edit">
                 <div class="edit-row">
-                    <label>Attack Bonus</label>
+                    <label>攻撃力 Bonus</label>
                     <input type="number" id="edit-weapon-atk" step="0.5" oninput="livePreview()">
                 </div>
+                <div class="edit-row">
+                    <label>命中率 Bonus</label>
+                    <input type="number" id="edit-weapon-accuracy" step="1" oninput="livePreview()">
+                </div>
             </div>
-            <button id="btn-save-weapon" class="side-save-btn" onclick="manualSaveEquipment('weapon')">SAVE WEAPON</button>
+            <button id="btn-save-weapon" class="side-save-btn" onclick="manualSaveEquipment('weapon')">SAVE
+                WEAPON</button>
         </div>
 
         <!-- Armor / Shield -->
@@ -202,18 +363,29 @@
                 <div class="section-title">Active Armor</div>
                 <select id="armor-select" onchange="updateUI()"></select>
                 <div class="inline-edit defense-mode-input">
-                    <div class="edit-row"><label>Def Bonus</label><input type="number" id="edit-armor-def" step="0.5" oninput="livePreview()"></div>
-                    <div class="edit-row"><label>HP Bonus</label><input type="number" id="edit-armor-hp" oninput="livePreview()"></div>
+                    <div class="edit-row"><label>Def Bonus</label><input type="number" id="edit-armor-def" step="0.5"
+                            oninput="livePreview()"></div>
+                    <div class="edit-row"><label>HP Bonus</label><input type="number" id="edit-armor-hp"
+                            oninput="livePreview()"></div>
+                    <div class="edit-row"><label>Evasion Bonus</label><input type="number" id="edit-armor-eva" step="1"
+                            oninput="livePreview()"></div>
                 </div>
-                <button id="btn-save-armor" class="side-save-btn" onclick="manualSaveEquipment('armor')">SAVE ARMOR</button>
+                <button id="btn-save-armor" class="side-save-btn" onclick="manualSaveEquipment('armor')">SAVE
+                    ARMOR</button>
             </div>
             <div class="control-group">
                 <div class="section-title">Active Shield</div>
                 <select id="shield-select" onchange="updateUI()"></select>
                 <div class="inline-edit defense-mode-input">
-                    <div class="edit-row"><label>Def Bonus</label><input type="number" id="edit-shield-def" step="0.5" oninput="livePreview()"></div>
+                    <div class="edit-row"><label>Def Bonus</label><input type="number" id="edit-shield-def" step="0.5"
+                            oninput="livePreview()"></div>
+                    <div class="edit-row"><label>Block(C)</label><input type="number" id="edit-shield-block" step="0.01"
+                            oninput="livePreview()"></div>
+                    <div class="edit-row"><label>Block(R)</label><input type="number" id="edit-shield-block-ranged"
+                            step="0.01" oninput="livePreview()"></div>
                 </div>
-                <button id="btn-save-shield" class="side-save-btn" onclick="manualSaveEquipment('shield')">SAVE SHIELD</button>
+                <button id="btn-save-shield" class="side-save-btn" onclick="manualSaveEquipment('shield')">SAVE
+                    SHIELD</button>
             </div>
         </div>
 
@@ -300,11 +472,15 @@
             if (id === 'none') return;
             if (type === 'weapon') {
                 await updateStat('equipment', id, 'attack_bonus', document.getElementById('edit-weapon-atk').value);
+                await updateStat('equipment', id, 'accuracy_bonus_close', document.getElementById('edit-weapon-accuracy').value);
             } else if (type === 'armor') {
                 await updateStat('equipment', id, 'defense_bonus', document.getElementById('edit-armor-def').value);
                 await updateStat('equipment', id, 'hp_bonus', document.getElementById('edit-armor-hp').value);
+                await updateStat('equipment', id, 'evasion_bonus', document.getElementById('edit-armor-eva').value);
             } else if (type === 'shield') {
                 await updateStat('equipment', id, 'defense_bonus', document.getElementById('edit-shield-def').value);
+                await updateStat('equipment', id, 'block_chance_close', document.getElementById('edit-shield-block').value);
+                await updateStat('equipment', id, 'block_chance_ranged', document.getElementById('edit-shield-block-ranged').value);
             }
         }
 
@@ -340,35 +516,53 @@
                 const baseAtk = masterData.balance.PLAYER.attack || 5;
                 const weaponId = document.getElementById('weapon-select').value;
                 const weapon = masterData.weapons[weaponId] || {};
-                
+
                 const inputVal = document.getElementById('edit-weapon-atk');
-                if (!isLive) inputVal.value = weapon.attack_bonus || 0;
+                const inputAccuracy = document.getElementById('edit-weapon-accuracy');
                 
+                if (!isLive) {
+                    inputVal.value = weapon.attack_bonus || 0;
+                    inputAccuracy.value = weapon.accuracy_bonus_close || 0;
+                }
                 const finalWeaponAtk = parseFloat(inputVal.value) || 0;
                 const totalAtk = baseAtk + finalWeaponAtk;
-                summary.innerHTML = `<span>Base: ${baseAtk}</span><span>Weapon: +${finalWeaponAtk}</span><span class="stat-val val-atk">Total: ${totalAtk}</span>`;
+                const totalAccuracyClose = (masterData.balance.PLAYER.accuracy_close || 100) + (parseFloat(inputAccuracy.value) || 0);
+                const totalAccuracyRanged = (masterData.balance.PLAYER.accuracy_ranged || 100) + (weapon.accuracy_bonus_ranged || 0);
+                summary.innerHTML = `<span>Base: ${baseAtk}</span><span>Weapon: +${finalWeaponAtk}</span><span class="stat-val val-atk">Total: ${totalAtk}</span><span style="color:var(--text-dim)">ACC (C/R): ${totalAccuracyClose} / ${totalAccuracyRanged}</span>`;
 
-                tableHead.innerHTML = `<tr><th>Enemy ID</th><th>Name</th><th>HP</th><th>DEF</th><th>Hits to Kill</th><th>Actions</th></tr>`;
+                tableHead.innerHTML = `<tr><th>Enemy ID</th><th>Name</th><th>HP</th><th>DEF</th><th>Enemy EVA</th><th>Hit (C/R)</th><th>Hits to Kill</th><th>Actions</th></tr>`;
                 const rankEnemies = Object.entries(masterData.enemies).filter(([id, e]) => (e.min_rank || e.rank) === rank && !e.is_static);
                 const hasPenetration = weapon.armor_penetration === true;
-                
+
                 tableBody.innerHTML = rankEnemies.map(([id, e]) => {
                     const hp = liveEnemyOverrides[id]?.hp ?? e.hp;
                     const def = liveEnemyOverrides[id]?.defense ?? e.defense;
-                    
+
                     // 防御力貫通の適用
                     const effectiveDef = hasPenetration ? 0 : def;
                     const dmg = Math.max(1, totalAtk - effectiveDef);
-                    
+
                     const hits = Math.ceil(hp / dmg);
                     const cls = hits <= 1 ? 'hit-1' : (hits === 2 ? 'hit-2' : (hits === 3 ? 'hit-3' : 'hit-danger'));
                     const penBadge = hasPenetration ? `<span class="badge" style="background: rgba(255,255,0,0.1); color: yellow; border: 1px solid yellow; margin-left: 4px;">貫通!</span>` : "";
-                    
+
+                    // 命中率計算: (プレイヤー精度 - 敵回避) → 5%〜99%にクランプ → /10で丸める
+                    const enemyEva = liveEnemyOverrides[id]?.evasion ?? (e.evasion || 0);
+                    const rawHitPctC = Math.min(99, Math.max(5, totalAccuracyClose - enemyEva));
+                    const hitScoreC = Math.round(rawHitPctC / 10);
+                    const hitColorC = hitScoreC >= 9 ? 'var(--accent)' : (hitScoreC >= 6 ? 'var(--primary)' : (hitScoreC >= 4 ? 'orange' : 'var(--danger)'));
+
+                    const rawHitPctR = Math.min(99, Math.max(5, totalAccuracyRanged - enemyEva));
+                    const hitScoreR = Math.round(rawHitPctR / 10);
+                    const hitColorR = hitScoreR >= 9 ? 'var(--accent)' : (hitScoreR >= 6 ? 'var(--primary)' : (hitScoreR >= 4 ? 'orange' : 'var(--danger)'));
+
                     return `
                         <tr>
                             <td class="row-id">${id}</td><td class="row-name">${e.name}${penBadge}</td>
                             <td><input class="edit-input" type="number" value="${hp}" oninput="onEnemyInput('${id}', 'hp', this.value)" onblur="updateStat('enemies', '${id}', 'hp', this.value)"></td>
                             <td><input class="edit-input" type="number" value="${def}" oninput="onEnemyInput('${id}', 'defense', this.value)" onblur="updateStat('enemies', '${id}', 'defense', this.value)" style="${hasPenetration ? 'text-decoration: line-through; opacity: 0.5;' : ''}"></td>
+                            <td><input class="edit-input" type="number" value="${enemyEva}" oninput="onEnemyInput('${id}', 'evasion', this.value)" onblur="updateStat('enemies', '${id}', 'evasion', this.value)"></td>
+                            <td><span style="font-family:'JetBrains Mono'; font-weight:700;"><span style="color:${hitColorC}">${hitScoreC}</span>/<span style="color:${hitColorR}">${hitScoreR}</span></span></td>
                             <td><span class="badge ${cls}">${hits}撃</span></td>
                             <td><button class="save-btn" onclick="updateStat('enemies', '${id}', 'hp', this.parentNode.parentNode.querySelectorAll('input')[0].value)">Save All</button></td>
                         </tr>`;
@@ -378,7 +572,7 @@
                 document.getElementById('view-title').innerText = "Survival Simulator";
                 const playerBaseDef = masterData.balance.PLAYER.defense || 0;
                 const playerBaseHp = masterData.balance.PLAYER.max_hp || 100;
-                
+
                 const armorId = document.getElementById('armor-select').value;
                 const armor = masterData.armor[armorId] || {};
                 const inputADef = document.getElementById('edit-armor-def');
@@ -399,18 +593,54 @@
                 const totalDef = playerBaseDef + finalADef + finalSDef;
                 const totalHp = playerBaseHp + finalAHp;
 
-                summary.innerHTML = `<span>Total HP: <span class="stat-val val-hp">${totalHp}</span></span><span>Total DEF: <span class="stat-val val-def">${totalDef}</span></span>`;
-                tableHead.innerHTML = `<tr><th>Enemy ID</th><th>Name</th><th>Enemy ATK</th><th>Survival Hits</th><th>Actions</th></tr>`;
+                const inputArmorEva = document.getElementById('edit-armor-eva');
+                const inputShieldBlockC = document.getElementById('edit-shield-block');
+                const inputShieldBlockR = document.getElementById('edit-shield-block-ranged');
+                if (!isLive) {
+                    inputArmorEva.value = armor.evasion_bonus || 0;
+                    inputShieldBlockC.value = shield.block_chance_close || shield.block_chance || 0;
+                    inputShieldBlockR.value = shield.block_chance_ranged || shield.block_chance || 0;
+                }
+                const finalArmorEva = parseFloat(inputArmorEva.value) || 0;
+                const finalShieldBlockC = parseFloat(inputShieldBlockC.value) || 0;
+                const finalShieldBlockR = parseFloat(inputShieldBlockR.value) || 0;
+
+                const playerEvasionBase = (masterData.balance.PLAYER.evasion || 1) + finalArmorEva;
+                const playerEvasionClose = playerEvasionBase + (finalShieldBlockC * 100);
+                const playerEvasionRanged = playerEvasionBase + (finalShieldBlockR * 100);
+
+                summary.innerHTML = `<span>Total HP: <span class="stat-val val-hp">${totalHp}</span></span><span>Total DEF: <span class="stat-val val-def">${totalDef}</span></span><span style="color:var(--text-dim)">EVA (C/R): ${playerEvasionClose} / ${playerEvasionRanged}</span>`;
+                tableHead.innerHTML = `<tr><th>Enemy ID</th><th>Name</th><th>Enemy ATK</th><th>ACC (C/R)</th><th>Hit (C/R)</th><th>Survival Hits</th><th>Actions</th></tr>`;
                 const rankEnemies = Object.entries(masterData.enemies).filter(([id, e]) => (e.min_rank || e.rank) === rank && !e.is_static);
                 tableBody.innerHTML = rankEnemies.map(([id, e]) => {
                     const atk = liveEnemyOverrides[id]?.attack ?? e.attack;
                     const dmg = Math.max(1, atk - totalDef);
                     const hits = Math.floor(totalHp / dmg);
                     const cls = hits >= 10 ? 'hit-1' : (hits >= 5 ? 'hit-2' : (hits >= 3 ? 'hit-3' : 'hit-danger'));
+
+                    // 敵命中率計算: (敵精度 - プレイヤー回避) → 5%〜99%にクランプ → /10で丸める
+                    const enemyAccuracyC = liveEnemyOverrides[id]?.accuracy_close ?? (e.accuracy_close || 100);
+                    const enemyAccuracyR = liveEnemyOverrides[id]?.accuracy_ranged ?? (e.accuracy_ranged || 100);
+
+                    const rawEnemyHitPctC = Math.min(99, Math.max(5, enemyAccuracyC - playerEvasionClose));
+                    const enemyHitScoreC = Math.round(rawEnemyHitPctC / 10);
+                    const hitColorC = enemyHitScoreC >= 9 ? 'var(--danger)' : (enemyHitScoreC >= 6 ? 'orange' : (enemyHitScoreC >= 4 ? 'var(--primary)' : 'var(--accent)'));
+
+                    const rawEnemyHitPctR = Math.min(99, Math.max(5, enemyAccuracyR - playerEvasionRanged));
+                    const enemyHitScoreR = Math.round(rawEnemyHitPctR / 10);
+                    const hitColorR = enemyHitScoreR >= 9 ? 'var(--danger)' : (enemyHitScoreR >= 6 ? 'orange' : (enemyHitScoreR >= 4 ? 'var(--primary)' : 'var(--accent)'));
+
                     return `
                         <tr>
                             <td class="row-id">${id}</td><td class="row-name">${e.name}</td>
                             <td><input class="edit-input" type="number" value="${atk}" oninput="onEnemyInput('${id}', 'attack', this.value)" onblur="updateStat('enemies', '${id}', 'attack', this.value)"></td>
+                            <td>
+                                <div style="display:flex; flex-direction:column; gap:2px;">
+                                    <input class="edit-input" type="number" value="${enemyAccuracyC}" oninput="onEnemyInput('${id}', 'accuracy_close', this.value)" onblur="updateStat('enemies', '${id}', 'accuracy_close', this.value)">
+                                    <input class="edit-input" type="number" value="${enemyAccuracyR}" oninput="onEnemyInput('${id}', 'accuracy_ranged', this.value)" onblur="updateStat('enemies', '${id}', 'accuracy_ranged', this.value)">
+                                </div>
+                            </td>
+                            <td><span style="font-family:'JetBrains Mono'; font-weight:700;"><span style="color:${hitColorC}">${enemyHitScoreC}</span>/<span style="color:${hitColorR}">${enemyHitScoreR}</span></span></td>
                             <td><span class="badge ${cls}">${hits}発耐える</span></td>
                             <td><button class="save-btn" onclick="updateStat('enemies', '${id}', 'attack', this.parentNode.parentNode.querySelector('input').value)">Save</button></td>
                         </tr>`;
@@ -420,4 +650,5 @@
         fetchData();
     </script>
 </body>
+
 </html>

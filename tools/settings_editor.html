@@ -332,16 +332,25 @@
             <div class="nav-label">Core Settings</div>
             <div class="nav-item active" onclick="showTab('balance')">⚖️ Balance</div>
             <div class="nav-item" onclick="showTab('dungeon')">🏰 Dungeon</div>
+            <div class="nav-item" onclick="showTab('guild')">📜 Guild</div>
         </div>
 
         <div class="nav-group">
             <div class="nav-label">Master Data</div>
             <div class="nav-item" onclick="showTab('enemies')">👹 Enemies</div>
-            <div class="nav-item" onclick="showTab('equipment')">⚔️ Equipment</div>
+            <div class="nav-item" onclick="showTab('weapons')">⚔️ Weapons</div>
+            <div class="nav-item" onclick="showTab('armors')">🛡️ Armors</div>
+            <div class="nav-item" onclick="showTab('shields')">🔰 Shields</div>
             <div class="nav-item" onclick="showTab('items')">🧪 Items</div>
-            <div class="nav-item" onclick="showTab('quests')">📜 Quests</div>
+            <div class="nav-item" onclick="showTab('obstacles')">🪨 Obstacles</div>
             <div class="nav-item" onclick="showTab('npcs')">👥 NPCs</div>
-            <div class="nav-item" onclick="showTab('guild')">📜 Guild</div>
+            <div class="nav-item" onclick="showTab('quests')">📋 Quests</div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Advanced</div>
+            <div class="nav-item" onclick="showTab('magic_settings')">✨ Magic</div>
+            <div class="nav-item" onclick="showTab('story')">📖 Story</div>
             <div class="nav-item" onclick="showTab('ui')">🎨 Aesthetics</div>
         </div>
     </nav>
@@ -379,34 +388,72 @@
             enemies: {
                 title: "Enemy Bestiary",
                 type: "complex",
+                rootKey: "ENEMY_DATA",
                 fields: {
                     name: "text",
                     rank: "select:F,E,D,C,B,A,S,SS",
                     hp: "number",
                     attack: "number",
+                    defense: "number",
+                    evasion: "number",
+                    accuracy_close: "number",
+                    accuracy_ranged: "number",
                     attack_range: "number",
                     attack_effect: "select:physical_light,physical_heavy,fireball,dark_bolt,arrow,sonic_wave",
                     status_to_inflict: "select:none,poison,paralysis,sleep",
                     status_chance: "number",
-                    dash_distance: "number",
                     stupidity: "number",
                     exp: "number",
+                    reward_gold: "number",
                     min_floor: "number",
                     max_floor: "number",
                     image_folder: "path_dir",
                     sound: "path_sound"
                 }
             },
-            equipment: {
-                title: "Equipment Inventory",
-                type: "complex_groups",
-                groups: ["WEAPON_DATA", "ARMOR_DATA", "SHIELD_DATA"],
+            weapons: {
+                title: "Weapons",
+                type: "complex",
+                rootKey: "WEAPON_DATA",
                 fields: {
                     name: "text",
+                    rank: "select:-,F,E,D,C,B,A,S,SS",
                     price: "number",
-                    rarity: "number",
-                    image_path: "path_img",
-                    image_dir: "path_dir",
+                    attack_bonus: "number",
+                    accuracy_bonus_close: "number",
+                    accuracy_bonus_ranged: "number",
+                    armor_penetration: "text",
+                    image_path: "path_dir",
+                    describe: "text"
+                }
+            },
+            armors: {
+                title: "Armors",
+                type: "complex",
+                rootKey: "ARMOR_DATA",
+                fields: {
+                    name: "text",
+                    rank: "select:-,F,E,D,C,B,A,S,SS",
+                    price: "number",
+                    defense_bonus: "number",
+                    hp_bonus: "number",
+                    evasion_bonus: "number",
+                    image_path: "path_dir",
+                    describe: "text"
+                }
+            },
+            shields: {
+                title: "Shields",
+                type: "complex",
+                rootKey: "SHIELD_DATA",
+                fields: {
+                    name: "text",
+                    rank: "select:-,F,E,D,C,B,A,S,SS",
+                    price: "number",
+                    defense_bonus: "number",
+                    evasion_bonus: "number",
+                    block_chance: "number",
+                    image_path: "path_dir",
                     describe: "text"
                 }
             },
@@ -424,6 +471,20 @@
                     describe: "text"
                 }
             },
+            obstacles: {
+                title: "Obstacles",
+                type: "complex",
+                rootKey: "OBSTACLE_DATA",
+                fields: {
+                    name: "text",
+                    hp: "number",
+                    defense: "number",
+                    reward_gold: "number",
+                    min_floor: "number",
+                    max_floor: "number",
+                    image_path: "path_dir"
+                }
+            },
             balance: {
                 title: "Game Balance",
                 type: "nested"
@@ -434,7 +495,7 @@
                 groups: ["FIXED_QUESTS", "REPEATABLE_QUESTS"],
                 fields: {
                     title: "text",
-                    type: "select:hunt,delivery",
+                    type: "select:hunt,delivery,destroy",
                     target_key: "text",
                     amount: "number",
                     reward_gold: "number",
@@ -458,13 +519,15 @@
             },
             guild: {
                 title: "Guild Ranks",
-                type: "complex_groups",
-                groups: ["GUILD_RANKS"],
-                fields: {
-                    rank: "text",
-                    required_gp: "number",
-                    reward_multiplier: "number"
-                }
+                type: "nested"
+            },
+            magic_settings: {
+                title: "Magic Settings",
+                type: "nested"
+            },
+            story: {
+                title: "Story & Dialogue",
+                type: "nested"
             },
             ui: {
                 title: "UI Aesthetics",
@@ -527,10 +590,13 @@
             h.innerHTML = `<span>${schema.title}</span><button class="btn-add" onclick="addNewItem(null, '${currentTab}')">+</button>`;
             container.appendChild(h);
 
+            // rootKey があればその配下を参照（例: weapons.yml の WEAPON_DATA）
+            const items = schema.rootKey ? (data[schema.rootKey] || data) : data;
+
             const grid = document.createElement('div');
             grid.className = 'grid';
-            for (let id in data) {
-                grid.appendChild(createItemCard(null, id, data[id], schema.fields));
+            for (let id in items) {
+                grid.appendChild(createItemCard(null, id, items[id], schema.fields));
             }
             container.appendChild(grid);
         }

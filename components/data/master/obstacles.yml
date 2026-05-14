@@ -65,7 +65,7 @@ pot:
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 40
+  reward_gold: 50
   min_floor: null
   max_floor: null
   max_concurrent: 5

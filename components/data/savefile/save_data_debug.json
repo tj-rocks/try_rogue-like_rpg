@@ -1,38 +1,18 @@
 {
-  "x": 704,
-  "y": 1024,
-  "hp": 20,
+  "x": 1344,
+  "y": 896,
+  "hp": 116,
   "max_hp": 200,
   "coin": 100,
   "bank_coin": 0,
   "attack": 50,
   "defense": 3,
-  "items": [
-    {
-      "key": "hp_potion",
-      "count": 3
-    },
-    {
-      "key": "expired_potion",
-      "count": 2
-    },
-    {
-      "key": "rotten_potion",
-      "count": 1
-    }
-  ],
+  "items": [],
   "weapon_inventory": [
     {
       "iid": 2,
       "type": "weapon",
       "key": "old_sword",
-      "enhance": 0,
-      "stats": {}
-    },
-    {
-      "iid": 5,
-      "type": "weapon",
-      "key": "iron_sword",
       "enhance": 0,
       "stats": {}
     }
@@ -44,50 +24,37 @@
       "key": "adventurers_clothes",
       "enhance": 0,
       "stats": {}
-    },
-    {
-      "iid": 3,
-      "type": "armor",
-      "key": "adventurers_clothes",
-      "enhance": 0,
-      "stats": {}
     }
   ],
   "shield_inventory": [],
   "equipped_weapon": 2,
   "equipped_armor": 1,
   "equipped_shield": null,
-  "stave_inventory": [
-    {
-      "iid": 4,
-      "key": "heal_stave",
-      "charges": 5
-    },
-    {
-      "iid": 6,
-      "key": "fire_stave",
-      "charges": 5
-    }
-  ],
-  "lantern_inventory": [
-    {
-      "iid": 7,
-      "type": "lantern",
-      "key": "basic",
-      "enhance": 0,
-      "stats": {}
-    }
-  ],
+  "stave_inventory": [],
+  "lantern_inventory": [],
   "equipped_lantern": null,
   "invincible_turns": 0,
-  "guild_point": 1000,
+  "guild_point": 1100,
   "guild_rank": "F",
-  "active_quests": [],
+  "active_quests": [
+    {
+      "id": "rank_up_E",
+      "type": "delivery",
+      "is_rank_up": true,
+      "target_key": "guild_cert_e",
+      "target_name": "E級ギルド証",
+      "amount": 1,
+      "reward_gold": 2500,
+      "reward_gp": 0,
+      "next_rank": "E",
+      "title": "Eランクへの昇格"
+    }
+  ],
   "quest_tokens": {},
   "completed_fixed_quests": [],
   "has_seen_ending": false,
   "warehouse_items": [],
   "event_items": [],
-  "current_floor": 10,
-  "equip_id_counter": 7
+  "current_floor": 11,
+  "equip_id_counter": 2
 }

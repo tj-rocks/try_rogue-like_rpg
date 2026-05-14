@@ -6,17 +6,24 @@ import yaml
 # プロジェクトのルートをパスに追加
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-# equipment.yml のパス
-YML_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../components/data/master/equipment.yml"))
+MASTER_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../components/data/master"))
 
-def _load_yml():
-    with open(YML_PATH, "r", encoding="utf-8") as f:
+# モードごとに参照するYMLファイルを定義
+MODE_FILE = {
+    "WEAPON": "weapons.yml",
+    "ARMOR":  "armors.yml",
+    "SHIELD": "shields.yml",
+}
+
+def _load_yml(filename):
+    path = os.path.join(MASTER_DIR, filename)
+    with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
-def _save_yml(data):
+def _save_yml(filename, data):
+    path = os.path.join(MASTER_DIR, filename)
     try:
-        # コメントを維持するのは難しいが、構成を崩さないように safe_dump を使用
-        with open(YML_PATH, "w", encoding="utf-8") as f:
+        with open(path, "w", encoding="utf-8") as f:
             yaml.safe_dump(data, f, allow_unicode=True, sort_keys=False, indent=2)
         return True
     except Exception as e:
@@ -24,8 +31,9 @@ def _save_yml(data):
         return False
 
 def save_category_config(mode, cat_key, pos_data):
-    print(f"Saving {mode} Category: {cat_key}")
-    full_data = _load_yml()
+    filename = MODE_FILE[mode]
+    print(f"Saving {mode} Category '{cat_key}' -> {filename}")
+    full_data = _load_yml(filename)
     
     cat_section = f"{mode}_CATEGORIES"
     if cat_section not in full_data:
@@ -34,39 +42,53 @@ def save_category_config(mode, cat_key, pos_data):
         full_data[cat_section][cat_key] = {}
         
     full_data[cat_section][cat_key]["position"] = pos_data
-    return _save_yml(full_data)
+    return _save_yml(filename, full_data)
 
 def run_viewer():
     pygame.init()
     screen = pygame.display.set_mode((1200, 800))
-    pygame.display.set_caption("Equipment Offset Viewer & Editor (YML Mode)")
+    pygame.display.set_caption("Equipment Offset Viewer & Editor")
     clock = pygame.time.Clock()
 
-    # データの読み込み
-    yml_data = _load_yml()
-    weapon_cats = yml_data.get("WEAPON_CATEGORIES", {})
-    armor_cats = yml_data.get("ARMOR_CATEGORIES", {})
-    shield_cats = yml_data.get("SHIELD_CATEGORIES", {})
-    
-    # プレビュー用の代表アイテムを探す
+    # データの読み込み（各ファイルから）
+    weapons_data = _load_yml("weapons.yml")
+    armors_data  = _load_yml("armors.yml")
+    shields_data = _load_yml("shields.yml")
+
+    weapon_cats = weapons_data.get("WEAPON_CATEGORIES", {})
+    armor_cats  = armors_data.get("ARMOR_CATEGORIES", {})
+    shield_cats = shields_data.get("SHIELD_CATEGORIES", {})
+
+    # プレビュー用の代表アイテムを探す（各モードのDATA内からcategoryが一致するものを探す）
     def get_preview_item(mode, cat_key):
-        data_section = f"{mode}_DATA"
-        items = yml_data.get(data_section, {})
+        if mode == "WEAPON":
+            items = weapons_data.get("WEAPON_DATA", {})
+        elif mode == "ARMOR":
+            items = armors_data.get("ARMOR_DATA", {})
+        else:
+            items = shields_data.get("SHIELD_DATA", {})
         for k, v in items.items():
             if v.get("category") == cat_key:
                 return k, v
+        # category フィールドがない場合は先頭のアイテムを返す（フォールバック）
+        if items:
+            first_key = next(iter(items))
+            return first_key, items[first_key]
         return None, None
 
-    # プレイヤー画像の読み込み
+
+    # プレイヤー画像の読み込み（player/walk/ サブフォルダに格納）
     try:
-        p_dir = os.path.join(os.path.dirname(__file__), "../components/pictures/player")
+        p_dir = os.path.join(os.path.dirname(__file__), "../components/pictures/player/walk")
+        left_img = pygame.image.load(f"{p_dir}/left_1.png").convert_alpha()
         player_imgs = {
-            "down": pygame.image.load(f"{p_dir}/down_1.png").convert_alpha(),
-            "up": pygame.image.load(f"{p_dir}/up_1.png").convert_alpha(),
-            "left": pygame.image.load(f"{p_dir}/left_1.png").convert_alpha(),
-            "right": pygame.image.load(f"{p_dir}/right_1.png").convert_alpha(),
+            "down":  pygame.image.load(f"{p_dir}/down_1.png").convert_alpha(),
+            "up":    pygame.image.load(f"{p_dir}/up_1.png").convert_alpha(),
+            "left":  left_img,
+            "right": pygame.transform.flip(left_img, True, False),  # left を反転して使用
         }
-    except:
+    except Exception as e:
+        print(f"[WARN] Player image load failed: {e}")
         player_imgs = {d: pygame.Surface((64, 64)) for d in ["down", "up", "left", "right"]}
 
     font = pygame.font.SysFont("Arial", 18)
@@ -108,15 +130,16 @@ def run_viewer():
                 if event.key == pygame.K_TAB:
                     mode = "ARMOR" if mode == "WEAPON" else ("SHIELD" if mode == "ARMOR" else "WEAPON")
                 
-                # アイテム切り替え ( , / . )
-                if event.key == pygame.K_COMMA:
-                    sel_idx[mode] = (sel_idx[mode] - 1) % len(cat_keys[mode])
-                if event.key == pygame.K_PERIOD:
-                    sel_idx[mode] = (sel_idx[mode] + 1) % len(cat_keys[mode])
+                # アイテム切り替え ( Z: 前 / X: 次 )
+                if event.key == pygame.K_z:
+                    sel_idx[mode] = (sel_idx[mode] - 1) % max(len(cat_keys[mode]), 1)
+                if event.key == pygame.K_x:
+                    sel_idx[mode] = (sel_idx[mode] + 1) % max(len(cat_keys[mode]), 1)
                 
                 dir_keys = {pygame.K_DOWN: 0, pygame.K_UP: 1, pygame.K_LEFT: 2, pygame.K_RIGHT: 3}
                 if event.key in dir_keys: target_dir_idx = dir_keys[event.key]
                 if event.key == pygame.K_SPACE: is_attacking_preview = not is_attacking_preview
+                # S でセーブ
                 if event.key == pygame.K_s:
                     if save_category_config(mode, cur_cat_key, cur_pos):
                         message = f"SAVED: {mode} Category '{cur_cat_key}'"
@@ -137,26 +160,30 @@ def run_viewer():
             
             off = cur_pos["hand_offsets"][d_str]
             ang = cur_pos["weapon_angles"][d_str]
+            # QWER: 手1の位置 (Q=左, W=上, E=右, R=下)
+            if keys[pygame.K_q]: off[0][0] -= step
             if keys[pygame.K_w]: off[0][1] -= step
-            if keys[pygame.K_s]: off[0][1] += step
-            if keys[pygame.K_a]: off[0][0] -= step
-            if keys[pygame.K_d]: off[0][0] += step
+            if keys[pygame.K_e]: off[0][0] += step
+            if keys[pygame.K_r]: off[0][1] += step
+            # IJKL: 手2の位置
             if keys[pygame.K_i]: off[1][1] -= step
             if keys[pygame.K_k]: off[1][1] += step
             if keys[pygame.K_j]: off[1][0] -= step
             if keys[pygame.K_l]: off[1][0] += step
-            if keys[pygame.K_q]: ang[0] = (ang[0] - step) % 360
-            if keys[pygame.K_e]: ang[0] = (ang[0] + step) % 360
-            if keys[pygame.K_u]: ang[1] = (ang[1] - step) % 360
-            if keys[pygame.K_o]: ang[1] = (ang[1] + step) % 360
+            # 1/2: 手1の回転, 3/4: 手2の回転
+            if keys[pygame.K_1]: ang[0] = (ang[0] - step) % 360
+            if keys[pygame.K_2]: ang[0] = (ang[0] + step) % 360
+            if keys[pygame.K_3]: ang[1] = (ang[1] - step) % 360
+            if keys[pygame.K_4]: ang[1] = (ang[1] + step) % 360
         else: # ARMOR or SHIELD
             if "offsets" not in cur_pos:
                 cur_pos["offsets"] = {"down": [0,0], "up": [0,0], "left": [0,0], "right": [0,0]}
             off = cur_pos["offsets"][d_str]
+            # QWER: 位置 (Q=左, W=上, E=右, R=下)
+            if keys[pygame.K_q]: off[0] -= step
             if keys[pygame.K_w]: off[1] -= step
-            if keys[pygame.K_s]: off[1] += step
-            if keys[pygame.K_a]: off[0] -= step
-            if keys[pygame.K_d]: off[0] += step
+            if keys[pygame.K_e]: off[0] += step
+            if keys[pygame.K_r]: off[1] += step
 
         # --- 描画 ---
         preview_surf = pygame.Surface((400, 400))
@@ -231,7 +258,7 @@ def run_viewer():
         # 操作説明
         screen.blit(font.render(message, True, (255, 255, 255)), (50, 520))
         if msg_timer > 0: msg_timer -= 1
-        else: message = "TAB: Mode | S: Save | , / . : Select Category | Arrow: Facing | W/A/S/D: Move"
+        else: message = "TAB: Mode | S: Save | Z/X: Category | QWER: Move | IJKL: Hand2 | 1/2: Rot1 | 3/4: Rot2 | Shift: x5"
 
         pygame.display.flip()
         clock.tick(60)

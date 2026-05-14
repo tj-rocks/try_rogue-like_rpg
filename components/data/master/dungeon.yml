@@ -139,57 +139,63 @@ DUNGEON_IMAGES:
   '10':
     image: standard
     sound: dungeon_boss.mp3
-    brightness: 5
+    brightness: 2
     map: null
   '11':
-    image: temple
+    image: standard
     sound: just_move.mp3
-    brightness: 3
-    map: first_rest_point.txt
+    brightness: 2
+    # map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '12':
-    image: temple
+    image: standard
     sound: just_move.mp3
-    brightness: 3
+    brightness: 5
+    map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '13':
     image: temple
-    sound: just_move.mp3
-    brightness: 3
+    sound: sandstone_floor.mp3
+    brightness: 2
     wall_decoration_ratio: 0.3
   '14':
-    image: deesert_ruin
-    sound: just_move.mp3
-    brightness: 3
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 2
     wall_decoration_ratio: 0.3
   '15':
-    image: deesert_ruin
-    sound: just_move.mp3
-    brightness: 3
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 2
     wall_decoration_ratio: 0.3
   '16':
-    image: evil_castle
-    sound: just_move.mp3
+    image: desert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 3
     wall_decoration_ratio: 0.3
   '17':
-    image: evil_castle
-    sound: just_move.mp3
+    image: desert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 3
     wall_decoration_ratio: 0.3
   '18':
-    image: evil_castle
-    sound: just_move.mp3
+    image: desert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 3
     wall_decoration_ratio: 0.3
   '19':
-    image: evil_castle
-    sound: just_move.mp3
+    image: desert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 3
     wall_decoration_ratio: 0.3
   '20':
-    image: evil_castle
-    sound: just_move.mp3
+    image: desert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 3
+    wall_decoration_ratio: 0.3
+  '21':
+    image: desert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 3
     wall_decoration_ratio: 0.3
 

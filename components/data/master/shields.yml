@@ -11,7 +11,7 @@ SHIELD_CATEGORIES:
       offsets:
         down:
         - 22
-        - 15
+        - 7
         up:
         - -15
         - 13
@@ -21,6 +21,40 @@ SHIELD_CATEGORIES:
         right:
         - 15
         - 12
+      hand_offsets:
+        down:
+        - - 0
+          - 0
+        - - 0
+          - 0
+        up:
+        - - 0
+          - 0
+        - - 0
+          - 0
+        left:
+        - - 0
+          - 0
+        - - 0
+          - 0
+        right:
+        - - 0
+          - 0
+        - - 0
+          - 0
+      weapon_angles:
+        down:
+        - 0
+        - 0
+        up:
+        - 0
+        - 0
+        left:
+        - 0
+        - 0
+        right:
+        - 0
+        - 0
   kite_shield:
     name: カイトシールド
     block_chance: 0.1
