@@ -994,19 +994,56 @@ class Dungeon:
                        not any(isinstance(di, DroppedConsumable) and di.item_key == key for di in self.dropped_items):
                         event_candidates.append((key, data))
                         
-        if event_candidates and floor_tiles:
+        if event_candidates:
+            # 上り階段（開始地点）の位置を探す
+            up_stairs = None
+            for r in range(self.map_height):
+                for c in range(self.map_width):
+                    if self.map_data[r][c] == 2:  # 2: 上り階段
+                        up_stairs = (c, r)
+                        break
+                if up_stairs: break
+            
+            # 階段が見つからない場合はプレイヤーの開始位置
+            if not up_stairs:
+                up_stairs = (player_gx, player_gy)
+
+            # 上り階段から一番遠い部屋（中心座標）を探す
+            target_pos = up_stairs
+            if hasattr(self, "rooms") and self.rooms:
+                max_dist = -1
+                for rx, ry in self.rooms:
+                    dist = (rx - up_stairs[0])**2 + (ry - up_stairs[1])**2
+                    if dist > max_dist:
+                        max_dist = dist
+                        target_pos = (rx, ry)
+
             for e_key, e_data in event_candidates:
-                # 空いているタイルを探す
-                for tile_pos in floor_tiles:
-                    # 既にアイテムがある場所を避ける
-                    if any(int(di.x//self.tile_size) == tile_pos[0] and int(di.y//self.tile_size) == tile_pos[1] for di in self.dropped_items):
-                        continue
-                    
-                    px, py = tile_pos[0] * self.tile_size, tile_pos[1] * self.tile_size
+                # ターゲット位置（最も遠い部屋の中心）の周囲3x3から空いている床を探す
+                spawn_pos = None
+                for dx in range(-1, 2):
+                    for dy in range(-1, 2):
+                        cx, cy = target_pos[0] + dx, target_pos[1] + dy
+                        if 0 <= cx < self.map_width and 0 <= cy < self.map_height:
+                            if self.map_data[cy][cx] in (1, 3):  # 床(1)か下り階段(3)
+                                # 既にアイテムがあるかチェック
+                                if not any(int(di.x//self.tile_size) == cx and int(di.y//self.tile_size) == cy for di in self.dropped_items):
+                                    spawn_pos = (cx, cy)
+                                    break
+                    if spawn_pos: break
+                
+                # それでも空きがなければ元の tile_pos の最初の空き場所
+                if not spawn_pos and floor_tiles:
+                    for tile_pos in floor_tiles:
+                        if not any(int(di.x//self.tile_size) == tile_pos[0] and int(di.y//self.tile_size) == tile_pos[1] for di in self.dropped_items):
+                            spawn_pos = tile_pos
+                            break
+
+                if spawn_pos:
+                    px, py = spawn_pos[0] * self.tile_size, spawn_pos[1] * self.tile_size
                     item = DroppedConsumable(px, py, e_key, e_data)
                     self.dropped_items.append(item)
-                    print(f"[Dungeon] Forced spawn of event item: {e_key} at {tile_pos}")
-                    break
+                    print(f"[Dungeon] Forced spawn of event item: {e_key} at {spawn_pos} (furthest room)")
 
     def create_corridor(self, x1, x2, y1, y2, width=1):
         for x in range(min(x1, x2), max(x1, x2) + 1):
