@@ -163,7 +163,7 @@ ENEMY_DATA:
     drops:
     - {item: hp_potion}
     - {item: iron_sword}
-  sukewsuke_skeleton:
+  sukesuke_skeleton:
     name: スケスケスケルトン
     category: undead
     is_boss: true

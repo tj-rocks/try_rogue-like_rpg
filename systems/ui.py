@@ -2569,6 +2569,13 @@ class ShopDialog(BaseListDialog):
         for st in player.stave_inventory:
             data = STAVE_DATA.get(st.key, {})
             self.items.append((st.iid, "stave_inst", st.get_name_with_charges(), get_sell_price(data), 1, st.key))
+        for eq in getattr(player, "lantern_inventory", []):
+            sell_data = {}
+            for k, v in CONSUMABLE_DATA.items():
+                if v.get("effect") == "lantern" and v.get("lantern_key", "basic") == eq.key:
+                    sell_data = v
+                    break
+            self.items.append((eq.iid, "lantern_inst", eq.get_name(), get_sell_price(sell_data), 1, eq.key))
         self.items.append(("cancel", "cancel", Text.UI.SHOP_CANCEL, 0, 1))
 
 
@@ -2622,7 +2629,7 @@ class ShopDialog(BaseListDialog):
                     play_sfx(SOUND_PURCHASE); self.refresh_items_from_stock(); self.cursor_idx = min(self.cursor_idx, len(self.items)-1); dialog.text = Text.Items.BOUGHT.format(name=name); dialog.is_active = True
                 confirm_dialog.on_yes = do_buy; confirm_dialog.is_active = True
         else: # SELL
-            if (itype == "weapon_inst" and key_or_iid == player.equipped_weapon) or (itype == "armor_inst" and key_or_iid == player.equipped_armor) or (itype == "shield_inst" and key_or_iid == player.equipped_shield):
+            if (itype == "weapon_inst" and key_or_iid == player.equipped_weapon) or (itype == "armor_inst" and key_or_iid == player.equipped_armor) or (itype == "shield_inst" and key_or_iid == player.equipped_shield) or (itype == "lantern_inst" and key_or_iid == getattr(player, "equipped_lantern", None)):
                 dialog.text = Text.Items.CANT_SELL_EQUIPPED; dialog.is_active = True; return
             if confirm_dialog:
                 confirm_dialog.text = Text.UI.SHOP_SELL_CONFIRM.format(name=name, price=price)
@@ -2633,6 +2640,7 @@ class ShopDialog(BaseListDialog):
                     elif itype == "shield_inst": player.remove_shield_by_iid(key_or_iid); ok = True
                     elif itype == "consumable": player.remove_item_by_key(key_or_iid); ok = True
                     elif itype == "stave_inst": player.remove_stave_by_iid(key_or_iid); ok = True
+                    elif itype == "lantern_inst": player.remove_lantern_by_iid(key_or_iid); ok = True
                     if ok: player.coin += price; play_sfx(SOUND_PURCHASE); dialog.text = Text.Items.SOLD.format(name=name, price=price); dialog.auto_close_timer = 60
                     self.setup_sell_mode(player); self.cursor_idx = min(self.cursor_idx, len(self.items)-1); dialog.is_active = True
                 confirm_dialog.on_yes = do_sell; confirm_dialog.is_active = True

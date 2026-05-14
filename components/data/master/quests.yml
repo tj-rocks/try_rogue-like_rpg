@@ -58,7 +58,7 @@ FIXED_QUESTS:
     min_rank: E
     max_rank: C
     type: hunt
-    target_key: sukewsuke_skeleton
+    target_key: sukesuke_skeleton
     amount: 1
     reward_gold: 500
     reward_gp: 5

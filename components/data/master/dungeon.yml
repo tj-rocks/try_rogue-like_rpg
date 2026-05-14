@@ -169,32 +169,32 @@ DUNGEON_IMAGES:
     brightness: 2
     wall_decoration_ratio: 0.3
   '16':
-    image: desert_ruin
+    image: deesert_ruin
     sound: sandstone_floor2.mp3
     brightness: 3
     wall_decoration_ratio: 0.3
   '17':
-    image: desert_ruin
+    image: deesert_ruin
     sound: sandstone_floor2.mp3
     brightness: 3
     wall_decoration_ratio: 0.3
   '18':
-    image: desert_ruin
+    image: deesert_ruin
     sound: sandstone_floor2.mp3
     brightness: 3
     wall_decoration_ratio: 0.3
   '19':
-    image: desert_ruin
+    image: deesert_ruin
     sound: sandstone_floor2.mp3
     brightness: 3
     wall_decoration_ratio: 0.3
   '20':
-    image: desert_ruin
+    image: deesert_ruin
     sound: sandstone_floor2.mp3
     brightness: 3
     wall_decoration_ratio: 0.3
   '21':
-    image: desert_ruin
+    image: deesert_ruin
     sound: sandstone_floor2.mp3
     brightness: 3
     wall_decoration_ratio: 0.3
