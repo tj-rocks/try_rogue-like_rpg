@@ -46,7 +46,7 @@ FIXED_QUESTS:
     target_key: suisui_slime
     amount: 1
     reward_gold: 500
-    reward_gp: 5
+    reward_gp: 50
     title: スイスイスライムの討伐
     requester: ギルドマスター
     description: ダンジョン深層に現れるという、驚異的な回避能力を持つスライムを討伐してください。
@@ -61,7 +61,7 @@ FIXED_QUESTS:
     target_key: sukesuke_skeleton
     amount: 1
     reward_gold: 1500
-    reward_gp: 15
+    reward_gp: 150
     title: スケスケスケルトンの討伐
     requester: ギルドマスター
     description: ダンジョンに現れる姿の薄いスケルトンを討伐し、その脅威を排除してください。

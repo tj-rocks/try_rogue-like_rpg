@@ -206,3 +206,12 @@ T:
   - 魔導士「このダンジョンには、時として魔力の残滓が渦巻く場所があるのじゃ。」
   - 魔導士「杖を振る時は、その残数をよく確認するのじゃぞ。空の杖を振っても、何も起きぬからの。」
   base_tile: floor_1
+
+'(':
+  name: テレポート屋
+  image_path: components/pictures/npc/wizard
+  base_image_path: components/pictures/dungeon/home/floor_1.png
+  dialogue:
+  - テレポート屋「フフフ……。世界の理を超えて、お望みの場所へ飛ばしてやろう。」
+  - テレポート屋「ただし……それなりの『対価』はもらうぞ？」
+  base_tile: floor_1

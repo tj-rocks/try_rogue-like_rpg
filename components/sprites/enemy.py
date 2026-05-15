@@ -428,13 +428,19 @@ class Enemy(Entity):
         if not self.is_moving: self.move_speed = 300
 
     @classmethod
-    def spawn_enemies(cls, dungeon, player=None):
+    def spawn_enemies(cls, dungeon, player=None, is_outbreak=False):
         from constants import (ENEMY_SPAWN_MIN, ENEMY_SPAWN_MAX, ENEMY_SPAWN_ATTEMPTS, ENEMY_SPAWN_SAFE_RADIUS, ENEMY_SPAWN_SCATTER, ENEMY_DATA, ENEMY_TOTAL_MAX, ENEMY_TOTAL_SCALE_EVERY, ENEMY_TOTAL_SCALE_ADD, OBSTACLE_SPAWN_MIN, OBSTACLE_SPAWN_MAX, OBSTACLE_SPAWN_SCALE_EVERY, OBSTACLE_SPAWN_SCALE_ADD, OBSTACLE_SPAWN_LIMIT, OBSTACLE_TOTAL_MAX, OBSTACLE_TOTAL_SCALE_EVERY, OBSTACLE_TOTAL_SCALE_ADD)
         enemies = []; floor = getattr(dungeon, "current_floor", 1); pgx, pgy = (int(player.x//dungeon.tile_size), int(player.y//dungeon.tile_size)) if player else (-999,-999)
         mt = [k for k, v in ENEMY_DATA.items() if not v.get("is_static", False)]; ot = [k for k, v in ENEMY_DATA.items() if v.get("is_static", False)]
         ef = min(floor, OBSTACLE_SPAWN_LIMIT); nr = len(dungeon.rooms)
         m_cap = int(nr * ENEMY_TOTAL_MAX) + (floor-1)//ENEMY_TOTAL_SCALE_EVERY * ENEMY_TOTAL_SCALE_ADD
         o_cap = int(nr * OBSTACLE_TOTAL_MAX) + (ef-1)//OBSTACLE_TOTAL_SCALE_EVERY * OBSTACLE_TOTAL_SCALE_ADD
+        
+        # アウトブレイク時は出現数を倍増させる
+        if is_outbreak:
+            from constants import OUTBREAK_ENEMY_MULT
+            mult = OUTBREAK_ENEMY_MULT
+            m_cap = int(m_cap * mult)
 
         # 1. 階層ボス(is_boss)の確定配置
         # その階層がボスの出現開始階層(min_floor)であれば、最優先で1体配置する
@@ -509,6 +515,12 @@ class Enemy(Entity):
             if random.random() < 0.1: continue
             isr = (idx == getattr(dungeon, "start_room_idx", -1) or idx == getattr(dungeon, "target_room_idx", -1))
             s_min, s_max = (ENEMY_SPAWN_MIN//2, max(1, ENEMY_SPAWN_MAX//2)) if isr else (ENEMY_SPAWN_MIN, ENEMY_SPAWN_MAX)
+            
+            # アウトブレイク時は1部屋あたりの出現数も3倍に
+            if is_outbreak:
+                s_min *= 3
+                s_max *= 3
+                
             for _ in range(random.randint(s_min, s_max)):
                 if sum(1 for e in enemies if not e.is_static) >= m_cap: break
                 for att in range(ENEMY_SPAWN_ATTEMPTS*2):

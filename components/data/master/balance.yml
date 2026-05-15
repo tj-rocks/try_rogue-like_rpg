@@ -21,8 +21,9 @@ PLAYER:
   # 初期リソース
   initial_coin: 100   # スタート時の所持金
   max_item_slots: 20  # アイテム（消耗品）の最大スロット数
-  max_equip_slots: 10 # 装備（武器・鎧・盾）の最大スロット数
+  max_equip_slots: 15 # 装備（武器・鎧・盾）の最大スロット数
   max_stave_slots: 10 # 杖の最大スロット数
+  max_warehouse_slots: 40 # 預かり屋の最大スロット数
 
   # レベルアップ時の成長（将来的な拡張用）
   growth:
@@ -40,7 +41,7 @@ DUNGEON:
   # 指数成長とハードキャップ設定
   DUNGEON_ROOM_MAX_CAP: 20          # 最大部屋数の絶対上限 (深層でもこれを超えない)
   DUNGEON_ROOM_MIN_CAP: 10          # 最小部屋数の増加上限 (深層での最低部屋数)
-  DUNGEON_ROOM_GROWTH_LIMIT_FLOOR: 50 # 成長がストップする階層
+  DUNGEON_ROOM_GROWTH_LIMIT_FLOOR: 70 # 成長がストップする階層
   
   # --- 部屋数の成長ロジック解説 ---
   # 式: 現在数 = 初期値 * ( (上限値 / 初期値) ^ 進捗率 )
@@ -48,12 +49,12 @@ DUNGEON:
   # 特徴: 指数関数（掛け算）で増えるため、最初はゆっくり、後半で一気に広くなります。
   
   DUNGEON_MIN_ROOM_DISTANCE: 4      # 部屋同士の最小距離（近いと密集する）
-  DUNGEON_ROOM_DISTANCE_GROWTH: 0.5 # 階層が進むごとに部屋の距離をどれだけ広げるか
+  DUNGEON_ROOM_DISTANCE_GROWTH: 0.3 # 階層が進むごとに部屋の距離をどれだけ広げるか
   DUNGEON_CORRIDOR_W2_CHANCE: 0.1   # 通路が「2マス幅」になる確率 (0.0〜1.0)
   DUNGEON_STAIRS_FLOOR_RADIUS: 1    # 階段の周囲に確保する歩行可能タイルの半径
   DUNGEON_MIN_ROOM_SIZE: 2          # 部屋の最小サイズの初期値
   DUNGEON_MAX_ROOM_SIZE: 5          # 部屋の最大サイズの初期値
-  DUNGEON_ROOM_SIZE_GROWTH: 0.08    # 1階層進むごとに部屋サイズを何%ずつ増やすか
+  DUNGEON_ROOM_SIZE_GROWTH: 0.05    # 1階層進むごとに部屋サイズを何%ずつ増やすか
   DUNGEON_ROOM_MIN_SIZE_CAP: 3      # 最小サイズの成長上限
   DUNGEON_ROOM_MAX_SIZE_CAP: 20     # 最大サイズの成長上限
 
@@ -180,16 +181,41 @@ VILLAGE_SERVICES:
 # 🤝 GUILD_QUEST (ギルド依頼)
 # ------------------------------------------------------------------------------
 GUILD_QUEST:
-  BOARD_QUEST_COUNT: [5, 10]    # 掲示板に並ぶランダムクエストの数 [最小, 最大]
-  GP_PER_HUNT: 5                # 討伐クエスト：1体あたりの獲得GP
-  GP_PER_DELIVERY: 3            # 納品クエスト：1個あたりの獲得GP
+  BOARD_QUEST_COUNT: [5, 10]        # 掲示板に出現するランダムクエストの数 (最小, 最大)
+  GUILD_QUEST_GP_DIVISOR: 10        # GP報酬の算出用除数 (報酬ゴールド / この値 = GP)
+  
+  # ランク格差によるGP倍率設定
+  GP_RANK_DIFF_MULTIPLIERS:
+    CHALLENGE: 1.5   # 自分より高いランクの依頼 (1.5倍)
+    MATCH: 1.0       # 自分と同じランクの依頼 (1.0倍)
+    EASY: 0.5        # 自分より低いランクの依頼 (0.5倍)
   BOUNTY_BASE_MULTIPLIER: 5     # 討伐報酬の計算係数 (HP+ATK) * この値
   ITEM_PRICE_RATIO: 0.33        # 納品報酬の基準価格比率 (購入価格 * この値)
   DELIVERY_REWARD_BONUS: 1.2    # 納品報酬のボーナス倍率 (基準価格 * この値)
+  
 
 # 📈 GLOBAL_SCALING (ランクによる自動スケーリング倍率)
 # ------------------------------------------------------------------------------
 GLOBAL_SCALING:
   ENEMY: 1.05             # 敵のランクごとの強化倍率 (1ランクにつき 1.05倍: インフレ抑制)
   EQUIPMENT: 1.05         # 装備のランクごとの強化倍率 (1ランクにつき 1.05倍: シブい成長)
+
+# 🚨 OUTBREAK_CONFIG (魔物の氾濫イベント設定)
+# ------------------------------------------------------------------------------
+OUTBREAK_CONFIG:
+  min_floor: 2                  # 発生開始階層 (1階はチュートリアル的に除外)
+  max_floor: 99                 # 発生終了階層
+  occurrence_chance: 0.08       # 発生確率 (0.08 = 8%)
+  enemy_multiplier: 3.0         # 敵の出現数倍率
+  item_multiplier: 3.0          # アイテムの出現数倍率
+  reward_gp_multiplier: 2.0     # クリア時のGP報酬倍率
+  bgm: "components/sounds/bgm/outbreak.mp3" # 専用BGM (既存パス)
+  flash_color: [255, 0, 0]      # 発生時のフラッシュ色 (R, G, B)
+
+# 🌀 TELEPORT_CONFIG (テレポート屋設定)
+# ------------------------------------------------------------------------------
+TELEPORT_CONFIG:
+  money_per_floor: 1000         # 1階層あたりの料金
+  required_item_id: "teleport_stone" # 必要なアイテムID
+  return_village_money: 10000   # 休憩所から村への帰還料金 (超高額)
 

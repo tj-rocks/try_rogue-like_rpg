@@ -10,7 +10,7 @@ from constants import (
     COMBAT_LOG_WAIT_FRAMES, PLAYER_HP, PLAYER_COIN, PLAYER_ATTACK, 
     PLAYER_WEAPON, WEAPON_DATA, PLAYER_DEFENSE, PLAYER_ARMOR, ARMOR_DATA, ARMOR_COLORS,
     PLAYER_SHIELD, SHIELD_DATA, SHIELD_COLORS, PLAYER_ORE,
-    MAX_ITEM_SLOTS, MAX_EQUIP_SLOTS, MAX_STAVE_SLOTS,
+    MAX_ITEM_SLOTS, MAX_EQUIP_SLOTS, MAX_STAVE_SLOTS, MAX_WAREHOUSE_SLOTS,
     STAVE_DATA, HIT_STUN_DURATION, SOUND_ATTACK_HIT, SOUND_ATTACK_MISS,
     ENABLE_DEBUG_LOGGING, PLAYER_MOVE_SPEED, STATUS_EFFECTS
 )
@@ -273,6 +273,7 @@ class Player(Entity):
         self.status_timer = 0
         self._init_images()
         self.current_floor = 0
+        self.max_reached_floor = 0
         self.is_falling = False
         self.falling_timer = 0
         self.guild_point = 0
@@ -283,7 +284,9 @@ class Player(Entity):
         self.has_seen_ending = False
         self.event_items = []
         self.warehouse_items = []
-        self.warehouse_max = 20
+        self.warehouse_max = MAX_WAREHOUSE_SLOTS
+        self.outbreak_bonus_active = False # アウトブレイククリア後のGP2倍フラグ
+        self.outbreak_reward_mult = 1.0
 
         if PLAYER_ARMOR and PLAYER_ARMOR in ARMOR_DATA:
             inst = EquipInstance("armor", PLAYER_ARMOR); self.armor_inventory.append(inst); self._apply_armor(inst)
@@ -295,6 +298,11 @@ class Player(Entity):
             inst = EquipInstance("weapon", PLAYER_WEAPON); self.weapon_inventory.append(inst); self.equipped_weapon = inst.iid
             self.weapon = self._get_weapon_instance(PLAYER_WEAPON, inst.enhance)
         self.move_speed = 300
+
+    def set_current_floor(self, floor):
+        self.current_floor = floor
+        if floor > self.max_reached_floor:
+            self.max_reached_floor = floor
 
     @property
     def condition(self): return self._status
@@ -852,7 +860,7 @@ class Player(Entity):
             "stave_inventory": [st.to_dict() for st in self.stave_inventory], "lantern_inventory": [eq.to_dict() for eq in self.lantern_inventory], "equipped_lantern": self.equipped_lantern,
             "invincible_turns": self.invincible_turns, "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
             "completed_fixed_quests": self.completed_fixed_quests, "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
-            "current_floor": self.current_floor, "equip_id_counter": globals().get("_equip_id_counter", 0),
+            "current_floor": self.current_floor, "max_reached_floor": self.max_reached_floor, "equip_id_counter": globals().get("_equip_id_counter", 0),
         }
 
     def load_dict(self, data):
@@ -880,7 +888,7 @@ class Player(Entity):
             if "reward_gold" not in q: q["reward_gold"] = 1
             if "reward_gp" not in q: q["reward_gp"] = 1
         self.quest_tokens = data.get("quest_tokens", {}); self.completed_fixed_quests = data.get("completed_fixed_quests", [])
-        self.has_seen_ending = data.get("has_seen_ending", False); self.warehouse_items = data.get("warehouse_items", []); self.event_items = data.get("event_items", [])
+        self.has_seen_ending = data.get("has_seen_ending", False); self.max_reached_floor = data.get("max_reached_floor", 0); self.warehouse_items = data.get("warehouse_items", []); self.event_items = data.get("event_items", [])
         self.current_floor = data.get("current_floor", 0)
         global _equip_id_counter
         _equip_id_counter = max(_equip_id_counter, data.get("equip_id_counter", 0))

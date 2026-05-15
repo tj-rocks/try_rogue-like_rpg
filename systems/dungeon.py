@@ -55,7 +55,7 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
     
     # 敵・アイテムを初期配置（村や固定マップ階層以外）
     if floor_level > 0 and not new_dungeon.floor_info.get("map"):
-        new_dungeon.enemies = Enemy.spawn_enemies(new_dungeon, player)
+        new_dungeon.enemies = Enemy.spawn_enemies(new_dungeon, player, is_outbreak=new_dungeon.is_outbreak)
         new_dungeon.spawn_floor_items(player)
         new_dungeon.spawn_traps(player)
         
@@ -71,6 +71,26 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
         player.save_to_file(SAVE_DATA_PATH)
 
     return new_dungeon
+
+def warp_with_pitfall(floor_level, player, spawn_reason="teleport"):
+    """落とし穴の演出付きで指定階層へ移動予約を行う (共通化用)"""
+    from systems.game_state import game_state
+    from systems.sound_handler import sound_manager
+    
+    # 1. プレイヤーを落下状態にする
+    player.is_falling = True
+    player.falling_timer = 40 # 約0.7秒 (通常の階段より少し溜めを作る)
+    
+    # 2. 落下SE再生
+    # 既存の stairs SE とは別に、落とし穴感のある音があれば再生
+    sound_manager.play_sfx("components/sounds/sfx/fall.wav") 
+    
+    # 3. game_state に移動先を予約
+    game_state["pending_warp"] = {
+        "floor": floor_level,
+        "spawn_reason": spawn_reason
+    }
+    print(f"[WARP] Pitfall animation started. Target floor: {floor_level}")
 
 class Dungeon:
     # --- [NEW] クラスレベルのキャッシュ ---
@@ -118,15 +138,16 @@ class Dungeon:
         self.tile_size = TILE_SIZE
         
         # --- 部屋数の決定 (指数成長ロジック) ---
-        # 1階から LIMIT_FLOOR(50階) にかけて、初期値から CAP値まで「掛け算」で増やす
-        growth_floor_limit = DUNGEON_ROOM_GROWTH_LIMIT_FLOOR
+        # 成長の上限階層を取得
+        limit_floor = DUNGEON_ROOM_GROWTH_LIMIT_FLOOR
         interval = DUNGEON_ROOM_INCREASE_INTERVAL
         
-        # 5階ごとに段階的に増やすための「実効階層」
-        # (例: 1-5階 -> 1階扱い, 6-10階 -> 6階扱い...)
-        effective_level = ((level - 1) // interval) * interval + 1
+        # 上限階層で成長をストップさせつつ、段階的な増加(3階ごと等)を適用
+        capped_level = min(limit_floor, level)
+        effective_level = ((capped_level - 1) // interval) * interval + 1
         
-        progress = min(1.0, (effective_level - 1) / (growth_floor_limit - 1)) if growth_floor_limit > 1 else 1.0
+        # 進捗率を計算 (0.0 〜 1.0)
+        progress = (effective_level - 1) / (limit_floor - 1) if limit_floor > 1 else 1.0
         
         # 指数関数的な成長: start * (end/start)^progress
         def calc_exponential_growth(start, end, p):
@@ -140,20 +161,26 @@ class Dungeon:
         self.min_rooms = max(DUNGEON_MIN_ROOMS, min(DUNGEON_ROOM_MIN_CAP, self.min_rooms))
         self.max_rooms = max(DUNGEON_MAX_ROOMS, min(DUNGEON_ROOM_MAX_CAP, self.max_rooms))
         
-        room_growth = 1.0 + (level - 1) * DUNGEON_ROOM_SIZE_GROWTH # 部屋サイズは緩やかに大きくする
+        room_growth = 1.0 + (effective_level - 1) * DUNGEON_ROOM_SIZE_GROWTH # 部屋サイズは緩やかに大きくする
         self.min_room_size = min(DUNGEON_ROOM_MIN_SIZE_CAP, int(DUNGEON_MIN_ROOM_SIZE * room_growth))
         self.max_room_size = min(DUNGEON_ROOM_MAX_SIZE_CAP, int(DUNGEON_MAX_ROOM_SIZE * room_growth))
         
-        avg_room_area = ((self.min_room_size + self.max_room_size) / 2.0) ** 2
-        target_rooms = (self.min_rooms + self.max_rooms) / 2.0
+        from constants import DUNGEON_MIN_ROOM_DISTANCE, DUNGEON_ROOM_DISTANCE_GROWTH
         
-        margin_factor = 6.0 
-        target_total_area = avg_room_area * target_rooms * margin_factor
+        # 階層に応じた「部屋間の必要距離」を計算（生成ロジックと合わせる）
+        required_dist = int(DUNGEON_MIN_ROOM_DISTANCE + (level - 1) * DUNGEON_ROOM_DISTANCE_GROWTH)
+        
+        avg_room_size = (self.min_room_size + self.max_room_size) / 2.0
+        
+        # 修正: 余裕を持って「最大部屋数」が入る広さを確保する
+        effective_room_side = avg_room_size + required_dist
+        target_total_area = (effective_room_side ** 2) * self.max_rooms * 2.0
         
         calculated_side = int(math.sqrt(target_total_area))
         
-        self.map_width = calculated_side
-        self.map_height = calculated_side
+        # 最小サイズ(30x30)を保証しつつ、動的に決定
+        self.map_width = max(30, calculated_side)
+        self.map_height = max(30, calculated_side)
 
         # --- 各種データコンテナの初期化 (他のメソッドから参照されるため、ロジック実行前に初期化) ---
         self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
@@ -183,14 +210,6 @@ class Dungeon:
         self.shake_offset = (0, 0)
         self.flash_timer = 0
         
-        # --- モンスター氾濫 (Monster Overflow) ---
-        self.overflow_room_rect = None
-        self.overflow_trigger_pos = None
-        self.is_overflow_triggered = False
-        self.has_overflow_potential = False
-        self.overflow_message_shown = False
-        self.overflow_sequence_step = 0
-        self.overflow_wait_timer = 0
 
         # [DEBUG] 5Fはテスト用フラグがあれば部屋数を3つに固定し、氾濫を発生しやすくする
         if self.debug_overflow and level == 5:
@@ -217,6 +236,21 @@ class Dungeon:
             
         self.floor_info = info
         folder = info["image"] if isinstance(info, dict) else info
+        is_fixed_map = isinstance(info, dict) and info.get("map") is not None
+        
+        # --- アウトブレイク（魔物の氾濫）イベント ---
+        self.is_outbreak = False
+        self.outbreak_intro_done = False
+        self.outbreak_cleared = False
+        self.outbreak_clear_rewarded = False
+        self.outbreak_monster_initial_count = 0
+        
+        # 発生判定（設定された階層範囲内、かつ村や固定マップ階層以外）
+        if current_level > 0 and not is_fixed_map:
+            from constants import OUTBREAK_CHANCE, OUTBREAK_MIN_FLOOR, OUTBREAK_MAX_FLOOR
+            in_range = OUTBREAK_MIN_FLOOR <= current_level <= OUTBREAK_MAX_FLOOR
+            if (in_range and random.random() < OUTBREAK_CHANCE) or self.debug_overflow:
+                self.is_outbreak = True
         
         # --- 設定値のバリデーション ---
         if isinstance(info, dict):
@@ -404,6 +438,8 @@ class Dungeon:
         if self.current_floor == 0: # 村
             # デフォルトは開始地点(P)
             tx, ty = self.start_pos
+            if self.start_pos != (0, 0):
+                ty += 2 # 壁埋まり防止のため2マス下にオフセット
             
             # 死亡時は診療所(R)の右隣にスポーン
             if is_death and self.clinic_pos:
@@ -458,57 +494,70 @@ class Dungeon:
     
     def generate_dungeon(self):
         from constants import DUNGEON_MIN_ROOM_DISTANCE, DUNGEON_ROOM_DISTANCE_GROWTH, DUNGEON_CORRIDOR_W2_CHANCE, DUNGEON_STAIRS_FLOOR_RADIUS
-        num_rooms = random.randint(self.min_rooms, self.max_rooms)
-        required_dist = int(DUNGEON_MIN_ROOM_DISTANCE + (self.current_floor - 1) * DUNGEON_ROOM_DISTANCE_GROWTH)
         
-        self.valid_floor_coords = set()
-        pending_rooms = []
-        
-        for _ in range(num_rooms):
-            placed = False
-            for attempt in range(50):
-                w = random.randint(self.min_room_size, self.max_room_size)
-                h = random.randint(self.min_room_size, self.max_room_size)
-                x = random.randint(1, self.map_width - w - 1)
-                y = random.randint(1, self.map_height - h - 1)
-                
-                conflict = False
-                for (rx, ry, rw, rh) in self.room_rects:
-                    if (x < rx + rw + required_dist and x + w + required_dist > rx and
-                        y < ry + rh + required_dist and y + h + required_dist > ry):
-                        conflict = True
-                        break
-                        
-                if not conflict:
-                    center_x, center_y = x + w // 2, y + h // 2
-                    
-                    if self.rooms:
-                        min_dist = float('inf')
-                        closest_center = None
-                        for (rx, ry) in self.rooms:
-                            dist = abs(rx - center_x) + abs(ry - center_y)
-                            if dist < min_dist:
-                                min_dist = dist
-                                closest_center = (rx, ry)
-                        prev_cx, prev_cy = closest_center
-                        
-                        # 氾濫判定は最後に行うので、ここでは通常の通路生成
-                        c_width = 2 if random.random() < DUNGEON_CORRIDOR_W2_CHANCE else 1
-                        self.create_corridor(prev_cx, center_x, prev_cy, prev_cy, width=c_width)
-                        self.create_corridor(center_x, center_x, prev_cy, center_y, width=c_width)
-                        
-                    self.room_rects.append((x, y, w, h))
-                    self.rooms.append((center_x, center_y))
-                    pending_rooms.append((x, y, w, h))
-                    placed = True
-                    break
-        
-        for (x, y, w, h) in pending_rooms:
-            for row in range(y, y + h):
-                for col in range(x, x + w):
-                    self.map_data[row][col] = 1
-                    self.valid_floor_coords.add((col, row))
+        # 最小部屋数を確保するためのリトライループ
+        for dungeon_attempt in range(10):
+            # マップと部屋リストをリセット
+            self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
+            self.rooms = []
+            self.room_rects = []
+            self.valid_floor_coords = set()
+            pending_rooms = []
             
+            num_rooms = random.randint(self.min_rooms, self.max_rooms)
+            required_dist = int(DUNGEON_MIN_ROOM_DISTANCE + (self.current_floor - 1) * DUNGEON_ROOM_DISTANCE_GROWTH)
+            
+            for _ in range(num_rooms):
+                placed = False
+                for attempt in range(50):
+                    w = random.randint(self.min_room_size, self.max_room_size)
+                    h = random.randint(self.min_room_size, self.max_room_size)
+                    x = random.randint(1, self.map_width - w - 1)
+                    y = random.randint(1, self.map_height - h - 1)
+                    
+                    conflict = False
+                    for (rx, ry, rw, rh) in self.room_rects:
+                        if (x < rx + rw + required_dist and x + w + required_dist > rx and
+                            y < ry + rh + required_dist and y + h + required_dist > ry):
+                            conflict = True
+                            break
+                            
+                    if not conflict:
+                        center_x, center_y = x + w // 2, y + h // 2
+                        
+                        if self.rooms:
+                            min_dist = float('inf')
+                            closest_center = None
+                            for (rx, ry) in self.rooms:
+                                dist = abs(rx - center_x) + abs(ry - center_y)
+                                if dist < min_dist:
+                                    min_dist = dist
+                                    closest_center = (rx, ry)
+                            prev_cx, prev_cy = closest_center
+                            
+                            # 氾濫判定は最後に行うので、ここでは通常の通路生成
+                            c_width = 2 if random.random() < DUNGEON_CORRIDOR_W2_CHANCE else 1
+                            self.create_corridor(prev_cx, center_x, prev_cy, prev_cy, width=c_width)
+                            self.create_corridor(center_x, center_x, prev_cy, center_y, width=c_width)
+                            
+                        self.room_rects.append((x, y, w, h))
+                        self.rooms.append((center_x, center_y))
+                        pending_rooms.append((x, y, w, h))
+                        placed = True
+                        break
+            # 最小部屋数を確保できたかチェック
+            if len(self.rooms) >= self.min_rooms:
+                if dungeon_attempt > 0:
+                    print(f"[DUNGEON] Guaranteed min rooms ({len(self.rooms)}) after {dungeon_attempt} retries.")
+                
+                # 床タイルの書き込み
+                for (x, y, w, h) in pending_rooms:
+                    for row in range(y, y + h):
+                        for col in range(x, x + w):
+                            self.map_data[row][col] = 1
+                            self.valid_floor_coords.add((col, row))
+                break
+        
         start_room_idx = 0
         self.map_data[self.rooms[start_room_idx][1]][self.rooms[start_room_idx][0]] = 2
         
@@ -533,94 +582,12 @@ class Dungeon:
                 target_room_idx = random.choices(room_indices, weights=weights, k=1)[0]
             else:
                 target_room_idx = start_room_idx
+            
+            self.map_data[self.rooms[target_room_idx][1]][self.rooms[target_room_idx][0]] = 3
+
         self.start_room_idx = start_room_idx
         self.target_room_idx = target_room_idx
-        self.map_data[self.rooms[target_room_idx][1]][self.rooms[target_room_idx][0]] = 3
 
-        # --- モンスター氾濫の専用部屋生成 ---
-        from constants import OVERFLOW_CHANCE, OVERFLOW_MIN_FLOOR
-        
-        # 発生条件: 
-        # 1. デバッグ中かつB11の場合(テスト用) 
-        # 2. または、ランダム確率(OVERFLOW_CHANCE)に当選
-        # 3. かつ、最低階層(OVERFLOW_MIN_FLOOR)以上
-        # 4. かつ、固定マップでない(map情報がない)
-        is_min_floor = self.current_floor >= OVERFLOW_MIN_FLOOR
-        is_fixed_map = bool(self.floor_info.get("map"))
-        
-        force_overflow = (self.debug_overflow and self.current_floor == OVERFLOW_MIN_FLOOR) or (random.random() < OVERFLOW_CHANCE)
-        
-        if force_overflow and is_min_floor and not is_fixed_map:
-            # 氾濫用の追加部屋を1つ生成
-            placed = False
-            for attempt in range(50):
-                w = random.randint(self.min_room_size, self.max_room_size)
-                h = random.randint(self.min_room_size, self.max_room_size)
-                x = random.randint(1, self.map_width - w - 1)
-                y = random.randint(1, self.map_height - h - 1)
-                
-                # 既存の部屋との衝突判定
-                conflict = False
-                for (rx, ry, rw, rh) in self.room_rects:
-                    if (x < rx + rw + 2 and x + w + 2 > rx and
-                        y < ry + rh + 2 and y + h + 2 > ry):
-                        conflict = True; break
-                
-                if not conflict:
-                    center_x, center_y = x + w // 2, y + h // 2
-                    # 最も近い既存の部屋を探して接続
-                    min_dist = float('inf')
-                    closest_center = self.rooms[0]
-                    for (rx, ry) in self.rooms:
-                        dist = abs(rx - center_x) + abs(ry - center_y)
-                        if dist < min_dist:
-                            min_dist = dist
-                            closest_center = (rx, ry)
-                    
-                    prev_cx, prev_cy = closest_center
-                    # 1マス幅の通路で接続
-                    self.create_corridor(prev_cx, center_x, prev_cy, prev_cy, width=1)
-                    self.create_corridor(center_x, center_x, prev_cy, center_y, width=1)
-                    
-                    # トリガー地点（入口）の特定ロジックを修正
-                    # 通路は (prev_cx, prev_cy) -> (center_x, prev_cy) -> (center_x, center_y) の順で作られる
-                    # 1. 水平移動が部屋のY範囲内なら、左右の壁が入り口になる
-                    if y <= prev_cy < y + h:
-                        if center_x > prev_cx: self.overflow_trigger_pos = (x - 1, prev_cy)
-                        else: self.overflow_trigger_pos = (x + w, prev_cy)
-                    # 2. そうでなければ、垂直移動が上下の壁に刺さる
-                    else:
-                        if center_y > prev_cy: self.overflow_trigger_pos = (center_x, y - 1)
-                        else: self.overflow_trigger_pos = (center_x, y + h)
-                    
-                    self.has_overflow_potential = True
-                    self.overflow_room_rect = (x, y, w, h)
-                    self.room_rects.append((x, y, w, h))
-                    self.rooms.append((center_x, center_y))
-                    # 部屋の床を塗る
-                    for row in range(y, y + h):
-                        for col in range(x, x + w):
-                            self.map_data[row][col] = 1
-                            self.valid_floor_coords.add((col, row))
-
-                    # [NEW] フロードスイッチを配置
-                    if self.overflow_trigger_pos:
-                        from components.sprites.trap import Trap
-                        from constants import OVERFLOW_CENTER_SWITCH_MIN_FLOOR
-                        tx, ty = self.overflow_trigger_pos
-                        
-                        # 深い階層では、50%の確率で部屋の中心にスイッチを置く
-                        if self.current_floor >= OVERFLOW_CENTER_SWITCH_MIN_FLOOR and random.random() < 0.5:
-                            tx, ty = center_x, center_y
-                            print(f"[Dungeon] Deep floor detected. Placing switch at center: ({tx}, {ty})")
-                        else:
-                            print(f"[Dungeon] Placing switch at entrance: ({tx}, {ty})")
-                            
-                        # スイッチを配置
-                        self.traps.append(Trap(tx, ty, "flood_switch"))
-                    
-                    placed = True
-                    break
 
         r_stairs = DUNGEON_STAIRS_FLOOR_RADIUS
         for sx, sy in [self.rooms[start_room_idx], self.rooms[target_room_idx]]:
@@ -636,112 +603,47 @@ class Dungeon:
         # 最後に有効エリア以外を削る
         self._trim_to_valid_areas()
         
-    def check_overflow(self, player, dialog):
-        """プレイヤーが氾濫部屋の入口を踏んだかチェックする"""
-        if not self.has_overflow_potential or self.is_overflow_triggered:
-            return self
-            
-        # 最初の予感メッセージ
-        if not self.overflow_message_shown:
-            dialog.text = Text.System.OVERFLOW_SENSE
-            dialog.is_active = True
-            self.overflow_message_shown = True
-            
-        # 以前はここで直接トリガー判定をしていたが、
-        # 今後は Trap(flood_switch) がトリガーされることで trigger_overflow が呼ばれる
-        return self
-
-    def trigger_overflow(self, player, dialog):
-        # 演出シーケンス開始！
-        self.is_overflow_triggered = True
-        self.overflow_sequence_step = 1 # Step 1: 発生メッセージ表示
-        
-        dialog.text = Text.System.OVERFLOW_START
-        dialog.is_active = True
-        
-        # 画面揺らし演出
-        self.shake_amount = 15
-        self.shake_timer = 60
-
-    def _update_overflow_sequence(self, dialog):
-        """演出シーケンスの更新処理"""
-        from systems.game_state import game_state
-        
-        if self.overflow_sequence_step == 1:
-            # Step 1: メッセージ1が閉じられるのを待つ
-            if not dialog.is_active and game_state.get("dialog_just_closed"):
-                # 効果音再生
-                from systems.audio_manager import play_sfx
-                from constants import SOUND_OVERFLOW
-                play_sfx(SOUND_OVERFLOW)
-                
-                self.overflow_sequence_step = 2
-                self.overflow_wait_timer = 60 # 1秒程度待機
-                
-        elif self.overflow_sequence_step == 2:
-            # Step 2: SE再生中のウェイト
-            self.overflow_wait_timer -= 1
-            if self.overflow_wait_timer <= 0:
-                # BGM開始
-                from systems.audio_manager import play_bgm
+    def check_outbreak_start(self, dialog):
+        """フロア開始時のアウトブレイク演出"""
+        if self.is_outbreak and not self.outbreak_intro_done:
+            if dialog:
+                from constants import SOUND_OUTBREAK_ALERT, OUTBREAK_FLASH_COLOR
+                from systems.sound_handler import sound_manager
+                from systems.magic_handler import FlashEffect
+                self.magic_effects.append(FlashEffect(color=OUTBREAK_FLASH_COLOR, duration=60))
                 from constants import BGM_OVERFLOW
+                from systems.audio_manager import play_sfx, play_bgm
+                
+                play_sfx(SOUND_OUTBREAK_ALERT)
+                self.shake_amount = 15
+                self.shake_timer = 60
+                
+                dialog.text = "＜警告＞\n魔物の気配が濃すぎます！\n逃げ場のない『魔物の氾濫』が発生した！"
+                dialog.is_active = True
                 play_bgm(BGM_OVERFLOW)
                 
-                # Step 3: 煽りメッセージ表示 ＆ 召喚
-                dialog.text = Text.System.OVERFLOW_SURVIVE
-                dialog.is_active = True
-                
-                self._spawn_overflow_monsters()
-                self.overflow_sequence_step = 3
-                
-        elif self.overflow_sequence_step == 3:
-            # Step 3: メッセージ2が閉じられたらシーケンス終了
-            if not dialog.is_active and game_state.get("dialog_just_closed"):
-                self.overflow_sequence_step = 4 # 完了
-                print("[Dungeon] Overflow sequence completed.")
+                self.outbreak_intro_done = True
 
-    def _spawn_overflow_monsters(self):
-        """モンスターを部屋の中に召喚する"""
-        if getattr(self, "overflow_room_rect", None) is None:
-            print("[Dungeon] Warning: No overflow_room_rect defined. Skipping spawn.")
+    def update_outbreak_status(self, player, dialog):
+        """アウトブレイクのクリア判定"""
+        if not self.is_outbreak or self.outbreak_cleared:
             return
             
-        x, y, w, h = self.overflow_room_rect
-        num_spawn = (w * h) // 2
-        num_spawn = max(8, min(num_spawn, 25))
+        # 生きている敵をカウント
+        alive_enemies = [e for e in self.enemies if not getattr(e, "is_dead", False) and not e.is_static]
         
-        spawned_count = 0
-        attempts = 0
-        while spawned_count < num_spawn and attempts < 100:
-            attempts += 1
-            gx = random.randint(x, x + w - 1)
-            gy = random.randint(y, y + h - 1)
+        if len(alive_enemies) == 0:
+            self.outbreak_cleared = True
+            from constants import OUTBREAK_GP_MULT
+            player.outbreak_bonus_active = True
+            player.outbreak_reward_mult = OUTBREAK_GP_MULT
             
-            conflict = False
-            if (gx, gy) == (int(self.player.x // self.tile_size), int(self.player.y // self.tile_size)):
-                conflict = True
-            for e in self.enemies:
-                if (gx, gy) == (int(e.x // self.tile_size), int(e.y // self.tile_size)):
-                    conflict = True
-                    break
+            dialog.text = "＜CLEAR＞\nフロアの魔物を一掃した！\nギルドでの報酬が特別に２倍になるようだ！"
+            dialog.is_active = True
             
-            if not conflict:
-                from components.sprites.enemy import Enemy
-                from constants import ENEMY_DATA
-                available_types = []
-                for etype, edata in ENEMY_DATA.items():
-                    if edata["min_floor"] <= self.current_floor <= edata["max_floor"]:
-                        available_types.append(etype)
-                
-                if not available_types: available_types = ["slime"]
-                etype = random.choice(available_types)
-                
-                new_enemy = Enemy(gx * self.tile_size, gy * self.tile_size, etype, player=self.player)
-                new_enemy.update_equipment_stats() 
-                self.enemies.append(new_enemy)
-                spawned_count += 1
-        
-        print(f"[Dungeon] Overflow triggered! Spawned {spawned_count} enemies.")
+            # BGMを元に戻すか、無音にする
+            from systems.audio_manager import stop_bgm
+            stop_bgm()
 
     def generate_fixed_map(self, map_name):
         """テキストファイルから固定マップを生成する（村や休憩ポイント用）"""
@@ -894,6 +796,11 @@ class Dungeon:
         
         # 最終的な個数を Min/Max の範囲内に収める
         count = max(FLOOR_ITEM_SPAWN_MIN, min(FLOOR_ITEM_SPAWN_MAX + scale_add, base_count))
+        
+        # アウトブレイク時はアイテム数を増やす
+        if self.is_outbreak:
+            from constants import OUTBREAK_ITEM_MULT
+            count = int(count * OUTBREAK_ITEM_MULT)
         
         # ランクアップアイテムのチェック
         cert_to_spawn = None
@@ -1433,9 +1340,7 @@ class Dungeon:
 
     def update(self, dialog=None):
         """ダンジョン全体の更新（タイマーや演出）"""
-        # モンスター氾濫演出シーケンスの更新
-        if getattr(self, "overflow_sequence_step", 0) > 0 and dialog:
-            self._update_overflow_sequence(dialog)
+        # アウトブレイク演出は check_outbreak_start で完結
 
         # 画面揺らしの更新
         if self.shake_timer > 0:
@@ -1445,10 +1350,7 @@ class Dungeon:
                 self.shake_amount = 0
                 self.shake_offset = (0, 0)
         
-        # [NEW] 落とし穴の落下待ち処理
-        if self.player and self.player.is_falling and self.player.falling_timer <= 0:
-            self.player.is_falling = False
-            self.next_dungeon = warp_to_floor(self.current_floor + 1, self.player, old_dungeon=self)
+        # --- [Logic Update Phase] ---
         
         # [NEW] フラッシュタイマーの更新
         if self.flash_timer > 0:

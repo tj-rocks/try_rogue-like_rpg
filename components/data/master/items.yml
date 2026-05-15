@@ -74,10 +74,16 @@ CONSUMABLE_DATA:
     shop_buyable: true
     max_stack: 3
     describe: 足元の罠を安全に解除するための道具。罠に向かって使うと、その罠を消去できる。
+  teleport_stone:
+    name: 転移の石
+    price: 2000
+    min_rank: F
+    rarity: 3
+    image_path: components/pictures/icon/item.png
     sound: components/sounds/sfx/recharge.wav
     shop_buyable: true
-    max_stack: 1
-    describe: 不思議な魔力が込められたお守り。所持していると、力尽きた時に一度だけHP半分で復活できる。
+    max_stack: 5
+    describe: テレポート屋のサービスを利用するために必要な不思議な石。
   hp_potion:
     name: ヒールポーション
     effect: heal_hp
@@ -89,7 +95,7 @@ CONSUMABLE_DATA:
     sound: components/sounds/sfx/drink.wav
     shop_buyable: true
     category: common
-    max_stack: 3
+    max_stack: 10
     describe: 傷を癒やす一般的な薬草の煎じ薬。
   antidote_potion:
     name: 毒消薬
@@ -102,7 +108,6 @@ CONSUMABLE_DATA:
     shop_buyable: true
     max_stack: 10
     describe: 解毒作用を持つ薬。毒状態を回復する。
-    max_stack: 3
   hi_potion:
     name: ハイポーション
     effect: heal_hp

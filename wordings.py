@@ -59,7 +59,7 @@ class Text:
         ATK_LABEL = "攻撃:{atk:.1f}"
         DEF_LABEL = "防御:{defense:.1f}"
         EVA_LABEL = "回避:{eva}%"
-        VILLAGE = "Village"
+        VILLAGE = "ダンジョンの街"
         FLOOR = "B{level}F"
         MENU_TITLE = "--- MENU ---"
         QUIT_CONFIRM_MSG = "セーブせずにタイトルへ戻りますか？\nギルドか宿屋でセーブをお勧めします。"
