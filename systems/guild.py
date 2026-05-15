@@ -100,14 +100,14 @@ class GuildSystem:
             q_type = random.choice(["hunt", "delivery"])
             
             if q_type == "hunt":
-                quest = self._generate_hunt_quest(allowed_ranks, mult, min_amount, max_amount)
+                quest = self._generate_hunt_quest(allowed_ranks, mult, min_amount, max_amount, player_rank=player.guild_rank)
             else:
-                quest = self._generate_delivery_quest(allowed_ranks, mult, min_amount, max_amount)
+                quest = self._generate_delivery_quest(allowed_ranks, mult, min_amount, max_amount, player_rank=player.guild_rank)
             
             if quest:
                 self.available_quests.append(quest)
 
-    def _generate_hunt_quest(self, allowed_ranks, multiplier, min_amt, max_amt):
+    def _generate_hunt_quest(self, allowed_ranks, multiplier, min_amt, max_amt, player_rank="F"):
         # 許可されたランクの敵をリストアップ
         candidates = []
         for key, data in ENEMY_DATA.items():
@@ -128,10 +128,29 @@ class GuildSystem:
             unit_reward = (target_data.get("hp", 10) + target_data.get("attack", 0)) * 5
             
         from systems.math_utils import hardcore_round
-        reward_gold = hardcore_round(unit_reward * amount * multiplier, is_hp=True)
-        reward_gp = amount * 5 # GPは討伐数×5
+        from constants import _balance, RANK_ORDER
+        _gq = _balance.get("GUILD_QUEST", {})
+        divisor = _gq.get("GUILD_QUEST_GP_DIVISOR", 10)
         
+        reward_gold = hardcore_round(unit_reward * amount * multiplier, is_hp=True)
+        # GPは報酬ゴールド / 設定値 とする（最低1GP保証）
+        reward_gp = max(1, reward_gold // divisor)
+
+        # ランク格差による倍率補正
         target_rank = target_data.get("min_rank") or target_data.get("rank") or "F"
+        p_idx = RANK_ORDER.index(player_rank)
+        q_idx = RANK_ORDER.index(target_rank)
+        
+        multipliers = _gq.get("GP_RANK_DIFF_MULTIPLIERS", {"CHALLENGE": 2.0, "MATCH": 1.5, "EASY": 0.5})
+        if q_idx > p_idx:
+            gp_mult = multipliers.get("CHALLENGE", 2.0)
+        elif q_idx == p_idx:
+            gp_mult = multipliers.get("MATCH", 1.5)
+        else:
+            gp_mult = multipliers.get("EASY", 0.5)
+            
+        reward_gp = int(reward_gp * gp_mult)
+        reward_gp = max(1, reward_gp)
         if target_data.get("is_static"):
             title = Text.Guild.QUEST_DESTROY_TITLE.format(rank=target_rank, name=target_data['name'], amount=amount)
         else:
@@ -160,7 +179,7 @@ class GuildSystem:
             "requester": requester
         }
 
-    def _generate_delivery_quest(self, allowed_ranks, multiplier, min_amt, max_amt):
+    def _generate_delivery_quest(self, allowed_ranks, multiplier, min_amt, max_amt, player_rank="F"):
         # 許可されたランクのアイテムを候補とする
         candidates = []
         for catalog in [WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA]:
@@ -185,10 +204,30 @@ class GuildSystem:
         base_sell = max(1, base_sell)
         
         from systems.math_utils import hardcore_round
+        from constants import _balance, RANK_ORDER
+        _gq = _balance.get("GUILD_QUEST", {})
+        divisor = _gq.get("GUILD_QUEST_GP_DIVISOR", 10)
+
         reward_gold = hardcore_round(base_sell * 1.2 * amount * multiplier, is_hp=True)
         reward_gold = max(1, reward_gold) # 最終的な報酬も最低1Gを保証
+        # GPは報酬ゴールド / 設定値 とする（最低1GP保証）
+        reward_gp = max(1, reward_gold // divisor)
 
-        reward_gp = amount * 3 # 納品は討伐よりGP低め
+        # ランク格差による倍率補正
+        target_rank = target_data.get("min_rank") or target_data.get("rank") or "F"
+        p_idx = RANK_ORDER.index(player_rank)
+        q_idx = RANK_ORDER.index(target_rank)
+        
+        multipliers = _gq.get("GP_RANK_DIFF_MULTIPLIERS", {"CHALLENGE": 2.0, "MATCH": 1.5, "EASY": 0.5})
+        if q_idx > p_idx:
+            gp_mult = multipliers.get("CHALLENGE", 2.0)
+        elif q_idx == p_idx:
+            gp_mult = multipliers.get("MATCH", 1.5)
+        else:
+            gp_mult = multipliers.get("EASY", 0.5)
+            
+        reward_gp = int(reward_gp * gp_mult)
+        reward_gp = max(1, reward_gp)
         
         target_rank = target_data.get("min_rank", "F")
         desc = random.choice(Text.Guild.QUEST_DELIVERY_FLAVORS).format(name=target_data["name"])

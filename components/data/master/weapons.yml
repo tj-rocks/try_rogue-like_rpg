@@ -145,7 +145,7 @@ WEAPON_DATA:
     max_rank: E
     rarity: 2
     attack_bonus: 11
-    price: 100
+    price: 300
     armor_penetration: false
     image_path: components/pictures/weapon/iron_sword.png
     shop_buyable: true
@@ -159,7 +159,7 @@ WEAPON_DATA:
     max_rank: D
     rarity: 8
     attack_bonus: 6
-    price: 75
+    price: 150
     armor_penetration: false
     image_path: components/pictures/weapon/old_sword.png
     shop_buyable: false
@@ -172,7 +172,7 @@ WEAPON_DATA:
     max_rank: E
     rarity: 1
     attack_bonus: 6
-    price: 100
+    price: 120
     armor_penetration: false
     image_path: components/pictures/weapon/wooden_stick.png
     sound: components/sounds/sfx/wood_swing.wav

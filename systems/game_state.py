@@ -21,6 +21,7 @@ game_state = {
     "ore_selection_active": False, # 鍛冶屋での「どの鉱石使う？」メニュー用
     "stave_selection_active": False, # 杖の回復対象選択用
     "bank_active": False,        # 銀行画面用
+    "teleport_active": False,    # テレポート画面用
     "turn_state": "player",       # "player" or "enemies"
     "current_enemy_idx": 0,      # 現在行動中の敵のインデックス
     "inter_action_timer": 0,     # 行動間の待機時間用タイマー
@@ -50,4 +51,5 @@ def is_paused():
             game_state.get("menu_active", False) or
             game_state.get("equip_active", False) or
             game_state.get("stave_inventory_active", False) or
+            game_state.get("teleport_active", False) or
             game_state.get("event_item_active", False))

@@ -45,7 +45,9 @@ class FireEffect(MagicEffect):
             ry = random.randint(-self.size//3, self.size//3)
             rs = random.randint(self.size//2, self.size)
             s = pygame.Surface((rs, rs), pygame.SRCALPHA)
-            pygame.draw.circle(s, (*self.color, alpha), (rs//2, rs//2), rs//2)
+            color_obj = pygame.Color(*self.color)
+            color_obj.a = alpha
+            pygame.draw.circle(s, color_obj, (rs//2, rs//2), rs//2)
             screen.blit(s, (draw_x + rx - rs//2 + 30, draw_y + ry - rs//2 + 30))
 
 class FlashEffect(MagicEffect):
@@ -56,7 +58,9 @@ class FlashEffect(MagicEffect):
     def draw(self, screen, camera_x, camera_y):
         alpha = int(150 * (self.duration / self.max_duration))
         s = pygame.Surface((screen.get_width(), screen.get_height()), pygame.SRCALPHA)
-        s.fill((*self.color, alpha))
+        color_obj = pygame.Color(*self.color)
+        color_obj.a = alpha
+        s.fill(color_obj)
         screen.blit(s, (0, 0))
 
 class ProjectileEffect(MagicEffect):
@@ -111,7 +115,9 @@ class ProjectileEffect(MagicEffect):
         for p in self.particles:
             alpha = max(0, min(255, int(255 * (p["life"] / 15))))
             s = pygame.Surface((8, 8), pygame.SRCALPHA)
-            pygame.draw.circle(s, (*p["color"], alpha), (4, 4), 4)
+            c = pygame.Color(*p["color"])
+            c.a = alpha
+            pygame.draw.circle(s, c, (4, 4), 4)
             screen.blit(s, (p["x"] - camera_x - 4, p["y"] - camera_y - 4))
 
         # メイン弾体の描画
@@ -143,8 +149,11 @@ class ProjectileEffect(MagicEffect):
             
         # 発光感のある描画
         s = pygame.Surface((radius * 3, radius * 3), pygame.SRCALPHA)
-        pygame.draw.circle(s, (*color, 100), (radius*1.5, radius*1.5), radius*1.5)
-        pygame.draw.circle(s, (*color, 255), (radius*1.5, radius*1.5), radius)
+        c_main = pygame.Color(*color)
+        c_main.a = 100
+        pygame.draw.circle(s, c_main, (radius*1.5, radius*1.5), radius*1.5)
+        c_main.a = 255
+        pygame.draw.circle(s, c_main, (radius*1.5, radius*1.5), radius)
         pygame.draw.circle(s, (255, 255, 255, 200), (radius*1.5, radius*1.5), radius // 2)
         screen.blit(s, (curr_x - radius*1.5, curr_y - radius*1.5))
 
@@ -171,9 +180,12 @@ class KnockbackEffect(MagicEffect):
                 alpha = int(220 * (self.duration / self.max_duration) / (i + 1))
                 s = pygame.Surface((radius * 2 + 2, radius * 2 + 2), pygame.SRCALPHA)
                 # 外側の光
-                pygame.draw.circle(s, (*self.color, alpha // 2), (int(radius), int(radius)), int(radius))
+                c_outer = pygame.Color(*self.color)
+                c_outer.a = alpha // 2
+                pygame.draw.circle(s, c_outer, (int(radius), int(radius)), int(radius))
                 # 内側の芯
-                pygame.draw.circle(s, (255, 255, 255, alpha), (int(radius), int(radius)), int(radius // 2))
+                c_inner = pygame.Color(255, 255, 255, alpha)
+                pygame.draw.circle(s, c_inner, (int(radius), int(radius)), int(radius // 2))
                 screen.blit(s, (curr_x - radius, curr_y - radius))
 
 class DirectionalFlashEffect(MagicEffect):
@@ -193,7 +205,9 @@ class DirectionalFlashEffect(MagicEffect):
             radius = int(self.size * (1.2 - self.duration / self.max_duration) * (r / 3))
             if radius <= 0: continue
             s = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
-            pygame.draw.circle(s, (*self.color, alpha // r), (radius, radius), radius)
+            c_flash = pygame.Color(*self.color)
+            c_flash.a = alpha // r
+            pygame.draw.circle(s, c_flash, (radius, radius), radius)
             screen.blit(s, (draw_x - radius, draw_y - radius))
 
 def execute_stave(player, stave, dungeon, dialog):

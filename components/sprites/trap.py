@@ -49,9 +49,9 @@ class Trap:
         msg = Text.Trap.TRIGGERED.format(name=self.data.get('name'))
         
         if self.type == "pitfall":
-            # 落とし穴：次の階層へ（アニメーションはPlayer側で開始）
-            if hasattr(player, "start_falling"):
-                player.start_falling(dungeon.tile_size)
+            # 落とし穴：次の階層へ (共通関数で予約)
+            from systems.dungeon import warp_with_pitfall
+            warp_with_pitfall(dungeon.current_floor + 1, player, spawn_reason="trap")
             msg += Text.Trap.PITFALL
             
         elif self.type == "damage_floor":

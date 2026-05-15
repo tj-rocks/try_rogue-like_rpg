@@ -88,6 +88,7 @@ PLAYER_ORE          = _p.get("initial_ore", 0)
 MAX_ITEM_SLOTS      = _p.get("max_item_slots", 20)
 MAX_EQUIP_SLOTS     = _p.get("max_equip_slots", 10)
 MAX_STAVE_SLOTS     = _p.get("max_stave_slots", 10)
+MAX_WAREHOUSE_SLOTS = _p.get("max_warehouse_slots", 20)
 PLAYER_ACCURACY_CLOSE = _p.get("accuracy_close", 100)
 PLAYER_ACCURACY_RANGED = _p.get("accuracy_ranged", 100)
 PLAYER_EVASION      = _p.get("evasion", 1)
@@ -243,6 +244,15 @@ _ms = _vs.get("MAGIC_SHOP", {})
 RECHARGE_COST_PER_CHARGE = _ms.get("RECHARGE_COST_PER_CHARGE", 15)
 STAVE_PRICE_MULTIPLIER   = _ms.get("STAVE_PRICE_MULTIPLIER", 1.5)
 
+# 🤝 GUILD_QUEST (ギルド依頼)
+# ------------------------------------------------------------------------------
+# Data Source: balance.yml (GUILD_QUEST)
+_gq = _balance.get("GUILD_QUEST", {})
+GUILD_QUEST_GP_DIVISOR = _gq.get("GUILD_QUEST_GP_DIVISOR", 10)
+GP_RANK_DIFF_MULTIPLIERS = _gq.get("GP_RANK_DIFF_MULTIPLIERS", {
+    "CHALLENGE": 2.0, "MATCH": 1.5, "EASY": 0.5
+})
+
 # ------------------------------------------------------------------------------
 
 # ==============================================================================
@@ -275,18 +285,27 @@ ATTACK_EFFECT_DATA = load_master_data("enemy_attack_effects.json")
 _quests          = load_master_data("quests.json")
 FIXED_QUEST_DATA = _quests.get("FIXED_QUESTS", [])
 
-# --- 氾濫イベント（ランク連動） ---
-# 移動済み（上部へ）
-OVERFLOW_CHANCE = 0.1
-# Bランクの開始階
-OVERFLOW_MIN_FLOOR = RANK_FLOOR_MAP.get("B", {"min": 21})["min"]
-# Bランクの次(Aランク)の開始階
-OVERFLOW_CENTER_SWITCH_MIN_FLOOR = RANK_FLOOR_MAP.get("A", {"min": 26})["min"]
-SOUND_OVERFLOW = "components/sounds/sfx/explosion.wav"
+# --- アウトブレイク（魔物の氾濫）イベント ---
+_outbreak = _balance.get("OUTBREAK_CONFIG", {})
+OUTBREAK_MIN_FLOOR   = _outbreak.get("min_floor", 2)
+OUTBREAK_MAX_FLOOR   = _outbreak.get("max_floor", 99)
+OUTBREAK_CHANCE      = _outbreak.get("occurrence_chance", 0.08)
+OUTBREAK_ENEMY_MULT  = _outbreak.get("enemy_multiplier", 3.0)
+OUTBREAK_ITEM_MULT   = _outbreak.get("item_multiplier", 3.0)
+OUTBREAK_GP_MULT     = _outbreak.get("reward_gp_multiplier", 2.0)
+OUTBREAK_FLASH_COLOR = _outbreak.get("flash_color", [255, 0, 0])
+BGM_OVERFLOW         = _outbreak.get("bgm", "components/sounds/bgm/beyond_the_suffer.mp3")
+SOUND_OUTBREAK_ALERT = "components/sounds/sfx/explosion.wav"
 
 # ==============================================================================
 # 🛠️ 4. その他・システム固定データ
 # ==============================================================================
+
+# --- テレポート（転移屋）設定 ---
+_teleport = _balance.get("TELEPORT_CONFIG", {})
+TELEPORT_MONEY_PER_FLOOR = _teleport.get("money_per_floor", 1000)
+TELEPORT_REQUIRED_ITEM   = _teleport.get("required_item_id", "teleport_stone")
+TELEPORT_RETURN_VILLAGE_COST = _teleport.get("return_village_money", 10000)
 
 # --- 初期装備 ---
 PLAYER_WEAPON   = "old_sword"

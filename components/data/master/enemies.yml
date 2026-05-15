@@ -168,7 +168,7 @@ ENEMY_DATA:
     category: undead
     is_boss: true
     stupidity: 0
-    image_scale: 1
+    image_scale: 2.0
     detect_range: 15
     min_rank: E
     min_floor: 20

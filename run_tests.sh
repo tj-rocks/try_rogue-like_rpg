@@ -13,6 +13,25 @@ echo "========================================"
 
 # テストモードを強制（セーブデータの汚染防止）
 export TEST_MODE=1
+export PYTHONPATH=$PYTHONPATH:.
+
+# --- [SAFEGUARD] 本番セーブデータの物理バックアップ ---
+OFFICIAL_SAVE="components/data/savefile/save_official.json"
+BACKUP_SAVE="components/data/savefile/save_official.json.bak"
+
+if [ -f "$OFFICIAL_SAVE" ]; then
+    echo "💾 本番セーブデータを一時的にバックアップします..."
+    cp "$OFFICIAL_SAVE" "$BACKUP_SAVE"
+fi
+
+# スクリプト終了時に必ず復元する設定 (エラー時や中断時も含む)
+function cleanup {
+    if [ -f "$BACKUP_SAVE" ]; then
+        echo "🔄 バックアップから本番データを復元しています..."
+        mv "$BACKUP_SAVE" "$OFFICIAL_SAVE"
+    fi
+}
+trap cleanup EXIT
 
 echo "----------------------------------------"
 echo "🔍 セーブデータ隔離チェック実行中..."
@@ -56,6 +75,9 @@ TEST_FILES=(
     "tests/test_delivery_all_types.py"
     "tests/test_boss_spawn.py"
     "tests/test_guild_autosave.py"
+    "tests/test_dungeon_growth.py"
+    "tests/test_outbreak_event.py"
+    "tests/test_teleport_system.py"
 )
 
 SUCCESS_COUNT=0

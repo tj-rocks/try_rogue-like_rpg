@@ -311,8 +311,11 @@ def main():
                         idx = ranks.index(player.guild_rank) if player.guild_rank in ranks else 0
                         if idx > 0:
                             player.guild_rank = ranks[idx - 1]
-                            print(f"[DEBUG] Rank DOWN: {player.guild_rank}")
-                            dungeon = setup_gungeon_mode(dungeon, player)
+                        print(f"[DEBUG] Rank DOWN: {player.guild_rank}")
+                        dungeon = setup_gungeon_mode(dungeon, player)
+                    elif event.key == pygame.K_o:
+                        dungeon.debug_overflow = True
+                        print(f"[DEBUG] Outbreak Reserved for Next Floor. Go to the stairs!")
 
             # 常に全表示
             dungeon.is_lighted = True

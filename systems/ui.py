@@ -1451,10 +1451,9 @@ def draw_vision_overlay(screen, player, dungeon):
     screen.blit(fog, (0, 0))
 
 
-def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, menu_dialog=None, player=None, dungeon=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, **kwargs):
+def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, menu_dialog=None, player=None, dungeon=None, shop_dialog=None, stave_selection_dialog=None, guild_dialog=None, warehouse_dialog=None, bank_dialog=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, teleport_dialog=None, cutscene_manager=None, **kwargs):
     """全てのUIイベントを一括で処理する"""
     
-    cutscene_manager = kwargs.get("cutscene_manager")
     if cutscene_manager and cutscene_manager.is_active:
         events.clear() # イベントを破棄して操作を受け付けない
         return
@@ -1464,8 +1463,8 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
         inventory_dialog.dungeon = dungeon
         if equip_dialog: equip_dialog.dungeon = dungeon
         if stave_inv_dialog: stave_inv_dialog.dungeon = dungeon
-        if kwargs.get("stave_selection_dialog"):
-            kwargs.get("stave_selection_dialog").dungeon = dungeon
+        if stave_selection_dialog:
+            stave_selection_dialog.dungeon = dungeon
             
     from constants import KEY_CONFIRM, KEY_CANCEL, KEY_INVENTORY, KEY_STATUS, KEY_MENU, KEY_MAP
     
@@ -1479,6 +1478,20 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
     # 決定ダイアログは最優先
     if confirm_dialog.is_active:
         confirm_dialog.handle_events(events)
+        return
+    
+    if teleport_dialog and teleport_dialog.is_active:
+        new_dungeon = teleport_dialog.handle_input(events, player)
+        # メッセージが出ていれば決定キーで閉じる（商店などと同様の処理）
+        if dialog.is_active and dialog.just_opened_timer <= 0:
+            for event in events:
+                if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
+                    dialog.is_active = False
+        if new_dungeon:
+            # 演出（青いフラッシュ）
+            from systems.magic_handler import FlashEffect
+            new_dungeon.magic_effects.append(FlashEffect(color=(100, 150, 255), duration=40))
+            return new_dungeon
         return
     
     if menu_dialog and menu_dialog.is_active:
@@ -1513,8 +1526,8 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
         event_inv_dialog.handle_events(events)
         return
 
-    if kwargs.get("stave_selection_dialog") and kwargs.get("stave_selection_dialog").is_active:
-        kwargs.get("stave_selection_dialog").handle_events(events)
+    if stave_selection_dialog and stave_selection_dialog.is_active:
+        stave_selection_dialog.handle_events(events)
         return
 
     # アクティブなダイアログがあれば優先的に処理
@@ -1534,7 +1547,6 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                     dialog.is_active = False
         return
     
-    bank_dialog = kwargs.get("bank_dialog")
     if bank_dialog and bank_dialog.is_active:
         bank_dialog.handle_events(events, player, dialog)
         if dialog.is_active and dialog.just_opened_timer <= 0:
@@ -1543,7 +1555,6 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                     dialog.is_active = False
         return
 
-    shop_dialog = kwargs.get("shop_dialog")
     if shop_dialog and shop_dialog.is_active:
         gs = getattr(dungeon, "guild_system", None)
         shop_dialog.handle_events(events, player, dialog, confirm_dialog, gs)
@@ -1553,7 +1564,6 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                     dialog.is_active = False
         return
 
-    guild_dialog = kwargs.get("guild_dialog")
     if guild_dialog and guild_dialog.is_active:
         guild_dialog.handle_events(events, player, dialog, confirm_dialog)
         if dialog.is_active and dialog.just_opened_timer <= 0:
@@ -1562,7 +1572,6 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                     dialog.is_active = False
         return
 
-    warehouse_dialog = kwargs.get("warehouse_dialog")
     if warehouse_dialog and warehouse_dialog.is_active:
         warehouse_dialog.handle_events(events, player, confirm_dialog, dialog)
         if dialog.is_active:
@@ -1615,7 +1624,6 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                 dialog.is_active = True
                                                 print(f"[INN] Rest Complete. Debt: {has_debt}, New Coin: {player.coin}")
 
-                                            cutscene_manager = kwargs.get("cutscene_manager")
                                             if cutscene_manager:
                                                 cutscene_manager.start_inn_rest(callback=on_inn_done)
                                             else:
@@ -1641,28 +1649,24 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             dialog.is_active = True
                                             return
                                     elif npc.name == "武器屋":
-                                        shop_dialog = kwargs.get("shop_dialog")
                                         if shop_dialog and dungeon:
                                             dialog.text = Text.NPC.WEAPON_SHOP_WELCOME
                                             dialog.is_active = True
                                             shop_dialog.open_shop("武器屋", dungeon.weapon_shop_stock)
                                             return
                                     elif npc.name == "道具屋":
-                                        shop_dialog = kwargs.get("shop_dialog")
                                         if shop_dialog and dungeon:
                                             dialog.text = Text.NPC.ITEM_SHOP_WELCOME
                                             dialog.is_active = True
                                             shop_dialog.open_shop("道具屋", dungeon.item_shop_stock)
                                             return
                                     elif npc.name == "大魔導士":
-                                        shop_dialog = kwargs.get("shop_dialog")
                                         if shop_dialog and dungeon:
                                             dialog.text = "フォッフォッフォ、杖のことならわしに任せるがよいぞ。"
                                             dialog.is_active = True
                                             shop_dialog.open_shop("魔法屋", dungeon.magic_shop_stock)
                                             return
                                     elif npc.name == "商人":
-                                        shop_dialog = kwargs.get("shop_dialog")
                                         if shop_dialog:
                                             dialog.text = Text.NPC.MERCHANT_WELCOME
                                             dialog.is_active = True
@@ -1671,7 +1675,6 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             shop_dialog.is_active = True
                                             return
                                     elif npc.name == "ギルドマスター":
-                                        guild_dialog = kwargs.get("guild_dialog")
                                         if guild_dialog and dungeon:
                                             # 状況に応じたメッセージを設定
                                             next_rank_data = dungeon.guild_system.get_next_rank_data(player.guild_rank)
@@ -1708,14 +1711,12 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                 dialog.is_active = True
                                             return
                                     elif npc.name == "預かり屋":
-                                        warehouse_dialog = kwargs.get("warehouse_dialog")
                                         if warehouse_dialog:
                                             dialog.text = Text.NPC.WAREHOUSE_WELCOME
                                             dialog.is_active = True
                                             warehouse_dialog.is_active = True
                                             return
                                     elif npc.name == "銀行員":
-                                        bank_dialog = kwargs.get("bank_dialog")
                                         if bank_dialog:
                                             dialog.text = Text.NPC.BANK_WELCOME
                                             dialog.is_active = True
@@ -1724,7 +1725,6 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                     elif npc.name == "医者":
                                         dialog.text = "\n".join(npc.get_dialogue()); dialog.is_active = True
                                         from constants import DOCTOR_FEE, POISON_CURE_FEE
-                                        confirm_dialog = kwargs.get("confirm_dialog")
                                         
                                         def make_heal_callback(fee, cure_poison=False):
                                             def heal():
@@ -1765,6 +1765,14 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                         else:
                                             dialog.text = Text.UI.DOCTOR_HEALTHY
                                             dialog.is_active = True
+                                            return
+                                    elif npc.name == "テレポート屋":
+                                        if teleport_dialog:
+                                            # 先に挨拶を表示
+                                            dialog.text = "\n".join(npc.get_dialogue())
+                                            dialog.is_active = True
+                                            # ダイアログが開いた後にテレポートUIを起動
+                                            teleport_dialog.open(player)
                                             return
                                     else:
                                         dialog.text = "\n".join(npc.get_dialogue())
@@ -1949,6 +1957,7 @@ class GuildDialog:
                     play_sfx(SOUND_CANCEL)
                     if self.mode == "MENU":
                         self.is_active = False
+                        player.outbreak_bonus_active = False # ギルドを離れる時にボーナスをリセット
                     else:
                         self.mode = "MENU"
                         self._skip_auto_report = True # キャンセルしたら以降はメニューを表示
@@ -1978,6 +1987,7 @@ class GuildDialog:
         
         if status == "cancel":
             self.is_active = False
+            player.outbreak_bonus_active = False # ギルドを離れる時にボーナスをリセット
             return
         if status == "back":
             self.mode = "MENU"
@@ -2092,8 +2102,14 @@ class GuildDialog:
 
             else:
                 player.coin += q["reward_gold"]
-                player.guild_point += q["reward_gp"]
-                dialog.text = "見事に依頼を達成しましたね！\nおめでとうございます！"
+                gp_reward = q["reward_gp"]
+                if getattr(player, "outbreak_bonus_active", False):
+                    gp_reward *= 2
+                    dialog.text = "見事に依頼を達成しましたね！\n魔物の氾濫を鎮圧した功績として、獲得GPを2倍にしました！"
+                else:
+                    dialog.text = "見事に依頼を達成しましたね！\nおめでとうございます！"
+                
+                player.guild_point += gp_reward
                 if q.get("id"): player.completed_fixed_quests.append(q["id"])
                 dialog.is_active = True
 
@@ -3003,6 +3019,191 @@ class BankDialog(BaseListDialog):
     def draw(self, screen, player): super().draw(screen, player)
 
 
+# 🌀 TELEPORT_DIALOG
+class TeleportDialog(BaseListDialog):
+    """テレポート屋（転移）での目的地選択を行うダイアログ"""
+    STATE_KEY = "teleport_active"
+
+    def __init__(self, screen_width, screen_height):
+        super().__init__(screen_width, screen_height)
+        self.row_height = 36
+        self.target_floor = 0
+        self.target_name = ""
+        self.cost_money = 0
+        self.required_item = ""
+
+    def get_title(self):
+        return "テレポート屋（転移）"
+
+    def get_header_right(self, player):
+        return Text.UI.GOLD_LABEL.format(coin=player.coin)
+
+    def on_activated(self):
+        # 活性化時に目的地リストを構築
+        from systems.game_state import game_state
+        player = game_state.get("player_ref")
+        if not player: return
+        self.setup_destinations(player)
+
+    def setup_destinations(self, player):
+        from constants import DUNGEON_IMAGES, TELEPORT_MONEY_PER_FLOOR, TELEPORT_REQUIRED_ITEM, TELEPORT_RETURN_VILLAGE_COST
+        self.items = []
+        self.mode = "SELECT"
+        self.required_item = TELEPORT_REQUIRED_ITEM
+
+        if player.current_floor == 0:
+            # 村にいる：到達済みの休憩所へ
+            for f_str, info in DUNGEON_IMAGES.items():
+                if not f_str.isdigit(): continue
+                f_lv = int(f_str)
+                if f_lv == 0: continue
+                # 固定マップ(map指定あり)かつ到達済み
+                if f_lv <= player.max_reached_floor and info.get("map"):
+                    name = f"{f_lv}F 休憩所"
+                    self.items.append({"floor": f_lv, "name": name, "cost": f_lv * TELEPORT_MONEY_PER_FLOOR, "type": "warp"})
+        else:
+            # 休憩所にいる：村(0F)へ帰還
+            self.items.append({"floor": 0, "name": "村（帰還）", "cost": TELEPORT_RETURN_VILLAGE_COST, "type": "return"})
+        
+        if not self.items:
+            return # 何もなければQUITも追加しない（openがFalseを返すようにする）
+
+        self.items.append({"floor": -1, "name": Text.UI.QUIT, "cost": 0, "type": "cancel"})
+
+    def get_item_label(self, item, idx):
+        return item["name"]
+
+    def get_detail_lines(self, player):
+        if not self.items or self.cursor_idx >= len(self.items): return []
+        item = self.items[self.cursor_idx]
+        if item["type"] == "cancel": return ["店を出ます。"]
+        
+        from systems.guild import GuildSystem
+        guild = GuildSystem()
+        f_lv = item["floor"]
+        req_rank = guild.get_required_rank_for_floor(f_lv) if f_lv > 0 else "F"
+        
+        lines = [f"【{item['name']}】", ""]
+        lines.append(f"消費コイン: {item['cost']} G")
+        
+        if f_lv > 0:
+            lines.append(f"到達可能ランク: {req_rank}")
+            lines.append("")
+            lines.append(f"地下 {f_lv} 階にある休憩所へ転移します。")
+            lines.append("※強力な魔物の気配が漂っています。")
+        else:
+            lines.append("")
+            lines.append("冒険者の拠点となる村へ帰還します。")
+            lines.append("一度休息をとり、装備を整えましょう。")
+        return lines
+
+    def open(self, player):
+        # player参照を保持し、リストを構築してからアクティブにする
+        self.setup_destinations(player)
+        if not self.items: return False
+        self.is_active = True
+        return True
+
+    def handle_input(self, events, player):
+        if not self.is_active: return None
+        from systems.audio_manager import play_sfx
+        from constants import SOUND_SELECT, SOUND_CANCEL
+        
+        old_idx = self.cursor_idx
+        res = self._navigate(events)
+        if self.cursor_idx != old_idx:
+            self.mode = "SELECT"
+
+        if res == "cancel":
+            play_sfx(SOUND_CANCEL)
+            self.is_active = False
+            self.mode = "SELECT"
+            return None
+        elif res == "confirm":
+            selected = self.items[self.cursor_idx]
+            if selected["type"] == "cancel":
+                play_sfx(SOUND_CANCEL)
+                self.is_active = False
+                return None
+                
+            self.target_floor = selected["floor"]
+            self.cost_money = selected["cost"]
+            
+            # 所持金・アイテムチェック
+            from systems.game_state import game_state
+            dialog = game_state.get("ui_elements", {}).get("dialog")
+            
+            if player.coin < self.cost_money:
+                self.mode = "NO_MONEY"
+                if dialog:
+                    dialog.text = Text.Items.NOT_ENOUGH_COIN
+                    dialog.is_active = True
+                play_sfx(SOUND_CANCEL)
+                return None
+            elif not self._has_required_item(player):
+                self.mode = "NO_ITEM"
+                if dialog:
+                    dialog.text = "テレポートには『転移の石』が必要です。"
+                    dialog.is_active = True
+                play_sfx(SOUND_CANCEL)
+                return None
+            
+            if self.mode != "CONFIRM":
+                play_sfx(SOUND_SELECT)
+                self.mode = "CONFIRM"
+                return None
+            
+            play_sfx(SOUND_SELECT)
+            self._execute_teleport(player)
+            self.mode = "SELECT"
+        return None
+
+    def _has_required_item(self, player):
+        # 消耗品データに転移の石があるか
+        for item in player.items:
+            if item.get("key") == self.required_item:
+                return True
+        return False
+
+    def _execute_teleport(self, player):
+        from systems.dungeon import warp_with_pitfall
+        from systems.game_state import game_state
+        
+        # 挨拶ダイアログを閉じる
+        ui_el = game_state.get("ui_elements", {})
+        if "dialog" in ui_el:
+            ui_el["dialog"].is_active = False
+
+        selected = self.items[self.cursor_idx]
+        reason = selected.get("type", "teleport")
+
+        # コインとアイテムを消費
+        player.coin -= self.cost_money
+        player.remove_item_by_key(self.required_item, 1)
+        
+        # 演出付き転移の開始
+        warp_with_pitfall(self.target_floor, player, spawn_reason=reason)
+        self.is_active = False
+
+    def draw(self, screen, player):
+        if not self.is_active: return
+        super().draw(screen, player)
+        
+        sep_x = self.x + self.width // 2
+        start = max(0, self.cursor_idx - self.view_size // 2)
+        if start + self.view_size > len(self.items): start = max(0, len(self.items) - self.view_size)
+        
+        for i in range(start, min(start + self.view_size, len(self.items))):
+            item = self.items[i]
+            if item["type"] == "cancel": continue
+            y_pos = self.y + 80 + (i - start) * self.row_height
+            is_sel = (i == self.cursor_idx)
+            color = self.get_item_color(item, i, is_sel)
+            screen.blit(self.font.render(f"{item['cost']} G", True, color), (sep_x - 110, y_pos))
+
+
+
+
 def draw_minimap(screen, dungeon, player):
     """
     探索済みのタイルを表示するミニマップ（透過オーバーレイ）を描画する。
@@ -3066,7 +3267,7 @@ def draw_minimap(screen, dungeon, player):
     # 描画
     screen.blit(map_surf, (off_x, off_y))
 
-def draw_all_ui(screen, player, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, shop_dialog, stave_selection_dialog, guild_dialog=None, warehouse_dialog=None, bank_dialog=None, menu_dialog=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, dungeon=None, events=None, **kwargs):
+def draw_all_ui(screen, player, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, shop_dialog, stave_selection_dialog, guild_dialog=None, warehouse_dialog=None, bank_dialog=None, menu_dialog=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, teleport_dialog=None, dungeon=None, events=None, **kwargs):
     """全てのUIダイアログなどをまとめて更新・描画する"""
     inventory_dialog.draw(screen, player)
     if equip_dialog: equip_dialog.draw(screen, player)
@@ -3091,6 +3292,8 @@ def draw_all_ui(screen, player, dialog, confirm_dialog, inventory_dialog, status
     item_action_dialog.draw(screen)
     ore_selection_dialog.draw(screen)
     stave_selection_dialog.draw(screen)
+    if teleport_dialog:
+        teleport_dialog.draw(screen, player)
     
     dialog.update()
     dialog.draw(screen)
