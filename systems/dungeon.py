@@ -52,6 +52,7 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
     old_floor = getattr(player, "prev_floor", -1)
     player.prev_floor = floor_level
     player.reset_status()
+    player.boss_message_shown = False # 階層移動時に表示済みフラグをリセット
     
     # 敵・アイテムを初期配置（村や固定マップ階層以外）
     if floor_level > 0 and not new_dungeon.floor_info.get("map"):

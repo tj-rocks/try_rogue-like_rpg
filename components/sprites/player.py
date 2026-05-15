@@ -287,6 +287,7 @@ class Player(Entity):
         self.warehouse_max = MAX_WAREHOUSE_SLOTS
         self.outbreak_bonus_active = False # アウトブレイククリア後のGP2倍フラグ
         self.outbreak_reward_mult = 1.0
+        self.boss_message_shown = False # ボス発見メッセージ表示済みフラグ
 
         if PLAYER_ARMOR and PLAYER_ARMOR in ARMOR_DATA:
             inst = EquipInstance("armor", PLAYER_ARMOR); self.armor_inventory.append(inst); self._apply_armor(inst)
@@ -861,6 +862,7 @@ class Player(Entity):
             "invincible_turns": self.invincible_turns, "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
             "completed_fixed_quests": self.completed_fixed_quests, "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
             "current_floor": self.current_floor, "max_reached_floor": self.max_reached_floor, "equip_id_counter": globals().get("_equip_id_counter", 0),
+            "boss_message_shown": getattr(self, "boss_message_shown", False),
         }
 
     def load_dict(self, data):
@@ -890,6 +892,7 @@ class Player(Entity):
         self.quest_tokens = data.get("quest_tokens", {}); self.completed_fixed_quests = data.get("completed_fixed_quests", [])
         self.has_seen_ending = data.get("has_seen_ending", False); self.max_reached_floor = data.get("max_reached_floor", 0); self.warehouse_items = data.get("warehouse_items", []); self.event_items = data.get("event_items", [])
         self.current_floor = data.get("current_floor", 0)
+        self.boss_message_shown = data.get("boss_message_shown", False)
         global _equip_id_counter
         _equip_id_counter = max(_equip_id_counter, data.get("equip_id_counter", 0))
 
