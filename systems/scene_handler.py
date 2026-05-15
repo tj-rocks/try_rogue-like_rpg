@@ -193,7 +193,7 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
     is_death_active = game_state.get("death_sequence_step", 0) > 0
     if not is_paused() and not is_death_active and not player.is_dead:
         # 敵の更新、アイテム取得判定
-        update_dungeon_entities(dungeon, player, dt, ui_elements["dialog"])
+        update_dungeon_entities(new_dungeon, player, dt, ui_elements["dialog"])
         
         # 罠・階段・特殊イベントの判定
         if not player.is_falling:
@@ -203,23 +203,24 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
         new_dungeon = new_dungeon.check_stairs(player, ui_elements["confirm_dialog"], ui_elements["dialog"])
 
     # 1-3. 死亡演出、カットシーンなどの更新
-    new_dungeon = handle_death_sequence(player, dungeon, ui_elements["dialog"], game_state)
+    new_dungeon = handle_death_sequence(player, new_dungeon, ui_elements["dialog"], game_state)
     if ui_elements.get("cutscene_manager"):
         ui_elements["cutscene_manager"].update()
 
     # --- 2. 描画フェーズ ---
-
+    # ワープ等でnew_dungeonが更新されている可能性があるため、以降はnew_dungeonを使用
+    
     # 2-1. 最新の座標に基づいてカメラを計算
-    camera_x = int(player.x - (SCREEN_WIDTH / 2) + (player.width / 2) + dungeon.shake_offset[0])
-    camera_y = int(player.y - (SCREEN_HEIGHT / 2) + (player.height / 2) + dungeon.shake_offset[1])
+    camera_x = int(player.x - (SCREEN_WIDTH / 2) + (player.width / 2) + new_dungeon.shake_offset[0])
+    camera_y = int(player.y - (SCREEN_HEIGHT / 2) + (player.height / 2) + new_dungeon.shake_offset[1])
     
     screen.fill((0, 0, 0))
     
     # 2-2. ダンジョンの描画
-    dungeon.draw(screen, camera_x, camera_y)
-    dungeon.update(dialog=ui_elements["dialog"])
-    if getattr(dungeon, "next_dungeon", None):
-        new_dungeon = dungeon.next_dungeon
+    new_dungeon.draw(screen, camera_x, camera_y)
+    new_dungeon.update(dialog=ui_elements["dialog"])
+    if getattr(new_dungeon, "next_dungeon", None):
+        new_dungeon = new_dungeon.next_dungeon
     
     # 2-3. プレイヤーと視界の描画
     player.draw(screen, camera_x, camera_y)

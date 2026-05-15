@@ -3048,6 +3048,7 @@ class TeleportDialog(BaseListDialog):
     def setup_destinations(self, player):
         from constants import DUNGEON_IMAGES, TELEPORT_MONEY_PER_FLOOR, TELEPORT_REQUIRED_ITEM, TELEPORT_RETURN_VILLAGE_COST
         self.items = []
+        self.mode = "SELECT"
         self.required_item = TELEPORT_REQUIRED_ITEM
 
         if player.current_floor == 0:
@@ -3064,6 +3065,9 @@ class TeleportDialog(BaseListDialog):
             # 休憩所にいる：村(0F)へ帰還
             self.items.append({"floor": 0, "name": "村（帰還）", "cost": TELEPORT_RETURN_VILLAGE_COST, "type": "return"})
         
+        if not self.items:
+            return # 何もなければQUITも追加しない（openがFalseを返すようにする）
+
         self.items.append({"floor": -1, "name": Text.UI.QUIT, "cost": 0, "type": "cancel"})
 
     def get_item_label(self, item, idx):
@@ -3105,10 +3109,15 @@ class TeleportDialog(BaseListDialog):
         from systems.audio_manager import play_sfx
         from constants import SOUND_SELECT, SOUND_CANCEL
         
+        old_idx = self.cursor_idx
         res = self._navigate(events)
+        if self.cursor_idx != old_idx:
+            self.mode = "SELECT"
+
         if res == "cancel":
             play_sfx(SOUND_CANCEL)
             self.is_active = False
+            self.mode = "SELECT"
             return None
         elif res == "confirm":
             selected = self.items[self.cursor_idx]
@@ -3118,7 +3127,6 @@ class TeleportDialog(BaseListDialog):
                 return None
                 
             self.target_floor = selected["floor"]
-            self.target_name = selected["name"]
             self.cost_money = selected["cost"]
             
             # 所持金・アイテムチェック
@@ -3126,20 +3134,28 @@ class TeleportDialog(BaseListDialog):
             dialog = game_state.get("ui_elements", {}).get("dialog")
             
             if player.coin < self.cost_money:
+                self.mode = "NO_MONEY"
                 if dialog:
                     dialog.text = Text.Items.NOT_ENOUGH_COIN
                     dialog.is_active = True
                 play_sfx(SOUND_CANCEL)
                 return None
             elif not self._has_required_item(player):
+                self.mode = "NO_ITEM"
                 if dialog:
                     dialog.text = "テレポートには『転移の石』が必要です。"
                     dialog.is_active = True
                 play_sfx(SOUND_CANCEL)
                 return None
-            else:
+            
+            if self.mode != "CONFIRM":
                 play_sfx(SOUND_SELECT)
-                self._execute_teleport(player)
+                self.mode = "CONFIRM"
+                return None
+            
+            play_sfx(SOUND_SELECT)
+            self._execute_teleport(player)
+            self.mode = "SELECT"
         return None
 
     def _has_required_item(self, player):
@@ -3147,7 +3163,7 @@ class TeleportDialog(BaseListDialog):
         for item in player.items:
             if item.get("key") == self.required_item:
                 return True
-        return True # 一旦常にTrue（仕様確認中）
+        return False
 
     def _execute_teleport(self, player):
         from systems.dungeon import warp_with_pitfall
@@ -3161,8 +3177,9 @@ class TeleportDialog(BaseListDialog):
         selected = self.items[self.cursor_idx]
         reason = selected.get("type", "teleport")
 
-        # 金を消費
+        # コインとアイテムを消費
         player.coin -= self.cost_money
+        player.remove_item_by_key(self.required_item, 1)
         
         # 演出付き転移の開始
         warp_with_pitfall(self.target_floor, player, spawn_reason=reason)

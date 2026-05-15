@@ -20,7 +20,8 @@ from constants import TELEPORT_REQUIRED_ITEM
 class TestTeleportSystem(unittest.TestCase):
     def setUp(self):
         self.player = Player()
-        self.dialog = TeleportDialog()
+        from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+        self.dialog = TeleportDialog(SCREEN_WIDTH, SCREEN_HEIGHT)
         game_state["teleport_active"] = False
         game_state["pending_warp"] = None
 
@@ -31,9 +32,9 @@ class TestTeleportSystem(unittest.TestCase):
         
         success = self.dialog.open(self.player)
         self.assertTrue(success)
-        self.assertTrue(len(self.dialog.destinations) > 0)
+        self.assertTrue(len(self.dialog.items) > 0)
         # 12F休憩所が含まれているか確認
-        dest_floors = [d["floor"] for d in self.dialog.destinations]
+        dest_floors = [d["floor"] for d in self.dialog.items]
         self.assertIn(12, dest_floors)
 
     def test_destination_listing_rest_area(self):
@@ -42,8 +43,10 @@ class TestTeleportSystem(unittest.TestCase):
         
         success = self.dialog.open(self.player)
         self.assertTrue(success)
-        self.assertEqual(len(self.dialog.destinations), 1)
-        self.assertEqual(self.dialog.destinations[0]["floor"], 0)
+        # 「村（帰還）」＋「やめる」の2件
+        self.assertEqual(len(self.dialog.items), 2)
+        self.assertEqual(self.dialog.items[0]["floor"], 0)
+        self.assertEqual(self.dialog.items[1]["type"], "cancel")
 
     def test_no_destinations(self):
         """一度も休憩所にいっていない場合、村でのオープンに失敗するか"""
@@ -90,7 +93,7 @@ class TestTeleportSystem(unittest.TestCase):
         item_count_before = self.player.get_item_count()
         
         self.dialog.open(self.player)
-        dest = self.dialog.destinations[0]
+        dest = self.dialog.items[0]
         cost = dest["cost"]
         
         # 1. 決定して CONFIRM モードへ
