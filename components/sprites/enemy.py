@@ -482,16 +482,20 @@ class Enemy(Entity):
                             if not (0 <= ey < dungeon.map_height and 0 <= ex < dungeon.map_width): continue
                             # プレイヤーとの距離制約を一旦無視して「置ける場所」を探す
                             temp_enemy = Enemy(ex*dungeon.tile_size, ey*dungeon.tile_size, b_type, player=player)
-                            if temp_enemy.can_move_grid(temp_enemy.x, temp_enemy.y, dungeon):
-                                if not any(set(temp_enemy.get_occupied_grids(dungeon.tile_size)) & set(e.get_occupied_grids(dungeon.tile_size)) for e in enemies):
+                            final_x = temp_enemy.x + (dungeon.tile_size - temp_enemy.width) // 2
+                            final_y = temp_enemy.y + (dungeon.tile_size - temp_enemy.height) // 2
+                            if temp_enemy.can_move_grid(final_x, final_y, dungeon):
+                                if not any(set(temp_enemy.get_occupied_grids_at(final_x, final_y, dungeon.tile_size)) & set(e.get_occupied_grids(dungeon.tile_size)) for e in enemies):
                                     dist = abs(ex-pgx) + abs(ey-pgy)
-                                    candidate_tiles.append((ex, ey, dist))
+                                    candidate_tiles.append((ex, ey, dist, final_x, final_y))
                     
                     if candidate_tiles:
                         # プレイヤーからなるべく離れている場所を優先
                         candidate_tiles.sort(key=lambda x: x[2], reverse=True)
-                        best_ex, best_ey, _ = candidate_tiles[0]
-                        enemies.append(Enemy(best_ex*dungeon.tile_size, best_ey*dungeon.tile_size, b_type, player=player))
+                        best_ex, best_ey, _, fx, fy = candidate_tiles[0]
+                        boss = Enemy(best_ex*dungeon.tile_size, best_ey*dungeon.tile_size, b_type, player=player)
+                        boss.x, boss.y = fx, fy
+                        enemies.append(boss)
                         dungeon.spawn_counts[b_type] = dungeon.spawn_counts.get(b_type,0)+1
                         spawned = True
                         print(f"[Dungeon] Boss {b_type} spawned via fallback exhaustive search at ({best_ex}, {best_ey})")
@@ -516,10 +520,14 @@ class Enemy(Entity):
                         if not vm: break
                         mtp = random.choice(vm)
                         nm = Enemy(ex*dungeon.tile_size, ey*dungeon.tile_size, mtp, player=player)
-                        # 全占有タイルが床かチェック
-                        if nm.can_move_grid(nm.x, nm.y, dungeon):
-                            if not any(set(nm.get_occupied_grids(dungeon.tile_size)) & set(e.get_occupied_grids(dungeon.tile_size)) for e in enemies):
-                                nm.x += (dungeon.tile_size-nm.width)//2; nm.y += (dungeon.tile_size-nm.height)//2; nm.target_x, nm.target_y = nm.x, nm.y
+                        # タイル中央に寄せるオフセットを先に計算
+                        final_x = nm.x + (dungeon.tile_size - nm.width) // 2
+                        final_y = nm.y + (dungeon.tile_size - nm.height) // 2
+                        # 最終的な座標で全占有グリッドが床かチェック
+                        if nm.can_move_grid(final_x, final_y, dungeon):
+                            if not any(set(nm.get_occupied_grids_at(final_x, final_y, dungeon.tile_size)) & set(e.get_occupied_grids(dungeon.tile_size)) for e in enemies):
+                                nm.x, nm.y = final_x, final_y
+                                nm.target_x, nm.target_y = nm.x, nm.y
                                 enemies.append(nm); dungeon.spawn_counts[mtp] = dungeon.spawn_counts.get(mtp,0)+1; break
             
             # 3. 障害物の配置
@@ -528,11 +536,19 @@ class Enemy(Entity):
                 for att in range(ENEMY_SPAWN_ATTEMPTS):
                     ex, ey = random.randint(room[0]-ENEMY_SPAWN_SCATTER, room[0]+ENEMY_SPAWN_SCATTER), random.randint(room[1]-ENEMY_SPAWN_SCATTER, room[1]+ENEMY_SPAWN_SCATTER)
                     if 0 <= ey < dungeon.map_height and 0 <= ex < dungeon.map_width and dungeon.map_data[ey][ex] == 1:
-                        if not any(int((e.x+e.width/2)//dungeon.tile_size) == ex and int((e.y+e.height/2)//dungeon.tile_size) == ey for e in enemies):
-                            vo = [o for o in ot if ENEMY_DATA[o].get("min_floor",1) <= floor <= ENEMY_DATA[o].get("max_floor",999)]
-                            if vo:
-                                otp = random.choice(vo); no = Enemy(ex*dungeon.tile_size, ey*dungeon.tile_size, otp, player=player)
-                                no.x += (dungeon.tile_size-no.width)//2; no.y += (dungeon.tile_size-no.height)//2; no.target_x, no.target_y = no.x, no.y; enemies.append(no); break
+                        vo = [o for o in ot if ENEMY_DATA[o].get("min_floor",1) <= floor <= ENEMY_DATA[o].get("max_floor",999)]
+                        if vo:
+                            otp = random.choice(vo)
+                            no = Enemy(ex*dungeon.tile_size, ey*dungeon.tile_size, otp, player=player)
+                            # タイル中央に寄せるオフセットを先に計算
+                            final_x = no.x + (dungeon.tile_size - no.width) // 2
+                            final_y = no.y + (dungeon.tile_size - no.height) // 2
+                            # 最終的な座標で全占有グリッドが床かチェック
+                            if no.can_move_grid(final_x, final_y, dungeon):
+                                if not any(set(no.get_occupied_grids_at(final_x, final_y, dungeon.tile_size)) & set(e.get_occupied_grids(dungeon.tile_size)) for e in enemies):
+                                    no.x, no.y = final_x, final_y
+                                    no.target_x, no.target_y = no.x, no.y
+                                    enemies.append(no); break
         cls.log_population(dungeon, "Warped", override_enemies=enemies); return enemies
 
     @classmethod
