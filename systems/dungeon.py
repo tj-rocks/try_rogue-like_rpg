@@ -69,7 +69,7 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
     if floor_level != old_floor and spawn_reason != "continue" and not is_death:
         from systems.data_loader import SAVE_DATA_PATH
         print(f"[AUTO-SAVE] Floor transition ({old_floor} -> {floor_level}). Saving to persistent file: {SAVE_DATA_PATH}")
-        player.save_to_file(SAVE_DATA_PATH)
+        player.save_to_file()
 
     return new_dungeon
 

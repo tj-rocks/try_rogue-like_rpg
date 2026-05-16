@@ -1615,7 +1615,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                 player.hp = player.max_hp
                                                 
                                                 from systems.data_loader import SAVE_OFFICIAL_PATH
-                                                player.save_to_file(SAVE_OFFICIAL_PATH)
+                                                player.save_to_file()
                                                 
                                                 if has_debt:
                                                     dialog.text = Text.NPC.INN_DEBT
