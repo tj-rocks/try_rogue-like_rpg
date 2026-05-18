@@ -141,7 +141,11 @@ class Player(Entity):
         if armor_inst: bonus += armor_inst.get_stat("attack_bonus", 0)
         shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
         if shield_inst: bonus += shield_inst.get_stat("attack_bonus", 0)
-        return round(self.attack + bonus, 1)
+        val = round(self.attack + bonus, 1)
+        if "attack" in getattr(self, "cursed_stats", []):
+            from constants import CURSE_REDUCTION_RATE
+            val = round(val * (1.0 - CURSE_REDUCTION_RATE), 1)
+        return val
 
     @property
     def max_hp(self):
@@ -150,7 +154,11 @@ class Player(Entity):
         if armor_inst: bonus += armor_inst.get_stat("hp_bonus", 0)
         shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
         if shield_inst: bonus += shield_inst.get_stat("hp_bonus", 0)
-        return int(self._base_max_hp + bonus)
+        val = int(self._base_max_hp + bonus)
+        if "hp" in getattr(self, "cursed_stats", []):
+            from constants import CURSE_REDUCTION_RATE
+            val = int(val * (1.0 - CURSE_REDUCTION_RATE))
+        return val
 
     @max_hp.setter
     def max_hp(self, value): self._base_max_hp = value
@@ -163,7 +171,11 @@ class Player(Entity):
         for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("accuracy_bonus_close", inst.get_stat("accuracy_bonus", 0))
-        return int(base + bonus)
+        val = int(base + bonus)
+        if "accuracy" in getattr(self, "cursed_stats", []):
+            from constants import CURSE_REDUCTION_RATE
+            val = int(val * (1.0 - CURSE_REDUCTION_RATE))
+        return val
 
     @property
     def total_accuracy_ranged(self):
@@ -173,7 +185,11 @@ class Player(Entity):
         for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("accuracy_bonus_ranged", inst.get_stat("accuracy_bonus", 0))
-        return int(base + bonus)
+        val = int(base + bonus)
+        if "accuracy" in getattr(self, "cursed_stats", []):
+            from constants import CURSE_REDUCTION_RATE
+            val = int(val * (1.0 - CURSE_REDUCTION_RATE))
+        return val
 
     @property
     def eva_bonus(self):
@@ -190,7 +206,11 @@ class Player(Entity):
                     bonus += val * 100
                 else:
                     bonus += val
-        return int(base + bonus)
+        val = int(base + bonus)
+        if "evasion" in getattr(self, "cursed_stats", []):
+            from constants import CURSE_REDUCTION_RATE
+            val = int(val * (1.0 - CURSE_REDUCTION_RATE))
+        return val
 
     @property
     def crit_bonus(self):
@@ -237,7 +257,12 @@ class Player(Entity):
         for inv, eid, key in [(self.armor_inventory, self.equipped_armor, "defense_bonus"), (self.shield_inventory, self.equipped_shield, "defense_bonus")]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat(key, 0) + inst.get_enhance_bonus(key)
-        return round(self.defense + bonus, 1)
+        val = round(self.defense + bonus, 1)
+        if "defense" in getattr(self, "cursed_stats", []):
+            from constants import CURSE_REDUCTION_RATE
+            val = round(val * (1.0 - CURSE_REDUCTION_RATE), 1)
+        return val
+
 
     @property
     def block_chance_close(self):
@@ -287,6 +312,9 @@ class Player(Entity):
         self.warehouse_max = MAX_WAREHOUSE_SLOTS
         self.outbreak_bonus_active = False # アウトブレイククリア後のGP2倍フラグ
         self.outbreak_reward_mult = 1.0
+        self.boss_message_shown = False # ボス発見メッセージ表示済みフラグ
+        self.curse_level = 0
+        self.cursed_stats = []
 
         if PLAYER_ARMOR and PLAYER_ARMOR in ARMOR_DATA:
             inst = EquipInstance("armor", PLAYER_ARMOR); self.armor_inventory.append(inst); self._apply_armor(inst)
@@ -303,6 +331,26 @@ class Player(Entity):
         self.current_floor = floor
         if floor > self.max_reached_floor:
             self.max_reached_floor = floor
+
+    def apply_curse(self):
+        import random
+        self.curse_level = min(5, self.curse_level + 1)
+        all_possible = ["attack", "defense", "evasion", "accuracy", "hp"]
+        self.cursed_stats = random.sample(all_possible, self.curse_level)
+
+    def get_cursed_stats_japanese_single(self, key):
+        jp_names = {
+            "attack": "攻撃力",
+            "defense": "防御力",
+            "evasion": "回避率",
+            "accuracy": "命中率",
+            "hp": "最大HP"
+        }
+        return jp_names.get(key, key)
+
+    def get_cursed_stats_japanese(self):
+        return [self.get_cursed_stats_japanese_single(s) for s in self.cursed_stats]
+
 
     @property
     def condition(self): return self._status
@@ -528,13 +576,19 @@ class Player(Entity):
             td = (WALK_ANIMATION_SPEED * 2) // len(self.walk_images[self.facing])
             img = self.walk_images[self.facing][(self.walk_anim_timer // td) % len(self.walk_images[self.facing])]
 
+        player_alpha = 255
+        if getattr(self, "curse_level", 0) > 0:
+            player_alpha = max(60, 255 - int(self.curse_level * 39))
+
         poison_tint = tuple(STATUS_EFFECTS.get("poison", {}).get("color_tint", [180, 100, 255])) if self.condition == "poison" else None
         (fsx, fsy), phase = self.get_breathing_scale()
-        ck = (img, phase, poison_tint, False)
+        ck = (img, phase, poison_tint, False, player_alpha)
         cached = Player._player_scaled_cache.get(ck)
         if cached is None:
             w, h = img.get_size(); scaled = pygame.transform.smoothscale(img, (int(w * fsx), int(h * fsy)))
             if poison_tint: scaled.fill((*poison_tint, 255), special_flags=pygame.BLEND_RGBA_MULT)
+            if player_alpha < 255:
+                scaled.set_alpha(player_alpha)
             cached = scaled; Player._player_scaled_cache[ck] = cached
         img = cached; draw_x += (self.width - img.get_width()) / 2; draw_y += (self.height - img.get_height())
 
@@ -543,6 +597,8 @@ class Player(Entity):
             bimg = self.walk_images[self.facing][0]; w, h = int(bimg.get_width() * sfall), int(bimg.get_height() * sfall)
             if w > 0 and h > 0:
                 simg = pygame.transform.smoothscale(bimg, (w, h)); rimg = pygame.transform.rotate(simg, ang)
+                if player_alpha < 255:
+                    rimg.set_alpha(player_alpha)
                 screen.blit(rimg, rimg.get_rect(center=(draw_x + self.width//2, draw_y + self.height//2)).topleft)
             return
 
@@ -564,17 +620,17 @@ class Player(Entity):
             elif self.facing == "right": bdx += off
 
         so = {"up": False, "down": True, "left": True, "right": False}.get(self.facing, True)
-        if self.equipped_shield and not so: self._draw_shield_overlay(screen, bdx, bdy, scale_x=fsx, scale_y=fsy, tint_color=poison_tint)
+        if self.equipped_shield and not so: self._draw_shield_overlay(screen, bdx, bdy, scale_x=fsx, scale_y=fsy, tint_color=poison_tint, alpha=player_alpha)
         if self.weapon:
             over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
             if not over:
-                if self.is_attacking: self.weapon.draw_attack(screen, cx, cy, self.facing, prog, scale_x=fsx, scale_y=fsy)
-                else: self.weapon.draw_idle(screen, cx, cy, self.facing, scale_x=fsx, scale_y=fsy)
+                if self.is_attacking: self.weapon.draw_attack(screen, cx, cy, self.facing, prog, scale_x=fsx, scale_y=fsy, alpha=player_alpha)
+                else: self.weapon.draw_idle(screen, cx, cy, self.facing, scale_x=fsx, scale_y=fsy, alpha=player_alpha)
         
         is_v = not (getattr(self, "damage_flash_timer", 0) > HIT_STUN_DURATION and (self.damage_flash_timer - HIT_STUN_DURATION) % 4 < 2)
         if is_v: screen.blit(img, (draw_x, draw_y))
-        if self.equipped_armor: self._draw_armor_overlay(screen, bdx, bdy, scale_x=fsx, scale_y=fsy, tint_color=poison_tint)
-        if self.equipped_shield and so: self._draw_shield_overlay(screen, bdx, bdy, scale_x=fsx, scale_y=fsy, tint_color=poison_tint)
+        if self.equipped_armor: self._draw_armor_overlay(screen, bdx, bdy, scale_x=fsx, scale_y=fsy, tint_color=poison_tint, alpha=player_alpha)
+        if self.equipped_shield and so: self._draw_shield_overlay(screen, bdx, bdy, scale_x=fsx, scale_y=fsy, tint_color=poison_tint, alpha=player_alpha)
         if self.invincible_turns > 0:
             import math; p = (math.sin(pygame.time.get_ticks()/150)+1)/2; gs = int(self.width*(1.1+p*0.3)); gsf = pygame.Surface((gs*2,gs*2), pygame.SRCALPHA)
             a = int(100+p*100); pygame.draw.circle(gsf, (255,215,0,a), (gs,gs), gs, 3); pygame.draw.circle(gsf, (255,255,200,a//2), (gs,gs), gs//2)
@@ -582,10 +638,10 @@ class Player(Entity):
         if self.weapon:
             over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
             if over:
-                if self.is_attacking: self.weapon.draw_attack(screen, cx, cy, self.facing, prog, scale_x=fsx, scale_y=fsy)
-                else: self.weapon.draw_idle(screen, cx, cy, self.facing, scale_x=fsx, scale_y=fsy)
+                if self.is_attacking: self.weapon.draw_attack(screen, cx, cy, self.facing, prog, scale_x=fsx, scale_y=fsy, alpha=player_alpha)
+                else: self.weapon.draw_idle(screen, cx, cy, self.facing, scale_x=fsx, scale_y=fsy, alpha=player_alpha)
 
-    def _draw_armor_overlay(self, screen, bdx, bdy, scale_x=1.0, scale_y=1.0, tint_color=None):
+    def _draw_armor_overlay(self, screen, bdx, bdy, scale_x=1.0, scale_y=1.0, tint_color=None, alpha=255):
         if not self.equipped_armor or not hasattr(self, "_armor_images"): return
         img = self._armor_images.get(self.facing)
         if not img: return
@@ -598,11 +654,13 @@ class Player(Entity):
         offsets = cat_data.get("position", {}).get("offsets", {}).get(self.facing, (0, 0))
 
         (fsx, fsy), phase = self.get_breathing_scale()
-        ck = (img, phase, tint_color, False)
+        ck = (img, phase, tint_color, False, alpha)
         cached = Player._player_scaled_cache.get(ck)
         if cached is None:
             w, h = img.get_size(); scaled = pygame.transform.smoothscale(img, (int(w * fsx), int(h * fsy)))
             if tint_color: scaled.fill((*tint_color, 255), special_flags=pygame.BLEND_RGBA_MULT)
+            if alpha < 255:
+                scaled.set_alpha(alpha)
             cached = scaled; Player._player_scaled_cache[ck] = cached
         
         # オフセットを適用して描画
@@ -610,7 +668,7 @@ class Player(Entity):
         off_y = (self.height - cached.get_height()) + offsets[1]
         screen.blit(cached, (bdx + off_x, bdy + off_y))
 
-    def _draw_shield_overlay(self, screen, bdx, bdy, scale_x=1.0, scale_y=1.0, tint_color=None):
+    def _draw_shield_overlay(self, screen, bdx, bdy, scale_x=1.0, scale_y=1.0, tint_color=None, alpha=255):
         if not self.equipped_shield or not hasattr(self, "_shield_images"): return
         img = self._shield_images.get(self.facing)
         if not img: return
@@ -624,18 +682,21 @@ class Player(Entity):
         is_back = self.facing in ("up", "right")
 
         (fsx, fsy), phase = self.get_breathing_scale()
-        ck = (img, phase, tint_color, is_back) # is_backをキャッシュキーに追加
+        ck = (img, phase, tint_color, is_back, alpha) # is_backとalphaをキャッシュキーに追加
         cached = Player._player_scaled_cache.get(ck)
         if cached is None:
             w, h = img.get_size(); scaled = pygame.transform.smoothscale(img, (int(w * fsx), int(h * fsy)))
             if is_back: scaled.fill((150, 150, 150), special_flags=pygame.BLEND_RGBA_MULT)
             if tint_color: scaled.fill((*tint_color, 255), special_flags=pygame.BLEND_RGBA_MULT)
+            if alpha < 255:
+                scaled.set_alpha(alpha)
             cached = scaled; Player._player_scaled_cache[ck] = cached
         
         # オフセットを適用して描画
         off_x = (self.width - cached.get_width()) / 2 + offsets[0]
         off_y = (self.height - cached.get_height()) + offsets[1]
         screen.blit(cached, (bdx + off_x, bdy + off_y))
+
 
     def update_animation(self, dungeon, dt=1/60, dialog=None):
         if self.is_falling: self.falling_timer -= 1; return
@@ -861,6 +922,9 @@ class Player(Entity):
             "invincible_turns": self.invincible_turns, "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
             "completed_fixed_quests": self.completed_fixed_quests, "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
             "current_floor": self.current_floor, "max_reached_floor": self.max_reached_floor, "equip_id_counter": globals().get("_equip_id_counter", 0),
+            "boss_message_shown": getattr(self, "boss_message_shown", False),
+            "curse_level": getattr(self, "curse_level", 0),
+            "cursed_stats": getattr(self, "cursed_stats", []),
         }
 
     def load_dict(self, data):
@@ -890,8 +954,12 @@ class Player(Entity):
         self.quest_tokens = data.get("quest_tokens", {}); self.completed_fixed_quests = data.get("completed_fixed_quests", [])
         self.has_seen_ending = data.get("has_seen_ending", False); self.max_reached_floor = data.get("max_reached_floor", 0); self.warehouse_items = data.get("warehouse_items", []); self.event_items = data.get("event_items", [])
         self.current_floor = data.get("current_floor", 0)
+        self.boss_message_shown = data.get("boss_message_shown", False)
+        self.curse_level = int(data.get("curse_level", 0))
+        self.cursed_stats = data.get("cursed_stats", [])
         global _equip_id_counter
         _equip_id_counter = max(_equip_id_counter, data.get("equip_id_counter", 0))
+
 
     def accept_quest(self, q):
         if not self.active_quests: self.active_quests.append(q)

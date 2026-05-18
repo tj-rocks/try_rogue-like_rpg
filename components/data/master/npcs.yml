@@ -2,216 +2,204 @@
 # NPCデータ (npcs.yml)
 # ==============================================================================
 # 町やダンジョンに登場するNPCの定義です。
-# キー文字 (W, I, C, S, H, B, V, G, R, $, A, E, F, J, M, N, Q, T, !) は固定マップ用です。
 # ==============================================================================
 
 # --- 主要施設NPC ---
-W:
+weapon_shop:
   name: 武器屋
   image_path: components/pictures/npc/weapon_shop
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 武器屋「いらっしゃい！何にする？」
   base_tile: floor_1
+  role: weapon_shop
 
-I:
+item_shop:
   name: 道具屋
   image_path: components/pictures/npc/item_shop
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 道具屋「旅の準備は整ったかい？」
   base_tile: floor_1
+  role: item_shop
 
-C:
+merchant:
   name: 商人
   image_path: components/pictures/npc/merchant
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 商人「ダンジョンで拾ったお宝は俺が買い取ってやるぜ！」
   base_tile: floor_1
+  role: merchant
 
-S:
+storage:
   name: 預かり屋
   image_path: components/pictures/npc/storage
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 預かり屋「荷物を預かろうか？」
   base_tile: floor_1
+  role: storage
 
-H:
+inn:
   name: 宿屋
   image_path: components/pictures/npc/inn
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 宿屋「ゆっくり休んでいってね。」
   base_tile: floor_1
+  role: inn
 
-B:
+blacksmith:
   name: 鍛冶屋
   image_path: components/pictures/npc/blacksmith
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 鍛冶屋「俺ぁ鍛冶屋だ。鉱石を持ってこれば装備を叩き直してやるぜ。」
   base_tile: floor_1
+  role: blacksmith
 
-V:
+villager:
   name: 村人
   image_path: components/pictures/npc/villager
-  base_image_path: components/pictures/dungeon/home/floor_0.png
   dialogue:
-  - 村人「この先は危険だよ。1Fへ行くには右の階段を使ってね。」
+  - 村人「この先は危険だよ。1Fへ行くするには右の階段を使ってね。」
   base_tile: floor_0
 
-G:
+guild_master:
   name: ギルドマスター
   image_path: components/pictures/npc/guild
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - ギルドマスター「ようこそ冒険者ギルドへ。」
   base_tile: floor_1
+  role: guild_master
 
-R:
+doctor:
   name: 医者
   image_path: components/pictures/npc/doctor
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 医者「……気がついたかい？無茶はしちゃいけないよ。」
   base_tile: floor_1
+  role: doctor
 
-$:
+bank:
   name: 銀行員
   image_path: components/pictures/npc/bank
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 銀行員「大切なお金をお預かりします。」
   base_tile: floor_1
+  role: bank
+
+wizard:
+  name: 魔法屋
+  image_path: components/pictures/npc/wizard
+  dialogue:
+  - 魔導士「ほっほっほ、若き冒険者よ。魔法の真髄を知りたいか？」
+  - 魔導士「このダンジョンには、時として魔力の残滓が渦巻く場所があるのじゃ。」
+  - 魔導士「杖を振る時は、その残数をよく確認するのじゃぞ。空の杖を振っても、何も起きぬからの。」
+  base_tile: floor_1
+  role: magic_shop
+
+teleport_wizard:
+  name: テレポート屋
+  image_path: components/pictures/npc/wizard
+  dialogue:
+  - テレポート屋「フフフ……。世界の理を超えて、お望みの場所へ飛ばしてやろう。」
+  - テレポート屋「ただし……それなりの『対価』はもらうぞ？」
+  base_tile: floor_1
+  role: teleport
 
 # --- チュートリアル担当NPC群 ---
-A:
+guide_weapon:
   name: 武器屋の案内人
   image_path: components/pictures/npc/guide_weapon
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 案内人「武器屋では、強力な武器や防具、盾が売られているよ。」
-  - 案内人「買っただけでは意味がないから、[i]キーで装備するのを忘れないでね！」
+  - 案内人「買っただけでは意味がないから、装備するのを忘れないでね！」
   base_tile: floor_1
 
-E:
+guide_item:
   name: 道具屋の案内人
   image_path: components/pictures/npc/guide_item
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 案内人「道具屋には、回復薬や便利な『杖』が揃っているよ。」
   - 案内人「特に杖は、遠くの敵を眠らせたり吹き飛ばしたりできるから、ピンチの時に役立つよ。」
   base_tile: floor_1
 
-F:
+guide_merchant:
   name: 換金のアドバイザー
   image_path: components/pictures/npc/guide_merchant
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 案内人「不要なアイテムは商人に売って、お金（コイン）に換えよう。」
   - 案内人「売値は買値の半分になっちゃうけど、カバンがいっぱいなら整理も大事だよ。」
   base_tile: floor_1
 
-J:
+guide_storage:
   name: 倉庫の管理人
   image_path: components/pictures/npc/guide_storage
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 案内人「大事な装備やアイテムは『預かり屋』に預けておこう。」
   - 案内人「万が一ダンジョンで倒れても、預けてあるものは無くならないから安心だよ。」
   base_tile: floor_1
 
-M:
+guide_inn:
   name: 宿屋の看板娘
   image_path: components/pictures/npc/guide_inn
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 案内人「宿屋で休むと、HPが全回復して『永続セーブ』が行われるわ。」
   - 案内人「ダンジョンの中でも自動で『中断セーブ』はされるけど、あちらは再開したら消えてしまうし、もし倒れたらその記録も消えてしまうの。」
   - 案内人「絶対に失いたくない大切な記録は、ここでしっかり休んで残していってね。」
   base_tile: floor_1
 
-N:
+guide_blacksmith:
   name: 鍛冶の助っ人
   image_path: components/pictures/npc/guide_blacksmith
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 案内人「鍛冶屋では、鉱石を消費して装備を『強化』できるんだ。」
   - 案内人「強化値が上がれば攻撃力や防御力が格段にアップするから、こまめに通うといいよ。」
   base_tile: floor_1
 
-Q:
+guide_guild:
   name: ギルドの受付嬢
   image_path: components/pictures/npc/guide_guild
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 案内人「まずはギルドで『クエスト』を受けて、冒険の目的を決めましょう。」
   - 案内人「クエストを達成してポイントを貯めれば、より深い階層への通行許可が下りるわよ。」
   base_tile: floor_1
 
-T:
+guide_doctor:
   name: 医療助手
   image_path: components/pictures/npc/guide_doctor
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 案内人「もしダンジョンでHPが0になっても、お医者様がここまで運んでくれるわ。」
   - 案内人「ただし、持っていたコインや一部のアイテムを失うこともあるから注意してね。」
   base_tile: floor_1
 
-'!':
+guide_bank:
   name: 村人
   image_path: components/pictures/npc/guide_bank
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 案内人「手持ちのコインを銀行に預けておけば、倒れた時でも没収されずに済むよ。」
   - 案内人「まとまったお金が手に入ったら、こまめに預けに来るのが冒険者の知恵だね。」
   base_tile: floor_1
 
-'@':
+apprentice:
   name: 見習い冒険者
   image_path: components/pictures/npc/apprentice
-  base_image_path: components/pictures/dungeon/home/floor_0.png
   dialogue:
   - 見習い「ぼくもいつか、あなたみたいな強い冒険者になりたいな！」
   - 見習い「まずは基本の『移動』と『攻撃』をマスターしなきゃ。」
   - 見習い「矢印キーで移動して、敵の隣に行けば自動で攻撃できるんだよね？」
   base_tile: floor_0
 
-'?':
+guild_guide:
   name: ギルド案内人
   image_path: components/pictures/npc/guild_guide
-  base_image_path: components/pictures/dungeon/home/floor_1.png
   dialogue:
   - 案内人「ここは冒険者の拠点となる村だよ。まずは右上のギルドへ行ってみるといいわ。」
   - 案内人「ギルドマスターに話しかければ、最初のクエストを受けられるはずよ。」
   - 案内人「クエストを達成してランクを上げれば、より深い階層へ進めるようになるわ！」
   base_tile: floor_1
 
-'&':
+dungeon_expert:
   name: ダンジョン物知り博士
   image_path: components/pictures/npc/dungeon_expert
-  base_image_path: components/pictures/dungeon/home/floor_0.png
   dialogue:
   - 博士「おぉ、若き冒険者よ。ダンジョンの掟を知りたいか？\nこの場所は不思議な力に満ちていて、入るたびにその姿を変えると言われているぞ。\n奥深くには、誰も見たことがないような財宝が眠っているという噂じゃ。\nただし気をつけよ。各エリアの節目には強力なボスが待ち構えておる。\n十分な準備をしてから挑むのじゃぞ！\n\n…さて、さらに詳しい話を聞きたいか？\nダンジョン内では空腹にも気をつけるのじゃぞ。お腹が空くとHPが減っていくからの。\nそれと、怪しい床のタイルには罠が仕掛けられていることもある。\n罠を見つけるには、その場で足踏み（スペースキー）をすると周囲を調べられるぞ。\n冒険は慎重かつ大胆に進めるのじゃ。幸運を祈っておるぞ！」
   base_tile: floor_0
 
-'>':
-  name: 魔法屋
-  image_path: components/pictures/npc/wizard
-  base_image_path: components/pictures/dungeon/home/floor_1.png
-  dialogue:
-  - 魔導士「ほっほっほ、若き冒険者よ。魔法の真髄を知りたいか？」
-  - 魔導士「このダンジョンには、時として魔力の残滓が渦巻く場所があるのじゃ。」
-  - 魔導士「杖を振る時は、その残数をよく確認するのじゃぞ。空の杖を振っても、何も起きぬからの。」
-  base_tile: floor_1
 
-'(':
-  name: テレポート屋
-  image_path: components/pictures/npc/wizard
-  base_image_path: components/pictures/dungeon/home/floor_1.png
-  dialogue:
-  - テレポート屋「フフフ……。世界の理を超えて、お望みの場所へ飛ばしてやろう。」
-  - テレポート屋「ただし……それなりの『対価』はもらうぞ？」
-  base_tile: floor_1

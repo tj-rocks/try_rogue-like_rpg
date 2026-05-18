@@ -279,8 +279,10 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             play_bgm(target_bgm)
             
             # [NEW] ボス遭遇メッセージ (モーダル表示：入力を待つ)
-            from systems.ui import show_dialog
-            show_dialog(dialog, f"{active_boss.name} に 発見された！", modal=True, auto_close=0)
+            if not getattr(player, "boss_message_shown", False):
+                from systems.ui import show_dialog
+                show_dialog(dialog, f"{active_boss.name} に 発見された！", modal=True, auto_close=0)
+                player.boss_message_shown = True
             
             print(f"[SOUND] Boss encountered! Switching to: {target_bgm}")
     else:

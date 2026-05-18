@@ -33,6 +33,7 @@ def test_inn_debt():
     # 宿屋NPCを作成して配置
     inn_npc = MagicMock()
     inn_npc.name = "宿屋"
+    inn_npc.role = "inn"
     inn_npc.x = player.x + dungeon.tile_size
     inn_npc.y = player.y
     inn_npc.width = 64

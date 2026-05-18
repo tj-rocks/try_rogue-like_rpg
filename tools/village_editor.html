@@ -2,61 +2,187 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>🏡 村マップエディタ</title>
+<title>🏡 村マップグラフィックエディタ (Pro Edition)</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Courier New', monospace; background: #1a1a2e; color: #eee; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+:root {
+  --cell-size: 24px;
+  --bg-dark: #0f111a;
+  --panel-bg: #161925;
+  --border-color: #23293f;
+  --accent-color: #3b82f6;
+  --accent-glow: rgba(59, 130, 246, 0.4);
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+}
 
-header { background: #16213e; padding: 10px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 2px solid #0f3460; flex-shrink: 0; }
-header h1 { font-size: 16px; color: #e94560; }
-.btn { padding: 5px 12px; border: none; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 12px; font-weight: bold; transition: opacity .2s; }
-.btn:hover { opacity: .8; }
-.btn-blue  { background: #0f3460; color: #fff; }
-.btn-green { background: #2d6a4f; color: #fff; }
-.btn-red   { background: #c1121f; color: #fff; }
-.btn-gold  { background: #b5803a; color: #fff; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+header {
+  background: var(--panel-bg);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 2px solid var(--border-color);
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+header h1 {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn {
+  padding: 6px 14px;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  filter: brightness(1.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-blue  { background: #2563eb; color: #fff; }
+.btn-green { background: #16a34a; color: #fff; }
+.btn-red   { background: #dc2626; color: #fff; }
+.btn-gold  { background: #d97706; color: #fff; }
+.btn-cyan  { background: #0891b2; color: #fff; }
 
 .main { display: flex; flex: 1; overflow: hidden; }
 
 /* 左パネル: テキスト入力 */
-.panel-left { width: 340px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 2px solid #0f3460; background: #16213e; }
-.panel-left h2 { padding: 8px 10px; font-size: 13px; color: #a8dadc; border-bottom: 1px solid #0f3460; }
-#raw-text { flex: 1; background: #0d0d1a; color: #90ee90; font-size: 10px; padding: 8px; border: none; resize: none; outline: none; white-space: pre; overflow: auto; }
-.panel-left-buttons { padding: 6px; display: flex; gap: 6px; border-top: 1px solid #0f3460; flex-wrap: wrap; }
+.panel-left { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 2px solid var(--border-color); background: var(--panel-bg); }
+.panel-left h2 { padding: 12px 16px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+#raw-text { flex: 1; background: #0a0c14; color: #34d399; font-family: 'Fira Code', 'Courier New', monospace; font-size: 10px; padding: 12px; border: none; resize: none; outline: none; white-space: pre; overflow: auto; line-height: 1.4; }
+.panel-left-buttons { padding: 10px; display: flex; gap: 8px; border-top: 1px solid var(--border-color); flex-wrap: wrap; background: #121520; }
 
 /* 中央: マップ表示 */
-.panel-center { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.panel-center h2 { padding: 8px 10px; font-size: 13px; color: #a8dadc; border-bottom: 1px solid #0f3460; background: #16213e; flex-shrink: 0; }
-#map-container { flex: 1; overflow: auto; padding: 10px; background: #111; }
-#map-grid { display: inline-block; line-height: 0; border: 1px solid #333; }
+.panel-center { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #07080d; }
+.panel-center h2 { padding: 12px 16px; font-size: 13px; font-weight: 700; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); background: var(--panel-bg); flex-shrink: 0; }
+#map-container { flex: 1; overflow: auto; padding: 16px; display: flex; align-items: flex-start; justify-content: flex-start; }
+#map-grid { display: inline-block; line-height: 0; border: 2px solid var(--border-color); background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; }
 
-/* 右パネル: パレット + 凡例 */
-.panel-right { width: 200px; flex-shrink: 0; background: #16213e; border-left: 2px solid #0f3460; overflow-y: auto; }
-.panel-right h2 { padding: 8px 10px; font-size: 13px; color: #a8dadc; border-bottom: 1px solid #0f3460; }
-.palette-section { padding: 6px 8px; }
-.palette-section h3 { font-size: 11px; color: #888; margin-bottom: 4px; margin-top: 6px; text-transform: uppercase; }
-.palette-grid { display: flex; flex-wrap: wrap; gap: 3px; }
-.pal-item { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; cursor: pointer; border: 2px solid transparent; border-radius: 3px; transition: border-color .15s; }
-.pal-item:hover { border-color: #fff; }
-.pal-item.selected { border-color: #e94560; }
+/* 右パネル: パレット */
+.panel-right { width: 260px; flex-shrink: 0; background: var(--panel-bg); border-left: 2px solid var(--border-color); overflow-y: auto; display: flex; flex-direction: column; }
+.panel-right h2 { padding: 12px 16px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+#palette-container { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 14px; }
+.palette-section { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 10px; }
+.palette-section h3 { font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.03em; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; }
+.palette-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.pal-item {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.pal-item:hover {
+  transform: scale(1.08);
+  border-color: #fff;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(255,255,255,0.2);
+}
+.pal-item.selected {
+  border-color: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+  transform: scale(1.04);
+}
 
 /* セル */
-.cell { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; cursor: pointer; vertical-align: top; user-select: none; transition: filter .1s; }
-.cell:hover { filter: brightness(1.4); outline: 1px solid rgba(255,255,255,.5); }
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--cell-size) * 0.45);
+  font-weight: bold;
+  cursor: pointer;
+  vertical-align: top;
+  user-select: none;
+  transition: filter .1s;
+  position: relative;
+}
+.cell:hover {
+  filter: brightness(1.3) contrast(1.1);
+  outline: 2px solid #fff;
+  z-index: 100;
+  box-shadow: 0 0 8px rgba(255,255,255,0.8);
+}
+.cell.show-symbol {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+}
+.cell.hide-symbol {
+  color: transparent !important;
+}
 
 /* ステータスバー */
-#status-bar { background: #0d0d1a; padding: 3px 10px; font-size: 11px; color: #666; border-top: 1px solid #0f3460; flex-shrink: 0; }
+#status-bar {
+  background: #0d0d1a;
+  padding: 8px 16px;
+  font-size: 11px;
+  font-family: 'Fira Code', monospace;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🏡 村マップエディタ</h1>
+  <h1>🏡 村マップグラフィックエディタ</h1>
   <button class="btn btn-blue"  onclick="renderFromText()">▶ テキスト→描画</button>
   <button class="btn btn-green" onclick="exportToText()">💾 描画→テキスト</button>
-  <button class="btn btn-gold"  onclick="copyText()">📋 クリップボードへ</button>
+  <button class="btn btn-cyan"  id="btn-toggle-symbols" onclick="toggleSymbols()">🔤 記号OFF</button>
+  <button class="btn btn-gold"  onclick="saveToServer()">💾 直接ファイル保存</button>
+  <button class="btn btn-gold"  onclick="refreshAssets()">🔄 グラフィック更新</button>
   <button class="btn btn-red"   onclick="clearAll()">🗑 クリア</button>
-  <span style="margin-left:auto;font-size:11px;color:#666;">選択中: <span id="selected-char-disp" style="color:#e94560;font-weight:bold;">.</span></span>
+  
+  <span style="margin-left:auto; font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:8px;">
+    🔍 ズーム:
+    <input type="range" id="zoom-slider" min="14" max="48" value="24" oninput="updateZoom(this.value)" style="width:90px; cursor:pointer;">
+    <span id="zoom-val" style="width:34px; font-weight:bold; color:var(--accent-color);">24px</span>
+  </span>
+  <span style="font-size:12px; color:var(--text-secondary); padding-left:10px; border-left:1px solid var(--border-color);">選択中: <span id="selected-char-disp" style="color:#60a5fa; font-weight:bold; font-family:monospace;">.</span></span>
 </header>
 
 <div class="main">
@@ -72,92 +198,196 @@ header h1 { font-size: 16px; color: #e94560; }
 
   <!-- 中央: マップ -->
   <div class="panel-center">
-    <h2 id="map-title">🗺 マップビュー（61×n グリッド）&nbsp;<span style="font-size:11px;color:#555;">クリックで配置、右クリックで消去</span></h2>
+    <h2 id="map-title">🗺 マップビュー&nbsp;<span style="font-size:11px; color:#6b7280; font-weight:normal;">[左ドラッグ]: 配置、[右クリック / 右ドラッグ]: 消去（外床に置換）</span></h2>
     <div id="map-container">
       <div id="map-grid"></div>
     </div>
-    <div id="status-bar">行: - 列: - 文字: -</div>
+    <div id="status-bar">
+      <span id="coord-info">行: - 列: - 文字: -</span>
+      <span id="server-status" style="color:#10b981;">● 接続状態: 良好</span>
+    </div>
   </div>
 
   <!-- 右: パレット -->
   <div class="panel-right">
     <h2>🎨 パレット</h2>
-    <div class="palette-section">
-      <h3>床・通路</h3>
-      <div class="palette-grid" id="palette"></div>
-    </div>
+    <div id="palette-container"></div>
   </div>
 </div>
 
 <script>
-// =============================================
-// タイル定義 (文字 → [背景色, 前景色, ラベル])
-// =============================================
-const TILE = {
-  // 床
-  '.': ['#1c2a1c','#3a5a3a','.',   '外床'],
-  ',': ['#2a2a1a','#6a6a2a',',',   '内床'],
-  '~': ['#1a2a3a','#4a8aaa','~',   '水'],
-  '_': ['#2a1a0a','#6a4a2a','_',   '砂'],
-  // 壁天井
-  'a': ['#3a2a1a','#8a6a4a','a',   '壁(0)'],
-  'd': ['#3a1a1a','#aa5a3a','d',   '扉壁'],
-  'm': ['#1a1a3a','#4a4a8a','m',   'D壁'],
-  // 虚無
-  ';': ['#0d0d0d','#333',  ';',   '虚無'],
-  // 通路
-  'K': ['#2a1a2a','#cc88cc','K',   '通路'],
-  'L': ['#2a1a2a','#cc88cc','L',   '通路'],
-  // 特殊
-  'D': ['#cc2244','#fff',  'D',   'ダンジョン'],
-  'P': ['#2244cc','#fff',  'P',   'プレイヤー開始'],
-  // NPC施設
-  'G': ['#4a2a00','#ffaa00','G',  'ギルド'],
-  '$': ['#004a1a','#00ff88','$',  '銀行'],
-  'R': ['#3a0a3a','#ee88ff','R',  '診療所'],
-  'W': ['#4a0000','#ff6666','W',  '武器屋'],
-  'I': ['#003a4a','#66bbff','I',  '道具屋'],
-  'C': ['#3a3a00','#ffff66','C',  '商人'],
-  'H': ['#002a4a','#66aaff','H',  '宿屋'],
-  'B': ['#3a1a00','#ff8833','B',  '鍛冶屋'],
-  'S': ['#002a2a','#66ffdd','S',  '預かり屋'],
-  // チュートリアルNPC
-  'A': ['#3a1a1a','#ff9999','A',  'A武器案内'],
-  'E': ['#1a3a3a','#99eeff','E',  'E道具案内'],
-  'F': ['#3a3a1a','#eeee99','F',  'F換金'],
-  'J': ['#1a3a1a','#99ffbb','J',  'J倉庫管理'],
-  'M': ['#1a1a3a','#9999ff','M',  'M宿屋娘'],
-  'N': ['#3a2a1a','#ffbb88','N',  'N鍛冶助'],
-  'Q': ['#3a2a00','#ffcc55','Q',  'Qギルド受付'],
-  'T': ['#2a1a2a','#dd88ff','T',  'T医療助手'],
-  '!': ['#1a3a1a','#88ffaa','!',  '!銀行窓口'],
-  '@': ['#1a2a3a','#88ccff','@',  '@見習い'],
-  '?': ['#2a2a1a','#ffee88','?',  '?案内'],
-  '>': ['#3a0a2a','#ff88cc','>',  '>大魔導士'],
-  '&': ['#2a1a3a','#ccaaff','&',  '&博士'],
+// ==============================================================================
+// パレットグループ定義
+// ==============================================================================
+const GROUPS = {
+  floor: '🌱 床・地面・通路',
+  wall_top: '🧱 天井壁・屋根 (進入不可)',
+  wall_pass: '🚪 通路扉・すり抜けゲート',
+  wall_none: '🌌 虚無空間・背景暗闇',
+  special: '⭐ 特殊・システム',
+  npc: '👤 施設・NPCキャラクター',
+  obstacle: '📦 障害物・オブジェクト'
 };
 
-const DEFAULT_TILE = ['#111','#555','.',''];
+// ==============================================================================
+// タイル定義 (ch: [bg, fg, label, desc, imgPath, bgImgPath, category])
+// ==============================================================================
+const TILE = {
+  // --- 地面・床 ---
+  '.': ['#1c2a1c', '#3a5a3a', '.', '外床 (芝生)', '../components/pictures/dungeon/home/floor_0.png', '', 'floor'],
+  ',': ['#2a2a1a', '#6a6a2a', ',', '内床 (フローリング)', '../components/pictures/dungeon/home/floor_1.png', '', 'floor'],
+  '[': ['#1c1c1c', '#555',   '[', '内床2 (石床グレー)', '../components/pictures/dungeon/home/floor_2.png', '', 'floor'],
+  ':': ['#2c1c2c', '#656',   ':', '内床3 (石床赤紫)', '../components/pictures/dungeon/home/floor_3.png', '', 'floor'],
+  '_': ['#2a1a0a', '#6a4a2a', '_', '砂 (砂漠床)', '../components/pictures/dungeon/home/floor_4.png', '', 'floor'],
+  '~': ['#1a2a3a', '#4a8aaa', '~', '水', '../components/pictures/dungeon/home/floor_5.png', '', 'floor'],
+  '^': ['#2c2c2c', '#444',   '^', '内床6 (ダンジョン床)', '../components/pictures/dungeon/home/floor_6.png', '', 'floor'],
+  '*': ['#3c3c3c', '#666',   '*', '内床7', '../components/pictures/dungeon/home/floor_7.png', '', 'floor'],
+  'K': ['#2a1a2a', '#cc88cc', 'K', '通路 (石タイル)', '../components/pictures/dungeon/home/corridor.png', '', 'floor'],
+  'L': ['#2a1a2a', '#cc88cc', 'L', '通路 (石タイル2)', '../components/pictures/dungeon/home/corridor.png', '', 'floor'],
+
+  // --- 壁・屋根 ---
+  'a': ['#3a2a1a', '#8a6a4a', 'a', '壁0 (茶木目壁)', '../components/pictures/dungeon/home/wall_top_0.png', '', 'wall_top'],
+  'b': ['#3a2a1a', '#8a6a4a', 'b', '壁1', '../components/pictures/dungeon/home/wall_top_1.png', '', 'wall_top'],
+  'c': ['#3a2a1a', '#8a6a4a', 'c', '壁2', '../components/pictures/dungeon/home/wall_top_2.png', '', 'wall_top'],
+  'd': ['#3a2a1a', '#8a6a4a', 'd', '壁3', '../components/pictures/dungeon/home/wall_top_3.png', '', 'wall_top'],
+  'e': ['#3a2a1a', '#8a6a4a', 'e', '壁4', '../components/pictures/dungeon/home/wall_top_4.png', '', 'wall_top'],
+  'f': ['#3a2a1a', '#8a6a4a', 'f', '壁5', '../components/pictures/dungeon/home/wall_top_5.png', '', 'wall_top'],
+  '0': ['#3a1a1a', '#aa5a3a', '0', '扉・ゲート0 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_0-floor_1.png', '', 'wall_pass'],
+  '1': ['#3a1a1a', '#aa5a3a', '1', '扉・ゲート1 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_1-floor_1.png', '', 'wall_pass'],
+  '2': ['#3a1a1a', '#aa5a3a', '2', '扉・ゲート2 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_2-floor_1.png', '', 'wall_pass'],
+  '3': ['#3a1a1a', '#aa5a3a', '3', '扉・ゲート3 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_3-floor_1.png', '', 'wall_pass'],
+  '4': ['#3a1a1a', '#aa5a3a', '4', '扉・ゲート4 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_4-floor_1.png', '', 'wall_pass'],
+  '5': ['#3a1a1a', '#aa5a3a', '5', '扉・ゲート5 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_5-floor_1.png', '', 'wall_pass'],
+  '6': ['#3a1a1a', '#aa5a3a', '6', '扉・ゲート6 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_6-floor_1.png', '', 'wall_pass'],
+  '7': ['#3a1a1a', '#aa5a3a', '7', '扉・ゲート7 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_7-floor_1.png', '', 'wall_pass'],
+  '8': ['#3a1a1a', '#aa5a3a', '8', '扉・ゲート8 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_8-floor_1.png', '', 'wall_pass'],
+  '9': ['#3a1a1a', '#aa5a3a', '9', '扉・ゲート9 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_9-floor_1.png', '', 'wall_pass'],
+  'm': ['#1a1a3a', '#4a4a8a', 'm', 'D壁 (ダンジョン壁)', '../components/pictures/dungeon/home/wall_top_3.png', '', 'wall_top'],
+  ';': ['#08080c', '#333',   ';', '虚無・暗闇背景', '', '', 'wall_none'],
+  'k': ['#08080c', '#333',   'k', '背景虚無1', '', '', 'wall_none'],
+  'l': ['#08080c', '#333',   'l', '背景虚無2', '', '', 'wall_none'],
+  'w': ['#08080c', '#333',   'w', '背景虚無3', '', '', 'wall_none'],
+
+  // --- システム・特殊 ---
+  'P': ['#2244cc', '#fff',   'P', 'プレイヤー開始地点', '../components/pictures/player/walk/down_idel.png', '../components/pictures/dungeon/home/floor_0.png', 'special'],
+  'D': ['#cc2244', '#fff',   'D', 'ダンジョン入口階段 (Stairs Down)', '../components/pictures/dungeon/stairs/stairs_down.png', '', 'special'],
+  'U': ['#44cc22', '#fff',   'U', '街出口階段 (Stairs Up)', '../components/pictures/dungeon/stairs/stairs_up.png', '', 'special'],
+
+  // --- 施設・NPC ---
+  'G': ['#4a2a00', '#ffaa00', 'G', 'ギルドマスター', '../components/pictures/npc/guild/0.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  '$': ['#004a1a', '#00ff88', '$', '銀行員', '../components/pictures/npc/bank/0.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'R': ['#3a0a3a', '#ee88ff', 'R', '医者 (クリニック)', '../components/pictures/npc/doctor/0.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'W': ['#4a0000', '#ff6666', 'W', '武器屋', '../components/pictures/npc/weapon_shop/0.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'I': ['#003a4a', '#66bbff', 'I', '道具屋', '../components/pictures/npc/item_shop/0.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'C': ['#3a3a00', '#ffff66', 'C', '商人', '../components/pictures/npc/merchant/0.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'H': ['#002a4a', '#66aaff', 'H', '宿屋', '../components/pictures/npc/inn/0.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'B': ['#3a1a00', '#ff8833', 'B', '鍛冶屋', '../components/pictures/npc/blacksmith/0.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'S': ['#002a2a', '#66ffdd', 'S', '預かり屋 (倉庫)', '../components/pictures/npc/storage/0.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'V': ['#3a2a1a', '#ffbb88', 'V', '村人 (案内役)', '../components/pictures/npc/villager/0.png', '../components/pictures/dungeon/home/floor_0.png', 'npc'],
+
+  // --- チュートリアル・案内NPC ---
+  'A': ['#3a1a1a', '#ff9999', 'A', 'A武器屋の案内人', '../components/pictures/npc/guide_weapon/idel.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'E': ['#1a3a3a', '#99eeff', 'E', 'E道具屋の案内人', '../components/pictures/npc/guide_item/idel.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'F': ['#3a3a1a', '#eeee99', 'F', 'F換金アドバイザー', '../components/pictures/npc/guide_merchant/idel.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'J': ['#1a3a1a', '#99ffbb', 'J', 'J倉庫の管理人', '../components/pictures/npc/guide_storage/idel.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'M': ['#1a1a3a', '#9999ff', 'M', 'M宿屋の看板娘', '../components/pictures/npc/guide_inn/idel.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'N': ['#3a2a1a', '#ffbb88', 'N', 'N鍛冶の助っ人', '../components/pictures/npc/guide_blacksmith/idel.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'Q': ['#3a2a00', '#ffcc55', 'Q', 'Qギルドの受付嬢', '../components/pictures/npc/guide_guild/idel.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  'T': ['#2a1a2a', '#dd88ff', 'T', 'T医療助手', '../components/pictures/npc/guide_doctor/idel.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  '!': ['#1a3a1a', '#88ffaa', '!', '!銀行の窓口案内', '../components/pictures/npc/guide_bank/idel.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  '@': ['#1a2a3a', '#88ccff', '@', '@見習い冒険者', '../components/pictures/npc/apprentice/idel.png', '../components/pictures/dungeon/home/floor_0.png', 'npc'],
+  '?': ['#2a2a1a', '#ffee88', '?', '?ギルド案内人', '../components/pictures/npc/guild_guide/idel.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  '>': ['#3a0a2a', '#ff88cc', '>', '>大魔導士', '../components/pictures/npc/wizard/idel.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  '(': ['#3a0a2a', '#ff88cc', '(', '(テレポート屋', '../components/pictures/npc/wizard/idel.png', '../components/pictures/dungeon/home/floor_1.png', 'npc'],
+  '&': ['#2a1a3a', '#ccaaff', '&', '&ダンジョン博士', '../components/pictures/npc/dungeon_expert/idel.png', '../components/pictures/dungeon/home/floor_0.png', 'npc'],
+
+  // --- 障害物 ---
+  'o': ['#4a2a1a', '#aa5a3a', 'o', '樽 (Barrel)', '../components/pictures/obstacles/barrel.png', '../components/pictures/dungeon/home/floor_0.png', 'obstacle'],
+  'x': ['#3a2a1a', '#aa5a3a', 'x', '木箱 (Crate)', '../components/pictures/obstacles/crate.png', '../components/pictures/dungeon/home/floor_0.png', 'obstacle'],
+  'y': ['#2a2a1a', '#aa5a3a', 'y', '壺 (Pot)', '../components/pictures/obstacles/pot.png', '../components/pictures/dungeon/home/floor_0.png', 'obstacle'],
+  'z': ['#1a1a1a', '#888',   'z', 'ガレキ (Rubble)', '../components/pictures/obstacles/rubble.png', '../components/pictures/dungeon/home/floor_0.png', 'obstacle'],
+  'u': ['#2a2a2a', '#aaa',   'u', '石像 (Statue)', '../components/pictures/obstacles/statue.png', '../components/pictures/dungeon/home/floor_0.png', 'obstacle'],
+  'v': ['#3a3a3a', '#888',   'v', '壊れた石柱', '../components/pictures/obstacles/broken_pillar.png', '../components/pictures/dungeon/home/floor_0.png', 'obstacle'],
+};
+
+const DEFAULT_TILE = ['#111', '#555', '.', '未定義', '', '', 'floor'];
 let mapData = []; // 2D array of chars
 let selectedChar = '.';
+let availableFiles = null; // Set of verified home-theme image filenames
 let isMouseDown = false;
+let mouseButton = 0; // 0: left, 2: right
+let showSymbols = false; // デフォルトで綺麗なグラフィック表示
 
-// =============================================
+// ブラウザによる画像アセットキャッシュを完全に回避するためのクエリトークン
+let cacheBuster = '?v=' + new Date().getTime();
+
+// ==============================================================================
 // パレット生成
-// =============================================
+// ==============================================================================
 function buildPalette() {
-  const grid = document.getElementById('palette');
-  grid.innerHTML = '';
-  Object.entries(TILE).forEach(([ch, [bg, fg, label, desc]]) => {
-    const div = document.createElement('div');
-    div.className = 'pal-item';
-    div.title = `${ch}: ${desc}`;
-    div.textContent = ch;
-    div.style.background = bg;
-    div.style.color = fg;
-    div.dataset.ch = ch;
-    div.onclick = () => selectChar(ch);
-    grid.appendChild(div);
+  const container = document.getElementById('palette-container');
+  container.innerHTML = '';
+  
+  Object.entries(GROUPS).forEach(([groupKey, groupTitle]) => {
+    const section = document.createElement('div');
+    section.className = 'palette-section';
+    
+    const h3 = document.createElement('h3');
+    h3.textContent = groupTitle;
+    section.appendChild(h3);
+    
+    const grid = document.createElement('div');
+    grid.className = 'palette-grid';
+    
+    let hasItems = false;
+    Object.entries(TILE).forEach(([ch, [bg, fg, label, desc, imgPath, bgImgPath, category]]) => {
+      if (category !== groupKey) return;
+      
+      // 動的なファイル存在チェック (floor, wall_top, wall_pass に適用)
+      if (availableFiles && (category === 'floor' || category === 'wall_top' || category === 'wall_pass')) {
+        if (imgPath) {
+          const parts = imgPath.split('/');
+          const filename = parts[parts.length - 1];
+          if (!availableFiles.has(filename)) {
+            return; // フォルダ内に存在しないアセットはスキップ
+          }
+        }
+      }
+      
+      hasItems = true;
+      const div = document.createElement('div');
+      div.className = 'pal-item';
+      div.title = `[${ch}] ${desc}`;
+      div.dataset.ch = ch;
+      
+      div.style.backgroundColor = bg;
+      if (imgPath) {
+        const cacheImgPath = imgPath + cacheBuster;
+        const cacheBgImgPath = bgImgPath ? bgImgPath + cacheBuster : '';
+        if (bgImgPath) {
+          div.style.backgroundImage = `url(${cacheImgPath}), url(${cacheBgImgPath})`;
+        } else {
+          div.style.backgroundImage = `url(${cacheImgPath})`;
+        }
+        div.style.backgroundSize = 'cover, cover';
+        div.style.backgroundRepeat = 'no-repeat, no-repeat';
+        div.style.imageRendering = 'pixelated';
+      }
+      
+      // 文字のオーバーレイ
+      const charOverlay = document.createElement('span');
+      charOverlay.style.cssText = 'position: absolute; bottom: 1px; right: 2px; font-size: 9px; color: #fff; background: rgba(0,0,0,0.6); padding: 1px 3px; border-radius: 2px; font-weight: bold; font-family: monospace; z-index: 10;';
+      charOverlay.textContent = ch;
+      div.appendChild(charOverlay);
+      
+      div.onclick = () => selectChar(ch);
+      grid.appendChild(div);
+    });
+    
+    if (hasItems) {
+      section.appendChild(grid);
+      container.appendChild(section);
+    }
   });
 }
 
@@ -169,19 +399,37 @@ function selectChar(ch) {
   });
 }
 
-// =============================================
-// テキスト → マップデータ → 描画
-// =============================================
+// ==============================================================================
+// ズーム・記号トグル制御
+// ==============================================================================
+function updateZoom(val) {
+  document.documentElement.style.setProperty('--cell-size', val + 'px');
+  document.getElementById('zoom-val').textContent = val + 'px';
+}
+
+function toggleSymbols() {
+  showSymbols = !showSymbols;
+  const btn = document.getElementById('btn-toggle-symbols');
+  btn.textContent = showSymbols ? '🔤 記号ON' : '🔤 記号OFF';
+  btn.classList.toggle('btn-blue', showSymbols);
+  btn.classList.toggle('btn-cyan', !showSymbols);
+  
+  document.querySelectorAll('.cell').forEach(cell => {
+    cell.classList.toggle('show-symbol', showSymbols);
+    cell.classList.toggle('hide-symbol', !showSymbols);
+  });
+}
+
+// ==============================================================================
+// テキスト ⇆ マップデータ ⇆ グリッド描画
+// ==============================================================================
 function renderFromText() {
   const text = document.getElementById('raw-text').value;
   const lines = text.split('\n');
   mapData = [];
   lines.forEach(line => {
     if (line.startsWith('//')) return; // コメント行はスキップ
-    if (line.trim() === '') {
-      // 空行も保持しない（コメント外の空行はスキップ）
-      return;
-    }
+    if (line.trim() === '') return;     // 空行もスキップ
     mapData.push(Array.from(line.replace(/\r/,'')));
   });
   drawGrid();
@@ -199,57 +447,101 @@ function drawGrid() {
 
     rowArr.forEach((ch, ci) => {
       const cell = document.createElement('span');
-      cell.className = 'cell';
-      const [bg, fg] = TILE[ch] || DEFAULT_TILE;
-      cell.style.background = bg;
+      cell.className = `cell ${showSymbols ? 'show-symbol' : 'hide-symbol'}`;
+      
+      const [bg, fg, label, desc, imgPath, bgImgPath] = TILE[ch] || DEFAULT_TILE;
+      cell.style.backgroundColor = bg;
+      if (imgPath) {
+        const cacheImgPath = imgPath + cacheBuster;
+        const cacheBgImgPath = bgImgPath ? bgImgPath + cacheBuster : '';
+        if (bgImgPath) {
+          cell.style.backgroundImage = `url(${cacheImgPath}), url(${cacheBgImgPath})`;
+        } else {
+          cell.style.backgroundImage = `url(${cacheImgPath})`;
+        }
+        cell.style.backgroundSize = 'cover, cover';
+        cell.style.backgroundRepeat = 'no-repeat, no-repeat';
+        cell.style.imageRendering = 'pixelated';
+      } else {
+        cell.style.backgroundImage = '';
+      }
+      
       cell.style.color = fg;
       cell.textContent = ch;
       cell.dataset.r = ri;
       cell.dataset.c = ci;
 
+      // ドラッグ・クリックハンドラ
       cell.addEventListener('mousedown', e => {
         isMouseDown = true;
-        const newCh = e.button === 2 ? '.' : selectedChar;
+        mouseButton = e.button; // 0: left, 2: right
+        const newCh = mouseButton === 2 ? '.' : selectedChar;
         setCell(ri, ci, newCh, cell);
         e.preventDefault();
       });
+
       cell.addEventListener('mouseenter', e => {
-        document.getElementById('status-bar').textContent =
-          `行: ${ri+1}  列: ${ci+1}  文字: "${ch}"  ${TILE[ch]?.[3]||''}`;
-        if (isMouseDown) setCell(ri, ci, selectedChar, cell);
+        const info = TILE[ch] || DEFAULT_TILE;
+        document.getElementById('coord-info').textContent =
+          `行: ${ri+1}  列: ${ci+1}  文字: "${ch}"  [${info[3]}]`;
+          
+        if (isMouseDown) {
+          const newCh = mouseButton === 2 ? '.' : selectedChar;
+          setCell(ri, ci, newCh, cell);
+        }
       });
-      cell.addEventListener('contextmenu', e => { e.preventDefault(); setCell(ri, ci, '.', cell); });
+      
+      cell.addEventListener('contextmenu', e => {
+        e.preventDefault();
+        setCell(ri, ci, '.', cell);
+      });
 
       rowDiv.appendChild(cell);
     });
 
-    // 行番号
+    // 右端に行番号
     const lineNum = document.createElement('span');
-    lineNum.style.cssText = 'display:inline-block;width:28px;font-size:9px;color:#333;padding-left:4px;vertical-align:middle;';
-    lineNum.textContent = ri+1;
+    lineNum.style.cssText = 'display:inline-block;width:32px;font-size:9px;color:#4b5563;font-family:monospace;padding-left:6px;vertical-align:middle;user-select:none;';
+    lineNum.textContent = (ri+1).toString().padStart(2, '0');
     rowDiv.appendChild(lineNum);
     grid.appendChild(rowDiv);
   });
 
   document.getElementById('map-title').innerHTML =
-    `🗺 マップビュー (${mapData[0]?.length||0}列 × ${mapData.length}行)&nbsp;<span style="font-size:11px;color:#555;">左クリック:配置 右クリック:消去</span>`;
+    `🗺 マップビュー (${mapData[0]?.length||0}列 × ${mapData.length}行)&nbsp;<span style="font-size:11px;color:#4b5563;font-weight:normal;">[左ドラッグ]: 配置、[右クリック / 右ドラッグ]: 消去（外床）</span>`;
 }
 
 function setCell(ri, ci, ch, cell) {
   if (!mapData[ri] || ci >= mapData[ri].length) return;
   mapData[ri][ci] = ch;
-  const [bg, fg] = TILE[ch] || DEFAULT_TILE;
-  cell.style.background = bg;
+  
+  const [bg, fg, label, desc, imgPath, bgImgPath] = TILE[ch] || DEFAULT_TILE;
+  cell.style.backgroundColor = bg;
+  if (imgPath) {
+    const cacheImgPath = imgPath + cacheBuster;
+    const cacheBgImgPath = bgImgPath ? bgImgPath + cacheBuster : '';
+    if (bgImgPath) {
+      cell.style.backgroundImage = `url(${cacheImgPath}), url(${cacheBgImgPath})`;
+    } else {
+      cell.style.backgroundImage = `url(${cacheImgPath})`;
+    }
+    cell.style.backgroundSize = 'cover, cover';
+    cell.style.backgroundRepeat = 'no-repeat, no-repeat';
+    cell.style.imageRendering = 'pixelated';
+  } else {
+    cell.style.backgroundImage = '';
+  }
   cell.style.color = fg;
   cell.textContent = ch;
-  cell.dataset.ch = ch;
 }
 
 document.addEventListener('mouseup', () => { isMouseDown = false; });
+// グローバルなマウスドラッグキャンセル
+document.addEventListener('dragstart', e => e.preventDefault());
 
-// =============================================
-// マップデータ → テキスト
-// =============================================
+// ==============================================================================
+// サーバー連携・ファイル保存
+// ==============================================================================
 function exportToText() {
   const lines = document.getElementById('raw-text').value.split('\n');
   const comments = lines.filter(l => l.startsWith('//') || l.trim() === '').map(l => l.replace(/\r/,''));
@@ -257,19 +549,40 @@ function exportToText() {
   const mapLines = mapData.map(rowArr => rowArr.join(''));
   const output = [...comments, ...mapLines].join('\n');
   document.getElementById('raw-text').value = output;
+  return output;
 }
 
-function copyText() {
-  exportToText();
-  const text = document.getElementById('raw-text').value;
-  navigator.clipboard.writeText(text).then(() => {
-    document.getElementById('status-bar').textContent = '✅ クリップボードにコピーしました！';
-    setTimeout(() => document.getElementById('status-bar').textContent = '行: - 列: - 文字: -', 2000);
+let currentFilename = 'village.txt';
+
+function saveToServer() {
+  const fileContent = exportToText();
+  const serverStatus = document.getElementById('server-status');
+  serverStatus.textContent = '⏳ 保存中...';
+  serverStatus.style.color = '#eab308';
+  
+  fetch('/save_village', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content: fileContent, filename: currentFilename })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('保存エラーが発生しました');
+    return res.json();
+  })
+  .then(data => {
+    serverStatus.textContent = '● 直接保存完了！';
+    serverStatus.style.color = '#10b981';
+    alert(`🎉 ${currentFilename} への直接保存が完了しました！`);
+  })
+  .catch(err => {
+    serverStatus.textContent = '● 保存失敗';
+    serverStatus.style.color = '#ef4444';
+    alert('❌ エラー: ' + err.message + '\nサーバーが正しく稼働しているか確認してください。');
   });
 }
 
 function clearAll() {
-  if (confirm('マップをクリアしますか？')) {
+  if (confirm('マップグリッドとテキストをクリアしますか？')) {
     mapData = [];
     document.getElementById('map-grid').innerHTML = '';
     document.getElementById('raw-text').value = '';
@@ -280,6 +593,7 @@ function loadFile() { document.getElementById('file-input').click(); }
 function onFileLoad(e) {
   const file = e.target.files[0];
   if (!file) return;
+  currentFilename = file.name;
   const reader = new FileReader();
   reader.onload = ev => {
     document.getElementById('raw-text').value = ev.target.result;
@@ -288,20 +602,95 @@ function onFileLoad(e) {
   reader.readAsText(file, 'utf-8');
 }
 
-// 初期化
-buildPalette();
-selectChar('.');
+// ==============================================================================
+// 動的タイルマッピング取得
+// ==============================================================================
+async function loadTileDefinitions() {
+  try {
+    const res = await fetch('/api/tile_definitions');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    if (data.status === 'success' && data.tiles) {
+      // APIから取得したマッピングで上書き・追加
+      Object.entries(data.tiles).forEach(([ch, val]) => {
+        const imgPath = val.image_path ? `../${val.image_path}` : '';
+        const bgImgPath = val.bg_image_path ? `../${val.bg_image_path}` : '';
+        
+        TILE[ch] = [
+          val.bg_color || '#222',
+          val.fg_color || '#fff',
+          ch,
+          val.desc || '',
+          imgPath,
+          bgImgPath,
+          val.category || 'floor'
+        ];
+      });
+      console.log("🟢 Dynamic tile definitions loaded from village.yml / npcs.yml / obstacles.yml!");
+    }
+  } catch (e) {
+    console.warn("⚠️ YAMLタイル定義APIのロードに失敗しました。デフォルト設定を使用します。");
+  }
+}
 
-// village.txtを自動読み込み試行
-fetch('../components/data/dungeon/village.txt')
-  .then(r => r.text())
-  .then(text => {
-    document.getElementById('raw-text').value = text;
-    renderFromText();
-  })
-  .catch(() => {
-    document.getElementById('status-bar').textContent = 'village.txt を手動で読み込むか、テキストを貼り付けてください';
-  });
+// ==============================================================================
+// 初期ロード処理
+// ==============================================================================
+async function initEditor() {
+  // 1. サーバーから利用可能な画像ファイル名を取得
+  try {
+    const res = await fetch('/api/available_assets');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'success' && data.files) {
+        availableFiles = new Set(data.files);
+      }
+    }
+  } catch (e) {
+    console.log("⚠️ アセット一覧APIへの接続に失敗しました。全アセットをデフォルトで表示します。");
+  }
+
+  // 2. YAML定義の動的タイルマッピングを読み込む
+  await loadTileDefinitions();
+
+  // 3. パレット構築 & 初期キャラ選択
+  buildPalette();
+  selectChar('.');
+
+  // 4. village.txt を自動ロード
+  try {
+    const r = await fetch('../components/data/dungeon/village.txt');
+    if (r.ok) {
+      const text = await r.text();
+      document.getElementById('raw-text').value = text;
+      renderFromText();
+    }
+  } catch (e) {
+    document.getElementById('status-bar').textContent = '⚠️ village.txt のロードに失敗しました。ファイル読込ボタンから手動で読み込んでください。';
+  }
+}
+
+// エディタ起動
+initEditor();
+
+// キャッシュを無視したアセット・定義のリフレッシュ処理
+async function refreshAssets() {
+  cacheBuster = '?v=' + new Date().getTime();
+  try {
+    const res = await fetch('/api/available_assets');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'success' && data.files) {
+        availableFiles = new Set(data.files);
+      }
+    }
+  } catch (e) {}
+
+  await loadTileDefinitions();
+  buildPalette();
+  drawGrid();
+  console.log("🎨 Assets and definitions updated successfully!");
+}
 </script>
 </body>
 </html>

@@ -219,3 +219,11 @@ TELEPORT_CONFIG:
   required_item_id: "teleport_stone" # 必要なアイテムID
   return_village_money: 10000   # 休憩所から村への帰還料金 (超高額)
 
+
+# 💀 CURSE_SYSTEM (呪いシステム設定)
+# ------------------------------------------------------------------------------
+CURSE_SYSTEM:
+  reduction_rate: 0.10             # 1つ呪われるごとの能力下降率 (0.10 = 10%)
+  recovery_cost_gp_per_level: 50   # 1段階呪いを解くのに必要なギルドポイント (GP)
+
+

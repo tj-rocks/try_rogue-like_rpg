@@ -93,6 +93,11 @@ PLAYER_ACCURACY_CLOSE = _p.get("accuracy_close", 100)
 PLAYER_ACCURACY_RANGED = _p.get("accuracy_ranged", 100)
 PLAYER_EVASION      = _p.get("evasion", 1)
 
+# --- 呪いシステム設定 (Curse System) ---
+_curse = _balance.get("CURSE_SYSTEM", {})
+CURSE_REDUCTION_RATE = _curse.get("reduction_rate", 0.10)
+CURSE_RECOVERY_COST_GP_PER_LEVEL = _curse.get("recovery_cost_gp_per_level", 50)
+
 PLAYER_WEAPON   = "old_sword"
 PLAYER_ARMOR    = "adventurers_clothes"
 PLAYER_SHIELD   = None
@@ -352,3 +357,10 @@ SHIELD_COLORS = {
 }
 
 SOUND_OVERFLOW = "components/sounds/sfx/explosion.wav"
+# --- タイルID定義 ---
+TILE_WALL    = 0
+TILE_FLOOR   = 1
+TILE_STAIRS_UP = 2
+TILE_STAIRS_DOWN = 3
+TILE_CORRIDOR = 4
+TILE_GATE    = 9  # すり抜け可能な頭上レイヤータイル

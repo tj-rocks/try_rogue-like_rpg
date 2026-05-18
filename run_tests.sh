@@ -19,6 +19,15 @@ export PYTHONPATH=$PYTHONPATH:.
 OFFICIAL_SAVE="components/data/savefile/save_official.json"
 BACKUP_SAVE="components/data/savefile/save_official.json.bak"
 
+# 既にバックアップがある場合、前回の終了に失敗した可能性がある
+if [ -f "$BACKUP_SAVE" ]; then
+    echo "⚠️ 警告: 前回のバックアップファイル ($BACKUP_SAVE) が残っています。"
+    echo "前回のテストが異常終了した可能性があります。手動で確認してください。"
+    # 本番データが空、または異常な場合はバックアップから戻すなどの判断が必要だが、
+    # ここでは安全のため、実行を停止してユーザーに委ねる
+    exit 1
+fi
+
 if [ -f "$OFFICIAL_SAVE" ]; then
     echo "💾 本番セーブデータを一時的にバックアップします..."
     cp "$OFFICIAL_SAVE" "$BACKUP_SAVE"
@@ -26,12 +35,16 @@ fi
 
 # スクリプト終了時に必ず復元する設定 (エラー時や中断時も含む)
 function cleanup {
+    # 最後に必ず復元を実行
     if [ -f "$BACKUP_SAVE" ]; then
         echo "🔄 バックアップから本番データを復元しています..."
         mv "$BACKUP_SAVE" "$OFFICIAL_SAVE"
+        echo "✅ 本番データの復元が完了しました。"
     fi
 }
-trap cleanup EXIT
+
+# EXITだけでなく、Ctrl+C(INT)や終了要求(TERM)でもcleanupを走らせる
+trap cleanup EXIT INT TERM
 
 echo "----------------------------------------"
 echo "🔍 セーブデータ隔離チェック実行中..."

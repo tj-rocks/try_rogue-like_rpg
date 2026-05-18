@@ -52,6 +52,7 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
     old_floor = getattr(player, "prev_floor", -1)
     player.prev_floor = floor_level
     player.reset_status()
+    player.boss_message_shown = False # 階層移動時に表示済みフラグをリセット
     
     # 敵・アイテムを初期配置（村や固定マップ階層以外）
     if floor_level > 0 and not new_dungeon.floor_info.get("map"):
@@ -68,7 +69,7 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
     if floor_level != old_floor and spawn_reason != "continue" and not is_death:
         from systems.data_loader import SAVE_DATA_PATH
         print(f"[AUTO-SAVE] Floor transition ({old_floor} -> {floor_level}). Saving to persistent file: {SAVE_DATA_PATH}")
-        player.save_to_file(SAVE_DATA_PATH)
+        player.save_to_file()
 
     return new_dungeon
 
@@ -282,7 +283,7 @@ class Dungeon:
         else:
             img_dir = main_path + "/" + folder
             keys_to_load = ["floor", "wall_top", "wall_bottom", "wall_side", "wall_none", 
-                            "wall_corner", "corridor", "wall_single", "wall_base"]
+                            "wall_corner", "corridor", "wall_single", "wall_base", "wall_pass"]
 
             for key in keys_to_load:
                 p = f"{img_dir}/{key}.png"
@@ -316,6 +317,10 @@ class Dungeon:
                         elif f.startswith("wall_decoration"):
                             self.textures[key] = load_and_scale(path)
                             self.available_wall_decoration_variants.append(key)
+                        elif f.startswith("wall_pass"):
+                            self.textures[key] = load_and_scale(path)
+                            # wall_top_variants に含めることでゲートとして選ばれるようにする
+                            self.available_wall_top_variants.append(key)
             
             # バリデーションとベースキーの補完
             for base_key, variant_list in [("floor", self.available_floor_variants), 
@@ -343,7 +348,32 @@ class Dungeon:
                 "wall_none": self.available_wall_none_variants.copy(),
                 "wall_decoration": self.available_wall_decoration_variants.copy()
             }
+            
+            # --- [NEW] 命名規則による地面指定の解析 (wall_pass-floor_0.png 等) ---
+            self.overhead_base_map = {}
+            self.short_to_full_key = {} # 短縮名からフルキーへのマッピング
+            for k in self.textures.keys():
+                if "-" in k:
+                    parts = k.split("-")
+                    if len(parts) >= 2:
+                        # 例: "wall_pass_0-floor_1" -> {"wall_pass_0": "floor_1"}
+                        short = parts[0]
+                        self.overhead_base_map[short] = parts[1]
+                        self.short_to_full_key[short] = k
+                else:
+                    self.short_to_full_key[k] = k # 通常のキーはそのまま
+            
+            Dungeon._overhead_base_map_cache = getattr(Dungeon, "_overhead_base_map_cache", {})
+            Dungeon._overhead_base_map_cache[folder] = self.overhead_base_map.copy()
+            Dungeon._short_to_full_key_cache = getattr(Dungeon, "_short_to_full_key_cache", {})
+            Dungeon._short_to_full_key_cache[folder] = self.short_to_full_key.copy()
+            
             print(f"[DUNGEON] Theme '{folder}' cached.")
+        
+        # キャッシュからの復元時にも map を取得
+        if folder in Dungeon._texture_cache and not hasattr(self, "overhead_base_map"):
+            self.overhead_base_map = Dungeon._overhead_base_map_cache.get(folder, {}).copy()
+            self.short_to_full_key = Dungeon._short_to_full_key_cache.get(folder, {}).copy()
 
         self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
         
@@ -678,15 +708,71 @@ class Dungeon:
                 self.npcs = []
                 self.rooms = []
                 ts = self.tile_size
+                # Load dynamic tile mappings from village.yml
+                from systems.data_loader import load_master_data
+                village_data = load_master_data("village.yml") or {}
+                tile_mappings = village_data.get("TILE_MAPPINGS", {})
+
                 for r, line in enumerate(lines):
                     for c, char in enumerate(line):
                         if c >= self.map_width: break
                         # デフォルトは壁(0)
                         self.map_data[r][c] = 0
                         
-                        if char == "X":
+                        # --- [NEW] 完全動的マッピング・システム ---
+                        
+                        # 1. ゲート（すり抜け可能扉・ゲート）
+                        if char in tile_mappings and tile_mappings[char].get("category") == "wall_pass":
+                            self.map_data[r][c] = TILE_GATE
+                            self.wall_top_variants[r][c] = f"wall_pass_{tile_mappings[char].get('tile_id', 0)}"
+                            self.floor_variants[r][c] = "floor_0"
+                            
+                        # 2. 障害物 (Entity) - village.yml で定義されたIDからロード
+                        elif char in tile_mappings and tile_mappings[char].get("category") == "obstacle":
+                            self.map_data[r][c] = 1 # 地面の上に配置
+                            base_img_path = tile_mappings[char].get("base_image_path", "")
+                            if base_img_path:
+                                import os as _os
+                                fk = _os.path.splitext(_os.path.basename(base_img_path))[0]
+                            else:
+                                fk = "floor_0"
+                            self.floor_variants[r][c] = fk
+                            obs_type = tile_mappings[char].get("id")
+                            if obs_type:
+                                from components.sprites.enemy import Enemy
+                                ox, oy = c * ts, r * ts
+                                obstacle = Enemy(ox, oy, obs_type, player=self.player)
+                                obstacle.x = c * ts + (ts - obstacle.width)//2
+                                obstacle.y = r * ts + (ts - obstacle.height)//2
+                                obstacle.target_x, obstacle.target_y = obstacle.x, obstacle.y
+                                self.enemies.append(obstacle)
+                                
+                        # 3. 壁・天井
+                        elif char in tile_mappings and tile_mappings[char].get("category") == "wall_top":
                             self.map_data[r][c] = 0
-                            self.wall_variants[r][c] = "wall_single_1"
+                            self.wall_top_variants[r][c] = f"wall_top_{tile_mappings[char].get('tile_id', 0)}"
+                            
+                        # 4. 背景・虚無
+                        elif char in tile_mappings and tile_mappings[char].get("category") == "wall_none":
+                            self.map_data[r][c] = 0
+                            self.wall_none_variants[r][c] = f"wall_none_{tile_mappings[char].get('tile_id', 0)}"
+                            
+                        # 5. 床・地面
+                        elif char in tile_mappings and tile_mappings[char].get("category") == "floor":
+                            self.map_data[r][c] = 1
+                            self.floor_variants[r][c] = f"floor_{tile_mappings[char].get('tile_id', 0)}"
+
+                        # 6. 通路
+                        elif char in tile_mappings and tile_mappings[char].get("category") == "corridor":
+                            self.map_data[r][c] = 4
+                            img_path = tile_mappings[char].get("image_path", "")
+                            if img_path:
+                                import os as _os
+                                fk = _os.path.splitext(_os.path.basename(img_path))[0]
+                            else:
+                                fk = "corridor"
+                            self.floor_variants[r][c] = fk
+                        # 6. 特別・特殊タイル (P, D, U)
                         elif char == "P":
                             self.start_pos = (c, r)
                             self.map_data[r][c] = 1
@@ -696,52 +782,75 @@ class Dungeon:
                             self.dungeon_pos = (c, r)
                         elif char == "U": 
                             self.map_data[r][c] = 2
-                        elif char in NPC_DATA:
-                            self.map_data[r][c] = 1
-                            data = NPC_DATA[char]
-                            self.floor_variants[r][c] = data.get("base_tile", "floor_0")
-                            px, py = c * ts, r * ts
-                            npc = NPC(data["name"], px, py, 
-                                      dialogue=data["dialogue"], 
-                                      image_path=data["image_path"],
-                                      base_image_path=data.get("base_image_path"))
-                            self.npcs.append(npc)
-                            # 特殊な位置の記録
-                            if char == "H": self.inn_pos = (c, r)
-                            if char == "R": self.clinic_pos = (c, r)
                             
-                        elif char in ".,[:_~^*+=":
+                        # 7. NPC (village.yml で定義されたIDからロード)
+                        elif char in tile_mappings and tile_mappings[char].get("category") == "npc":
                             self.map_data[r][c] = 1
-                            mapping = {".":"0", ",":"1", "[":"2", ":":"3", "_":"4", "~":"5", "^":"6", "*":"7", "+":"8", "=":"9"}
-                            self.floor_variants[r][c] = f"floor_{mapping[char]}"
-                        elif char in "0123456789":
-                            self.map_data[r][c] = 1
-                            self.floor_variants[r][c] = f"floor_{char}"
-                        elif char in "abcdemnpqr":
-                            mapping = {'a':'0', 'b':'1', 'c':'2', 'd':'3', 'e':'4', 'm':'5', 'n':'6', 'p':'7', 'q':'8', 'r':'9'}
+                            npc_id = tile_mappings[char].get("id")
+                            from constants import NPC_DATA
+                            if npc_id and npc_id in NPC_DATA:
+                                data = NPC_DATA[npc_id]
+                                base_img_path = tile_mappings[char].get("base_image_path", "")
+                                if base_img_path:
+                                    import os as _os
+                                    fk = _os.path.splitext(_os.path.basename(base_img_path))[0]
+                                else:
+                                    fk = data.get("base_tile", "floor_0")
+                                self.floor_variants[r][c] = fk
+                                px, py = c * ts, r * ts
+                                
+                                # 役割の決定（データ定義を最優先し、未定義なら名前から推測）
+                                role = data.get("role")
+                                if not role:
+                                    name = data.get("name", "")
+                                    if "宿屋" in name: role = "inn"
+                                    elif "鍛冶屋" in name: role = "blacksmith"
+                                    elif "武器屋" in name: role = "weapon_shop"
+                                    elif "道具屋" in name: role = "item_shop"
+                                    elif "大魔導士" in name or "魔法屋" in name: role = "magic_shop"
+                                    elif "商人" in name: role = "merchant"
+                                    elif "ギルドマスター" in name: role = "guild_master"
+                                    elif "預かり屋" in name: role = "storage"
+                                    elif "銀行員" in name: role = "bank"
+                                    elif "医者" in name: role = "doctor"
+                                    elif "テレポート屋" in name: role = "teleport"
+                                
+                                npc = NPC(data["name"], px, py, 
+                                          dialogue=data["dialogue"], 
+                                          image_path=data["image_path"],
+                                          base_image_path=data.get("base_image_path"),
+                                          role=role)
+                                self.npcs.append(npc)
+                                # 特殊な位置の記録
+                                if role == "inn": self.inn_pos = (c, r)
+                                if role == "doctor": self.clinic_pos = (c, r)
+                            
+                        # 8. 互換性のためのフォールバック
+                        elif char == "X":
                             self.map_data[r][c] = 0
-                            self.wall_top_variants[r][c] = f"wall_top_{mapping[char]}"
-                        elif char in "fghijvwxyz":
-                            mapping = {'f':'0', 'g':'1', 'h':'2', 'i':'3', 'j':'4', 'v':'5', 'w':'6', 'x':'7', 'y':'8', 'z':'9'}
-                            self.map_data[r][c] = 0
-                            self.wall_none_variants[r][c] = f"wall_none_{mapping[char]}"
-                        elif char == "O":
-                            self.map_data[r][c] = 0
-                            self.wall_variants[r][c] = "wall_single"
+                            self.wall_variants[r][c] = "wall_single_1"
                         elif char == "Y":
                             self.map_data[r][c] = 0
                             self.wall_variants[r][c] = "wall_single_2"
                         elif char == "Z":
                             self.map_data[r][c] = 0
                             self.wall_variants[r][c] = "wall_single_3"
-                        elif char in "KLkl": # 通路 (C/cはNPCや壁として使いたいので除外)
+                        elif char == "O":
+                            self.map_data[r][c] = 0
+                            self.wall_variants[r][c] = "wall_single"
+                        elif char in "KLkl": # 通路
                             self.map_data[r][c] = 4
                         else: 
                             self.map_data[r][c] = 0
                 if not self.rooms: self.rooms = [self.start_pos]
                 else: self.rooms = [self.start_pos] # 固定マップでは開始地点を優先
                 self.refresh_shop_stock(player_rank=getattr(self.player, "guild_rank", "-"))
-                self.enemies = []
+                self.enemies = [e for e in self.enemies if getattr(e, "is_static", False)]
+                
+                # --- [NEW] 固定マップでも障害物を配置可能にする ---
+                if self.player and self.current_floor > 0:
+                    self._spawn_wall_obstacles(self.player)
+                    
                 return
             except Exception as e:
                 import traceback
@@ -1433,13 +1542,27 @@ class Dungeon:
                 dx, dy = (x * self.tile_size) - camera_x, (y * self.tile_size) - camera_y
                 tile = self.map_data[y][x]
                 
-                fk = "wall_none"
+                # [NEW] ゲート（頭上）はここでは地面だけ描画する
+                if tile == TILE_GATE:
+                    ov_key = self.wall_top_variants[y][x]
+                    # 短縮名（wall_pass_0）を使って地面を取得
+                    if ov_key in self.overhead_base_map:
+                        fk = self.overhead_base_map[ov_key]
+                    else:
+                        fk = self.floor_variants[y][x]
+                else:
+                    fk = "wall_none"
+                
                 if tile > 0:
                     # 床、階段、通路
                     if tile == 2: fk = "stairs_up"
                     elif tile == 3: fk = "stairs_down"
                     elif 4 <= tile <= 6: fk = "corridor"
-                    else: fk = self.floor_variants[y][x]
+                    elif tile == TILE_GATE:
+                        # すでに fk が設定されている（命名規則によるもの）場合はそのまま
+                        pass
+                    else: 
+                        fk = self.floor_variants[y][x]
                 else:
                     # 壁(ID 0)
                     wall_type = self._get_wall_texture_key(x, y)
@@ -1646,3 +1769,18 @@ class Dungeon:
                 if self.is_nw(x, y):
                     if random.random() < ratio:
                         self.wall_decoration_variants[y][x] = random.choice(self.available_wall_decoration_variants)
+    def draw_overhead(self, screen, camera_x, camera_y):
+        """プレイヤーの上に重なるタイル（ゲートなど）を描画する"""
+        sw, sh = screen.get_size()
+        sx, ex = max(0, int(camera_x // self.tile_size)), min(self.map_width, int((camera_x + sw) // self.tile_size) + 1)
+        sy, ey = max(0, int(camera_y // self.tile_size)), min(self.map_height, int((camera_y + sh) // self.tile_size) + 1)
+        
+        for y in range(sy, ey):
+            for x in range(sx, ex):
+                if self.map_data[y][x] == TILE_GATE:
+                    dx, dy = (x * self.tile_size) - camera_x, (y * self.tile_size) - camera_y
+                    ov_key = self.wall_top_variants[y][x]
+                    # フルキーを取得して描画
+                    full_key = self.short_to_full_key.get(ov_key, ov_key)
+                    if full_key in self.textures:
+                        screen.blit(self.textures[full_key], (dx, dy))

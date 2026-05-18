@@ -204,7 +204,9 @@ class Dialog:
         self.x = 100
         self.y = screen_height - self.height - 50
         
-        self.text = ""
+        self._text = ""
+        self.pages = []
+        self.page_idx = 0
         # ui.yml の専用フォントを使用
         self.font = font_dialog
         self.auto_close_timer = 0
@@ -212,6 +214,25 @@ class Dialog:
         self.max_scroll = 0
         self.just_opened_timer = 0 # 開いた直後の入力を無視するためのタイマー
 
+    @property
+    def text(self):
+        return self._text
+
+    @text.setter
+    def text(self, value):
+        self._text = value
+        # 直接テキストが代入された場合、それを唯一のページとする（ページ送り処理中を除く）
+        if not getattr(self, "_in_page_flip", False):
+            self.pages = [value]
+            self.page_idx = 0
+
+    def set_pages(self, pages_list):
+        self.pages = list(pages_list) if pages_list else [""]
+        self.page_idx = 0
+        self._in_page_flip = True
+        self.text = self.pages[0]
+        self._in_page_flip = False
+        self.is_active = True
 
     # is_active（開閉状態）は独立した変数ではなく、中央の game_state を使うように変更！
     @property
@@ -228,7 +249,9 @@ class Dialog:
         # 閉じる時（value=False）のみテキストと状態をクリアするように修正
         if not value:
             print(f"[UI] Close Dialog")
-            self.text = ""
+            self._text = ""
+            self.pages = []
+            self.page_idx = 0
             self.auto_close_timer = 0
             self.scroll_y = 0
             game_state["dialog_modal"] = True # デフォルトに戻す
@@ -248,12 +271,22 @@ class Dialog:
                 self.is_active = False
 
     def handle_events(self, events):
-        """操作: スペース/Enterで閉じる、上下キーでスクロール"""
+        """操作: スペース/Enterで閉じる/次のページへ、上下キーでスクロール"""
         if not self.is_active or self.just_opened_timer > 0: return
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_SPACE, pygame.K_RETURN, KEY_CONFIRM):
-                    self.is_active = False
+                    # 次のページがあれば進む
+                    if self.pages and self.page_idx < len(self.pages) - 1:
+                        self.page_idx += 1
+                        self._in_page_flip = True
+                        self.text = self.pages[self.page_idx]
+                        self._in_page_flip = False
+                        self.scroll_y = 0
+                        self.just_opened_timer = 2 # 誤連打防止のための短いウェイト
+                        print(f"[UI] Dialog page advanced to: {self.page_idx + 1}/{len(self.pages)}")
+                    else:
+                        self.is_active = False
                 elif event.key == KEY_MOVE_UP:
                     self.scroll_y = max(0, self.scroll_y - 1)
                 elif event.key == KEY_MOVE_DOWN:
@@ -324,6 +357,15 @@ class Dialog:
         if self.scroll_y < self.max_scroll:
             down_arrow = font_small.render("▼", True, (255, 255, 100))
             screen.blit(down_arrow, (self.x + self.width - 30, self.y + self.height - 30))
+
+        # 5. ページ送りインジケーター（次のページがある場合）
+        if self.pages and self.page_idx < len(self.pages) - 1:
+            # 右下に点滅する ▼ を表示
+            import time
+            blink = int(time.time() * 2) % 2 == 0
+            if blink:
+                next_indicator = font_small.render("▼", True, (200, 255, 200))
+                screen.blit(next_indicator, (self.x + self.width - 55, self.y + self.height - 30))
 
 class CutsceneManager:
     def __init__(self, screen_width, screen_height):
@@ -1362,9 +1404,55 @@ class StatusBar:
         draw_text_shadow(f"{player.coin} G", self.font, COLOR_TEXT, (rx, ry))
         # ランク & GP (GPはデバッグ時のみ表示)
         rank_name = player.guild_rank
-        draw_text_shadow(f"Rank: {rank_name}", self.font, (241, 196, 15), (rx, ry + 28))
+        draw_text_shadow(f"Rank: {rank_name}", self.font, (241, 196, 15), (rx, ry + 23))
+        
+        # 呪い表示 (Rankの下・Hollow表示とジェム◆◆◆◆◆の描画)
+        curse_level = getattr(player, "curse_level", 0)
+        draw_text_shadow(Text.UI.HOLLOW_LABEL, self.font, COLOR_TEXT, (rx, ry + 46))
+        
+        gem_start_x = rx + 75
+        gem_y = ry + 59
+        for i in range(5):
+            gx = gem_start_x + i * 16
+            # 1. 影を描画 (1pxオフセット)
+            pygame.draw.polygon(screen, (10, 15, 20), [
+                (gx + 6 + 1, gem_y + 1),
+                (gx + 12 + 1, gem_y + 6 + 1),
+                (gx + 6 + 1, gem_y + 12 + 1),
+                (gx + 1, gem_y + 6 + 1)
+            ])
+            if i < curse_level:
+                # 活性化した呪い：怪しく光る赤紫・クリムゾンの炎
+                pygame.draw.polygon(screen, (231, 76, 60), [
+                    (gx + 6, gem_y),
+                    (gx + 12, gem_y + 6),
+                    (gx + 6, gem_y + 12),
+                    (gx, gem_y + 6)
+                ])
+                # 内側の光沢ハイライト
+                pygame.draw.polygon(screen, (255, 130, 110), [
+                    (gx + 6, gem_y + 2),
+                    (gx + 9, gem_y + 6),
+                    (gx + 6, gem_y + 10),
+                    (gx + 3, gem_y + 6)
+                ])
+            else:
+                # 休眠状態：暗いガラスのようなグレーの枠
+                pygame.draw.polygon(screen, (30, 35, 45), [
+                    (gx + 6, gem_y),
+                    (gx + 12, gem_y + 6),
+                    (gx + 6, gem_y + 12),
+                    (gx, gem_y + 6)
+                ])
+                pygame.draw.polygon(screen, (70, 80, 95), [
+                    (gx + 6, gem_y),
+                    (gx + 12, gem_y + 6),
+                    (gx + 6, gem_y + 12),
+                    (gx, gem_y + 6)
+                ], 1)
+
         if getattr(player, "is_debug", False):
-            draw_text_shadow(f"GP: {player.guild_point}", self.font, COLOR_TEXT, (rx, ry + 54))
+            draw_text_shadow(f"GP: {player.guild_point}", self.font, COLOR_TEXT, (rx, ry + 70))
 
 
 # --- 視界制限（カンテラ）システム ---
@@ -1604,7 +1692,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                            (player.facing == "left" and dx < 0) or \
                                            (player.facing == "right" and dx > 0)
                                 if is_valid:
-                                    if npc.name == "宿屋":
+                                    if getattr(npc, "role", None) == "inn":
                                         from constants import INN_FEE
                                         dialog.text = Text.NPC.INN_WELCOME
                                         confirm_dialog.text = Text.UI.INN_CONFIRM.format(fee=INN_FEE)
@@ -1615,7 +1703,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                 player.hp = player.max_hp
                                                 
                                                 from systems.data_loader import SAVE_OFFICIAL_PATH
-                                                player.save_to_file(SAVE_OFFICIAL_PATH)
+                                                player.save_to_file()
                                                 
                                                 if has_debt:
                                                     dialog.text = Text.NPC.INN_DEBT
@@ -1636,7 +1724,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                         confirm_dialog.is_active = True
                                         dialog.is_active = True
                                         return
-                                    elif npc.name == "鍛冶屋":
+                                    elif getattr(npc, "role", None) == "blacksmith":
                                         from constants import CONSUMABLE_DATA
                                         has_ore = any(CONSUMABLE_DATA.get(k["key"], {}).get("effect") == "material" for k in player.items)
                                         if has_ore:
@@ -1648,25 +1736,25 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             dialog.text = Text.NPC.BLACKSMITH_NO_ORE
                                             dialog.is_active = True
                                             return
-                                    elif npc.name == "武器屋":
+                                    elif getattr(npc, "role", None) == "weapon_shop":
                                         if shop_dialog and dungeon:
                                             dialog.text = Text.NPC.WEAPON_SHOP_WELCOME
                                             dialog.is_active = True
                                             shop_dialog.open_shop("武器屋", dungeon.weapon_shop_stock)
                                             return
-                                    elif npc.name == "道具屋":
+                                    elif getattr(npc, "role", None) == "item_shop":
                                         if shop_dialog and dungeon:
                                             dialog.text = Text.NPC.ITEM_SHOP_WELCOME
                                             dialog.is_active = True
                                             shop_dialog.open_shop("道具屋", dungeon.item_shop_stock)
                                             return
-                                    elif npc.name == "大魔導士":
+                                    elif getattr(npc, "role", None) == "magic_shop":
                                         if shop_dialog and dungeon:
                                             dialog.text = "フォッフォッフォ、杖のことならわしに任せるがよいぞ。"
                                             dialog.is_active = True
                                             shop_dialog.open_shop("魔法屋", dungeon.magic_shop_stock)
                                             return
-                                    elif npc.name == "商人":
+                                    elif getattr(npc, "role", None) == "merchant":
                                         if shop_dialog:
                                             dialog.text = Text.NPC.MERCHANT_WELCOME
                                             dialog.is_active = True
@@ -1674,7 +1762,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             shop_dialog.setup_sell_mode(player)
                                             shop_dialog.is_active = True
                                             return
-                                    elif npc.name == "ギルドマスター":
+                                    elif getattr(npc, "role", None) == "guild_master":
                                         if guild_dialog and dungeon:
                                             # 状況に応じたメッセージを設定
                                             next_rank_data = dungeon.guild_system.get_next_rank_data(player.guild_rank)
@@ -1710,19 +1798,19 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                 dialog.text = "おお、見事に依頼を達成しましたね！\nおめでとうございます！"
                                                 dialog.is_active = True
                                             return
-                                    elif npc.name == "預かり屋":
+                                    elif getattr(npc, "role", None) == "storage":
                                         if warehouse_dialog:
                                             dialog.text = Text.NPC.WAREHOUSE_WELCOME
                                             dialog.is_active = True
                                             warehouse_dialog.is_active = True
                                             return
-                                    elif npc.name == "銀行員":
+                                    elif getattr(npc, "role", None) == "bank":
                                         if bank_dialog:
                                             dialog.text = Text.NPC.BANK_WELCOME
                                             dialog.is_active = True
                                             bank_dialog.is_active = True
                                             return
-                                    elif npc.name == "医者":
+                                    elif getattr(npc, "role", None) == "doctor":
                                         dialog.text = "\n".join(npc.get_dialogue()); dialog.is_active = True
                                         from constants import DOCTOR_FEE, POISON_CURE_FEE
                                         
@@ -1766,7 +1854,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             dialog.text = Text.UI.DOCTOR_HEALTHY
                                             dialog.is_active = True
                                             return
-                                    elif npc.name == "テレポート屋":
+                                    elif getattr(npc, "role", None) == "teleport":
                                         if teleport_dialog:
                                             # 先に挨拶を表示
                                             dialog.text = "\n".join(npc.get_dialogue())
@@ -1775,8 +1863,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             teleport_dialog.open(player)
                                             return
                                     else:
-                                        dialog.text = "\n".join(npc.get_dialogue())
-                                        dialog.is_active = True
+                                        dialog.set_pages(npc.get_dialogue())
                                     return
                 elif event.key == KEY_MENU:
                     if menu_dialog: menu_dialog.is_active = True
@@ -1849,6 +1936,9 @@ class GuildDialog:
             self.items.append(("mode", "ACCEPT_FIXED", "特別な依頼を見る", "特定の条件で発生する特別な依頼を確認します。"))
             self.items.append(("mode", "ABANDON", "依頼破棄", "現在受けている依頼をキャンセルします。"))
             self.items.append(("mode", "SAVE", "💾 記録する", "現在の進行状況をセーブします。"))
+            if getattr(player, "curse_level", 0) > 0:
+                from constants import CURSE_RECOVERY_COST_GP_PER_LEVEL
+                self.items.append(("mode", "CURE_CURSE", "☠️ 死の呪いを解く", f"ギルドポイント({CURSE_RECOVERY_COST_GP_PER_LEVEL}GP)を支払って、呪いを1段階解除します。"))
             self.items.append(("cancel", None, "🚪 ギルドを出る", "ギルドメニューを終了します。"))
             
         elif self.mode == "REPORT":
@@ -2003,6 +2093,41 @@ class GuildDialog:
                 dialog.text = "これまでの冒険を記録しました！"
                 dialog.is_active = True
                 # セーブ完了後はメニューに戻る
+                self.mode = "MENU"
+            elif self.mode == "CURE_CURSE":
+                from constants import CURSE_RECOVERY_COST_GP_PER_LEVEL
+                cost = CURSE_RECOVERY_COST_GP_PER_LEVEL
+                if player.guild_point >= cost:
+                    player.guild_point -= cost
+                    if getattr(player, "curse_level", 0) > 0:
+                        import random
+                        player.curse_level -= 1
+                        if player.cursed_stats:
+                            removed = random.choice(player.cursed_stats)
+                            player.cursed_stats.remove(removed)
+                            dialog.text = f"死の呪いが一段階解除されました！\n【{player.get_cursed_stats_japanese_single(removed)}】の低下ペナルティが消失しました。"
+                        else:
+                            dialog.text = "死の呪いが一段階解除されました！"
+                    else:
+                        dialog.text = "死の呪いはかかっていません。"
+                    
+                    dialog.is_active = True
+                    # 🎵 効果音再生
+                    from systems.sound_handler import sound_manager
+                    from constants import SOUND_SELECT
+                    sound_manager.play_sfx(SOUND_SELECT)
+                    
+                    # オートセーブ
+                    player.save_to_file()
+                else:
+                    dialog.text = f"ギルドポイント(GP)が足りません！\n解除には {cost}GP 必要ですが、現在 {player.guild_point}GP です。"
+                    dialog.is_active = True
+                    # 🎵 効果音再生
+                    from systems.audio_manager import play_sfx
+                    from constants import SOUND_CANCEL
+                    play_sfx(SOUND_CANCEL)
+                
+                # 解除後はMENUに戻る
                 self.mode = "MENU"
                 
             self.cursor_idx = 0
@@ -2437,6 +2562,7 @@ class StatusDialog:
             lines = [
                 f"【基本ステータス】",
                 f"ランク：{player.guild_rank} (GP:{player.guild_point})",
+                f"カース：{getattr(player, 'curse_level', 0)} / 5",
                 f"HP  ：{player.hp} / {player.max_hp}",
                 f"攻撃力：{player.total_attack}",
                 f"防御力：{player.total_defense}",

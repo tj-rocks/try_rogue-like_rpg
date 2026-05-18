@@ -133,7 +133,7 @@ ARMOR_DATA:
     min_rank: E
     max_rank: D
     rarity: 4
-    defense_bonus: 13
+    defense_bonus: 14
     price: 350
     eva_bonus: 0.05
     aggro_mod: -1
@@ -142,3 +142,4 @@ ARMOR_DATA:
     describe: なめし革を重ねて作られた防具.
     hp_bonus: 0
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    evasion_bonus: 0

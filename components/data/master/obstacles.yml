@@ -38,6 +38,22 @@ wood_barrel:
   image_path: components/pictures/obstacles/barrel.png
   image_scale: 0.8
 
+anvil:
+  name: 金床
+  min_rank: "C"
+  rarity: 1
+  hp: 1
+  defense: 0
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 50
+  min_floor: null
+  max_floor: null
+  max_concurrent: 2
+  max_spawns: 2
+  image_path: components/pictures/dungeon/other_objects/anvil.png
+  image_scale: 0.8
+
 crate:
   name: 木箱
   min_rank: "F"
