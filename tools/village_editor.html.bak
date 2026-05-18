@@ -311,9 +311,7 @@ const TILE = {
 };
 
 const DEFAULT_TILE = ['#111', '#555', '.', '未定義', '', '', 'floor'];
-let baseMapData = [];
-let entityMapData = [];
-let activeLayer = 'base'; // 'base' or 'entity' // 2D array of chars
+let mapData = []; // 2D array of chars
 let selectedChar = '.';
 let availableFiles = null; // Set of verified home-theme image filenames
 let isMouseDown = false;
@@ -428,36 +426,11 @@ function toggleSymbols() {
 function renderFromText() {
   const text = document.getElementById('raw-text').value;
   const lines = text.split('\n');
-  baseMapData = [];
-  entityMapData = [];
-  
-  lines.forEach((line, ri) => {
+  mapData = [];
+  lines.forEach(line => {
     if (line.startsWith('//')) return; // コメント行はスキップ
     if (line.trim() === '') return;     // 空行もスキップ
-    
-    let baseRow = [];
-    let entityRow = [];
-    
-    Array.from(line.replace(/\r/,'')).forEach((ch, ci) => {
-        const t = TILE[ch];
-        if (t && t[6] && (t[6] === 'npc' || t[6] === 'obstacle')) {
-            // It's an entity. Push to entity map, and fallback base map to floor
-            entityRow.push(ch);
-            // Guess background based on bgImgPath string
-            if (t[5] && t[5].includes('floor_1')) {
-                baseRow.push(','); // Indoors floor
-            } else {
-                baseRow.push('.'); // Outdoors grass
-            }
-        } else {
-            // Normal base tile
-            entityRow.push(null);
-            baseRow.push(ch);
-        }
-    });
-    
-    baseMapData.push(baseRow);
-    entityMapData.push(entityRow);
+    mapData.push(Array.from(line.replace(/\r/,'')));
   });
   drawGrid();
 }
@@ -465,17 +438,14 @@ function renderFromText() {
 function drawGrid() {
   const grid = document.getElementById('map-grid');
   grid.innerHTML = '';
-  if (baseMapData.length === 0) return;
+  if (mapData.length === 0) return;
 
-  baseMapData.forEach((rowArr, ri) => {
+  mapData.forEach((rowArr, ri) => {
     const rowDiv = document.createElement('div');
     rowDiv.style.display = 'block';
     rowDiv.style.lineHeight = '0';
 
-    rowArr.forEach((baseCh, ci) => {
-      const entCh = entityMapData[ri][ci];
-      const ch = entCh ? entCh : baseCh;
-
+    rowArr.forEach((ch, ci) => {
       const cell = document.createElement('span');
       cell.className = `cell ${showSymbols ? 'show-symbol' : 'hide-symbol'}`;
       
@@ -538,32 +508,12 @@ function drawGrid() {
   });
 
   document.getElementById('map-title').innerHTML =
-    `🗺 マップビュー (${baseMapData[0]?.length||0}列 × ${baseMapData.length}行)&nbsp;<span style="font-size:11px;color:#4b5563;font-weight:normal;">[左ドラッグ]: 配置、[右クリック / 右ドラッグ]: 消去（外床）</span>`;
+    `🗺 マップビュー (${mapData[0]?.length||0}列 × ${mapData.length}行)&nbsp;<span style="font-size:11px;color:#4b5563;font-weight:normal;">[左ドラッグ]: 配置、[右クリック / 右ドラッグ]: 消去（外床）</span>`;
 }
 
 function setCell(ri, ci, ch, cell) {
-  if (!baseMapData[ri] || ci >= baseMapData[ri].length) return;
-  
-  const t = TILE[ch];
-  const isEntity = t && t[6] && (t[6] === 'npc' || t[6] === 'obstacle');
-  const isEraser = (ch === '.');
-  
-  if (isEntity) {
-      entityMapData[ri][ci] = ch;
-  } else {
-      if (isEraser && entityMapData[ri][ci]) {
-          // Erase entity instead of base tile if an entity exists
-          entityMapData[ri][ci] = null;
-      } else {
-          baseMapData[ri][ci] = ch;
-      }
-  }
-  
-  const entCh = entityMapData[ri][ci];
-  const baseCh = baseMapData[ri][ci];
-  const finalCh = entCh ? entCh : baseCh;
-  ch = finalCh;
-
+  if (!mapData[ri] || ci >= mapData[ri].length) return;
+  mapData[ri][ci] = ch;
   
   const [bg, fg, label, desc, imgPath, bgImgPath] = TILE[ch] || DEFAULT_TILE;
   cell.style.backgroundColor = bg;
@@ -596,7 +546,7 @@ function exportToText() {
   const lines = document.getElementById('raw-text').value.split('\n');
   const comments = lines.filter(l => l.startsWith('//') || l.trim() === '').map(l => l.replace(/\r/,''));
 
-  const mapLines = baseMapData.map(rowArr => rowArr.join(''));
+  const mapLines = mapData.map(rowArr => rowArr.join(''));
   const output = [...comments, ...mapLines].join('\n');
   document.getElementById('raw-text').value = output;
   return output;
@@ -610,23 +560,10 @@ function saveToServer() {
   serverStatus.textContent = '⏳ 保存中...';
   serverStatus.style.color = '#eab308';
   
-  let entities = [];
-  for (let r = 0; r < entityMapData.length; r++) {
-    for (let c = 0; c < entityMapData[r].length; c++) {
-        if (entityMapData[r][c]) {
-            entities.push({
-                char: entityMapData[r][c],
-                x: c,
-                y: r
-            });
-        }
-    }
-  }
-  
   fetch('/save_village', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content: fileContent, filename: currentFilename, entities: entities })
+    body: JSON.stringify({ content: fileContent, filename: currentFilename })
   })
   .then(res => {
     if (!res.ok) throw new Error('保存エラーが発生しました');
@@ -646,8 +583,7 @@ function saveToServer() {
 
 function clearAll() {
   if (confirm('マップグリッドとテキストをクリアしますか？')) {
-    baseMapData = [];
-    entityMapData = [];
+    mapData = [];
     document.getElementById('map-grid').innerHTML = '';
     document.getElementById('raw-text').value = '';
   }
