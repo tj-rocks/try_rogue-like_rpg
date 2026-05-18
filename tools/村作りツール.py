@@ -57,7 +57,13 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 
                 # 1. Load base tile mappings and config from village.yml
                 village_data = load_master_data("village.yml") or {}
-                tile_mappings = village_data.get("TILE_MAPPINGS", {})
+                tile_mappings_raw = village_data.get("TILE_MAPPINGS", {})
+                tile_mappings = {}
+                for k, v in tile_mappings_raw.items():
+                    if isinstance(v, dict):
+                        ch = v.get("char", k)
+                        # Copy to avoid mutating master cache directly if shared
+                        tile_mappings[ch] = dict(v)
                 config = village_data.get("CONFIG", {})
                 
 
@@ -142,6 +148,45 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 # ファイルに書き込む
                 with open(village_path, "w", encoding="utf-8") as f:
                     f.write(text_content)
+                
+                # クライアントから送信されたentitiesを受け取る
+                entities = data.get('entities', [])
+                
+                # グループ化
+                grouped = {}
+                for e in entities:
+                    grouped.setdefault(e['char'], []).append({'x': e['x'], 'y': e['y']})
+
+                village_yml_path = os.path.join(base_dir, "components", "data", "master", "village.yml")
+                
+                from ruamel.yaml import YAML
+                yaml = YAML()
+                yaml.preserve_quotes = True
+                yaml.indent(mapping=2, sequence=4, offset=2)
+                
+                with open(village_yml_path, "r", encoding="utf-8") as f:
+                    village_yml_data = yaml.load(f)
+                
+                # positionsを各定義に注入
+                mappings = village_yml_data.get("TILE_MAPPINGS", {})
+                for k, v in mappings.items():
+                    if not isinstance(v, dict):
+                        continue
+                    ch = v.get("char")
+                    if ch in grouped:
+                        # ループして新しい座標リストをアサイン
+                        v["positions"] = grouped[ch]
+                    else:
+                        # 存在しなければ削除
+                        if "positions" in v:
+                            del v["positions"]
+                
+                # 古いENTITIESブロック（もし残っていれば）を完全に排除
+                if "ENTITIES" in village_yml_data:
+                    del village_yml_data["ENTITIES"]
+                
+                with open(village_yml_path, "w", encoding="utf-8") as f:
+                    yaml.dump(village_yml_data, f)
                 
                 # 正常終了のレスポンス
                 self.send_response(200)

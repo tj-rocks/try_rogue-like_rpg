@@ -677,6 +677,13 @@ async function loadTileDefinitions() {
     if (data.status === 'success' && data.tiles) {
       // APIから取得したマッピングで上書き・追加
       Object.entries(data.tiles).forEach(([ch, val]) => {
+        if (val.positions) {
+          val.positions.forEach(pos => {
+            while (entityMapData.length <= pos.y) entityMapData.push([]);
+            while (entityMapData[pos.y].length <= pos.x) entityMapData[pos.y].push(null);
+            entityMapData[pos.y][pos.x] = ch;
+          });
+        }
         const imgPath = val.image_path ? `../${val.image_path}` : '';
         const bgImgPath = val.bg_image_path ? `../${val.bg_image_path}` : '';
         
