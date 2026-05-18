@@ -56,6 +56,7 @@ class Text:
         GOLD_LABEL = "Gold: {coin} G"
         STATUS_TIPS = "装備の性能はステータスに反映されます"
         RANK_LABEL = "Rank: {rank}"
+        HOLLOW_LABEL = "Hollow"
         ATK_LABEL = "攻撃:{atk:.1f}"
         DEF_LABEL = "防御:{defense:.1f}"
         EVA_LABEL = "回避:{eva}%"

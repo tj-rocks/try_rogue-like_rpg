@@ -1,0 +1,1783 @@
+========================================
+🚀 2DGame テストスイート実行中...
+========================================
+💾 本番セーブデータを一時的にバックアップします...
+----------------------------------------
+🔍 セーブデータ隔離チェック実行中...
+--- セーブデータ隔離テスト ---
+✅ パスチェック合格: 現在のセーブ先 = /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+✅ 隔離テスト合格: 本番用セーブデータは保護されています。
+✅ 隔離確認完了。安全にテストを開始します。
+----------------------------------------
+Running: tests/test_boot.py
+2026-05-15 21:50:47.598 Python[7288:71968926] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:50:47.598 Python[7288:71968926] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- 起動・入力・結果検証 統合テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 0 theme: home
+[DUNGEON] Theme 'home' cached.
+[AUTO-SAVE] Floor transition (-1 -> 0). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+初期位置: (30, 42)
+[Frame 0] Step 0: UP を入力
+結果検証(UP): 位置 (30, 42) -> (30, 42)
+[Frame 30] Step 1: UP を入力
+結果検証(UP): 位置 (30, 42) -> (30, 42)
+[Frame 60] Step 2: DOWN を入力
+結果検証(DOWN): 位置 (30, 42) -> (30, 42)
+[Frame 90] Step 3: LEFT を入力
+結果検証(LEFT): 位置 (30, 42) -> (30, 42)
+[Frame 120] Step 4: RIGHT を入力
+結果検証(RIGHT): 位置 (30, 42) -> (30, 42)
+[Frame 150] Step 5: ATTACK を入力
+結果検証(ATTACK): 実行完了
+[Frame 170] Step 6: MENU を入力
+[UI] Open MenuDialog (--- MENU ---)
+結果検証(MENU): is_active=True
+[UI] Close MenuDialog
+[OK] 起動・描画・入力結果検証テスト合格！
+✅ tests/test_boot.py: PASSED
+----------------------------------------
+Running: tests/test_hitbox.py
+2026-05-15 21:50:49.062 Python[7293:71969131] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:50:49.062 Python[7293:71969131] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- 判定ロジックテスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+片手剣 (UP) 攻撃範囲: [(5, 4)]
+片手剣 (RIGHT) 攻撃範囲: [(6, 5)]
+槍 (UP) 攻撃範囲: [(5, 4), (5, 3)]
+巨大敵 (352, 288) 占有マス: [(7, 4), (5, 5), (6, 5), (5, 4), (6, 4), (7, 6), (5, 6), (6, 6), (7, 5)]
+[OK] 巨大敵の占有マス (5, 4) にヒットしました
+--- すべての判定テストに合格しました！ ---
+✅ tests/test_hitbox.py: PASSED
+----------------------------------------
+Running: tests/test_lantern_pickup.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- カンテラ取得・装備シナリオテスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+初期状態のカンテラ: None
+取得メッセージ: カンテラ を 手に入れた！
+インベントリの装備から 切り替えられます
+✅ カンテラ取得シナリオテスト合格！
+✅ tests/test_lantern_pickup.py: PASSED
+----------------------------------------
+Running: tests/test_save_load.py
+2026-05-15 21:50:50.328 Python[7299:71969209] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:50:50.328 Python[7299:71969209] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- セーブ＆ロード整合性テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[SYSTEM] Saving progress to tests/test_save_data.json...
+[INFO] データをセーブしました: tests/test_save_data.json
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[INFO] データをロードしました
+[OK] セーブ＆ロード整合性テスト合格！
+✅ tests/test_save_load.py: PASSED
+----------------------------------------
+Running: tests/test_revive_cure.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- 復活時の状態異常回復テスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+状態セット: poison
+アイテム所持: True
+致命的ダメージ付与...
+生存確認: True, HP: 50
+現在の状態: normal
+✅ 復活時の状態異常回復テスト合格！
+✅ tests/test_revive_cure.py: PASSED
+----------------------------------------
+Running: tests/test_death.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- 死亡ペナルティテスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[DEATH] Progress saved with penalty to: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+所持金検証: 期待値 450, 実際 450
+装備検証: weapon_inventory=1, equipped_weapon=None
+[OK] 死亡ペナルティテスト合格！
+--- 死亡時借金テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[DEATH] Progress saved with penalty to: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+借金検証: 実際 -45
+[OK] 死亡時借金テスト合格！
+--- 復活位置検証テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 0 theme: home
+[DUNGEON] Theme 'home' cached.
+座標検証: 期待値 (704, 1280), 実際 (704, 1280)
+[OK] 復活位置検証テスト合格！
+--- 毒状態での死亡・クリニック復活テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 0 theme: home
+[DUNGEON] Theme 'home' loaded from cache.
+[DEATH] Progress saved with penalty to: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+座標検証: 期待値 (704, 1280), 実際 (704, 1280)
+状態検証: hp=100, condition=normal
+[OK] 毒状態での死亡・クリニック復活テスト合格！
+✅ tests/test_death.py: PASSED
+----------------------------------------
+Running: tests/test_shopping.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- 全店舗購入テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 0 theme: home
+[DUNGEON] Theme 'home' cached.
+[AUTO-SAVE] Floor transition (-1 -> 0). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+テスト対象店舗数: 3
+店: 武器屋 | アイテム: 鉄の剣 (iron_sword) | 価格: 300
+[OK] 武器屋 での購入成功
+店: 道具屋 | アイテム: 罠解除ツール (trap_remover) | 価格: 100
+[OK] 道具屋 での購入成功
+店: 魔法屋 | アイテム: 火炎の杖 (fire_stave) | 価格: 1200
+[OK] 魔法屋 での購入成功
+[OK] 全店舗購入テスト合格！
+[OK] 全店舗購入テスト合格！
+✅ tests/test_shopping.py: PASSED
+----------------------------------------
+Running: tests/test_quest.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- クエスト受注・達成テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+テストクエスト: スイスイスライムの討伐 (ID: boss_hunt_suisui_slime, 対象: suisui_slime, 必要数: 1)
+[OK] クエスト受注成功
+[INFO] 敵 'suisui_slime' を 1 体討伐しました
+[OK] クエスト達成確認成功
+[OK] クエスト報告（削除）成功
+[OK] クエスト受注・達成テスト合格！
+--- クエスト生成データ整合性テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[OK] 10回の生成で全クエストの必須フィールドを確認しました
+[OK] クエスト生成データ整合性テスト合格！
+--- 固定クエストマスターデータ整合性テスト開始 ---
+  [OK] boss_hunt_suisui_slime: reward_gold=500, reward_gp=50, target_key=suisui_slime
+  [OK] boss_hunt_sukesuke_skeleton: reward_gold=1500, reward_gp=150, target_key=sukesuke_skeleton
+[OK] 固定クエストマスターデータ整合性テスト合格！
+✅ tests/test_quest.py: PASSED
+----------------------------------------
+Running: tests/test_blacksmith.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- 鍛冶・強化ステータステスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+武器初期状態: 鉄の剣, 総攻撃力: 13
+武器強化後 (+10): 鉄の剣+10, 総攻撃力: 15.2
+[SKIP] leather_armor がデータにありません
+強化限界設定を発見: times_limit=50
+限界突破時の上昇量: 0.0
+[OK] 鍛冶・強化ステータステスト合格！
+✅ tests/test_blacksmith.py: PASSED
+----------------------------------------
+Running: tests/test_game_flow.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- 初期位置テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 0 theme: home
+[DUNGEON] Theme 'home' cached.
+[AUTO-SAVE] Floor transition (-1 -> 0). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+初期階層: 0
+プレイヤー位置: (1920, 2688)
+[OK] 初期階層・位置確認成功
+--- 階層移動テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] pot HP set to 8
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] rubble HP set to 24
+[Obstacle] wood_barrel HP set to 16
+[POPULATION] Floor 1 | Rooms: 8 | Monsters: 8/16 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 1 | Item Candidates: 27 | Spawning: 3
+[Dungeon] Floor 1 | Potential Tiles: 73
+  - Item 1: 火炎の杖 at (8, 24)
+  - Item 2: 皮の胸当て at (13, 15)
+  - Item 3: 冒険者の服 at (14, 2)
+[Dungeon] Floor 1 | Total Items Placed: 3/3
+[AUTO-SAVE] Floor transition (-1 -> 1). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+移動後階層: 1
+1階移動直後の位置: (14, 13), タイル: 2
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 2 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] crate HP set to 16
+[Obstacle] pot HP set to 8
+[POPULATION] Floor 2 | Rooms: 4 | Monsters: 3/8 | Obstacles: 2/2 | Reason: Warped
+[Dungeon] Floor 2 | Item Candidates: 27 | Spawning: 1
+[Dungeon] Floor 2 | Potential Tiles: 54
+  - Item 1: 木の円盾 at (11, 20)
+[Dungeon] Floor 2 | Total Items Placed: 1/1
+[AUTO-SAVE] Floor transition (1 -> 2). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+2階移動直後の位置: (3, 25), タイル: 2
+[OK] 階層移動(1->2)成功
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] pot HP set to 8
+[Obstacle] rubble HP set to 24
+[POPULATION] Floor 1 | Rooms: 4 | Monsters: 4/8 | Obstacles: 2/2 | Reason: Warped
+[Dungeon] Floor 1 | Item Candidates: 27 | Spawning: 1
+[Dungeon] Floor 1 | Potential Tiles: 37
+  - Item 1: 毒消薬 at (23, 3)
+[Dungeon] Floor 1 | Total Items Placed: 1/1
+[AUTO-SAVE] Floor transition (2 -> 1). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+1階(逆送)移動直後の位置: (6, 23), タイル: 3
+[OK] 階層移動(2->1)成功
+--- アイテム取得・使用テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[OK] アイテム 'hp_potion' の取得成功
+[OK] アイテム使用によるHP回復成功 (HP: 50)
+✅ tests/test_game_flow.py: PASSED
+----------------------------------------
+Running: tests/test_combat_sim.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- 敵との実戦交戦シミュレーションテスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 0 theme: home
+[DUNGEON] Theme 'home' cached.
+[AUTO-SAVE] Floor transition (-1 -> 0). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+戦闘開始: プレイヤーHP=100, 敵(slime)HP=11
+[Step 1] プレイヤーの攻撃（Spaceキー入力）
+[COMBAT] 自分 -> スライム: Damage=15, Critical=True, Miss=False, TargetHP: 0, TargetCond: normal
+[UI] Open Dialog (Msg: クリティカルヒット 自分 は スライム に 15 ダメージを...)
+[Frame 1] 敵の被ダメージを検知！ HP: 0
+[UI] Close Dialog
+[POPULATION] Floor 1 | Rooms: 1 | Monsters: 0/2 | Obstacles: 0/0 | Reason: Killed
+[OK] 交戦シミュレーションテスト合格！
+✅ tests/test_combat_sim.py: PASSED
+----------------------------------------
+Running: tests/test_npc_collision.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- NPC衝突判定テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 0 theme: home
+[DUNGEON] Theme 'home' cached.
+[AUTO-SAVE] Floor transition (-1 -> 0). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[SKIP] 見習い冒険者が見つかりませんでした
+✅ tests/test_npc_collision.py: PASSED
+----------------------------------------
+Running: tests/test_enemy_collision.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- 敵同士の衝突判定テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 0 theme: home
+[DUNGEON] Theme 'home' cached.
+[AUTO-SAVE] Floor transition (-1 -> 0). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+敵A位置: (10, 10)
+敵B位置: (11, 10)
+移動判定結果: False
+[OK] 敵同士の衝突判定テスト合格！
+
+--- 移動中のすり抜け防止テスト開始 ---
+移動中マスへの進入判定結果: False
+[OK] 移動中のすり抜け防止テスト合格！
+✅ tests/test_enemy_collision.py: PASSED
+----------------------------------------
+Running: tests/test_item_turn_consumption.py
+2026-05-15 21:50:55.454 Python[7333:71969565] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:50:55.454 Python[7333:71969565] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+--- アイテム使用ターン消費テスト ---
+使用前: HP=50, enemy_turn_pending=False
+使用後: HP=90, enemy_turn_pending=True
+更新後: turn_state=enemies, enemy_turn_pending=False
+✅ アイテム使用ターン消費テスト合格！
+✅ tests/test_item_turn_consumption.py: PASSED
+----------------------------------------
+Running: tests/test_town_services.py
+2026-05-15 21:50:56.378 Python[7336:71969616] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:50:56.378 Python[7336:71969616] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+--- 銀行テスト開始 ---
+[UI] Open BankDialog (銀行)
+[UI] BankDialog Button: CONFIRM (100 G 預ける)
+[UI] Open Dialog (Msg: 100 G 預かりました...)
+100G預け入れ後: 所持金=1900, 銀行残高=100
+[UI] BankDialog Button: CONFIRM (100 G 引き出す)
+[UI] Open Dialog (Msg: 100 G 引き出しました...)
+100G引き出し後: 所持金=2000, 銀行残高=0
+✅ 銀行テスト合格！
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+
+--- 預かり屋テスト開始 ---
+[UI] Open WarehouseDialog (MENU)
+預け入れ確認表示中: 手数料 10 G で ヒールポーション を預けますか？
+預け入れ後: 所持金=990, 倉庫数=1, 手持ち数=0
+引き出し後: 倉庫数=0, 手持ち数=1
+✅ 預かり屋テスト合格！
+✅ tests/test_town_services.py: PASSED
+----------------------------------------
+Running: tests/test_inn_debt.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- 宿屋借金テスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 0 theme: home
+[DUNGEON] Theme 'home' cached.
+確認ダイアログ表示中: 一泊 60 G だよ泊まっていくかい？
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[INN] Rest Complete. Debt: True, New Coin: -60
+借金成功: 所持金 -60G
+--- 借金返済テスト ---
+[OK] 借金返済テスト合格: 武器を売却後の所持金 40G
+[OK] 宿屋借金・返済テスト合格: 最終所持金 40G, HP 100/100
+
+🎉 宿屋借金テストに合格しました！
+✅ tests/test_inn_debt.py: PASSED
+----------------------------------------
+Running: tests/test_stave_effects.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- 燈の杖テスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Dungeon] Converted 1 sandwiched walls to floor.
+[MAGIC] Execute Stave: 燈の杖 (Key: light_stave, Effect: light_all)
+[OK] 燈の杖テスト合格
+--- 回復の杖テスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' loaded from cache.
+[MAGIC] Execute Stave: 回復の杖 (Key: heal_stave, Effect: heal)
+[OK] 回復の杖テスト合格
+--- 火炎の杖テスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' loaded from cache.
+[Dungeon] Converted 2 sandwiched walls to floor.
+[MAGIC] Execute Stave: 火炎の杖 (Key: fire_stave, Effect: fire)
+[MAGIC] Fire Offsets: [[1, -1], [1, 0], [1, 1], [2, -1], [2, 0], [2, 1]]
+[MAGIC] Add FireEffect at Tile (3, 1)
+[MAGIC] Add FireEffect at Tile (3, 2)
+[MAGIC] Add FireEffect at Tile (3, 3)
+[MAGIC] Add FireEffect at Tile (4, 1)
+[MAGIC] Add FireEffect at Tile (4, 2)
+[MAGIC] Add FireEffect at Tile (4, 3)
+[COMBAT] テスト勇者 -> スライム: Damage=23, Critical=True, Miss=False, TargetHP: 77, TargetCond: normal
+敵HP検証: 期待値 < 100, 実際 77
+[OK] 火炎の杖テスト合格
+--- 吹き飛ばしの杖テスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' loaded from cache.
+[MAGIC] Execute Stave: 吹き飛ばしの杖 (Key: knockback_stave, Effect: knockback)
+[MAGIC] Knockback Effect added: From (2,2) to (3,2)
+[COMBAT] テスト勇者 -> スライム: Damage=3, Critical=False, Miss=False, TargetHP: 8, TargetCond: normal
+[MAGIC] Knockback Slide added: From (3,2) to (13,2)
+位置検証: 期待値 > 192, 実際 832
+速度検証: 期待値 1200, 実際 1200
+[OK] 吹き飛ばしの杖テスト合格
+--- 無敵の杖テスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' loaded from cache.
+[MAGIC] Execute Stave: 無敵の杖 (Key: invincible_stave, Effect: invincible)
+[OK] 無敵の杖テスト合格
+--- 壊れた杖テスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' loaded from cache.
+[OK] 壊れた杖テスト合格
+
+🎉 全ての杖効果テストに合格しました！
+✅ tests/test_stave_effects.py: PASSED
+----------------------------------------
+Running: tests/test_combat_damage.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+
+[TEST] 戦闘ダメージ計算テストを開始 (実クラス使用版)...
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+DEBUG: AttackerAtk=8, TargetDef=1
+プレイヤー攻撃テスト(正面): Damage=7, Crit=False, Miss=False
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+敵攻撃テスト(装備なし): Damage=9, Def=3
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[[93mWARNING[0m] Image not found: components/pictures/armor/leather_armor/right.png
+防具装備状態: BaseDef=3, TotalDef=13
+敵攻撃テスト(防具あり): Damage=10, TotalDef=13
+[SUCCESS] ダメージ計算テストが正常に完了しました。
+
+ALL COMBAT DAMAGE TESTS PASSED
+✅ tests/test_combat_damage.py: PASSED
+----------------------------------------
+Running: tests/test_combat_logic.py
+2026-05-15 21:50:58.559 Python[7352:71969775] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:50:58.559 Python[7352:71969775] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Dungeon] Converted 1 sandwiched walls to floor.
+Testing Combat: Enemy Initial HP = 11
+Attack Trial 1/20...
+[COMBAT] 自分 -> スライム: Damage=951, Critical=True, Miss=False, TargetHP: 0, TargetCond: normal
+[OK] Hit detected! Enemy HP: 11 -> 0
+
+[RESULT] Combat Logic Test: PASSED
+✅ tests/test_combat_logic.py: PASSED
+----------------------------------------
+Running: tests/test_attack_turn_transition.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+
+[TEST] 攻撃後のターン遷移テストを開始...
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+初期状態: turn_state=player, player.is_attacking=False
+攻撃開始後: is_attacking=True, enemy_turn_pending=True
+[COMBAT] 自分 -> スライム: Damage=15, Critical=True, Miss=False, TargetHP: 0, TargetCond: normal
+アニメーション終了後: is_attacking=False, turn_state=enemies
+[SUCCESS] 攻撃後のターン遷移が正常に確認されました。
+
+ALL TESTS PASSED
+✅ tests/test_attack_turn_transition.py: PASSED
+----------------------------------------
+Running: tests/test_collision_phasing.py
+2026-05-15 21:50:59.910 Python[7358:71969849] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:50:59.910 Python[7358:71969849] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Testing Phasing: Enemy moving (2,2) -> (3,2). Player trying to enter (3,2).
+[OK] Phasing blocked! Player cannot enter the enemy's target tile.
+Testing Idle: Enemy idling at (3,2) with offset. Player trying to enter (3,2).
+[OK] Idle collision blocked!
+
+[RESULT] Collision Phasing Test: PASSED
+✅ tests/test_collision_phasing.py: PASSED
+----------------------------------------
+Running: tests/test_decimal_impact.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+--- [検証] 小数点攻撃力の有効性テスト ---
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=1, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+攻撃力 8.0 の時のダメージ平均: 1.00 (Min: 1, Max: 1)
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+[COMBAT] Player -> Slime: Damage=2, Critical=False, Miss=False, TargetHP: 100, TargetCond: <MagicMock name='mock.condition' id='4388900208'>
+攻撃力 8.2 の時のダメージ平均: 2.00 (Min: 2, Max: 2)
+[OK] 小数点以下の攻撃力がダメージ計算に正しく反映されています。
+✅ tests/test_decimal_impact.py: PASSED
+----------------------------------------
+Running: tests/test_equipment_offsets.py
+2026-05-15 21:51:00.979 Python[7364:71969912] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:51:00.979 Python[7364:71969912] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+[TEST] 装備品オフセット変更の検証を開始...
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+
+[Shield Offset Test]
+[[93mWARNING[0m] Image not found: components/pictures/shield/wooden_round_shield/left.png
+[[93mWARNING[0m] Image not found: components/pictures/shield/wooden_round_shield/right.png
+[[93mWARNING[0m] Image not found: components/pictures/shield/wooden_round_shield/up.png
+初期オフセット (down): 22, 7
+変更後オフセット (down): 32, 27
+✓ 盾のオフセット反映成功
+
+[Armor Offset Test]
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+初期オフセット (left): 0, 0
+変更後オフセット (left): -5, 15
+✓ 鎧のオフセット反映成功
+
+[Weapon Offset Test]
+初期武器オフセット (right): -7, -4
+変更後武器オフセット (right): 23, -14
+✓ 武器のオフセット反映成功
+
+[SUCCESS] すべての装備品オフセット検証を通過しました！
+✅ tests/test_equipment_offsets.py: PASSED
+----------------------------------------
+Running: tests/test_evasion.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+
+[TEST] 回避率の統計テストを開始 (1000回試行)...
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+回避率 20% テスト結果: Miss=198/1000 (19.8%)
+回避 20% + ブロック 10% テスト結果: Miss=301/1000 (30.1%)
+[SUCCESS] 回避率・ブロック率の統計テストが正常に完了しました。
+✅ tests/test_evasion.py: PASSED
+----------------------------------------
+Running: tests/test_movement.py
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+✅ tests/test_movement.py: PASSED
+----------------------------------------
+Running: tests/test_rank_limit.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- [統合テスト] ランク '-' (未加入) の制限 & ワープテスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 0 theme: home
+[DUNGEON] Theme 'home' cached.
+[Step] ダイアログで『はい』を選択して遷移を検証
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Dungeon] Converted 1 sandwiched walls to floor.
+[Obstacle] crate HP set to 16
+[Obstacle] pot HP set to 8
+[Obstacle] wood_barrel HP set to 16
+[POPULATION] Floor 1 | Rooms: 6 | Monsters: 5/12 | Obstacles: 3/3 | Reason: Warped
+[Dungeon] Floor 1 | Item Candidates: 27 | Spawning: 2
+[Dungeon] Floor 1 | Potential Tiles: 56
+  - Item 1: 冒険者の服 at (13, 7)
+  - Item 2: 冒険者の服 at (14, 7)
+[Dungeon] Floor 1 | Total Items Placed: 2/2
+[AUTO-SAVE] Floor transition (-1 -> 1). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' cached.
+Floor 11 theme: standard
+[DUNGEON] Theme 'standard' loaded from cache.
+[OK] ランク '-' の統合テスト通過
+--- [統合テスト] ランク 'F' の制限 & ワープテスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 11 theme: standard
+[DUNGEON] Theme 'standard' loaded from cache.
+[MEMORY] Dungeon texture cache cleared (2 themes)
+Floor 12 theme: standard
+[DUNGEON] Theme 'standard' cached.
+[AUTO-SAVE] Floor transition (-1 -> 12). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[OK] ランク 'F' の統合テスト通過
+--- [統合テスト] 落とし穴(Pitfall)のランク制限テスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+ランク不足踏み込み: dialog.is_active=True, player.x=4
+[WARP] Pitfall animation started. Target floor: 2
+[DUNGEON] Trap Triggered: type=pitfall, msg=落とし穴 を踏んだ
+真っ暗な穴に 落ちていく...
+昇格クエスト中踏み込み: player.is_falling=True, trap.is_triggered=True
+[OK] 落とし穴のランク制限テスト通過
+
+=== すべてのランク制限・遷移統合テストに合格しました！ ===
+✅ tests/test_rank_limit.py: PASSED
+----------------------------------------
+Running: tests/test_trap.py
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+--- 毒矢の罠テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] pot HP set to 8
+[Obstacle] pot HP set to 8
+[Obstacle] crate HP set to 16
+[Obstacle] rubble HP set to 24
+[POPULATION] Floor 1 | Rooms: 7 | Monsters: 7/14 | Obstacles: 3/3 | Reason: Warped
+[Dungeon] Floor 1 | Item Candidates: 27 | Spawning: 2
+[Dungeon] Floor 1 | Potential Tiles: 67
+  - Item 1: 壊れた盾 at (21, 5)
+  - Item 2: 壊れかけの剣 at (10, 26)
+[Dungeon] Floor 1 | Total Items Placed: 2/2
+[AUTO-SAVE] Floor transition (-1 -> 1). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[DUNGEON] Trap Triggered: type=poison_trap, msg=毒矢の罠 を踏んだ
+
+毒を受けてしまった！
+プレイヤーの現在の状態: poison
+[OK] 毒状態での描画成功（クラッシュなし）
+[OK] 毒矢の罠テスト合格！
+--- 地雷の罠テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] crate HP set to 16
+[Obstacle] rubble HP set to 24
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] crate HP set to 16
+[POPULATION] Floor 1 | Rooms: 8 | Monsters: 9/16 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 1 | Item Candidates: 27 | Spawning: 3
+[Dungeon] Floor 1 | Potential Tiles: 102
+  - Item 1: カンテラ at (1, 17)
+  - Item 2: 回復の杖 at (15, 11)
+  - Item 3: 木の棍棒 at (1, 2)
+[Dungeon] Floor 1 | Total Items Placed: 3/3
+[AUTO-SAVE] Floor transition (-1 -> 1). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[DUNGEON] Trap Triggered: type=mine, msg=地雷 を踏んだ
+地雷を踏んだ 50 ダメージ
+初期HP: 100 -> 踏んだ後のHP: 50
+[OK] 地雷の罠テスト合格！
+✅ tests/test_trap.py: PASSED
+----------------------------------------
+Running: tests/test_quest_feedback.py
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+OK
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Completion message: 
+<Y>【瓦礫の撤去】の条件を達成した！</Y>
+帰還して報告しよう。
+Yellow line detected: 【瓦礫の撤去】の条件を達成した！
+✅ tests/test_quest_feedback.py: PASSED
+----------------------------------------
+Running: tests/test_quest_generation.py
+.pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+Generated Quest: [困り果てた開拓者] [F] スライムを3匹討伐 - 探索中の商人がスライムに襲われました。安全確保のため討伐をお願いします。
+Generated Quest: [村の老人] [F] 壺を3個破壊 - 探索路の整備のため、邪魔な壺の撤去を依頼します。
+Generated Quest: [預かり所の管理人] [F] 壺を1個破壊 - 探索路の整備のため、邪魔な壺の撤去を依頼します。
+Generated Quest: [旅の僧侶] [F] 樽を2個破壊 - 古びた樽が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [宿屋の看板娘] [F] スライムを2匹討伐 - 深層へ向かうルートにスライムが群生しています。早急な対応を！
+Generated Quest: [異国の商人] [F] 瓦礫を3個破壊 - 放置された瓦礫が探索の妨げになっています。片付けてください。
+Generated Quest: [銀行員] [F] スライムを1匹討伐 - 探索中の商人がスライムに襲われました。安全確保のため討伐をお願いします。
+Generated Quest: [心配性の母親] [F] スライムを1匹討伐 - 最近、ダンジョンの浅層でスライムが増えすぎて困っています。少し数を減らしてください。
+Generated Quest: [商人のギルド長] [F] 瓦礫を3個破壊 - 探索路に瓦礫が放置されていて邪魔です。撤去をお願いします。
+Generated Quest: [武器屋の親父] [F] 樽を2個破壊 - 探索路の整備のため、邪魔な樽の撤去を依頼します。
+Generated Quest: [心配性の母親] [F] 木箱を1個破壊 - 放置された木箱が探索の妨げになっています。片付けてください。
+Generated Quest: [異国の商人] [F] まわるがめを2匹討伐 - 深層へ向かうルートにまわるがめが群生しています。早急な対応を！
+Generated Quest: [引退した冒険者] [F] まわるがめを1匹討伐 - 最近、ダンジョンの浅層でまわるがめが増えすぎて困っています。少し数を減らしてください。
+Generated Quest: [大魔導士] [F] 瓦礫を1個破壊 - 探索路の整備のため、邪魔な瓦礫の撤去を依頼します。
+Generated Quest: [心配性の母親] [F] 瓦礫を2個破壊 - 古びた瓦礫が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [迷子の少女] [F] 樽を2個破壊 - 放置された樽が探索の妨げになっています。片付けてください。
+Generated Quest: [武器屋の親父] [F] まわるがめを1匹討伐 - 最近、ダンジョンの浅層でまわるがめが増えすぎて困っています。少し数を減らしてください。
+Generated Quest: [村の老人] [F] ふつうたこを1匹討伐 - 探索のついでに、ふつうたこを片付けてきてくれませんか？
+Generated Quest: [名もなき旅人] [F] 瓦礫を1個破壊 - 古びた瓦礫が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [心配性の母親] [F] スライムを2匹討伐 - 探索のついでに、スライムを片付けてきてくれませんか？
+Generated Quest: [引退した冒険者] [F] まわるがめを3匹討伐 - 生態系の調査のため、特定の階層におけるまわるがめの個体数調整が必要です。
+Generated Quest: [大魔導士] [F] 瓦礫を1個破壊 - 探索路の整備のため、邪魔な瓦礫の撤去を依頼します。
+Generated Quest: [お忍びの貴族] [F] 瓦礫を2個破壊 - 瓦礫の中に魔物が潜んでいるとの報告がありました。今のうちに破壊を！
+Generated Quest: [商人のギルド長] [F] 樽を3個破壊 - 探索路の整備のため、邪魔な樽の撤去を依頼します。
+Generated Quest: [腕利きの料理人] [F] 壺を2個破壊 - 放置された壺が探索の妨げになっています。片付けてください。
+Generated Quest: [ギルドマスター] [F] まわるがめを1匹討伐 - 深層へ向かうルートにまわるがめが群生しています。早急な対応を！
+Generated Quest: [お忍びの貴族] [F] 瓦礫を2個破壊 - 古びた瓦礫が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [怪しい研究者] [F] 木箱を3個破壊 - 探索路の整備のため、邪魔な木箱の撤去を依頼します。
+Generated Quest: [腕利きの料理人] [F] 壺を2個破壊 - 探索路の整備のため、邪魔な壺の撤去を依頼します。
+Generated Quest: [宿屋の女将] [F] スライムを1匹討伐 - 生態系の調査のため、特定の階層におけるスライムの個体数調整が必要です。
+Generated Quest: [引退した冒険者] [F] ふつうたこを1匹討伐 - 最近、ダンジョンの浅層でふつうたこが増えすぎて困っています。少し数を減らしてください。
+Generated Quest: [銀行員] [F] スライムを1匹討伐 - 探索中の商人がスライムに襲われました。安全確保のため討伐をお願いします。
+Generated Quest: [旅の僧侶] [F] スライムを3匹討伐 - 深層へ向かうルートにスライムが群生しています。早急な対応を！
+Generated Quest: [迷子の少女] [F] スライムを2匹討伐 - 深層へ向かうルートにスライムが群生しています。早急な対応を！
+Generated Quest: [近所の農夫] [F] 壺を3個破壊 - 壺の中に魔物が潜んでいるとの報告がありました。今のうちに破壊を！
+Generated Quest: [宿屋の看板娘] [F] ふつうたこを2匹討伐 - 探索中の商人がふつうたこに襲われました。安全確保のため討伐をお願いします。
+Generated Quest: [異国の商人] [F] 木箱を1個破壊 - 古びた木箱が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [怪しい研究者] [F] ふつうたこを1匹討伐 - 最近、ダンジョンの浅層でふつうたこが増えすぎて困っています。少し数を減らしてください。
+Generated Quest: [商人のギルド長] [F] 木箱を1個破壊 - 古びた木箱が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [商人のギルド長] [F] スライムを1匹討伐 - 生態系の調査のため、特定の階層におけるスライムの個体数調整が必要です。
+Generated Quest: [ギルドの受付嬢] [F] まわるがめを3匹討伐 - 深層へ向かうルートにまわるがめが群生しています。早急な対応を！
+Generated Quest: [武器屋の親父] [F] 木箱を2個破壊 - 探索路に木箱が放置されていて邪魔です。撤去をお願いします。
+Generated Quest: [鍛冶屋の親方] [F] 木箱を2個破壊 - 探索路に木箱が放置されていて邪魔です。撤去をお願いします。
+Generated Quest: [怪しい研究者] [F] ふつうたこを3匹討伐 - 深層へ向かうルートにふつうたこが群生しています。早急な対応を！
+Generated Quest: [腕利きの料理人] [F] 樽を2個破壊 - 古びた樽が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [お忍びの貴族] [F] 樽を2個破壊 - 放置された樽が探索の妨げになっています。片付けてください。
+Generated Quest: [迷子の少女] [F] 壺を3個破壊 - 探索路に壺が放置されていて邪魔です。撤去をお願いします。
+Generated Quest: [銀行員] [F] スライムを3匹討伐 - 探索中の商人がスライムに襲われました。安全確保のため討伐をお願いします。
+Generated Quest: [倉庫の管理人] [F] 樽を1個破壊 - 樽の中に魔物が潜んでいるとの報告がありました。今のうちに破壊を！
+Generated Quest: [道具屋の店主] [F] まわるがめを1匹討伐 - 生態系の調査のため、特定の階層におけるまわるがめの個体数調整が必要です。.
+----------------------------------------------------------------------
+Ran 2 tests in 0.001s
+
+OK
+
+Generated Quest: [迷子の少女] [F] 瓦礫を1個破壊 - 瓦礫の中に魔物が潜んでいるとの報告がありました。今のうちに破壊を！
+Generated Quest: [ギルドの受付嬢] [F] スライムを2匹討伐 - 深層へ向かうルートにスライムが群生しています。早急な対応を！
+Generated Quest: [お忍びの貴族] [F] ふつうたこを3匹討伐 - 探索のついでに、ふつうたこを片付けてきてくれませんか？
+Generated Quest: [異国の商人] [F] 壺を1個破壊 - 古びた壺が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [お忍びの貴族] [F] 樽を2個破壊 - 古びた樽が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [迷子の少女] [F] 樽を2個破壊 - 探索路に樽が放置されていて邪魔です。撤去をお願いします。
+Generated Quest: [武器屋の親父] [F] 木箱を3個破壊 - 古びた木箱が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [新米の衛兵] [F] 瓦礫を3個破壊 - 古びた瓦礫が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [迷子の少女] [F] まわるがめを2匹討伐 - 最近、ダンジョンの浅層でまわるがめが増えすぎて困っています。少し数を減らしてください。
+Generated Quest: [見習い冒険者] [F] 壺を1個破壊 - 探索路に壺が放置されていて邪魔です。撤去をお願いします。
+Generated Quest: [旅の僧侶] [F] 樽を3個破壊 - 樽の中に魔物が潜んでいるとの報告がありました。今のうちに破壊を！
+Generated Quest: [村の老人] [F] ふつうたこを1匹討伐 - 探索のついでに、ふつうたこを片付けてきてくれませんか？
+Generated Quest: [お忍びの貴族] [F] 壺を2個破壊 - 放置された壺が探索の妨げになっています。片付けてください。
+Generated Quest: [名もなき旅人] [F] スライムを2匹討伐 - 深層へ向かうルートにスライムが群生しています。早急な対応を！
+Generated Quest: [心配性の母親] [F] スライムを3匹討伐 - 探索のついでに、スライムを片付けてきてくれませんか？
+Generated Quest: [宿屋の看板娘] [F] ふつうたこを3匹討伐 - 生態系の調査のため、特定の階層におけるふつうたこの個体数調整が必要です。
+Generated Quest: [心配性の母親] [F] 壺を1個破壊 - 探索路に壺が放置されていて邪魔です。撤去をお願いします。
+Generated Quest: [心配性の母親] [F] 壺を3個破壊 - 放置された壺が探索の妨げになっています。片付けてください。
+Generated Quest: [お忍びの貴族] [F] 樽を1個破壊 - 探索路に樽が放置されていて邪魔です。撤去をお願いします。
+Generated Quest: [大魔導士] [F] 瓦礫を1個破壊 - 古びた瓦礫が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [腕利きの料理人] [F] 壺を1個破壊 - 壺の中に魔物が潜んでいるとの報告がありました。今のうちに破壊を！
+Generated Quest: [迷子の少女] [F] まわるがめを3匹討伐 - 深層へ向かうルートにまわるがめが群生しています。早急な対応を！
+Generated Quest: [武器屋の親父] [F] 瓦礫を2個破壊 - 放置された瓦礫が探索の妨げになっています。片付けてください。
+Generated Quest: [宿屋の看板娘] [F] ふつうたこを1匹討伐 - 探索中の商人がふつうたこに襲われました。安全確保のため討伐をお願いします。
+Generated Quest: [大魔導士] [F] ふつうたこを2匹討伐 - 生態系の調査のため、特定の階層におけるふつうたこの個体数調整が必要です。
+Generated Quest: [怪しい研究者] [F] ふつうたこを2匹討伐 - 深層へ向かうルートにふつうたこが群生しています。早急な対応を！
+Generated Quest: [困り果てた開拓者] [F] ふつうたこを1匹討伐 - 生態系の調査のため、特定の階層におけるふつうたこの個体数調整が必要です。
+Generated Quest: [見習い冒険者] [F] ふつうたこを3匹討伐 - 深層へ向かうルートにふつうたこが群生しています。早急な対応を！
+Generated Quest: [新米の衛兵] [F] 瓦礫を3個破壊 - 探索路に瓦礫が放置されていて邪魔です。撤去をお願いします。
+Generated Quest: [旅の僧侶] [F] スライムを2匹討伐 - 最近、ダンジョンの浅層でスライムが増えすぎて困っています。少し数を減らしてください。
+Generated Quest: [村の老人] [F] 樽を3個破壊 - 探索路の整備のため、邪魔な樽の撤去を依頼します。
+Generated Quest: [鍛冶屋の親方] [F] 樽を3個破壊 - 探索路の整備のため、邪魔な樽の撤去を依頼します。
+Generated Quest: [困り果てた開拓者] [F] ふつうたこを2匹討伐 - 最近、ダンジョンの浅層でふつうたこが増えすぎて困っています。少し数を減らしてください。
+Generated Quest: [宿屋の看板娘] [F] 樽を1個破壊 - 探索路に樽が放置されていて邪魔です。撤去をお願いします。
+Generated Quest: [倉庫の管理人] [F] 瓦礫を2個破壊 - 古びた瓦礫が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [旅の僧侶] [F] まわるがめを2匹討伐 - 探索のついでに、まわるがめを片付けてきてくれませんか？
+Generated Quest: [異国の商人] [F] 木箱を2個破壊 - 木箱の中に魔物が潜んでいるとの報告がありました。今のうちに破壊を！
+Generated Quest: [困り果てた開拓者] [F] ふつうたこを1匹討伐 - 深層へ向かうルートにふつうたこが群生しています。早急な対応を！
+Generated Quest: [商人のギルド長] [F] まわるがめを1匹討伐 - 生態系の調査のため、特定の階層におけるまわるがめの個体数調整が必要です。
+Generated Quest: [鍛冶屋の親方] [F] 樽を3個破壊 - 古びた樽が通路を塞いでいます。破壊して進路を確保してください。
+Generated Quest: [心配性の母親] [F] 木箱を3個破壊 - 探索路に木箱が放置されていて邪魔です。撤去をお願いします。
+Generated Quest: [名もなき旅人] [F] 壺を2個破壊 - 探索路の整備のため、邪魔な壺の撤去を依頼します。
+Generated Quest: [名もなき旅人] [F] スライムを3匹討伐 - 最近、ダンジョンの浅層でスライムが増えすぎて困っています。少し数を減らしてください。
+Generated Quest: [怪しい研究者] [F] 木箱を1個破壊 - 探索路の整備のため、邪魔な木箱の撤去を依頼します。
+Generated Quest: [倉庫の管理人] [F] 樽を1個破壊 - 樽の中に魔物が潜んでいるとの報告がありました。今のうちに破壊を！
+Generated Quest: [旅の僧侶] [F] スライムを1匹討伐 - 生態系の調査のため、特定の階層におけるスライムの個体数調整が必要です。
+Generated Quest: [異国の商人] [F] 瓦礫を2個破壊 - 放置された瓦礫が探索の妨げになっています。片付けてください。
+Generated Quest: [武器屋の親父] [F] まわるがめを2匹討伐 - 最近、ダンジョンの浅層でまわるがめが増えすぎて困っています。少し数を減らしてください。
+Generated Quest: [鍛冶屋の親方] [F] 木箱を2個破壊 - 放置された木箱が探索の妨げになっています。片付けてください。
+Generated Quest: [困り果てた開拓者] [F] 木箱を2個破壊 - 探索路に木箱が放置されていて邪魔です。撤去をお願いします。
+✅ tests/test_quest_generation.py: PASSED
+----------------------------------------
+Running: tests/test_delivery_all_types.py
+2026-05-15 21:51:04.452 Python[7385:71970126] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:51:04.452 Python[7385:71970126] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 0.668s
+
+OK
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+✅ tests/test_delivery_all_types.py: PASSED
+----------------------------------------
+Running: tests/test_boss_spawn.py
+2026-05-15 21:51:05.471 Python[7388:71970171] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:51:05.471 Python[7388:71970171] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+[INFO] Testing 2 stable bosses: ['スイスイスライム', 'スケスケスケルトン']
+
+--- スイスイスライム (10F) 確定出現テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' cached.
+[Dungeon] Boss suisui_slime spawned guaranteed at floor 10.
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] pot HP set to 8
+[POPULATION] Floor 10 | Rooms: 5 | Monsters: 4/13 | Obstacles: 2/2 | Reason: Warped
+[Dungeon] Floor 10 | Item Candidates: 27 | Spawning: 3
+[Dungeon] Floor 10 | Potential Tiles: 93
+  - Item 1: 鉄の胸当て at (36, 10)
+  - Item 2: 回復の杖 at (25, 28)
+  - Item 3: 冒険者の服 at (32, 9)
+[Dungeon] Floor 10 | Total Items Placed: 3/3
+[Audio] BGM file not found: components/sounds/bgm/dungeon_boss.mp3
+[AUTO-SAVE] Floor transition (-1 -> 10). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' cached.
+[Dungeon] Boss suisui_slime spawned guaranteed at floor 10.
+[Obstacle] pot HP set to 8
+[Obstacle] rubble HP set to 24
+[Obstacle] crate HP set to 16
+[Obstacle] pot HP set to 8
+[POPULATION] Floor 10 | Rooms: 8 | Monsters: 9/19 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 10 | Item Candidates: 27 | Spawning: 4
+[Dungeon] Floor 10 | Potential Tiles: 138
+  - Item 1: 火炎の杖 at (3, 27)
+  - Item 2: 皮の円盾 at (18, 30)
+  - Item 3: 鉄の円盾 at (4, 27)
+  - Item 4: 鉄の剣 at (3, 17)
+[Dungeon] Floor 10 | Total Items Placed: 4/4
+[Audio] BGM file not found: components/sounds/bgm/dungeon_boss.mp3
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' cached.
+[Dungeon] Boss suisui_slime spawned guaranteed at floor 10.
+[Obstacle] rubble HP set to 24
+[Obstacle] crate HP set to 16
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] crate HP set to 16
+[Obstacle] rubble HP set to 24
+[POPULATION] Floor 10 | Rooms: 9 | Monsters: 8/21 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 10 | Item Candidates: 27 | Spawning: 4
+[Dungeon] Floor 10 | Potential Tiles: 137
+  - Item 1: ヒールポーション at (4, 8)
+  - Item 2: ヒールポーション at (8, 10)
+  - Item 3: 木の棍棒 at (23, 27)
+  - Item 4: カンテラ at (40, 24)
+[Dungeon] Floor 10 | Total Items Placed: 4/4
+[Audio] BGM file not found: components/sounds/bgm/dungeon_boss.mp3
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' cached.
+[Dungeon] Converted 1 sandwiched walls to floor.
+[Dungeon] Boss suisui_slime spawned guaranteed at floor 10.
+[Obstacle] rubble HP set to 24
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] pot HP set to 8
+[Obstacle] rubble HP set to 24
+[POPULATION] Floor 10 | Rooms: 9 | Monsters: 29/21 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 10 | Item Candidates: 27 | Spawning: 12
+[Dungeon] Floor 10 | Potential Tiles: 149
+  - Item 1: 木の円盾 at (24, 4)
+  - Item 2: 腐ったポーション at (39, 29)
+  - Item 3: 皮の胸当て at (24, 2)
+  - Item 4: 木の円盾 at (17, 25)
+  - Item 5: 毒消薬 at (13, 24)
+  - Item 6: 木の円盾 at (32, 26)
+  - Item 7: 銅の鉱石 at (35, 26)
+  - Item 8: 皮の円盾 at (37, 3)
+  - Item 9: 火炎の杖 at (26, 3)
+  - Item 10: 壊れかけの剣 at (38, 4)
+  - Item 11: 毒消薬 at (38, 25)
+  - Item 12: 皮の胸当て at (40, 26)
+[Dungeon] Floor 10 | Total Items Placed: 12/12
+[Audio] BGM file not found: components/sounds/bgm/dungeon_boss.mp3
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' cached.
+[Dungeon] Boss suisui_slime spawned guaranteed at floor 10.
+[Obstacle] rubble HP set to 24
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] crate HP set to 16
+[POPULATION] Floor 10 | Rooms: 8 | Monsters: 9/19 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 10 | Item Candidates: 27 | Spawning: 4
+[Dungeon] Floor 10 | Potential Tiles: 127
+  - Item 1: 木の円盾 at (20, 15)
+  - Item 2: 鉄の円盾 at (13, 37)
+  - Item 3: 木の棍棒 at (4, 19)
+  - Item 4: 火炎の杖 at (14, 38)
+[Dungeon] Floor 10 | Total Items Placed: 4/4
+[Audio] BGM file not found: components/sounds/bgm/dungeon_boss.mp3
+[OK] スイスイスライム spawned successfully in all attempts.
+
+--- スケスケスケルトン (20F) 確定出現テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 20 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+[Dungeon] Converted 1 sandwiched walls to floor.
+[Dungeon] Boss sukesuke_skeleton spawned guaranteed at floor 20.
+[Obstacle] sword_stuck HP set to 16
+[Obstacle] skeleton HP set to 8
+[Obstacle] skeleton HP set to 8
+[Obstacle] web HP set to 8
+[Obstacle] skeleton HP set to 8
+[POPULATION] Floor 20 | Rooms: 8 | Monsters: 9/22 | Obstacles: 5/5 | Reason: Warped
+[Dungeon] Floor 20 | Item Candidates: 18 | Spawning: 5
+[Dungeon] Floor 20 | Potential Tiles: 322
+  - Item 1: 木の円盾 at (57, 11)
+  - Item 2: 壊れた盾 at (56, 11)
+  - Item 3: 皮の円盾 at (10, 45)
+  - Item 4: 壊れかけの剣 at (14, 49)
+  - Item 5: 鋼の円盾 at (60, 12)
+[Dungeon] Floor 20 | Total Items Placed: 5/5
+[AUTO-SAVE] Floor transition (-1 -> 20). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 20 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+[Dungeon] Boss sukesuke_skeleton spawned guaranteed at floor 20.
+[Obstacle] sword_stuck HP set to 16
+[Obstacle] crystal HP set to 32
+[Obstacle] skeleton HP set to 8
+[Obstacle] skeleton HP set to 8
+[Obstacle] sword_stuck HP set to 16
+[Obstacle] sword_stuck HP set to 16
+[POPULATION] Floor 20 | Rooms: 9 | Monsters: 10/24 | Obstacles: 5/5 | Reason: Warped
+[Dungeon] Floor 20 | Item Candidates: 18 | Spawning: 5
+[Dungeon] Floor 20 | Potential Tiles: 319
+  - Item 1: 鉄の剣 at (43, 32)
+  - Item 2: 鋼の円盾 at (29, 9)
+  - Item 3: 鋼の剣 at (58, 53)
+  - Item 4: 壊れた杖 at (28, 4)
+  - Item 5: 壊れた鎧 at (19, 24)
+[Dungeon] Floor 20 | Total Items Placed: 5/5
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 20 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+[Dungeon] Converted 1 sandwiched walls to floor.
+[Dungeon] Boss sukesuke_skeleton spawned guaranteed at floor 20.
+[Obstacle] sword_stuck HP set to 16
+[Obstacle] crystal HP set to 32
+[Obstacle] skeleton HP set to 8
+[POPULATION] Floor 20 | Rooms: 5 | Monsters: 8/16 | Obstacles: 3/3 | Reason: Warped
+[Dungeon] Floor 20 | Item Candidates: 18 | Spawning: 4
+[Dungeon] Floor 20 | Potential Tiles: 124
+  - Item 1: 皮の円盾 at (34, 55)
+  - Item 2: 鉄の剣 at (4, 31)
+  - Item 3: 鉄の円盾 at (4, 36)
+  - Item 4: 鋼のカイトシールド at (47, 18)
+[Dungeon] Floor 20 | Total Items Placed: 4/4
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 20 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+[Dungeon] Boss sukesuke_skeleton spawned guaranteed at floor 20.
+[Obstacle] skeleton HP set to 8
+[Obstacle] crystal HP set to 32
+[Obstacle] sword_stuck HP set to 16
+[Obstacle] sword_stuck HP set to 16
+[Obstacle] sword_stuck HP set to 16
+[Obstacle] web HP set to 8
+[POPULATION] Floor 20 | Rooms: 10 | Monsters: 12/26 | Obstacles: 6/6 | Reason: Warped
+[Dungeon] Floor 20 | Item Candidates: 18 | Spawning: 6
+[Dungeon] Floor 20 | Potential Tiles: 318
+  - Item 1: 鋼の胸当て at (63, 6)
+  - Item 2: 木の円盾 at (39, 8)
+  - Item 3: 鉄の剣 at (28, 50)
+  - Item 4: 鉄の円盾 at (5, 62)
+  - Item 5: 鋼の剣 at (10, 61)
+  - Item 6: 鉄の剣 at (38, 6)
+[Dungeon] Floor 20 | Total Items Placed: 6/6
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 20 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+[Dungeon] Boss sukesuke_skeleton spawned guaranteed at floor 20.
+[Obstacle] skeleton HP set to 8
+[Obstacle] crystal HP set to 32
+[Obstacle] crystal HP set to 32
+[Obstacle] sword_stuck HP set to 16
+[Obstacle] sword_stuck HP set to 16
+[POPULATION] Floor 20 | Rooms: 9 | Monsters: 10/24 | Obstacles: 5/5 | Reason: Warped
+[Dungeon] Floor 20 | Item Candidates: 18 | Spawning: 5
+[Dungeon] Floor 20 | Potential Tiles: 220
+  - Item 1: 壊れた鎧 at (29, 45)
+  - Item 2: 鋼の剣 at (29, 44)
+  - Item 3: 盗賊のダガー at (60, 15)
+  - Item 4: 木の棍棒 at (32, 8)
+  - Item 5: 壊れかけの剣 at (28, 45)
+[Dungeon] Floor 20 | Total Items Placed: 5/5
+[OK] スケスケスケルトン spawned successfully in all attempts.
+
+--- ボス占有エリア 壁内めり込み防止テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Checking Floor 10 (スイスイスライム)...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' cached.
+[Dungeon] Boss suisui_slime spawned guaranteed at floor 10.
+[Obstacle] rubble HP set to 24
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] crate HP set to 16
+[POPULATION] Floor 10 | Rooms: 8 | Monsters: 8/19 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 10 | Item Candidates: 27 | Spawning: 4
+[Dungeon] Floor 10 | Potential Tiles: 164
+  - Item 1: 燈の杖 at (14, 36)
+  - Item 2: 冒険者の服 at (32, 34)
+  - Item 3: 木の棍棒 at (13, 4)
+  - Item 4: 燈の杖 at (3, 34)
+[Dungeon] Floor 10 | Total Items Placed: 4/4
+[Audio] BGM file not found: components/sounds/bgm/dungeon_boss.mp3
+[AUTO-SAVE] Floor transition (-1 -> 10). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' cached.
+[Dungeon] Boss suisui_slime spawned guaranteed at floor 10.
+[Obstacle] crate HP set to 16
+[Obstacle] rubble HP set to 24
+[POPULATION] Floor 10 | Rooms: 4 | Monsters: 5/11 | Obstacles: 2/2 | Reason: Warped
+[Dungeon] Floor 10 | Item Candidates: 27 | Spawning: 2
+[Dungeon] Floor 10 | Potential Tiles: 63
+  - Item 1: ハイポーション at (23, 27)
+  - Item 2: 鉄の円盾 at (33, 38)
+[Dungeon] Floor 10 | Total Items Placed: 2/2
+[Audio] BGM file not found: components/sounds/bgm/dungeon_boss.mp3
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' cached.
+[Dungeon] Boss suisui_slime spawned guaranteed at floor 10.
+[Obstacle] crate HP set to 16
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] crate HP set to 16
+[Obstacle] crate HP set to 16
+[POPULATION] Floor 10 | Rooms: 9 | Monsters: 14/21 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 10 | Item Candidates: 27 | Spawning: 4
+[Dungeon] Floor 10 | Potential Tiles: 182
+  - Item 1: 回復の杖 at (39, 12)
+  - Item 2: 鉄の胸当て at (41, 3)
+  - Item 3: 冒険者の服 at (34, 38)
+  - Item 4: 木の棍棒 at (26, 23)
+[Dungeon] Floor 10 | Total Items Placed: 4/4
+[Audio] BGM file not found: components/sounds/bgm/dungeon_boss.mp3
+[OK] Floor 10 boss/enemy safety check passed.
+Checking Floor 20 (スケスケスケルトン)...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 20 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+[Dungeon] Boss sukesuke_skeleton spawned guaranteed at floor 20.
+[Obstacle] web HP set to 8
+[Obstacle] skeleton HP set to 8
+[Obstacle] crystal HP set to 32
+[POPULATION] Floor 20 | Rooms: 5 | Monsters: 6/16 | Obstacles: 3/3 | Reason: Warped
+[Dungeon] Floor 20 | Item Candidates: 18 | Spawning: 4
+[Dungeon] Floor 20 | Potential Tiles: 184
+  - Item 1: 木の棍棒 at (7, 21)
+  - Item 2: ダマスカス鋼の剣 at (33, 1)
+  - Item 3: 木の円盾 at (50, 42)
+  - Item 4: ダマスカス鋼の剣 at (43, 20)
+[Dungeon] Floor 20 | Total Items Placed: 4/4
+[AUTO-SAVE] Floor transition (10 -> 20). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 20 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+[Dungeon] Boss sukesuke_skeleton spawned guaranteed at floor 20.
+[Obstacle] sword_stuck HP set to 16
+[Obstacle] web HP set to 8
+[Obstacle] web HP set to 8
+[POPULATION] Floor 20 | Rooms: 5 | Monsters: 7/16 | Obstacles: 3/3 | Reason: Warped
+[Dungeon] Floor 20 | Item Candidates: 18 | Spawning: 4
+[Dungeon] Floor 20 | Potential Tiles: 122
+  - Item 1: 壊れた鎧 at (39, 13)
+  - Item 2: 硬革のカイトシールド at (41, 13)
+  - Item 3: 鋼の円盾 at (13, 54)
+  - Item 4: 鋼のカイトシールド at (10, 57)
+[Dungeon] Floor 20 | Total Items Placed: 4/4
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 20 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+[Dungeon] Boss sukesuke_skeleton spawned guaranteed at floor 20.
+[Obstacle] web HP set to 8
+[Obstacle] sword_stuck HP set to 16
+[Obstacle] skeleton HP set to 8
+[Obstacle] crystal HP set to 32
+[POPULATION] Floor 20 | Rooms: 7 | Monsters: 10/20 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 20 | Item Candidates: 18 | Spawning: 4
+[Dungeon] Floor 20 | Potential Tiles: 201
+  - Item 1: 鋼の円盾 at (34, 61)
+  - Item 2: 壊れた鎧 at (55, 8)
+  - Item 3: 鋼の剣 at (52, 8)
+  - Item 4: 鋼の円盾 at (55, 50)
+[Dungeon] Floor 20 | Total Items Placed: 4/4
+[OK] Floor 20 boss/enemy safety check passed.
+
+--- 全エンティティ 床タイル配置検証テスト開始 ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Verifying all entities on Floor 1...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] crate HP set to 16
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] wood_barrel HP set to 16
+[POPULATION] Floor 1 | Rooms: 6 | Monsters: 3/12 | Obstacles: 3/3 | Reason: Warped
+[Dungeon] Floor 1 | Item Candidates: 27 | Spawning: 2
+[Dungeon] Floor 1 | Potential Tiles: 71
+  - Item 1: 壊れた盾 at (16, 25)
+  - Item 2: ヒールポーション at (17, 25)
+[Dungeon] Floor 1 | Total Items Placed: 2/2
+[AUTO-SAVE] Floor transition (-1 -> 1). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[OK] Floor 1: Verified 6 enemies, 2 items, and 1 traps are on floor tiles.
+Verifying all entities on Floor 10...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' cached.
+[Dungeon] Boss suisui_slime spawned guaranteed at floor 10.
+[Obstacle] pot HP set to 8
+[Obstacle] pot HP set to 8
+[Obstacle] rubble HP set to 24
+[Obstacle] crate HP set to 16
+[POPULATION] Floor 10 | Rooms: 8 | Monsters: 10/19 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 10 | Item Candidates: 27 | Spawning: 4
+[Dungeon] Floor 10 | Potential Tiles: 163
+  - Item 1: 壊れた鎧 at (16, 40)
+  - Item 2: 壊れた盾 at (7, 30)
+  - Item 3: ヒールポーション at (22, 4)
+  - Item 4: 木の円盾 at (38, 39)
+[Dungeon] Floor 10 | Total Items Placed: 4/4
+[Audio] BGM file not found: components/sounds/bgm/dungeon_boss.mp3
+[AUTO-SAVE] Floor transition (1 -> 10). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[OK] Floor 10: Verified 14 enemies, 4 items, and 2 traps are on floor tiles.
+Verifying all entities on Floor 20...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 20 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+[Dungeon] Boss sukesuke_skeleton spawned guaranteed at floor 20.
+[Obstacle] skeleton HP set to 8
+[Obstacle] web HP set to 8
+[Obstacle] skeleton HP set to 8
+[Obstacle] skeleton HP set to 8
+[Obstacle] crystal HP set to 32
+[Obstacle] web HP set to 8
+[Obstacle] skeleton HP set to 8
+[Obstacle] sword_stuck HP set to 16
+[POPULATION] Floor 20 | Rooms: 10 | Monsters: 13/26 | Obstacles: 6/6 | Reason: Warped
+[Dungeon] Floor 20 | Item Candidates: 18 | Spawning: 6
+[Dungeon] Floor 20 | Potential Tiles: 342
+  - Item 1: 壊れた杖 at (35, 62)
+  - Item 2: 木の円盾 at (51, 54)
+  - Item 3: 木の棍棒 at (60, 6)
+  - Item 4: 木の棍棒 at (29, 41)
+  - Item 5: 鉄の円盾 at (11, 5)
+  - Item 6: 壊れた鎧 at (38, 18)
+[Dungeon] Floor 20 | Total Items Placed: 6/6
+[AUTO-SAVE] Floor transition (10 -> 20). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[OK] Floor 20: Verified 19 enemies, 6 items, and 5 traps are on floor tiles.
+Verifying all entities on Floor 35...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 35 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[Obstacle] statue HP set to 40
+[POPULATION] Floor 35 | Rooms: 8 | Monsters: 0/27 | Obstacles: 6/6 | Reason: Warped
+[Dungeon] Floor 35 | Item Candidates: 7 | Spawning: 6
+[Dungeon] Floor 35 | Potential Tiles: 566
+  - Item 1: 壊れた鎧 at (93, 5)
+  - Item 2: 壊れた鎧 at (24, 74)
+  - Item 3: 鋼の円盾 at (73, 68)
+  - Item 4: 壊れた盾 at (51, 11)
+  - Item 5: 壊れかけの剣 at (98, 7)
+  - Item 6: 壊れた鎧 at (23, 74)
+[Dungeon] Floor 35 | Total Items Placed: 6/6
+[AUTO-SAVE] Floor transition (20 -> 35). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[OK] Floor 35: Verified 6 enemies, 6 items, and 2 traps are on floor tiles.
+
+✅ All spawn validity tests PASSED!
+✅ tests/test_boss_spawn.py: PASSED
+----------------------------------------
+Running: tests/test_guild_autosave.py
+2026-05-15 21:51:07.641 Python[7395:71970231] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:51:07.641 Python[7395:71970231] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+
+--- ギルドクエスト達成時自動セーブテスト ---
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[TEST] クエスト報告実行: テスト用納品依頼
+[GUILD] Quest 'テスト用納品依頼' completed. Auto-saving...
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[TEST] 保存データ確認: coin=100, gp=10
+✅ ギルドクエスト達成時自動セーブテスト合格！
+✅ tests/test_guild_autosave.py: PASSED
+----------------------------------------
+Running: tests/test_dungeon_growth.py
+2026-05-15 21:51:08.565 Python[7398:71970270] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:51:08.565 Python[7398:71970270] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.581s
+
+OK
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+  [Check] Floor 1 (Attempt 0): Rooms=8, ExpectedMin=4
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' loaded from cache.
+  [Check] Floor 1 (Attempt 1): Rooms=4, ExpectedMin=4
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' loaded from cache.
+  [Check] Floor 1 (Attempt 2): Rooms=7, ExpectedMin=4
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' cached.
+  [Check] Floor 10 (Attempt 0): Rooms=8, ExpectedMin=4
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' loaded from cache.
+  [Check] Floor 10 (Attempt 1): Rooms=5, ExpectedMin=4
+Floor 10 theme: standard
+[DUNGEON] Theme 'standard' loaded from cache.
+  [Check] Floor 10 (Attempt 2): Rooms=4, ExpectedMin=4
+Floor 20 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+  [Check] Floor 20 (Attempt 0): Rooms=10, ExpectedMin=5
+Floor 20 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' loaded from cache.
+  [Check] Floor 20 (Attempt 1): Rooms=10, ExpectedMin=5
+Floor 20 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' loaded from cache.
+  [Check] Floor 20 (Attempt 2): Rooms=7, ExpectedMin=5
+Floor 30 theme: standard
+[DUNGEON] Theme 'standard' loaded from cache.
+  [Check] Floor 30 (Attempt 0): Rooms=5, ExpectedMin=5
+Floor 30 theme: standard
+[DUNGEON] Theme 'standard' loaded from cache.
+  [Check] Floor 30 (Attempt 1): Rooms=5, ExpectedMin=5
+Floor 30 theme: temple
+[DUNGEON] Theme 'temple' cached.
+  [Check] Floor 30 (Attempt 2): Rooms=5, ExpectedMin=5
+Floor 40 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' loaded from cache.
+  [Check] Floor 40 (Attempt 0): Rooms=9, ExpectedMin=6
+Floor 40 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' loaded from cache.
+  [Check] Floor 40 (Attempt 1): Rooms=7, ExpectedMin=6
+Floor 40 theme: standard
+[DUNGEON] Theme 'standard' loaded from cache.
+[Dungeon] Converted 1 sandwiched walls to floor.
+  [Check] Floor 40 (Attempt 2): Rooms=12, ExpectedMin=6
+✅ tests/test_dungeon_growth.py: PASSED
+----------------------------------------
+Running: tests/test_outbreak_event.py
+..pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] rubble HP set to 24
+[Obstacle] rubble HP set to 24
+[POPULATION] Floor 1 | Rooms: 7 | Monsters: 22/14 | Obstacles: 3/3 | Reason: Warped
+[Dungeon] Floor 1 | Item Candidates: 27 | Spawning: 6
+[Dungeon] Floor 1 | Potential Tiles: 68
+  - Item 1: 皮の胸当て at (23, 25)
+  - Item 2: 回復の杖 at (16, 17)
+  - Item 3: ヒールポーション at (24, 8)
+  - Item 4: 火炎の杖 at (15, 19)
+  - Item 5: 燈の杖 at (25, 8)
+  - Item 6: 燈の杖 at (24, 9)
+[Dungeon] Floor 1 | Total Items Placed: 6/6
+[AUTO-SAVE] Floor transition (-1 -> 1). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 2 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] crate HP set to 16
+[Obstacle] rubble HP set to 24
+[Obstacle] crate HP set to 16
+[Obstacle] crate HP set to 16
+[POPULATION] Floor 2 | Rooms: 8 | Monsters: 29/16 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 2 | Item Candidates: 27 | Spawning: 9
+[Dungeon] Floor 2 | Potential Tiles: 95
+  - Item 1: 冒険者の服 at (22, 3)
+  - Item 2: 回復の杖 at (11, 28)
+  - Item 3: 皮の胸当て at (21, 2)
+  - Item 4: 鉄の円盾 at (9, 1)
+  - Item 5: 壊れた盾 at (10, 3)
+  - Item 6: 木の円盾 at (24, 2)
+  - Item 7: 冒険者の服 at (22, 13)
+  - Item 8: 皮の胸当て at (22, 4)
+  - Item 9: くさいポーション at (12, 16)
+[Dungeon] Floor 2 | Total Items Placed: 9/9
+[AUTO-SAVE] Floor transition (-1 -> 2). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 99 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+[POPULATION] Floor 99 | Rooms: 12 | Monsters: 0/56 | Obstacles: 0/8 | Reason: Warped
+[Dungeon] Floor 99 | Item Candidates: 4 | Spawning: 39
+[Dungeon] Floor 99 | Potential Tiles: 1091
+  - Item 1: 壊れた鎧 at (212, 95)
+  - Item 2: 壊れた盾 at (221, 219)
+  - Item 3: 壊れた盾 at (58, 136)
+  - Item 4: 壊れた盾 at (215, 92)
+  - Item 5: 壊れた盾 at (101, 225)
+  - Item 6: 壊れた盾 at (254, 63)
+  - Item 7: 壊れた鎧 at (53, 124)
+  - Item 8: 壊れた盾 at (102, 227)
+  - Item 9: 壊れた杖 at (214, 219)
+  - Item 10: 壊れた盾 at (156, 43)
+  - Item 11: 壊れた杖 at (53, 130)
+  - Item 12: 壊れた盾 at (153, 185)
+  - Item 13: 壊れた杖 at (145, 119)
+  - Item 14: 壊れかけの剣 at (169, 259)
+  - Item 15: 壊れかけの剣 at (101, 228)
+  - Item 16: 壊れた盾 at (155, 46)
+  - Item 17: 壊れた鎧 at (218, 218)
+  - Item 18: 壊れかけの剣 at (64, 136)
+  - Item 19: 壊れた盾 at (154, 182)
+  - Item 20: 壊れた鎧 at (66, 127)
+  - Item 21: 壊れた盾 at (214, 107)
+  - Item 22: 壊れた鎧 at (213, 94)
+  - Item 23: 壊れた盾 at (215, 220)
+  - Item 24: 壊れた盾 at (160, 43)
+  - Item 25: 壊れた盾 at (210, 103)
+  - Item 26: 壊れた盾 at (51, 129)
+  - Item 27: 壊れた鎧 at (174, 258)
+  - Item 28: 壊れた盾 at (165, 46)
+  - Item 29: 壊れた鎧 at (213, 111)
+  - Item 30: 壊れた杖 at (152, 189)
+  - Item 31: 壊れた鎧 at (213, 109)
+  - Item 32: 壊れた鎧 at (153, 44)
+  - Item 33: 壊れた盾 at (45, 67)
+  - Item 34: 壊れた盾 at (60, 133)
+  - Item 35: 壊れた鎧 at (44, 62)
+  - Item 36: 壊れかけの剣 at (63, 134)
+  - Item 37: 壊れた鎧 at (61, 127)
+  - Item 38: 壊れた盾 at (216, 107)
+  - Item 39: 壊れかけの剣 at (108, 233)
+[Dungeon] Floor 99 | Total Items Placed: 39/39
+[Dungeon] Forced spawn of event item: fathers_keepsake at (172, 259) (furthest room)
+[AUTO-SAVE] Floor transition (2 -> 99). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 100 theme: deesert_ruin
+[DUNGEON] Theme 'deesert_ruin' cached.
+[POPULATION] Floor 100 | Rooms: 18 | Monsters: 0/69 | Obstacles: 0/11 | Reason: Warped
+[Dungeon] Floor 100 | Item Candidates: 4 | Spawning: 15
+[Dungeon] Floor 100 | Potential Tiles: 2177
+  - Item 1: 壊れた盾 at (132, 45)
+  - Item 2: 壊れかけの剣 at (16, 17)
+  - Item 3: 壊れかけの剣 at (234, 261)
+  - Item 4: 壊れた盾 at (143, 157)
+  - Item 5: 壊れた鎧 at (78, 109)
+  - Item 6: 壊れた盾 at (176, 265)
+  - Item 7: 壊れかけの剣 at (182, 100)
+  - Item 8: 壊れた盾 at (230, 258)
+  - Item 9: 壊れかけの剣 at (87, 97)
+  - Item 10: 壊れた盾 at (230, 256)
+  - Item 11: 壊れた鎧 at (134, 170)
+  - Item 12: 壊れかけの剣 at (242, 256)
+  - Item 13: 壊れた盾 at (236, 260)
+  - Item 14: 壊れかけの剣 at (243, 258)
+  - Item 15: 壊れた杖 at (133, 154)
+[Dungeon] Floor 100 | Total Items Placed: 15/15
+[AUTO-SAVE] Floor transition (99 -> 100). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] wood_barrel HP set to 16
+[POPULATION] Floor 1 | Rooms: 7 | Monsters: 5/14 | Obstacles: 3/3 | Reason: Warped
+[Dungeon] Floor 1 | Item Candidates: 27 | Spawning: 2
+[Dungeon] Floor 1 | Potential Tiles: 76
+  - Item 1: 壊れた盾 at (15, 6)
+  - Item 2: カンテラ at (13, 7)
+[Dungeon] Floor 1 | Total Items Placed: 2/2
+[AUTO-SAVE] Floor transition (100 -> 1). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 5 theme: standard
+[DUNGEON] Theme 'standard' cached.
+[Obstacle] rubble HP set to 24
+[Obstacle] rubble HP set to 24
+[Obstacle] crate HP set to 16
+[POPULATION] Floor 5 | Rooms: 6 | Monsters: 18/13 | Obstacles: 3/3 | Reason: Warped
+[Dungeon] Floor 5 | Item Candidates: 27 | Spawning: 6
+[Dungeon] Floor 5 | Potential Tiles: 73
+  - Item 1: 燈の杖 at (29, 31)
+  - Item 2: 鉄の剣 at (32, 18)
+  - Item 3: 鉄の胸当て at (20, 11)
+  - Item 4: 木の円盾 at (28, 30)
+  - Item 5: 冒険者の服 at (32, 19)
+  - Item 6: 木の円盾 at (16, 25)
+[Dungeon] Floor 5 | Total Items Placed: 6/6
+[AUTO-SAVE] Floor transition (1 -> 5). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] rubble HP set to 24
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] crate HP set to 16
+[POPULATION] Floor 1 | Rooms: 8 | Monsters: 3/16 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 1 | Item Candidates: 27 | Spawning: 3
+[Dungeon] Floor 1 | Potential Tiles: 94
+  - Item 1: 皮の胸当て at (14, 25)
+  - Item 2: 壊れかけの剣 at (23, 10)
+  - Item 3: 壊れかけの剣 at (14, 16)
+[Dungeon] Floor 1 | Total Items Placed: 3/3
+[AUTO-SAVE] Floor transition (-1 -> 1). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json.....
+----------------------------------------------------------------------
+Ran 4 tests in 2.398s
+
+OK
+
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] pot HP set to 8
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] pot HP set to 8
+[POPULATION] Floor 1 | Rooms: 8 | Monsters: 23/16 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 1 | Item Candidates: 27 | Spawning: 9
+[Dungeon] Floor 1 | Potential Tiles: 95
+  - Item 1: ヒールポーション at (25, 2)
+  - Item 2: 毒消薬 at (15, 17)
+  - Item 3: 木の円盾 at (25, 4)
+  - Item 4: 木の円盾 at (24, 2)
+  - Item 5: 鉄の円盾 at (14, 15)
+  - Item 6: 壊れた盾 at (16, 15)
+  - Item 7: 木の円盾 at (24, 19)
+  - Item 8: 燈の杖 at (14, 16)
+  - Item 9: ハイポーション at (24, 10)
+[Dungeon] Floor 1 | Total Items Placed: 9/9
+
+[Test] Normal: Enemies=3, Items=3
+[Test] Outbreak: Enemies=23, Items=9
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 1 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] rubble HP set to 24
+[Obstacle] wood_barrel HP set to 16
+[POPULATION] Floor 1 | Rooms: 5 | Monsters: 18/10 | Obstacles: 2/2 | Reason: Warped
+[Dungeon] Floor 1 | Item Candidates: 27 | Spawning: 6
+[Dungeon] Floor 1 | Potential Tiles: 65
+  - Item 1: 転移の石 at (5, 2)
+  - Item 2: 回復の杖 at (8, 19)
+  - Item 3: 火炎の杖 at (16, 4)
+  - Item 4: 鉄の胸当て at (4, 3)
+  - Item 5: ヒールポーション at (6, 15)
+  - Item 6: 壊れた杖 at (16, 5)
+[Dungeon] Floor 1 | Total Items Placed: 6/6
+[AUTO-SAVE] Floor transition (-1 -> 1). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+[MEMORY] Dungeon texture cache cleared (1 themes)
+Floor 2 theme: shallow
+[DUNGEON] Theme 'shallow' cached.
+[Obstacle] pot HP set to 8
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] wood_barrel HP set to 16
+[Obstacle] crate HP set to 16
+[POPULATION] Floor 2 | Rooms: 8 | Monsters: 10/16 | Obstacles: 4/4 | Reason: Warped
+[Dungeon] Floor 2 | Item Candidates: 27 | Spawning: 3
+[Dungeon] Floor 2 | Potential Tiles: 94
+  - Item 1: 壊れた盾 at (11, 27)
+  - Item 2: 鉄の剣 at (19, 23)
+  - Item 3: 皮の胸当て at (21, 24)
+[Dungeon] Floor 2 | Total Items Placed: 3/3
+[AUTO-SAVE] Floor transition (1 -> 2). Saving to persistent file: /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json
+[SYSTEM] Saving progress to /Users/tj/Desktop/2DGame/components/data/savefile/save_data_test.json...
+✅ tests/test_outbreak_event.py: PASSED
+----------------------------------------
+Running: tests/test_teleport_system.py
+2026-05-15 21:51:12.633 Python[7408:71970386] +[IMKClient subclass]: chose IMKClient_Modern
+2026-05-15 21:51:12.633 Python[7408:71970386] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.007s
+
+OK
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.5)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[DataLoader] Items loaded: Consumables=24, Staves=6, Lanterns=3
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[UI] Open TeleportDialog (テレポート屋（転移）)
+[UI] TeleportDialog Button: CONFIRM (12F 休憩所)
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[UI] Open TeleportDialog (テレポート屋（転移）)
+[UI] TeleportDialog Button: CONFIRM (12F 休憩所)
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[UI] Open TeleportDialog (テレポート屋（転移）)
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[UI] Open TeleportDialog (テレポート屋（転移）)
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+[UI] Open TeleportDialog (テレポート屋（転移）)
+[UI] TeleportDialog Button: CONFIRM (12F 休憩所)
+[UI] TeleportDialog Button: CONFIRM (12F 休憩所)
+[WARP] Pitfall animation started. Target floor: 12
+[UI] Close TeleportDialog
+[[93mWARNING[0m] Image not found: components/pictures/armor/adventurers_clothes/right.png
+✅ tests/test_teleport_system.py: PASSED
+========================================
+📊 テスト結果報告: 35 / 35 合格
+========================================
+🔄 バックアップから本番データを復元しています...

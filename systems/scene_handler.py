@@ -224,6 +224,7 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
     
     # 2-3. プレイヤーと視界の描画
     player.draw(screen, camera_x, camera_y)
+    new_dungeon.draw_overhead(screen, camera_x, camera_y) # [NEW] 頭上タイルの描画
     draw_vision_overlay(screen, player, new_dungeon)
         
     # UIの描画

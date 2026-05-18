@@ -13,7 +13,7 @@ class NPC(Entity):
         if count > 0:
             print(f"[MEMORY] NPC scaled image cache cleared ({count} items)")
 
-    def __init__(self, name, x, y, sprite_type="villager", dialogue=[], image_path=None, base_image_path=None):
+    def __init__(self, name, x, y, sprite_type="villager", dialogue=[], image_path=None, base_image_path=None, role=None):
         # NPCもEntityを継承して移動や描画の基本機能を持たせる
         # とりあえず固定位置にいるので move_speed=0
         super().__init__(x=x, y=y, hp=100, max_hp=100, attack=0, width=64, height=64)
@@ -21,6 +21,7 @@ class NPC(Entity):
         self.sprite_type = sprite_type
         self.dialogue = dialogue
         self.move_speed = 0
+        self.role = role
         
         # 背景画像（足元の床など）の読み込み
         self.base_image = None

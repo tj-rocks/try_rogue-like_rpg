@@ -46,26 +46,41 @@ def handle_death_sequence(player, dungeon, dialog, game_state):
         game_state["death_timer"] -= 1
         if game_state["death_timer"] <= 0:
             # Step 4: 復活処理（ペナルティ適用とワープ）
+            # 装備品は残し、それ以外のインベントリ(未装備装備、消耗品、杖)をロスト
+            if player.equipped_weapon is not None:
+                player.weapon_inventory = [eq for eq in player.weapon_inventory if eq.iid == player.equipped_weapon]
+            else:
+                player.weapon_inventory = []
+                player.weapon = None
+
+            if player.equipped_armor is not None:
+                player.armor_inventory = [eq for eq in player.armor_inventory if eq.iid == player.equipped_armor]
+            else:
+                player.armor_inventory = []
+
+            if player.equipped_shield is not None:
+                player.shield_inventory = [eq for eq in player.shield_inventory if eq.iid == player.equipped_shield]
+            else:
+                player.shield_inventory = []
+
+            if player.equipped_lantern is not None:
+                player.lantern_inventory = [eq for eq in player.lantern_inventory if eq.iid == player.equipped_lantern]
+            else:
+                player.lantern_inventory = []
+
             player.items = []
-            player.weapon_inventory = []
-            player.armor_inventory = []
-            player.shield_inventory = []
             player.stave_inventory = []
-            player.lantern_inventory = []
-            player.equipped_weapon = None
-            player.equipped_armor = None
-            player.equipped_shield = None
-            player.equipped_lantern = None
-            player.weapon = None
+            
             player.defense = PLAYER_DEFENSE
             player.block_chance = 0.0
+            
+            # 死の呪いを進行させる
+            player.apply_curse()
+
             player.hp = player.max_hp
             player.is_dead = False
             player.condition = "normal"
             player.status_timer = 0
-            
-            # 復活時の最低限の装備（木の棍棒）を再付与
-            player.equip_weapon_by_key("wooden_stick")
 
             # 所持金を半分にする（銀行預金は無事）
             player.coin //= 2
@@ -93,7 +108,12 @@ def handle_death_sequence(player, dungeon, dialog, game_state):
             player.save_to_file(SAVE_OFFICIAL_PATH)
             print(f"[DEATH] Progress saved with penalty to: {SAVE_OFFICIAL_PATH}")
 
-            dialog.text = Text.System.DOCTOR_REVIVE
+            curse_msg = ""
+            if player.curse_level > 0:
+                jp_stats = player.get_cursed_stats_japanese()
+                curse_msg = f"\n\n🚨【死の呪い】段階 {player.curse_level}/5\n能力低下中(-10%): " + "、".join(jp_stats)
+
+            dialog.text = Text.System.DOCTOR_REVIVE + curse_msg
             game_state["dialog_modal"] = True
             dialog.is_active = True
             game_state["death_sequence_step"] = 4

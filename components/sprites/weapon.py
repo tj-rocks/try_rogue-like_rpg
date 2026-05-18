@@ -108,7 +108,7 @@ class OneHanded(Weapon):
         elif facing == "up": return [(gx, gy-1)]
         return []
 
-    def draw_attack(self, screen, center_x, center_y, facing, progress, scale_x=1.0, scale_y=1.0):
+    def draw_attack(self, screen, center_x, center_y, facing, progress, scale_x=1.0, scale_y=1.0, alpha=255):
         """画像を使って武器を描画する"""
         idx = 1
         
@@ -131,6 +131,8 @@ class OneHanded(Weapon):
                 self._weapon_cache[cache_key] = cached_img
             
             rotated_sword = cached_img
+            if alpha < 255:
+                rotated_sword.set_alpha(alpha)
             
             # 3. 手の位置（中心基準のオフセット）から描画座標を計算
             offset = self.HAND_OFFSETS.get(facing, [(0, 0), (0, 0)])[idx]
@@ -157,7 +159,7 @@ class OneHanded(Weapon):
             end_y = center_y + math.sin(rad) * length
             pygame.draw.line(screen, self.color, (center_x, center_y), (end_x, end_y), width)
 
-    def draw_idle(self, screen, center_x, center_y, facing, scale_x=1.0, scale_y=1.0):
+    def draw_idle(self, screen, center_x, center_y, facing, scale_x=1.0, scale_y=1.0, alpha=255):
         """待機・歩行時の描画（中心基準のオフセット）"""
         if self.image:
             angle = self.WEAPON_ANGLES.get(facing, [0, 0])[0]
@@ -175,6 +177,8 @@ class OneHanded(Weapon):
                 self._weapon_cache[cache_key] = cached_img
                 
             rotated = cached_img
+            if alpha < 255:
+                rotated.set_alpha(alpha)
             offset = self.HAND_OFFSETS.get(facing, [(0, 0), (0, 0)])[0]
             # スケール分、オフセットも拡大
             off_x, off_y = offset[0] * scale_x, offset[1] * scale_y
