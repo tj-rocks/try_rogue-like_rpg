@@ -91,6 +91,7 @@ TEST_FILES=(
     "tests/test_dungeon_growth.py"
     "tests/test_outbreak_event.py"
     "tests/test_teleport_system.py"
+    "tests/test_village_spawning.py"
 )
 
 SUCCESS_COUNT=0

@@ -1668,9 +1668,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                     dialog.is_active = False
         return
     elif dialog.is_active and dialog.just_opened_timer <= 0:
-        for event in events:
-            if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
-                dialog.is_active = False
+        dialog.handle_events(events)
     else:
         # 非アクティブ時のキー入力
         for event in events:
@@ -2559,14 +2557,81 @@ class StatusDialog:
             armor_inst = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
             shield_inst = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
             
+            # 各呪いによる減少値の計算
+            # 1. HP
+            hp_reduction = 0
+            if "hp" in getattr(player, "cursed_stats", []):
+                hp_bonus = 0
+                if armor_inst: hp_bonus += armor_inst.get_stat("hp_bonus", 0)
+                if shield_inst: hp_bonus += shield_inst.get_stat("hp_bonus", 0)
+                raw_max_hp = int(player._base_max_hp + hp_bonus)
+                hp_reduction = raw_max_hp - player.max_hp
+
+            # 2. 攻撃力
+            atk_reduction = 0
+            if "attack" in getattr(player, "cursed_stats", []):
+                atk_bonus = 0
+                if weapon_inst: atk_bonus += weapon_inst.get_stat("attack_bonus", 0) + weapon_inst.get_enhance_bonus("attack_bonus")
+                if armor_inst: atk_bonus += armor_inst.get_stat("attack_bonus", 0)
+                if shield_inst: atk_bonus += shield_inst.get_stat("attack_bonus", 0)
+                raw_attack = round(player.attack + atk_bonus, 1)
+                atk_reduction = round(raw_attack - player.total_attack, 1)
+                if atk_reduction % 1 == 0:
+                    atk_reduction = int(atk_reduction)
+
+            # 3. 防御力
+            def_reduction = 0
+            if "defense" in getattr(player, "cursed_stats", []):
+                def_bonus = 0
+                for inv, eid, key in [(player.armor_inventory, player.equipped_armor, "defense_bonus"), (player.shield_inventory, player.equipped_shield, "defense_bonus")]:
+                    inst = player._find_equip_inst(inv, eid)
+                    if inst: def_bonus += inst.get_stat(key, 0) + inst.get_enhance_bonus(key)
+                raw_defense = round(player.defense + def_bonus, 1)
+                def_reduction = round(raw_defense - player.total_defense, 1)
+                if def_reduction % 1 == 0:
+                    def_reduction = int(def_reduction)
+
+            # 4. 回避率
+            eva_reduction = 0
+            if "evasion" in getattr(player, "cursed_stats", []):
+                from constants import PLAYER_EVASION
+                eva_base = PLAYER_EVASION
+                eva_bonus = 0
+                for inv, eid in [(player.weapon_inventory, player.equipped_weapon), (player.armor_inventory, player.equipped_armor), (player.shield_inventory, player.equipped_shield)]:
+                    inst = player._find_equip_inst(inv, eid)
+                    if inst:
+                        val = inst.get_stat("eva_bonus", inst.get_stat("block_chance", 0))
+                        if isinstance(val, float) and val < 1.0:
+                            eva_bonus += val * 100
+                        else:
+                            eva_bonus += val
+                raw_evasion = int(eva_base + eva_bonus)
+                eva_reduction = raw_evasion - player.eva_bonus
+
+            # カッコ書き表示テキストの作成
+            hp_str = f"HP  ：{player.hp} / {player.max_hp}"
+            if hp_reduction > 0:
+                hp_str += f" (-{hp_reduction})"
+
+            atk_str = f"攻撃力：{player.total_attack}"
+            if atk_reduction > 0:
+                atk_str += f" (-{atk_reduction})"
+
+            def_str = f"防御力：{player.total_defense}"
+            if def_reduction > 0:
+                def_str += f" (-{def_reduction})"
+
+            eva_str = f"回避率：{player.eva_bonus}%"
+            if eva_reduction > 0:
+                eva_str += f" (-{eva_reduction}%)"
+
             lines = [
                 f"【基本ステータス】",
                 f"ランク：{player.guild_rank} (GP:{player.guild_point})",
-                f"カース：{getattr(player, 'curse_level', 0)} / 5",
-                f"HP  ：{player.hp} / {player.max_hp}",
-                f"攻撃力：{player.total_attack}",
-                f"防御力：{player.total_defense}",
-                f"回避率：{player.eva_bonus}%",
+                hp_str,
+                atk_str,
+                def_str,
+                eva_str,
                 "",
                 f"【装備中】",
                 f"武器：{weapon_inst.get_name() if weapon_inst else 'なし'}",

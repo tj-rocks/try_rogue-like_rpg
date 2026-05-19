@@ -57,7 +57,12 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 
                 # 1. Load base tile mappings and config from village.yml
                 village_data = load_master_data("village.yml") or {}
-                tile_mappings = village_data.get("TILE_MAPPINGS", {})
+                tile_mappings = {}
+                # Shallow copy to avoid mutating cache
+                tile_mappings_raw = village_data.get("TILE_MAPPINGS", {})
+                for k, v in tile_mappings_raw.items():
+                    if isinstance(v, dict):
+                        tile_mappings[k] = dict(v)
                 config = village_data.get("CONFIG", {})
                 
 
@@ -82,18 +87,12 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                                 image_file = "idel.png"
                             
                             tile["image_path"] = f"{img}/{image_file}" if img else ""
-                            tile["bg_image_path"] = tile.get("base_image_path", data.get("base_image_path", "components/pictures/dungeon/home/floor_1.png"))
-                            tile["bg_color"] = tile.get("bg_color", "#3a2a1a")
-                            tile["fg_color"] = tile.get("fg_color", "#ffbb88")
                             tile["desc"] = data.get("name", tile.get("desc"))
                             
                     elif category == "obstacle":
                         data = obstacles.get(entity_id)
                         if data:
                             tile["image_path"] = data.get("image_path", "")
-                            tile["bg_image_path"] = tile.get("base_image_path", data.get("base_image_path", "components/pictures/dungeon/home/floor_0.png"))
-                            tile["bg_color"] = tile.get("bg_color", "#4a2a1a")
-                            tile["fg_color"] = tile.get("fg_color", "#aa5a3a")
                             tile["desc"] = data.get("name", tile.get("desc"))
                 
                 self.send_response(200)
@@ -142,6 +141,61 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 # ファイルに書き込む
                 with open(village_path, "w", encoding="utf-8") as f:
                     f.write(text_content)
+                
+                # クライアントから送信されたentitiesを受け取る
+                entities = data.get('entities', [])
+                
+                # グループ化 (idをキーにする)
+                grouped = {}
+                for e in entities:
+                    ent_id = e.get('id')
+                    if ent_id:
+                        grouped.setdefault(ent_id, []).append({'x': e['x'], 'y': e['y']})
+
+                village_yml_path = os.path.join(base_dir, "components", "data", "master", "village.yml")
+                
+                try:
+                    import importlib
+                    ruamel_yaml = importlib.import_module("ruamel.yaml")
+                    YAML = ruamel_yaml.YAML
+                    has_ruamel = True
+                except ImportError:
+                    import yaml as pyyaml
+                    has_ruamel = False
+                
+                if has_ruamel:
+                    yaml = YAML()
+                    yaml.preserve_quotes = True
+                    yaml.indent(mapping=2, sequence=4, offset=2)
+                    with open(village_yml_path, "r", encoding="utf-8") as f:
+                        village_yml_data = yaml.load(f)
+                else:
+                    with open(village_yml_path, "r", encoding="utf-8") as f:
+                        village_yml_data = pyyaml.safe_load(f) or {}
+                
+                # positionsを各定義に注入
+                mappings = village_yml_data.get("TILE_MAPPINGS", {})
+                for k, v in mappings.items():
+                    if not isinstance(v, dict):
+                        continue
+                    # k は weapon_shop や floor_0 などのIDキー
+                    if k in grouped:
+                        v["positions"] = grouped[k]
+                    else:
+                        # 存在しなければ削除
+                        if "positions" in v:
+                            del v["positions"]
+                
+                # 古いENTITIESブロック（もし残っていれば）を完全に排除
+                if "ENTITIES" in village_yml_data:
+                    del village_yml_data["ENTITIES"]
+                
+                if has_ruamel:
+                    with open(village_yml_path, "w", encoding="utf-8") as f:
+                        yaml.dump(village_yml_data, f)
+                else:
+                    with open(village_yml_path, "w", encoding="utf-8") as f:
+                        pyyaml.safe_dump(village_yml_data, f, allow_unicode=True, sort_keys=False, indent=2)
                 
                 # 正常終了のレスポンス
                 self.send_response(200)

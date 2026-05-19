@@ -711,7 +711,15 @@ class Dungeon:
                 # Load dynamic tile mappings from village.yml
                 from systems.data_loader import load_master_data
                 village_data = load_master_data("village.yml") or {}
-                tile_mappings = village_data.get("TILE_MAPPINGS", {})
+                tile_mappings_raw = village_data.get("TILE_MAPPINGS", {})
+                
+                # 地形文字マッピング（village.txtのパース用）
+                tile_mappings = {}
+                for k, v in tile_mappings_raw.items():
+                    if isinstance(v, dict):
+                        ch = v.get("char")
+                        if ch:
+                            tile_mappings[ch] = v
 
                 for r, line in enumerate(lines):
                     for c, char in enumerate(line):
@@ -727,27 +735,7 @@ class Dungeon:
                             self.wall_top_variants[r][c] = f"wall_pass_{tile_mappings[char].get('tile_id', 0)}"
                             self.floor_variants[r][c] = "floor_0"
                             
-                        # 2. 障害物 (Entity) - village.yml で定義されたIDからロード
-                        elif char in tile_mappings and tile_mappings[char].get("category") == "obstacle":
-                            self.map_data[r][c] = 1 # 地面の上に配置
-                            base_img_path = tile_mappings[char].get("base_image_path", "")
-                            if base_img_path:
-                                import os as _os
-                                fk = _os.path.splitext(_os.path.basename(base_img_path))[0]
-                            else:
-                                fk = "floor_0"
-                            self.floor_variants[r][c] = fk
-                            obs_type = tile_mappings[char].get("id")
-                            if obs_type:
-                                from components.sprites.enemy import Enemy
-                                ox, oy = c * ts, r * ts
-                                obstacle = Enemy(ox, oy, obs_type, player=self.player)
-                                obstacle.x = c * ts + (ts - obstacle.width)//2
-                                obstacle.y = r * ts + (ts - obstacle.height)//2
-                                obstacle.target_x, obstacle.target_y = obstacle.x, obstacle.y
-                                self.enemies.append(obstacle)
-                                
-                        # 3. 壁・天井
+                        # 2. 壁・天井
                         elif char in tile_mappings and tile_mappings[char].get("category") == "wall_top":
                             self.map_data[r][c] = 0
                             self.wall_top_variants[r][c] = f"wall_top_{tile_mappings[char].get('tile_id', 0)}"
@@ -783,49 +771,7 @@ class Dungeon:
                         elif char == "U": 
                             self.map_data[r][c] = 2
                             
-                        # 7. NPC (village.yml で定義されたIDからロード)
-                        elif char in tile_mappings and tile_mappings[char].get("category") == "npc":
-                            self.map_data[r][c] = 1
-                            npc_id = tile_mappings[char].get("id")
-                            from constants import NPC_DATA
-                            if npc_id and npc_id in NPC_DATA:
-                                data = NPC_DATA[npc_id]
-                                base_img_path = tile_mappings[char].get("base_image_path", "")
-                                if base_img_path:
-                                    import os as _os
-                                    fk = _os.path.splitext(_os.path.basename(base_img_path))[0]
-                                else:
-                                    fk = data.get("base_tile", "floor_0")
-                                self.floor_variants[r][c] = fk
-                                px, py = c * ts, r * ts
-                                
-                                # 役割の決定（データ定義を最優先し、未定義なら名前から推測）
-                                role = data.get("role")
-                                if not role:
-                                    name = data.get("name", "")
-                                    if "宿屋" in name: role = "inn"
-                                    elif "鍛冶屋" in name: role = "blacksmith"
-                                    elif "武器屋" in name: role = "weapon_shop"
-                                    elif "道具屋" in name: role = "item_shop"
-                                    elif "大魔導士" in name or "魔法屋" in name: role = "magic_shop"
-                                    elif "商人" in name: role = "merchant"
-                                    elif "ギルドマスター" in name: role = "guild_master"
-                                    elif "預かり屋" in name: role = "storage"
-                                    elif "銀行員" in name: role = "bank"
-                                    elif "医者" in name: role = "doctor"
-                                    elif "テレポート屋" in name: role = "teleport"
-                                
-                                npc = NPC(data["name"], px, py, 
-                                          dialogue=data["dialogue"], 
-                                          image_path=data["image_path"],
-                                          base_image_path=data.get("base_image_path"),
-                                          role=role)
-                                self.npcs.append(npc)
-                                # 特殊な位置の記録
-                                if role == "inn": self.inn_pos = (c, r)
-                                if role == "doctor": self.clinic_pos = (c, r)
-                            
-                        # 8. 互換性のためのフォールバック
+                        # 7. 互換性のためのフォールバック
                         elif char == "X":
                             self.map_data[r][c] = 0
                             self.wall_variants[r][c] = "wall_single_1"
@@ -846,6 +792,73 @@ class Dungeon:
                 else: self.rooms = [self.start_pos] # 固定マップでは開始地点を優先
                 self.refresh_shop_stock(player_rank=getattr(self.player, "guild_rank", "-"))
                 self.enemies = [e for e in self.enemies if getattr(e, "is_static", False)]
+                
+                # --- [NEW] 外部化されたエンティティ座標データ (positions) からキャラ/障害物を配置 ---
+                print(f"[DEBUG-NPC] Loading entities from TILE_MAPPINGS in village.yml. Total entries: {len(tile_mappings_raw)}")
+                for ent_id, tile_info in tile_mappings_raw.items():
+                    if not isinstance(tile_info, dict): continue
+                    positions = tile_info.get("positions", [])
+                    cat = tile_info.get("category")
+                    
+                    if not positions:
+                        if cat in ("npc", "obstacle"):
+                            print(f"[DEBUG-NPC] Entity '{ent_id}' has NO positions listed in village.yml!")
+                        continue
+                    
+                    print(f"[DEBUG-NPC] Found entity '{ent_id}' ({cat}) with {len(positions)} positions.")
+                    for pos in positions:
+                        c, r = pos.get("x"), pos.get("y")
+                        if c is None or r is None:
+                            print(f"[DEBUG-NPC]   Position is missing x or y for '{ent_id}'!")
+                            continue
+                        if c < 0 or c >= self.map_width or r < 0 or r >= self.map_height:
+                            print(f"[DEBUG-NPC]   Position ({c}, {r}) is out of bounds for '{ent_id}' (map size: {self.map_width}x{self.map_height})!")
+                            continue
+                        
+                        if cat == "obstacle":
+                            self.map_data[r][c] = 1 # 地面の上に配置
+                            from components.sprites.enemy import Enemy
+                            ox, oy = c * ts, r * ts
+                            obstacle = Enemy(ox, oy, ent_id, player=self.player)
+                            obstacle.x = c * ts + (ts - obstacle.width)//2
+                            obstacle.y = r * ts + (ts - obstacle.height)//2
+                            obstacle.target_x, obstacle.target_y = obstacle.x, obstacle.y
+                            self.enemies.append(obstacle)
+                            print(f"[DEBUG-NPC]   Successfully spawned obstacle '{ent_id}' at grid coordinate ({c}, {r})")
+                            
+                        elif cat == "npc":
+                            self.map_data[r][c] = 1
+                            from constants import NPC_DATA
+                            if ent_id in NPC_DATA:
+                                data = NPC_DATA[ent_id]
+                                px, py = c * ts, r * ts
+                                
+                                role = data.get("role")
+                                if not role:
+                                    name = data.get("name", "")
+                                    if "宿屋" in name: role = "inn"
+                                    elif "鍛冶屋" in name: role = "blacksmith"
+                                    elif "武器屋" in name: role = "weapon_shop"
+                                    elif "道具屋" in name: role = "item_shop"
+                                    elif "大魔導士" in name or "魔法屋" in name: role = "magic_shop"
+                                    elif "商人" in name: role = "merchant"
+                                    elif "ギルドマスター" in name: role = "guild_master"
+                                    elif "預かり屋" in name: role = "storage"
+                                    elif "銀行員" in name: role = "bank"
+                                    elif "医者" in name: role = "doctor"
+                                    elif "テレポート屋" in name: role = "teleport"
+                                
+                                npc = NPC(data["name"], px, py, 
+                                          dialogue=data["dialogue"], 
+                                          image_path=data["image_path"],
+                                          base_image_path=tile_info.get("base_image_path", data.get("base_image_path")),
+                                          role=role)
+                                self.npcs.append(npc)
+                                if role == "inn": self.inn_pos = (c, r)
+                                if role == "doctor": self.clinic_pos = (c, r)
+                                print(f"[DEBUG-NPC]   Successfully spawned NPC '{ent_id}' ('{data['name']}') at grid coordinate ({c}, {r})")
+                            else:
+                                print(f"[DEBUG-NPC]   NPC '{ent_id}' not found in NPC_DATA! Check npcs.yml")
                 
                 # --- [NEW] 固定マップでも障害物を配置可能にする ---
                 if self.player and self.current_floor > 0:
