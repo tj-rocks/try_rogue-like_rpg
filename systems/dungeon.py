@@ -1605,7 +1605,7 @@ class Dungeon:
                 img = self.textures.get(fk, self.textures.get("wall_none"))
                 if img:
                     # [NEW] 床系、または1マスの壁（壺や樽などの障害物）の場合はベースレイヤーを描画する
-                    is_floor_type = (tile > 0)
+                    is_floor_type = (tile > 0 and tile != TILE_GATE)
                     is_obstacle = (tile == 0 and wall_type == "wall_single")
                     
                     if is_floor_type or is_obstacle:
