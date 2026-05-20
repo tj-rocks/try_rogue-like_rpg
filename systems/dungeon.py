@@ -421,6 +421,7 @@ class Dungeon:
         self.wall_top_variants = [[get_rand_wall_top() for _ in range(self.map_width)] for _ in range(self.map_height)]
         self.wall_none_variants = [[get_rand_wall_none() for _ in range(self.map_width)] for _ in range(self.map_height)]
         self.wall_decoration_variants = [["" for _ in range(self.map_width)] for _ in range(self.map_height)]
+        self.gate_variants = [["" for _ in range(self.map_width)] for _ in range(self.map_height)]
         
         if "corridor" in self.textures:
             self.textures["corridor_h"] = pygame.transform.rotate(self.textures["corridor"], -90)
@@ -717,6 +718,7 @@ class Dungeon:
                 self.wall_none_variants = [[(random.choice(wn_list) if wn_list else "wall_none") for _ in range(self.map_width)] for _ in range(self.map_height)]
                 self.base_floor_variants = [[(random.choice(f_list) if f_list else "floor") for _ in range(self.map_width)] for _ in range(self.map_height)]
                 self.wall_decoration_variants = [["" for _ in range(self.map_width)] for _ in range(self.map_height)]
+                self.gate_variants = [["" for _ in range(self.map_width)] for _ in range(self.map_height)]
                 self.npcs = []
                 self.rooms = []
                 ts = self.tile_size
@@ -882,7 +884,7 @@ class Dungeon:
                         elif cat == "wall_pass":
                             self.map_data[r][c] = TILE_GATE
                             tile_id = tile_info.get("tile_id", 0)
-                            self.wall_top_variants[r][c] = f"wall_pass_{tile_id}"
+                            self.gate_variants[r][c] = f"wall_pass_{tile_id}"
                             print(f"[DEBUG-NPC]   Successfully placed wall_pass '{ent_id}' (tile_id={tile_id}) at grid coordinate ({c}, {r})")
                 
                 # --- [NEW] 固定マップでも障害物を配置可能にする ---
@@ -909,6 +911,7 @@ class Dungeon:
         self.wall_variants = [[(random.choice(w_list) if w_list else "wall_single") for _ in range(self.map_width)] for _ in range(self.map_height)]
         self.wall_top_variants = [[(random.choice(wt_list) if wt_list else "wall_top") for _ in range(self.map_width)] for _ in range(self.map_height)]
         self.wall_none_variants = [[(random.choice(wn_list) if wn_list else "wall_none") for _ in range(self.map_width)] for _ in range(self.map_height)]
+        self.gate_variants = [["" for _ in range(self.map_width)] for _ in range(self.map_height)]
         for row in range(5, 15):
             for col in range(5, 20): self.map_data[row][col] = 1
         self.rooms = [(12, 10)]
@@ -1153,7 +1156,7 @@ class Dungeon:
     def is_nw(self, x, y):
         """指定した座標が「南側に床がある北壁」かどうかを判定します。"""
         if not (0 <= x < self.map_width and 0 <= y < self.map_height): return False
-        return self.map_data[y][x] == 0 and y < self.map_height - 1 and self.map_data[y+1][x] > 0
+        return (self.map_data[y][x] == 0 or self.map_data[y][x] == TILE_GATE) and y < self.map_height - 1 and self.map_data[y+1][x] > 0
 
     def _get_wall_texture_key(self, x, y):
         # 南側が床（ID > 0）である壁のみを「表示される壁」とする
@@ -1580,29 +1583,17 @@ class Dungeon:
                 dx, dy = (x * self.tile_size) - camera_x, (y * self.tile_size) - camera_y
                 tile = self.map_data[y][x]
                 
-                # [NEW] ゲート（頭上）はここでは地面だけ描画する
-                if tile == TILE_GATE:
-                    ov_key = self.wall_top_variants[y][x]
-                    # 短縮名（wall_pass_0）を使って地面を取得
-                    if ov_key in self.overhead_base_map:
-                        fk = self.overhead_base_map[ov_key]
-                    else:
-                        fk = self.floor_variants[y][x]
-                else:
-                    fk = "wall_none"
+                fk = "wall_none"
                 
-                if tile > 0:
+                if tile > 0 and tile != TILE_GATE:
                     # 床、階段、通路
                     if tile == 2: fk = "stairs_up"
                     elif tile == 3: fk = "stairs_down"
                     elif 4 <= tile <= 6: fk = "corridor"
-                    elif tile == TILE_GATE:
-                        # すでに fk が設定されている（命名規則によるもの）場合はそのまま
-                        pass
                     else: 
                         fk = self.floor_variants[y][x]
                 else:
-                    # 壁(ID 0)
+                    # 壁(ID 0) または TILE_GATE
                     wall_type = self._get_wall_texture_key(x, y)
                     if wall_type == "wall_top":
                         fk = self.wall_top_variants[y][x]
@@ -1817,7 +1808,7 @@ class Dungeon:
             for x in range(sx, ex):
                 if self.map_data[y][x] == TILE_GATE:
                     dx, dy = (x * self.tile_size) - camera_x, (y * self.tile_size) - camera_y
-                    ov_key = self.wall_top_variants[y][x]
+                    ov_key = getattr(self, "gate_variants", [[]])[y][x] if y < len(getattr(self, "gate_variants", [])) else ""
                     # フルキーを取得して描画
                     full_key = self.short_to_full_key.get(ov_key, ov_key)
                     if full_key in self.textures:
