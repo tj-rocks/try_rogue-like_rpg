@@ -999,6 +999,12 @@ TILE_MAPPINGS:
     desc: 武器屋の看板
     id: wall_decoration_weapon_shop
     image_path: components/pictures/dungeon/home/wall_decoration_3.png
+  wall_deco_4:
+    char:
+    category: wall_decoration
+    desc: 壁の装飾4
+    id: wall_decoration_4
+    image_path: components/pictures/dungeon/home/wall_decoration_4.png
   wall_deco_window:
     char:
     category: wall_decoration
