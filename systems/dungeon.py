@@ -321,7 +321,18 @@ class Dungeon:
                             self.textures[key] = load_and_scale(path)
                             # wall_top_variants に含めることでゲートとして選ばれるようにする
                             self.available_wall_top_variants.append(key)
-            
+            # もし wall_decoration_variants が空の場合、フォールバックとして shallow テーマから読み込む
+            if not self.available_wall_decoration_variants:
+                fallback_dir = main_path + "/shallow"
+                if os.path.exists(fallback_dir):
+                    for f in os.listdir(fallback_dir):
+                        if f.endswith(".png") and f.startswith("wall_decoration"):
+                            key = f[:-4]
+                            path = os.path.join(fallback_dir, f)
+                            self.textures[key] = load_and_scale(path)
+                            self.available_wall_decoration_variants.append(key)
+                            print(f"[Dungeon] Loaded fallback wall_decoration '{key}' from {path}")
+
             # バリデーションとベースキーの補完
             for base_key, variant_list in [("floor", self.available_floor_variants), 
                                            ("wall_top", self.available_wall_top_variants),
@@ -442,8 +453,9 @@ class Dungeon:
         # [NEW] 3方向置換で新たに発生した孤立壁を最終クリーニング
         self._remove_lone_walls()
         
-        # 壁の装飾を配置
-        self._add_wall_decorations()
+        # 壁の装飾を配置 (ランダムダンジョンのみ)
+        if not map_file:
+            self._add_wall_decorations()
         
         self._add_floor_edges()
         
@@ -823,6 +835,7 @@ class Dungeon:
                             obstacle.x = c * ts + (ts - obstacle.width)//2
                             obstacle.y = r * ts + (ts - obstacle.height)//2
                             obstacle.target_x, obstacle.target_y = obstacle.x, obstacle.y
+                            obstacle.flip = pos.get("flip", False)
                             self.enemies.append(obstacle)
                             print(f"[DEBUG-NPC]   Successfully spawned obstacle '{ent_id}' at grid coordinate ({c}, {r})")
                             
@@ -852,13 +865,25 @@ class Dungeon:
                                           dialogue=data["dialogue"], 
                                           image_path=data["image_path"],
                                           base_image_path=tile_info.get("base_image_path", data.get("base_image_path")),
-                                          role=role)
+                                          role=role,
+                                          flip=pos.get("flip", False))
                                 self.npcs.append(npc)
                                 if role == "inn": self.inn_pos = (c, r)
                                 if role == "doctor": self.clinic_pos = (c, r)
                                 print(f"[DEBUG-NPC]   Successfully spawned NPC '{ent_id}' ('{data['name']}') at grid coordinate ({c}, {r})")
                             else:
                                 print(f"[DEBUG-NPC]   NPC '{ent_id}' not found in NPC_DATA! Check npcs.yml")
+                                
+                        elif cat == "wall_decoration":
+                            deco_id = tile_info.get("id", ent_id)
+                            self.wall_decoration_variants[r][c] = deco_id
+                            print(f"[DEBUG-NPC]   Successfully placed wall_decoration '{deco_id}' at grid coordinate ({c}, {r})")
+                        
+                        elif cat == "wall_pass":
+                            self.map_data[r][c] = TILE_GATE
+                            tile_id = tile_info.get("tile_id", 0)
+                            self.wall_top_variants[r][c] = f"wall_pass_{tile_id}"
+                            print(f"[DEBUG-NPC]   Successfully placed wall_pass '{ent_id}' (tile_id={tile_id}) at grid coordinate ({c}, {r})")
                 
                 # --- [NEW] 固定マップでも障害物を配置可能にする ---
                 if self.player and self.current_floor > 0:

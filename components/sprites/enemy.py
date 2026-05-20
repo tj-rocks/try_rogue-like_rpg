@@ -32,6 +32,7 @@ class Enemy(Entity):
         self.width = max(1, int(TILE_SIZE * scale) if width is None else width)
         self.height = max(1, int(TILE_SIZE * scale) if height is None else height)
         self.is_static = data.get("is_static", False)
+        self.flip = False
         hp_val = data.get("hp", 10)
         if self.is_static and player:
             from systems.math_utils import hardcore_round
@@ -107,13 +108,17 @@ class Enemy(Entity):
         
         (sx, sy), ph = self.get_breathing_scale() if not (self.is_attacking or self.is_static) else ((1.0, 1.0), 0)
         if -self.width <= draw_x <= screen.get_width() and -self.height <= draw_y <= screen.get_height():
+            is_flipped = getattr(self, "flip", False)
             base = self.images.get(self.facing, pygame.Surface((self.width, self.height)))
-            ck = (base, "attack" if self.is_attacking else ph)
+            ck = (base, "attack" if self.is_attacking else ph, is_flipped)
             cur = Enemy._scaled_image_cache.get(ck)
             if cur is None:
                 if self.is_attacking: cur = pygame.transform.scale(base, (int(base.get_width() * 1.2), int(base.get_height() * 1.2)))
                 elif not self.is_static: cur = pygame.transform.smoothscale(base, (int(base.get_width() * sx), int(base.get_height() * sy)))
                 else: cur = base
+                
+                if is_flipped:
+                    cur = pygame.transform.flip(cur, True, False)
                 Enemy._scaled_image_cache[ck] = cur
             draw_x += (self.width - cur.get_width()) / 2; draw_y += (self.height - cur.get_height())
             from constants import HIT_STUN_DURATION

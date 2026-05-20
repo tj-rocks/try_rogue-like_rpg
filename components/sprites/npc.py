@@ -13,7 +13,7 @@ class NPC(Entity):
         if count > 0:
             print(f"[MEMORY] NPC scaled image cache cleared ({count} items)")
 
-    def __init__(self, name, x, y, sprite_type="villager", dialogue=[], image_path=None, base_image_path=None, role=None):
+    def __init__(self, name, x, y, sprite_type="villager", dialogue=[], image_path=None, base_image_path=None, role=None, flip=False):
         # NPCもEntityを継承して移動や描画の基本機能を持たせる
         # とりあえず固定位置にいるので move_speed=0
         super().__init__(x=x, y=y, hp=100, max_hp=100, attack=0, width=64, height=64)
@@ -22,6 +22,7 @@ class NPC(Entity):
         self.dialogue = dialogue
         self.move_speed = 0
         self.role = role
+        self.flip = flip
         
         # 背景画像（足元の床など）の読み込み
         self.base_image = None
@@ -93,12 +94,16 @@ class NPC(Entity):
         (scale_x, scale_y), phase = self.get_breathing_scale()
         
         # --- [OPTIMIZED] NPCのスケーリングキャッシュ利用 ---
-        cache_key = (img, phase)
+        cache_key = (img, phase, self.flip)
         cached_img = NPC._npc_scaled_cache.get(cache_key)
         
         if cached_img is None:
             w, h = img.get_size()
-            cached_img = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
+            scaled_img = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
+            if self.flip:
+                scaled_img = pygame.transform.flip(scaled_img, True, False)
+            cached_img = scaled_img
+            NPC._npc_scaled_cache[cache_key] = cached_img
             NPC._npc_scaled_cache[cache_key] = cached_img
             
         img = cached_img
