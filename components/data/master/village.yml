@@ -664,6 +664,9 @@ TILE_MAPPINGS:
       - x: 19
         y: 15
         flip: false
+      - x: 34
+        y: 24
+        flip: false
       - x: 16
         y: 38
         flip: false
@@ -675,6 +678,15 @@ TILE_MAPPINGS:
     positions:
       - x: 54
         y: 5
+        flip: false
+      - x: 34
+        y: 23
+        flip: false
+      - x: 38
+        y: 24
+        flip: false
+      - x: 34
+        y: 25
         flip: false
       - x: 20
         y: 38
@@ -711,6 +723,10 @@ TILE_MAPPINGS:
     category: obstacle
     desc: 石像
     id: statue
+    positions:
+      - x: 24
+        y: 24
+        flip: false
   broken_pillar:
     char:
     category: obstacle
@@ -753,11 +769,28 @@ TILE_MAPPINGS:
     category: obstacle
     desc: クリスタル
     id: crystal
+    positions:
+      - x: 28
+        y: 23
+        flip: false
+      - x: 28
+        y: 24
+        flip: false
+      - x: 28
+        y: 25
+        flip: false
   sword_stuck:
     char:
     category: obstacle
     desc: 刺さった剣
     id: sword_stuck
+    positions:
+      - x: 15
+        y: 24
+        flip: false
+      - x: 19
+        y: 24
+        flip: false
   web:
     char:
     category: obstacle
@@ -768,6 +801,13 @@ TILE_MAPPINGS:
     category: obstacle
     desc: 汚れた鎧立て
     id: stained_armor_stand
+    positions:
+      - x: 19
+        y: 23
+        flip: false
+      - x: 19
+        y: 25
+        flip: false
   weapon_shop:
     char: W
     category: npc
@@ -776,6 +816,9 @@ TILE_MAPPINGS:
     positions:
       - x: 19
         y: 16
+        flip: false
+      - x: 15
+        y: 23
         flip: false
   item_shop:
     char: I
@@ -786,6 +829,9 @@ TILE_MAPPINGS:
       - x: 19
         y: 14
         flip: false
+      - x: 38
+        y: 23
+        flip: false
   merchant:
     char: C
     category: npc
@@ -795,6 +841,15 @@ TILE_MAPPINGS:
       - x: 19
         y: 4
         flip: false
+      - x: 15
+        y: 25
+        flip: true
+      - x: 24
+        y: 25
+        flip: true
+      - x: 38
+        y: 25
+        flip: false
   storage:
     char: S
     category: npc
@@ -803,9 +858,6 @@ TILE_MAPPINGS:
     positions:
       - x: 21
         y: 4
-        flip: false
-      - x: 15
-        y: 23
         flip: false
   inn:
     char: H
@@ -924,10 +976,6 @@ TILE_MAPPINGS:
     category: npc
     desc: 村人
     id: guide_bank
-    positions:
-      - x: 38
-        y: 23
-        flip: false
   apprentice:
     char: '@'
     category: npc
@@ -956,6 +1004,9 @@ TILE_MAPPINGS:
       - x: 15
         y: 14
         flip: false
+      - x: 24
+        y: 23
+        flip: false
   teleport_wizard:
     char: (
     category: npc
@@ -965,9 +1016,6 @@ TILE_MAPPINGS:
       - x: 45
         y: 23
         flip: false
-      - x: 15
-        y: 25
-        flip: false
   wall_deco_ivy:
     char:
     category: wall_decoration
@@ -975,6 +1023,9 @@ TILE_MAPPINGS:
     id: wall_decoration_0
     image_path: components/pictures/dungeon/shallow/wall_decoration_0.png
     positions:
+      - x: 16
+        y: 22
+        flip: false
       - x: 43
         y: 22
         flip: false
@@ -993,18 +1044,57 @@ TILE_MAPPINGS:
     desc: 壁掛けの盾
     id: wall_decoration_1
     image_path: components/pictures/dungeon/home/wall_decoration_1.png
+    positions:
+      - x: 18
+        y: 22
+        flip: false
   wall_deco_weapon_shop:
     char:
     category: wall_decoration
     desc: 武器屋の看板
     id: wall_decoration_weapon_shop
     image_path: components/pictures/dungeon/home/wall_decoration_3.png
+    positions:
+      - x: 16
+        y: 27
+        flip: false
+      - x: 18
+        y: 27
+        flip: false
   wall_deco_4:
     char:
     category: wall_decoration
     desc: 壁の装飾4
     id: wall_decoration_4
     image_path: components/pictures/dungeon/home/wall_decoration_4.png
+    positions:
+      - x: 16
+        y: 23
+        flip: false
+      - x: 25
+        y: 23
+        flip: false
+      - x: 37
+        y: 23
+        flip: true
+      - x: 16
+        y: 24
+        flip: false
+      - x: 25
+        y: 24
+        flip: false
+      - x: 37
+        y: 24
+        flip: true
+      - x: 16
+        y: 25
+        flip: false
+      - x: 25
+        y: 25
+        flip: false
+      - x: 37
+        y: 25
+        flip: true
   wall_deco_window:
     char:
     category: wall_decoration
@@ -1054,12 +1144,6 @@ TILE_MAPPINGS:
       - x: 46
         y: 9
         flip: false
-      - x: 16
-        y: 13
-        flip: false
-      - x: 18
-        y: 13
-        flip: false
       - x: 44
         y: 13
         flip: false
@@ -1074,6 +1158,18 @@ TILE_MAPPINGS:
         flip: false
       - x: 55
         y: 13
+        flip: false
+      - x: 15
+        y: 18
+        flip: false
+      - x: 16
+        y: 18
+        flip: false
+      - x: 18
+        y: 18
+        flip: false
+      - x: 19
+        y: 18
         flip: false
       - x: 44
         y: 18
@@ -1153,3 +1249,26 @@ TILE_MAPPINGS:
       - x: 46
         y: 35
         flip: false
+  wall_deco_masic_shop:
+    char:
+    category: wall_decoration
+    desc: 魔法屋のシンボル
+    id: wall_decoration_masic_shop
+    image_path: components/pictures/icon/stave.png
+    positions:
+      - x: 25
+        y: 27
+        flip: false
+      - x: 27
+        y: 27
+        flip: false
+  wall_deco_item_shop:
+    char:
+    category: wall_decoration
+    desc: アイテム屋のシンボル
+    id: wall_decoration_item_shop
+    image_path: components/pictures/icon/hp_potion.png
+
+
+
+

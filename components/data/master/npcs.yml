@@ -21,7 +21,7 @@ item_shop:
 
 merchant:
   name: 商人
-  image_path: components/pictures/npc/boy_0_v
+  image_path: components/pictures/npc/rich_man_h
   dialogue:
   - 商人「ダンジョンで拾ったお宝は俺が買い取ってやるぜ！」
   role: merchant
@@ -122,7 +122,7 @@ guide_storage:
 
 guide_inn:
   name: 宿屋の看板娘
-  image_path: components/pictures/npc/maid_0_v
+  image_path: components/pictures/npc/woman_maid_h
   dialogue:
   - 案内人「宿屋で休むと、HPが全回復して『永続セーブ』が行われるわ。」
   - 案内人「ダンジョンの中でも自動で『中断セーブ』はされるけど、あちらは再開したら消えてしまうし、もし倒れたらその記録も消えてしまうの。」
@@ -144,7 +144,7 @@ guide_guild:
 
 guide_doctor:
   name: 医療助手
-  image_path: components/pictures/npc/doctor_0_h
+  image_path: components/pictures/npc/ordinary_woman_h
   dialogue:
   - 案内人「もしダンジョンでHPが0になっても、お医者様がここまで運んでくれるわ。」
   - 案内人「ただし、持っていたコインや一部のアイテムを失うこともあるから注意してね。」
@@ -166,7 +166,7 @@ apprentice:
 
 guild_guide:
   name: ギルド案内人
-  image_path: components/pictures/npc/middleage_man_0_h
+  image_path: components/pictures/npc/ordinary_woman_h
   dialogue:
   - 案内人「ここは冒険者の拠点となる村だよ。まずは右上のギルドへ行ってみるといいわ。」
   - 案内人「ギルドマスターに話しかければ、最初のクエストを受けられるはずよ。」

@@ -835,6 +835,19 @@ async function loadTileDefinitions() {
         delete TILE[key];
       }
       
+      // --- グラフィック更新前の flip 状態を保持するため現在の状態をスナップショット ---
+      const currentFlipSnapshot = {};
+      for (let r = 0; r < entityMapData.length; r++) {
+        for (let c = 0; c < entityMapData[r].length; c++) {
+          const entId = entityMapData[r][c];
+          if (entId) {
+            currentFlipSnapshot[`${r},${c}`] = { id: entId, flip: entityFlipMapData[r] ? (entityFlipMapData[r][c] || false) : false };
+          }
+        }
+      }
+
+      storedPositions.length = 0; // リセット（重複防止）
+      
       // APIから取得したマッピングで追加
       Object.entries(data.tiles).forEach(([ch, val]) => {
         if (val.char) {
@@ -842,7 +855,11 @@ async function loadTileDefinitions() {
         }
         if (val.positions) {
           val.positions.forEach(pos => {
-            storedPositions.push({ id: ch, x: pos.x, y: pos.y, flip: pos.flip || false });
+            const key = `${pos.y},${pos.x}`;
+            // 現在エディタ上でflipが変更済みの場合はその値を優先する
+            const current = currentFlipSnapshot[key];
+            const flip = (current && current.id === ch) ? current.flip : (pos.flip || false);
+            storedPositions.push({ id: ch, x: pos.x, y: pos.y, flip });
           });
         }
         const imgPath = val.image_path ? `../${val.image_path}` : '';
