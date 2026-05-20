@@ -239,8 +239,10 @@ const GROUPS = {
   wall_pass: '🚪 通路扉・すり抜けゲート',
   wall_none: '🌌 虚無空間・背景暗闇',
   special: '⭐ 特殊・システム',
-  npc: '👤 施設・NPCキャラクター',
-  obstacle: '📦 障害物・オブジェクト'
+  npc_facility: '🏪 施設NPC (ショップ・サービス)',
+  npc_dialogue: '💬 セリフNPC (案内人・村人)',
+  obstacle: '📦 障害物・オブジェクト',
+  wall_decoration: '🖼️ 壁の装飾・デコレーション'
 };
 
 // ==============================================================================
@@ -321,10 +323,12 @@ const TILE = {
 const DEFAULT_TILE = ['#111', '#555', '.', '未定義', '', '', 'floor'];
 let baseMapData = [];
 let entityMapData = [];
+let entityFlipMapData = [];
 let charToId = {};
 let activeLayer = 'base'; // 'base' or 'entity' // 2D array of chars
 let selectedChar = '.';
 let availableFiles = null; // Set of verified home-theme image filenames
+let storedPositions = []; // APIから読み込んだpositionsデータの一時保存
 let isMouseDown = false;
 let mouseButton = 0; // 0: left, 2: right
 let showSymbols = false; // デフォルトで綺麗なグラフィック表示
@@ -351,11 +355,19 @@ function buildPalette() {
     grid.className = 'palette-grid';
     
     let hasItems = false;
-    Object.entries(TILE).forEach(([ch, [bg, fg, label, desc, imgPath, bgImgPath, category]]) => {
-      if (category !== groupKey) return;
+    Object.entries(TILE).forEach(([ch, tileArr]) => {
+      const [bg, fg, label, desc, imgPath, bgImgPath, category] = tileArr;
+      const subcategory = tileArr[7] || null; // 8番目の要素: subcategory
+      // category が corridor の場合は floor グループに含める
+      let effectiveCategory = (category === 'corridor') ? 'floor' : category;
+      // NPC は subcategory (npc_facility / npc_dialogue) でグループ分け
+      if (category === 'npc' && subcategory) {
+        effectiveCategory = subcategory;
+      }
+      if (effectiveCategory !== groupKey) return;
       
-      // 動的なファイル存在チェック (floor, wall_top, wall_pass に適用)
-      if (availableFiles && (category === 'floor' || category === 'wall_top' || category === 'wall_pass')) {
+      // 動的なファイル存在チェック (floor, corridor, wall_top, wall_pass に適用)
+      if (availableFiles && (effectiveCategory === 'floor' || category === 'wall_top' || category === 'wall_pass')) {
         if (imgPath) {
           const parts = imgPath.split('/');
           const filename = parts[parts.length - 1];
@@ -371,7 +383,7 @@ function buildPalette() {
       div.title = `[${ch}] ${desc}`;
       div.dataset.ch = ch;
       
-      if (category === 'npc' || category === 'obstacle') {
+      if (category === 'npc' || category === 'obstacle' || category === 'wall_decoration' || category === 'wall_pass') {
         div.style.backgroundColor = 'transparent';
       } else {
         div.style.backgroundColor = bg;
@@ -379,7 +391,7 @@ function buildPalette() {
       
       if (imgPath) {
         const cacheImgPath = imgPath + cacheBuster;
-        if (bgImgPath && category !== 'npc' && category !== 'obstacle') {
+        if (bgImgPath && category !== 'npc' && category !== 'obstacle' && category !== 'wall_decoration' && category !== 'wall_pass') {
           const cacheBgImgPath = bgImgPath + cacheBuster;
           div.style.backgroundImage = `url(${cacheImgPath}), url(${cacheBgImgPath})`;
         } else {
@@ -479,6 +491,7 @@ function renderFromText() {
   const lines = text.split('\n');
   baseMapData = [];
   entityMapData = [];
+  entityFlipMapData = [];
   
   lines.forEach((line, ri) => {
     if (line.startsWith('//')) return; // コメント行はスキップ
@@ -486,6 +499,7 @@ function renderFromText() {
     
     let baseRow = [];
     let entityRow = [];
+    let entityFlipRow = [];
     
     Array.from(line.replace(/\r/,'')).forEach((ch, ci) => {
         let tileId = charToId[ch];
@@ -500,14 +514,16 @@ function renderFromText() {
             }
         }
         const t = TILE[tileId];
-        if (t && t[6] && (t[6] === 'npc' || t[6] === 'obstacle')) {
+        if (t && t[6] && (t[6] === 'npc' || t[6] === 'obstacle' || t[6] === 'wall_decoration' || t[6] === 'wall_pass')) {
             // It's an entity. Push to entity map, and fallback base map to floor
             entityRow.push(tileId);
+            entityFlipRow.push(false);
             const bgChar = (t[5] && t[5].includes('floor_1')) ? ',' : '.';
             baseRow.push(bgChar);
         } else {
             // Normal base tile
             entityRow.push(null);
+            entityFlipRow.push(false);
             const indoorChars = 'HIMSABCJNT!@?>&';
             if (indoorChars.includes(ch)) {
                 baseRow.push(',');
@@ -521,6 +537,7 @@ function renderFromText() {
     
     baseMapData.push(baseRow);
     entityMapData.push(entityRow);
+    entityFlipMapData.push(entityFlipRow);
   });
   drawGrid();
 }
@@ -643,13 +660,19 @@ function setCell(ri, ci, ch, cell) {
   
   if (ch === 'eraser_entity') {
       entityMapData[ri][ci] = null;
+      entityFlipMapData[ri][ci] = false;
   } else {
       const tileId = charToId[ch] || ch;
       const t = TILE[tileId];
-      const isEntity = t && t[6] && (t[6] === 'npc' || t[6] === 'obstacle');
+      const isEntity = t && t[6] && (t[6] === 'npc' || t[6] === 'obstacle' || t[6] === 'wall_decoration' || t[6] === 'wall_pass');
       
       if (isEntity) {
-          entityMapData[ri][ci] = tileId;
+          if (entityMapData[ri][ci] === tileId) {
+              entityFlipMapData[ri][ci] = !entityFlipMapData[ri][ci];
+          } else {
+              entityMapData[ri][ci] = tileId;
+              entityFlipMapData[ri][ci] = false;
+          }
       } else {
           baseMapData[ri][ci] = t ? (t[2] || ch) : ch;
       }
@@ -695,8 +718,22 @@ function setCell(ri, ci, ch, cell) {
   } else {
     cell.style.backgroundImage = '';
   }
+  
+  // Apply visual flip reflection
+  const isFlipped = entityFlipMapData[ri] && entityFlipMapData[ri][ci];
+  if (isFlipped) {
+    cell.style.transform = 'scaleX(-1)';
+  } else {
+    cell.style.transform = '';
+  }
+  
   cell.style.color = fg;
-  cell.textContent = entCh ? (TILE[charToId[entCh] || entCh]?.[2] || label) : label || '';
+  const textVal = entCh ? (TILE[charToId[entCh] || entCh]?.[2] || label) : label || '';
+  if (textVal) {
+    cell.innerHTML = `<span style="display:inline-block; transform: ${isFlipped ? 'scaleX(-1)' : 'none'}">${textVal}</span>`;
+  } else {
+    cell.innerHTML = '';
+  }
 }
 
 document.addEventListener('mouseup', () => { isMouseDown = false; });
@@ -732,7 +769,8 @@ function saveToServer() {
                 id: entityMapData[r][c],
                 char: entityMapData[r][c],
                 x: c,
-                y: r
+                y: r,
+                flip: entityFlipMapData[r] ? (entityFlipMapData[r][c] || false) : false
             });
         }
     }
@@ -803,9 +841,7 @@ async function loadTileDefinitions() {
         }
         if (val.positions) {
           val.positions.forEach(pos => {
-            while (entityMapData.length <= pos.y) entityMapData.push([]);
-            while (entityMapData[pos.y].length <= pos.x) entityMapData[pos.y].push(null);
-            entityMapData[pos.y][pos.x] = ch;
+            storedPositions.push({ id: ch, x: pos.x, y: pos.y, flip: pos.flip || false });
           });
         }
         const imgPath = val.image_path ? `../${val.image_path}` : '';
@@ -818,7 +854,8 @@ async function loadTileDefinitions() {
           val.desc || '',
           imgPath,
           bgImgPath,
-          val.category || 'floor'
+          val.category || 'floor',
+          val.subcategory || null
         ];
       });
       console.log("🟢 Dynamic tile definitions loaded from village.yml / npcs.yml / obstacles.yml!");
@@ -859,9 +896,24 @@ async function initEditor() {
       const text = await r.text();
       document.getElementById('raw-text').value = text;
       renderFromText();
+      // positionsデータをentityMapDataにマージ（renderFromTextでリセットされるため後から適用）
+      applyStoredPositions();
+      drawGrid();
     }
   } catch (e) {
     document.getElementById('status-bar').textContent = '⚠️ village.txt のロードに失敗しました。ファイル読込ボタンから手動で読み込んでください。';
+  }
+}
+
+function applyStoredPositions() {
+  for (const p of storedPositions) {
+    if (p.y < entityMapData.length && p.x < entityMapData[p.y].length) {
+      // テキストから読み込んだエンティティがなければ、positionsで上書き
+      if (!entityMapData[p.y][p.x]) {
+        entityMapData[p.y][p.x] = p.id;
+        entityFlipMapData[p.y][p.x] = p.flip;
+      }
+    }
   }
 }
 

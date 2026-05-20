@@ -88,12 +88,26 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                             
                             tile["image_path"] = f"{img}/{image_file}" if img else ""
                             tile["desc"] = data.get("name", tile.get("desc"))
+                            # 施設NPC(role有) vs セリフだけのNPC(role無) を区別
+                            role = data.get("role")
+                            if role:
+                                tile["subcategory"] = "npc_facility"
+                                tile["role"] = role
+                            else:
+                                tile["subcategory"] = "npc_dialogue"
                             
                     elif category == "obstacle":
                         data = obstacles.get(entity_id)
                         if data:
                             tile["image_path"] = data.get("image_path", "")
                             tile["desc"] = data.get("name", tile.get("desc"))
+                            
+                    elif category == "wall_decoration":
+                        image_path = tile.get("image_path")
+                        if not image_path:
+                            image_path = "components/pictures/dungeon/shallow/wall_decoration_0.png"
+                        tile["image_path"] = image_path
+                        tile["desc"] = tile.get("desc", "壁装飾")
                 
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
@@ -150,7 +164,7 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 for e in entities:
                     ent_id = e.get('id')
                     if ent_id:
-                        grouped.setdefault(ent_id, []).append({'x': e['x'], 'y': e['y']})
+                        grouped.setdefault(ent_id, []).append({'x': e['x'], 'y': e['y'], 'flip': e.get('flip', False)})
 
                 village_yml_path = os.path.join(base_dir, "components", "data", "master", "village.yml")
                 
@@ -162,6 +176,10 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 except ImportError:
                     import yaml as pyyaml
                     has_ruamel = False
+                    
+                    class IndentedSafeDumper(pyyaml.SafeDumper):
+                        def increase_indent(self, flow=False, indentless=False):
+                            return super(IndentedSafeDumper, self).increase_indent(flow, False)
                 
                 if has_ruamel:
                     yaml = YAML()
@@ -195,7 +213,7 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                         yaml.dump(village_yml_data, f)
                 else:
                     with open(village_yml_path, "w", encoding="utf-8") as f:
-                        pyyaml.safe_dump(village_yml_data, f, allow_unicode=True, sort_keys=False, indent=2)
+                        pyyaml.dump(village_yml_data, f, Dumper=IndentedSafeDumper, allow_unicode=True, sort_keys=False, indent=2)
                 
                 # 正常終了のレスポンス
                 self.send_response(200)
