@@ -1586,8 +1586,6 @@ class Dungeon:
                     # 短縮名（wall_pass_0）を使って地面を取得
                     if ov_key in self.overhead_base_map:
                         fk = self.overhead_base_map[ov_key]
-                    elif "wall_pass" in ov_key:
-                        fk = "floor_1"
                     else:
                         fk = self.floor_variants[y][x]
                 else:
