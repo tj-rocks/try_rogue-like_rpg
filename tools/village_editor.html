@@ -599,7 +599,19 @@ function drawGrid() {
       }
       
       cell.style.color = fg;
-      cell.textContent = entCh ? (TILE[charToId[entCh] || entCh]?.[2] || label) : label || '';
+      
+      // Apply flip transform from entityFlipMapData
+      const isFlipped = entityFlipMapData[ri] && entityFlipMapData[ri][ci];
+      if (isFlipped) {
+        cell.style.transform = 'scaleX(-1)';
+      }
+      
+      const textVal = entCh ? (TILE[charToId[entCh] || entCh]?.[2] || label) : label || '';
+      if (textVal) {
+        cell.innerHTML = `<span style="display:inline-block; transform: ${isFlipped ? 'scaleX(-1)' : 'none'}">${textVal}</span>`;
+      } else {
+        cell.innerHTML = '';
+      }
       cell.dataset.r = ri;
       cell.dataset.c = ci;
 

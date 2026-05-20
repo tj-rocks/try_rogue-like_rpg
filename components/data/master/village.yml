@@ -826,9 +826,6 @@ TILE_MAPPINGS:
     desc: 道具屋
     id: item_shop
     positions:
-      - x: 19
-        y: 14
-        flip: false
       - x: 38
         y: 23
         flip: false
@@ -840,6 +837,9 @@ TILE_MAPPINGS:
     positions:
       - x: 19
         y: 4
+        flip: false
+      - x: 19
+        y: 14
         flip: false
       - x: 15
         y: 25
