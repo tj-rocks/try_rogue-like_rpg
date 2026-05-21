@@ -1071,25 +1071,16 @@ TILE_MAPPINGS:
       - x: 16
         y: 23
         flip: false
-      - x: 25
-        y: 23
-        flip: false
       - x: 37
         y: 23
         flip: true
       - x: 16
         y: 24
         flip: false
-      - x: 25
-        y: 24
-        flip: false
       - x: 37
         y: 24
         flip: true
       - x: 16
-        y: 25
-        flip: false
-      - x: 25
         y: 25
         flip: false
       - x: 37

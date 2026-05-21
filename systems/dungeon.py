@@ -827,6 +827,21 @@ class Dungeon:
                             print(f"[DEBUG-NPC]   Position ({c}, {r}) is out of bounds for '{ent_id}' (map size: {self.map_width}x{self.map_height})!")
                             continue
                         
+                        # --- ランクフィルタ ---
+                        min_rank = pos.get("min_rank")
+                        max_rank = pos.get("max_rank")
+                        if min_rank or max_rank:
+                            from constants import RANK_ORDER
+                            player_rank = getattr(self.player, "guild_rank", "-") if self.player else "-"
+                            p_idx = RANK_ORDER.index(player_rank) if player_rank in RANK_ORDER else 0
+                            if min_rank and min_rank in RANK_ORDER:
+                                if p_idx < RANK_ORDER.index(min_rank):
+                                    continue
+                            if max_rank and max_rank in RANK_ORDER:
+                                if p_idx > RANK_ORDER.index(max_rank):
+                                    continue
+
+                        
                         if cat == "obstacle":
                             self.map_data[r][c] = 1 # 地面の上に配置
                             from components.sprites.enemy import Enemy
