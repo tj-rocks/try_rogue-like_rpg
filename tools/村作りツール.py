@@ -164,7 +164,12 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 for e in entities:
                     ent_id = e.get('id')
                     if ent_id:
-                        grouped.setdefault(ent_id, []).append({'x': e['x'], 'y': e['y'], 'flip': e.get('flip', False)})
+                        pos_entry = {'x': e['x'], 'y': e['y'], 'flip': e.get('flip', False)}
+                        if e.get('min_rank'):
+                            pos_entry['min_rank'] = e['min_rank']
+                        if e.get('max_rank'):
+                            pos_entry['max_rank'] = e['max_rank']
+                        grouped.setdefault(ent_id, []).append(pos_entry)
 
                 village_yml_path = os.path.join(base_dir, "components", "data", "master", "village.yml")
                 

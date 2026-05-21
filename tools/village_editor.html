@@ -164,9 +164,98 @@ header h1 {
   display: flex;
   justify-content: space-between;
 }
+/* ランク設定ポップアップ */
+#rank-popup {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  background: #1a1f35;
+  border: 1px solid #3b82f6;
+  border-radius: 10px;
+  padding: 14px 16px;
+  min-width: 240px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(59,130,246,0.3);
+  font-family: 'Outfit', sans-serif;
+}
+#rank-popup h4 {
+  font-size: 12px;
+  color: #60a5fa;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#rank-popup label {
+  font-size: 11px;
+  color: #9ca3af;
+  display: block;
+  margin-bottom: 4px;
+}
+#rank-popup select {
+  background: #0f111a;
+  color: #f3f4f6;
+  border: 1px solid #374151;
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 12px;
+  width: 100%;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+#rank-popup select:focus { outline: none; border-color: #3b82f6; }
+#rank-popup .rank-row { display: flex; gap: 8px; }
+#rank-popup .rank-col { flex: 1; }
+#rank-popup .rank-actions { display: flex; gap: 6px; margin-top: 4px; }
+#rank-popup .btn-rank-ok   { background: #2563eb; color:#fff; flex:1; }
+#rank-popup .btn-rank-clear{ background: #374151; color:#9ca3af; flex:1; }
+#rank-popup .btn-rank-close{ background: transparent; border:none; color:#6b7280; font-size:14px; cursor:pointer; margin-left:auto; padding:0; }
 </style>
 </head>
 <body>
+
+<!-- ランク設定ポップアップ -->
+<div id="rank-popup">
+  <h4>📊 出現ランク設定 <button class="btn-rank-close" onclick="closeRankPopup()">✕</button></h4>
+  <div class="rank-row">
+    <div class="rank-col">
+      <label>Min ランク (これ以上)</label>
+      <select id="rank-min-sel">
+        <option value="">-- なし --</option>
+        <option value="-">- (初期)</option>
+        <option value="F">F</option>
+        <option value="E">E</option>
+        <option value="D">D</option>
+        <option value="C">C</option>
+        <option value="B">B</option>
+        <option value="A">A</option>
+        <option value="S">S</option>
+        <option value="SS">SS</option>
+      </select>
+    </div>
+    <div class="rank-col">
+      <label>Max ランク (これ以下)</label>
+      <select id="rank-max-sel">
+        <option value="">-- なし --</option>
+        <option value="-">- (初期)</option>
+        <option value="F">F</option>
+        <option value="E">E</option>
+        <option value="D">D</option>
+        <option value="C">C</option>
+        <option value="B">B</option>
+        <option value="A">A</option>
+        <option value="S">S</option>
+        <option value="SS">SS</option>
+      </select>
+    </div>
+  </div>
+  <div class="rank-actions">
+    <button class="btn btn-rank-ok" onclick="applyRankPopup()">✔ 適用</button>
+    <button class="btn btn-rank-clear" onclick="clearRankPopup()">🗑 クリア</button>
+  </div>
+</div>
 
 <header>
   <h1>🏡 村マップグラフィックエディタ</h1>
@@ -324,6 +413,7 @@ const DEFAULT_TILE = ['#111', '#555', '.', '未定義', '', '', 'floor'];
 let baseMapData = [];
 let entityMapData = [];
 let entityFlipMapData = [];
+let entityRankMapData = []; // {min_rank, max_rank} per cell
 let charToId = {};
 let activeLayer = 'base'; // 'base' or 'entity' // 2D array of chars
 let selectedChar = '.';
@@ -492,6 +582,7 @@ function renderFromText() {
   baseMapData = [];
   entityMapData = [];
   entityFlipMapData = [];
+  entityRankMapData = [];
   
   lines.forEach((line, ri) => {
     if (line.startsWith('//')) return; // コメント行はスキップ
@@ -539,6 +630,7 @@ function renderFromText() {
     baseMapData.push(baseRow);
     entityMapData.push(entityRow);
     entityFlipMapData.push(entityFlipRow);
+    entityRankMapData.push(entityFlipRow.map(() => null)); // ランクは初期null
   });
   drawGrid();
 }
@@ -631,6 +723,13 @@ function drawGrid() {
         e.preventDefault();
       });
 
+      cell.addEventListener('dblclick', e => {
+        e.stopPropagation();
+        if (entityMapData[ri][ci]) {
+          openRankPopup(ri, ci, e.clientX, e.clientY);
+        }
+      });
+
       cell.addEventListener('mouseenter', e => {
         const info = TILE[ch] || DEFAULT_TILE;
         document.getElementById('coord-info').textContent =
@@ -652,6 +751,15 @@ function drawGrid() {
       cell.addEventListener('contextmenu', e => {
         e.preventDefault();
       });
+
+      // ランク表示バッジ
+      const rankInfo = entityRankMapData[ri] && entityRankMapData[ri][ci];
+      if (rankInfo && entityMapData[ri][ci]) {
+        const badge = document.createElement('div');
+        badge.style.cssText = 'position:absolute;bottom:0;right:0;background:rgba(59,130,246,0.85);color:#fff;font-size:6px;line-height:1;padding:1px 2px;border-radius:2px 0 0 0;font-family:monospace;pointer-events:none;z-index:5;';
+        badge.textContent = [rankInfo.min_rank ? rankInfo.min_rank+'↑' : '', rankInfo.max_rank ? rankInfo.max_rank+'↓' : ''].filter(Boolean).join(' ');
+        cell.appendChild(badge);
+      }
 
       rowDiv.appendChild(cell);
     });
@@ -778,12 +886,15 @@ function saveToServer() {
   for (let r = 0; r < entityMapData.length; r++) {
     for (let c = 0; c < entityMapData[r].length; c++) {
         if (entityMapData[r][c]) {
+            const rankInfo = entityRankMapData[r] && entityRankMapData[r][c];
             entities.push({
                 id: entityMapData[r][c],
                 char: entityMapData[r][c],
                 x: c,
                 y: r,
-                flip: entityFlipMapData[r] ? (entityFlipMapData[r][c] || false) : false
+                flip: entityFlipMapData[r] ? (entityFlipMapData[r][c] || false) : false,
+                min_rank: rankInfo ? (rankInfo.min_rank || null) : null,
+                max_rank: rankInfo ? (rankInfo.max_rank || null) : null,
             });
         }
     }
@@ -814,6 +925,8 @@ function clearAll() {
   if (confirm('マップグリッドとテキストをクリアしますか？')) {
     baseMapData = [];
     entityMapData = [];
+    entityFlipMapData = [];
+    entityRankMapData = [];
     document.getElementById('map-grid').innerHTML = '';
     document.getElementById('raw-text').value = '';
   }
@@ -871,7 +984,9 @@ async function loadTileDefinitions() {
             // 現在エディタ上でflipが変更済みの場合はその値を優先する
             const current = currentFlipSnapshot[key];
             const flip = (current && current.id === ch) ? current.flip : (pos.flip || false);
-            storedPositions.push({ id: ch, x: pos.x, y: pos.y, flip });
+            storedPositions.push({ id: ch, x: pos.x, y: pos.y, flip,
+              min_rank: pos.min_rank || null,
+              max_rank: pos.max_rank || null });
           });
         }
         const imgPath = val.image_path ? `../${val.image_path}` : '';
@@ -938,14 +1053,62 @@ async function initEditor() {
 function applyStoredPositions() {
   for (const p of storedPositions) {
     if (p.y < entityMapData.length && p.x < entityMapData[p.y].length) {
-      // テキストから読み込んだエンティティがなければ、positionsで上書き
       if (!entityMapData[p.y][p.x]) {
         entityMapData[p.y][p.x] = p.id;
         entityFlipMapData[p.y][p.x] = p.flip;
       }
+      // ランク情報は常に復元
+      if (p.min_rank || p.max_rank) {
+        if (!entityRankMapData[p.y]) entityRankMapData[p.y] = [];
+        entityRankMapData[p.y][p.x] = { min_rank: p.min_rank || null, max_rank: p.max_rank || null };
+      }
     }
   }
 }
+
+// ランクポップアップ
+let rankPopupTarget = null;
+function openRankPopup(ri, ci, px, py) {
+  rankPopupTarget = { ri, ci };
+  const pop = document.getElementById('rank-popup');
+  const rankInfo = (entityRankMapData[ri] && entityRankMapData[ri][ci]) || {};
+  document.getElementById('rank-min-sel').value = rankInfo.min_rank || '';
+  document.getElementById('rank-max-sel').value = rankInfo.max_rank || '';
+  // 画面端に収まるよう調整
+  pop.style.display = 'block';
+  const pw = pop.offsetWidth || 250, ph = pop.offsetHeight || 160;
+  let x = px + 10, y = py + 10;
+  if (x + pw > window.innerWidth) x = px - pw - 10;
+  if (y + ph > window.innerHeight) y = py - ph - 10;
+  pop.style.left = x + 'px';
+  pop.style.top = y + 'px';
+}
+function closeRankPopup() {
+  document.getElementById('rank-popup').style.display = 'none';
+  rankPopupTarget = null;
+}
+function applyRankPopup() {
+  if (!rankPopupTarget) return;
+  const { ri, ci } = rankPopupTarget;
+  const minR = document.getElementById('rank-min-sel').value;
+  const maxR = document.getElementById('rank-max-sel').value;
+  if (!entityRankMapData[ri]) entityRankMapData[ri] = [];
+  entityRankMapData[ri][ci] = (minR || maxR) ? { min_rank: minR || null, max_rank: maxR || null } : null;
+  closeRankPopup();
+  drawGrid();
+}
+function clearRankPopup() {
+  if (!rankPopupTarget) return;
+  const { ri, ci } = rankPopupTarget;
+  if (!entityRankMapData[ri]) entityRankMapData[ri] = [];
+  entityRankMapData[ri][ci] = null;
+  closeRankPopup();
+  drawGrid();
+}
+document.addEventListener('click', e => {
+  const pop = document.getElementById('rank-popup');
+  if (pop.style.display !== 'none' && !pop.contains(e.target)) closeRankPopup();
+});
 
 // エディタ起動
 initEditor();
