@@ -91,11 +91,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
       - x: 17
-        y: 13
-        flip: false
-        min_rank: F
-        max_rank: SS
-      - x: 17
         y: 18
         flip: false
         min_rank: F
@@ -415,6 +410,14 @@ TILE_MAPPINGS:
     image_path: components/pictures/dungeon/home/wall_top_wood_frame.png
     bg_color: '#3a2a1a'
     fg_color: '#8a6a4a'
+  wall_top_stone_blocks:
+    char: t
+    category: wall_top
+    tile_id: 11
+    desc: 壁11 (石ブロック壁)
+    image_path: components/pictures/dungeon/home/wall_top_stone_blocks.png
+    bg_color: '#2a2a2a'
+    fg_color: '#888'
   wall_none_0:
     char: ;
     category: wall_none
@@ -455,10 +458,15 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
-      - x: 19
-        y: 15
+      - x: 15
+        y: 14
         flip: false
-        min_rank: F
+        min_rank: D
+        max_rank: SS
+      - x: 19
+        y: 14
+        flip: false
+        min_rank: E
         max_rank: SS
       - x: 34
         y: 24
@@ -481,6 +489,9 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 17
+        y: 14
+        flip: false
       - x: 34
         y: 23
         flip: false
@@ -509,11 +520,6 @@ TILE_MAPPINGS:
     positions:
       - x: 8
         y: 7
-        flip: false
-        min_rank: F
-        max_rank: SS
-      - x: 15
-        y: 15
         flip: false
         min_rank: F
         max_rank: SS
@@ -660,11 +666,6 @@ TILE_MAPPINGS:
     desc: 武器屋
     id: weapon_shop
     positions:
-      - x: 19
-        y: 16
-        flip: false
-        min_rank: F
-        max_rank: SS
       - x: 15
         y: 23
         flip: false
@@ -689,11 +690,6 @@ TILE_MAPPINGS:
     positions:
       - x: 19
         y: 4
-        flip: false
-        min_rank: E
-        max_rank: SS
-      - x: 19
-        y: 14
         flip: false
         min_rank: E
         max_rank: SS
@@ -723,6 +719,9 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 16
+        y: 14
+        flip: false
   inn:
     char: H
     category: npc
@@ -778,6 +777,9 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 18
+        y: 14
+        flip: false
   guide_item:
     char: E
     category: npc
@@ -849,11 +851,6 @@ TILE_MAPPINGS:
     desc: 魔法屋
     id: wizard
     positions:
-      - x: 15
-        y: 14
-        flip: false
-        min_rank: D
-        max_rank: SS
       - x: 24
         y: 23
         flip: false
@@ -864,12 +861,6 @@ TILE_MAPPINGS:
     category: npc
     desc: テレポート屋
     id: teleport_wizard
-    positions:
-      - x: 45
-        y: 23
-        flip: false
-        min_rank: D
-        max_rank: SS
   guild_staff:
     char: (
     category: npc
@@ -905,6 +896,12 @@ TILE_MAPPINGS:
     category: npc
     desc: 村人 (銀行案内)
     id: guide_bank
+    positions:
+      - x: 19
+        y: 16
+        flip: false
+        min_rank: F
+        max_rank: SS
   villager:
     char: Z
     category: npc
@@ -918,6 +915,11 @@ TILE_MAPPINGS:
     id: wall_decoration_0
     image_path: components/pictures/dungeon/shallow/wall_decoration_0.png
     positions:
+      - x: 18
+        y: 18
+        flip: false
+        min_rank: F
+        max_rank: SS
       - x: 16
         y: 22
         flip: false
@@ -979,11 +981,20 @@ TILE_MAPPINGS:
     id: wall_decoration_tapestry
     image_path: components/pictures/dungeon/home/wall_decoration_tapestry.png
     positions:
+      - x: 14
+        y: 18
+        flip: false
+      - x: 20
+        y: 18
+        flip: true
       - x: 16
         y: 23
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 25
+        y: 23
+        flip: false
       - x: 37
         y: 23
         flip: true
@@ -994,6 +1005,9 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 25
+        y: 24
+        flip: false
       - x: 37
         y: 24
         flip: true
@@ -1004,11 +1018,20 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 25
+        y: 25
+        flip: false
       - x: 37
         y: 25
         flip: true
         min_rank: F
         max_rank: SS
+      - x: 23
+        y: 27
+        flip: false
+      - x: 29
+        y: 27
+        flip: true
   wall_deco_window:
     char:
     category: wall_decoration
@@ -1112,16 +1135,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
       - x: 15
-        y: 18
-        flip: false
-        min_rank: F
-        max_rank: SS
-      - x: 16
-        y: 18
-        flip: false
-        min_rank: F
-        max_rank: SS
-      - x: 18
         y: 18
         flip: false
         min_rank: F
@@ -1292,6 +1305,12 @@ TILE_MAPPINGS:
     id: wall_decoration_bank
     image_path: components/pictures/dungeon/home/wall_decoration_bank.png
 
+    positions:
+      - x: 16
+        y: 18
+        flip: false
+        min_rank: F
+        max_rank: SS
   wall_deco_wooden_roof:
     char:
     category: wall_decoration
@@ -1301,6 +1320,26 @@ TILE_MAPPINGS:
 
 
 
+    positions:
+      - x: 15
+        y: 15
+        flip: false
+        min_rank: F
+        max_rank: SS
+      - x: 16
+        y: 15
+        flip: false
+      - x: 17
+        y: 15
+        flip: false
+      - x: 18
+        y: 15
+        flip: false
+      - x: 19
+        y: 15
+        flip: false
+        min_rank: F
+        max_rank: SS
   table:
     char:
     category: obstacle
@@ -1308,6 +1347,10 @@ TILE_MAPPINGS:
     id: table
 
   # ーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+    positions:
+      - x: 15
+        y: 16
+        flip: false
   special_P:
     char: P
     category: special
