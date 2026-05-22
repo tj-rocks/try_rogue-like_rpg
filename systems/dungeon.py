@@ -230,7 +230,12 @@ class Dungeon:
         if info is None and current_level > 0:
             valid_keys = [k for k in DUNGEON_IMAGES.keys() if k.isdigit() and k != "0"]
             if valid_keys:
-                info = DUNGEON_IMAGES.get(random.choice(valid_keys))
+                chosen_info = DUNGEON_IMAGES.get(random.choice(valid_keys))
+                if isinstance(chosen_info, dict):
+                    info = chosen_info.copy()
+                    info["map"] = None
+                else:
+                    info = chosen_info
         
         if info is None:
             info = {"image": "normal"}
@@ -481,8 +486,6 @@ class Dungeon:
         if self.current_floor == 0: # 村
             # デフォルトは開始地点(P)
             tx, ty = self.start_pos
-            if self.start_pos != (0, 0):
-                ty += 2 # 壁埋まり防止のため2マス下にオフセット
             
             # 死亡時は診療所(R)の右隣にスポーン
             if is_death and self.clinic_pos:
@@ -861,11 +864,15 @@ class Dungeon:
                             from constants import RANK_ORDER
                             player_rank = getattr(self.player, "guild_rank", "-") if self.player else "-"
                             p_idx = RANK_ORDER.index(player_rank) if player_rank in RANK_ORDER else 0
+                            
+                            # ランク "-" (0) の時は F (1) ランクの位置も表示可能にするための仮想インデックス
+                            virtual_p_idx = 1 if p_idx == 0 else p_idx
+                            
                             if min_rank and min_rank in RANK_ORDER:
-                                if p_idx < RANK_ORDER.index(min_rank):
+                                if virtual_p_idx < RANK_ORDER.index(min_rank):
                                     continue
                             if max_rank and max_rank in RANK_ORDER:
-                                if p_idx > RANK_ORDER.index(max_rank):
+                                if virtual_p_idx > RANK_ORDER.index(max_rank):
                                     continue
 
                         
@@ -920,6 +927,20 @@ class Dungeon:
                             deco_id = tile_info.get("id", ent_id)
                             self.wall_decoration_variants[r][c] = deco_id
                             self.wall_decoration_flips[r][c] = pos.get("flip", False)
+                            
+                            # Dynamically load custom wall_decoration image paths (e.g. components/pictures/icon/stave.png)
+                            if deco_id not in self.textures:
+                                img_path = tile_info.get("image_path")
+                                if img_path and os.path.exists(img_path):
+                                    try:
+                                        img = pygame.image.load(img_path).convert_alpha()
+                                        if img.get_size() != (ts, ts):
+                                            img = pygame.transform.scale(img, (ts, ts))
+                                        self.textures[deco_id] = img
+                                        print(f"[DEBUG-NPC]   Dynamically loaded custom wall_decoration image '{img_path}' for '{deco_id}'")
+                                    except Exception as ex:
+                                        print(f"[DEBUG-NPC]   Failed to load custom wall_decoration image '{img_path}': {ex}")
+                            
                             print(f"[DEBUG-NPC]   Successfully placed wall_decoration '{deco_id}' at grid coordinate ({c}, {r}) (in textures: {deco_id in self.textures}) (flip: {pos.get('flip', False)})")
                         
                         elif cat == "wall_pass":

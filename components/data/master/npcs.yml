@@ -60,6 +60,13 @@ guild_receptionist:
   - ギルド受付「ようこそ冒険者ギルドへ。」
   role: guild_receptionist
 
+guild_master:
+  name: ギルドマスター
+  image_path: components/pictures/npc/man_middleage_h
+  dialogue:
+  - ギルドマスター「よくぞ来た、若き冒険者よ。ギルドへ歓迎する！」
+  role: guild_receptionist
+
 doctor:
   name: 医者
   image_path: components/pictures/npc/man_doctor_h
@@ -124,8 +131,8 @@ guide_inn:
   - 案内人「貴重な装備品を手に入れたり、大切なアイテムを手に入れたら、泊まっていくといいわ。」
 
 guide_guild:
-  name: ギルドの受付嬢
-  image_path: components/pictures/npc/girl_town_v
+  name: ギルド職員
+  image_path: components/pictures/npc/woman_ordinary_h
   dialogue:
   - 案内人「まずはギルドで『クエスト』を受けて、冒険の目的を決めましょう。」
   - 案内人「クエストを達成してポイントを貯めれば、より深い階層への通行許可が下りるわよ。」
@@ -171,7 +178,7 @@ pub_master:
 
 guild_staff:
   name: ギルド職員
-  image_path: components/pictures/npc/woman_ordinary2_h
+  image_path: components/pictures/npc/woman_scientist_v
   dialogue:
   - 看護師「ダンジョンで死んでも諦めないでください。ダンジョンの呪いはかかりますが生きて帰れます。」
   - 看護師「ギルドでは呪いを解くことも可能です。安心して冒険に行ってください。」
