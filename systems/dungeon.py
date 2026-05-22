@@ -924,9 +924,15 @@ class Dungeon:
                         
                         elif cat == "wall_pass":
                             self.map_data[r][c] = TILE_GATE
-                            tile_id = tile_info.get("tile_id", 0)
-                            self.wall_top_variants[r][c] = f"wall_pass_{tile_id}"
-                            print(f"[DEBUG-NPC]   Successfully placed wall_pass '{ent_id}' (tile_id={tile_id}) at grid coordinate ({c}, {r})")
+                            img_path = tile_info.get("image_path", "")
+                            if img_path:
+                                import os as _os
+                                fk = _os.path.splitext(_os.path.basename(img_path))[0]
+                            else:
+                                tile_id = tile_info.get("tile_id", 0)
+                                fk = f"wall_pass_{tile_id}"
+                            self.wall_top_variants[r][c] = fk
+                            print(f"[DEBUG-NPC]   Successfully placed wall_pass '{ent_id}' (fk={fk}) at grid coordinate ({c}, {r})")
                 
                 # --- [NEW] 固定マップでも障害物を配置可能にする ---
                 if self.player and self.current_floor > 0:
