@@ -238,3 +238,17 @@ statue:
   max_spawns: 1
   image_path: components/pictures/obstacles/statue.png
   image_scale: 1.1
+
+table:
+  name: テーブル
+  min_rank: "F"
+  rarity: 1
+  hp: 10
+  defense: 10
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 0
+  min_floor: 999
+  max_floor: 999
+  image_path: components/pictures/obstacles/table.png
+  image_scale: 1.0

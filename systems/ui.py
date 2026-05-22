@@ -1760,7 +1760,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             shop_dialog.setup_sell_mode(player)
                                             shop_dialog.is_active = True
                                             return
-                                    elif getattr(npc, "role", None) == "guild_master":
+                                    elif getattr(npc, "role", None) == "guild_receptionist":
                                         if guild_dialog and dungeon:
                                             # 状況に応じたメッセージを設定
                                             next_rank_data = dungeon.guild_system.get_next_rank_data(player.guild_rank)

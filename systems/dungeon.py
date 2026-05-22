@@ -421,6 +421,7 @@ class Dungeon:
         self.wall_top_variants = [[get_rand_wall_top() for _ in range(self.map_width)] for _ in range(self.map_height)]
         self.wall_none_variants = [[get_rand_wall_none() for _ in range(self.map_width)] for _ in range(self.map_height)]
         self.wall_decoration_variants = [["" for _ in range(self.map_width)] for _ in range(self.map_height)]
+        self.wall_decoration_flips = [[False for _ in range(self.map_width)] for _ in range(self.map_height)]
         
         if "corridor" in self.textures:
             self.textures["corridor_h"] = pygame.transform.rotate(self.textures["corridor"], -90)
@@ -717,6 +718,7 @@ class Dungeon:
                 self.wall_none_variants = [[(random.choice(wn_list) if wn_list else "wall_none") for _ in range(self.map_width)] for _ in range(self.map_height)]
                 self.base_floor_variants = [[(random.choice(f_list) if f_list else "floor") for _ in range(self.map_width)] for _ in range(self.map_height)]
                 self.wall_decoration_variants = [["" for _ in range(self.map_width)] for _ in range(self.map_height)]
+                self.wall_decoration_flips = [[False for _ in range(self.map_width)] for _ in range(self.map_height)]
                 self.npcs = []
                 self.rooms = []
                 ts = self.tile_size
@@ -744,23 +746,47 @@ class Dungeon:
                         # 1. ゲート（すり抜け可能扉・ゲート）
                         if char in tile_mappings and tile_mappings[char].get("category") == "wall_pass":
                             self.map_data[r][c] = TILE_GATE
-                            self.wall_top_variants[r][c] = f"wall_pass_{tile_mappings[char].get('tile_id', 0)}"
-                            self.floor_variants[r][c] = "floor_0"
+                            img_path = tile_mappings[char].get("image_path", "")
+                            if img_path:
+                                import os as _os
+                                fk = _os.path.splitext(_os.path.basename(img_path))[0]
+                            else:
+                                fk = f"wall_pass_{tile_mappings[char].get('tile_id', 0)}"
+                            self.wall_top_variants[r][c] = fk
+                            self.floor_variants[r][c] = "floor_lawn"
                             
                         # 2. 壁・天井
                         elif char in tile_mappings and tile_mappings[char].get("category") == "wall_top":
                             self.map_data[r][c] = 0
-                            self.wall_top_variants[r][c] = f"wall_top_{tile_mappings[char].get('tile_id', 0)}"
+                            img_path = tile_mappings[char].get("image_path", "")
+                            if img_path:
+                                import os as _os
+                                fk = _os.path.splitext(_os.path.basename(img_path))[0]
+                            else:
+                                fk = f"wall_top_{tile_mappings[char].get('tile_id', 0)}"
+                            self.wall_top_variants[r][c] = fk
                             
                         # 4. 背景・虚無
                         elif char in tile_mappings and tile_mappings[char].get("category") == "wall_none":
                             self.map_data[r][c] = 0
-                            self.wall_none_variants[r][c] = f"wall_none_{tile_mappings[char].get('tile_id', 0)}"
+                            img_path = tile_mappings[char].get("image_path", "")
+                            if img_path:
+                                import os as _os
+                                fk = _os.path.splitext(_os.path.basename(img_path))[0]
+                            else:
+                                fk = f"wall_none_{tile_mappings[char].get('tile_id', 0)}"
+                            self.wall_none_variants[r][c] = fk
                             
                         # 5. 床・地面
                         elif char in tile_mappings and tile_mappings[char].get("category") == "floor":
                             self.map_data[r][c] = 1
-                            self.floor_variants[r][c] = f"floor_{tile_mappings[char].get('tile_id', 0)}"
+                            img_path = tile_mappings[char].get("image_path", "")
+                            if img_path:
+                                import os as _os
+                                fk = _os.path.splitext(_os.path.basename(img_path))[0]
+                            else:
+                                fk = f"floor_{tile_mappings[char].get('tile_id', 0)}"
+                            self.floor_variants[r][c] = fk
 
                         # 6. 通路
                         elif char in tile_mappings and tile_mappings[char].get("category") == "corridor":
@@ -776,7 +802,8 @@ class Dungeon:
                         elif char == "P":
                             self.start_pos = (c, r)
                             self.map_data[r][c] = 1
-                            self.floor_variants[r][c] = "floor_0"
+                            self.floor_variants[r][c] = "floor_lawn"
+
                         elif char == "D":
                             self.map_data[r][c] = 3
                             self.dungeon_pos = (c, r)
@@ -870,7 +897,7 @@ class Dungeon:
                                     elif "道具屋" in name: role = "item_shop"
                                     elif "大魔導士" in name or "魔法屋" in name: role = "magic_shop"
                                     elif "商人" in name: role = "merchant"
-                                    elif "ギルドマスター" in name: role = "guild_master"
+                                    elif "ギルドマスター" in name or "ギルド受付" in name: role = "guild_receptionist"
                                     elif "預かり屋" in name: role = "storage"
                                     elif "銀行員" in name: role = "bank"
                                     elif "医者" in name: role = "doctor"
@@ -892,7 +919,8 @@ class Dungeon:
                         elif cat == "wall_decoration":
                             deco_id = tile_info.get("id", ent_id)
                             self.wall_decoration_variants[r][c] = deco_id
-                            print(f"[DEBUG-NPC]   Successfully placed wall_decoration '{deco_id}' at grid coordinate ({c}, {r})")
+                            self.wall_decoration_flips[r][c] = pos.get("flip", False)
+                            print(f"[DEBUG-NPC]   Successfully placed wall_decoration '{deco_id}' at grid coordinate ({c}, {r}) (in textures: {deco_id in self.textures}) (flip: {pos.get('flip', False)})")
                         
                         elif cat == "wall_pass":
                             self.map_data[r][c] = TILE_GATE
@@ -1645,8 +1673,12 @@ class Dungeon:
                     
                     # [NEW] 壁の装飾を描画
                     dec_key = self.wall_decoration_variants[y][x]
+                    if x == 25 and y == 25:
+                        print(f"[DEBUG-DRAW] (25, 25) dec_key={dec_key}, in_tex={dec_key in self.textures if dec_key else False}")
                     if dec_key and dec_key in self.textures:
                         dec_img = self.textures[dec_key]
+                        if self.wall_decoration_flips[y][x]:
+                            dec_img = pygame.transform.flip(dec_img, True, False)
                         screen.blit(dec_img, (dx, dy))
         for e in self.edges:
             dx, dy = (e["x"] * self.tile_size) + e["ox"] - camera_x, (e["y"] * self.tile_size) + e["oy"] - camera_y

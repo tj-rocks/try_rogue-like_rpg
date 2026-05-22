@@ -122,9 +122,9 @@ class GuildSystem:
         target_key, target_data = random.choice(candidates)
         amount = random.randint(min_amt, max_amt)
         
-        # 個別に報酬額が設定されている場合はそれを使う。ない場合は能力値から算出（係数を2->5に強化）
+        # 個別に報酬額が設定されている場合はそれを使う。ない場合または0以下の場合は能力値から算出（係数を2->5に強化）
         unit_reward = target_data.get("reward_gold")
-        if unit_reward is None:
+        if unit_reward is None or unit_reward <= 0:
             unit_reward = (target_data.get("hp", 10) + target_data.get("attack", 0)) * 5
             
         from systems.math_utils import hardcore_round
@@ -133,6 +133,7 @@ class GuildSystem:
         divisor = _gq.get("GUILD_QUEST_GP_DIVISOR", 10)
         
         reward_gold = hardcore_round(unit_reward * amount * multiplier, is_hp=True)
+        reward_gold = max(1, reward_gold)  # 最低1G保証
         # GPは報酬ゴールド / 設定値 とする（最低1GP保証）
         reward_gp = max(1, reward_gold // divisor)
 
