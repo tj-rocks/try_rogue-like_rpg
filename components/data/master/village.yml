@@ -436,7 +436,6 @@ TILE_MAPPINGS:
     fg_color: '#333'
   # ーーーーーーーーーーーーーーーーーーーーーーーーーーーー
   wood_barrel:
-    char:
     category: obstacle
     id: wood_barrel
     positions:
@@ -473,7 +472,6 @@ TILE_MAPPINGS:
         y: 36
         flip: false
   crate:
-    char:
     category: obstacle
     id: crate
     positions:
@@ -507,7 +505,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   pot:
-    char:
     category: obstacle
     id: pot
     positions:
@@ -537,7 +534,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   rubble:
-    char:
     category: obstacle
     id: rubble
     positions:
@@ -552,7 +548,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   statue:
-    char:
     category: obstacle
     id: statue
     positions:
@@ -562,7 +557,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   broken_pillar:
-    char:
     category: obstacle
     id: broken_pillar
     positions:
@@ -592,7 +586,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   anvil:
-    char:
     category: obstacle
     id: anvil
     positions:
@@ -603,15 +596,12 @@ TILE_MAPPINGS:
         y: 28
         flip: false
   well:
-    char:
     category: obstacle
     id: well
   skeleton:
-    char:
     category: obstacle
     id: skeleton
   crystal:
-    char:
     category: obstacle
     id: crystal
     positions:
@@ -626,7 +616,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   sword_stuck:
-    char:
     category: obstacle
     id: sword_stuck
     positions:
@@ -650,11 +639,9 @@ TILE_MAPPINGS:
         y: 28
         flip: false
   web:
-    char:
     category: obstacle
     id: web
   stained_armor_stand:
-    char:
     category: obstacle
     id: stained_armor_stand
     positions:
@@ -681,7 +668,6 @@ TILE_MAPPINGS:
         y: 28
         flip: false
   weapon_shop:
-    char: W
     category: npc
     id: weapon_shop
     positions:
@@ -691,7 +677,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   item_shop:
-    char: I
     category: npc
     id: item_shop
     positions:
@@ -701,7 +686,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   merchant:
-    char: C
     category: npc
     id: merchant
     positions:
@@ -724,7 +708,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   storage:
-    char: S
     category: npc
     id: storage
     positions:
@@ -732,7 +715,6 @@ TILE_MAPPINGS:
         y: 14
         flip: false
   inn:
-    char: H
     category: npc
     id: inn
     positions:
@@ -745,7 +727,6 @@ TILE_MAPPINGS:
         y: 16
         flip: true
   blacksmith:
-    char: B
     category: npc
     id: blacksmith
     positions:
@@ -753,11 +734,9 @@ TILE_MAPPINGS:
         y: 23
         flip: false
   guild_receptionist:
-    char: G
     category: npc
     id: guild_receptionist
   doctor:
-    char: R
     category: npc
     id: doctor
     positions:
@@ -767,7 +746,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   bank:
-    char: $
     category: npc
     id: bank
     positions:
@@ -775,7 +753,6 @@ TILE_MAPPINGS:
         y: 14
         flip: false
   guide_item:
-    char: E
     category: npc
     id: guide_item
     positions:
@@ -785,7 +762,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   guide_inn:
-    char: M
     category: npc
     id: guide_inn
     positions:
@@ -795,7 +771,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   guide_guild:
-    char: Q
     category: npc
     id: guide_guild
     positions:
@@ -811,7 +786,6 @@ TILE_MAPPINGS:
         y: 4
         flip: false
   guide_doctor:
-    char: T
     category: npc
     id: guide_doctor
     positions:
@@ -821,7 +795,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   guild_guide:
-    char: '?'
     category: npc
     id: guild_guide
     positions:
@@ -837,7 +810,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   wizard:
-    char: '>'
     category: npc
     id: wizard
     positions:
@@ -847,7 +819,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   teleport_wizard:
-    char: (
     category: npc
     id: teleport_wizard
     positions:
@@ -855,7 +826,6 @@ TILE_MAPPINGS:
         y: 32
         flip: false
   guild_staff:
-    char: (
     category: npc
     id: guild_staff
     positions:
@@ -869,7 +839,6 @@ TILE_MAPPINGS:
         y: 30
         flip: false
   crank_adventurer:
-    char: A
     category: npc
     id: crank_adventurer
     positions:
@@ -895,7 +864,6 @@ TILE_MAPPINGS:
         y: 35
         flip: false
   crank_adventurer2:
-    char: F
     category: npc
     id: crank_adventurer2
     positions:
@@ -912,7 +880,6 @@ TILE_MAPPINGS:
         y: 34
         flip: false
   crank_adventurer3:
-    char: J
     category: npc
     id: crank_adventurer3
     positions:
@@ -929,7 +896,6 @@ TILE_MAPPINGS:
         y: 32
         flip: true
   apprentice:
-    char: V
     category: npc
     id: apprentice
     positions:
@@ -942,7 +908,6 @@ TILE_MAPPINGS:
         y: 32
         flip: false
   pub_master:
-    char: X
     category: npc
     id: pub_master
     positions:
@@ -953,7 +918,6 @@ TILE_MAPPINGS:
         y: 33
         flip: true
   guide_bank:
-    char: Y
     category: npc
     id: guide_bank
     positions:
@@ -966,7 +930,6 @@ TILE_MAPPINGS:
         y: 36
         flip: false
   villager:
-    char: Z
     category: npc
     id: villager
   # ーーーーーーーーーーーーーーーーーーーーーーーーーーーー
@@ -975,7 +938,6 @@ TILE_MAPPINGS:
         y: 35
         flip: false
   wall_deco_ivy:
-    char:
     category: wall_decoration
     desc: 壁のツタ
     id: wall_decoration_0
@@ -1029,7 +991,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   wall_deco_shield:
-    char:
     category: wall_decoration
     desc: 壁掛けの盾
     id: wall_decoration_shield
@@ -1051,7 +1012,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   wall_deco_weapon_shop:
-    char:
     category: wall_decoration
     desc: 武器屋の看板
     id: wall_decoration_weapon_shop
@@ -1068,7 +1028,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   wall_deco_tapestry:
-    char:
     category: wall_decoration
     desc: タペストリー
     id: wall_decoration_tapestry
@@ -1200,7 +1159,6 @@ TILE_MAPPINGS:
         y: 38
         flip: true
   wall_deco_window:
-    char:
     category: wall_decoration
     desc: 窓
     id: wall_decoration_window
@@ -1404,7 +1362,6 @@ TILE_MAPPINGS:
         y: 38
         flip: false
   wall_deco_masic_shop:
-    char:
     category: wall_decoration
     desc: 魔法屋のシンボル
     id: wall_decoration_masic_shop
@@ -1421,7 +1378,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   wall_deco_item_shop:
-    char:
     category: wall_decoration
     desc: アイテム屋のシンボル
     id: wall_decoration_item_shop
@@ -1434,7 +1390,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   wall_deco_bank:
-    char:
     category: wall_decoration
     desc: 銀行の看板
     id: wall_decoration_bank
@@ -1447,7 +1402,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   wall_decoration_pub:
-    char:
     category: wall_decoration
     desc: パブの看板
     id: wall_decoration_pub
@@ -1478,7 +1432,6 @@ TILE_MAPPINGS:
         y: 38
         flip: false
   wall_deco_wooden_roof:
-    char:
     category: wall_decoration
     desc: 木製の屋根飾り
     id: wall_decoration_wooden_roof
@@ -1525,7 +1478,6 @@ TILE_MAPPINGS:
         min_rank: F
         max_rank: SS
   table:
-    char:
     category: obstacle
     id: table
 

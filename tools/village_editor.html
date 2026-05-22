@@ -991,11 +991,24 @@ async function loadTileDefinitions() {
         }
         const imgPath = val.image_path ? `../${val.image_path}` : '';
         const bgImgPath = val.bg_image_path ? `../${val.bg_image_path}` : '';
+
+        let displayChar = val.char;
+        if (!displayChar) {
+          if (val.category === 'npc') {
+            displayChar = (val.subcategory === 'npc_facility') ? '🏪' : '💬';
+          } else if (val.category === 'obstacle') {
+            displayChar = '📦';
+          } else if (val.category === 'wall_decoration') {
+            displayChar = '🖼️';
+          } else {
+            displayChar = ch;
+          }
+        }
         
         TILE[ch] = [
           val.bg_color || '#222',
           val.fg_color || '#fff',
-          val.char || ch,
+          displayChar,
           val.desc || '',
           imgPath,
           bgImgPath,
