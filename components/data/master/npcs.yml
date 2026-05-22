@@ -7,76 +7,83 @@
 # --- 主要施設NPC ---
 weapon_shop:
   name: 武器屋
-  image_path: components/pictures/npc/middleage_man_0_h
+  image_path: components/pictures/npc/man_middleage_h
   dialogue:
   - 武器屋「いらっしゃい！何にする？」
   role: weapon_shop
 
 item_shop:
   name: 道具屋
-  image_path: components/pictures/npc/young_man_0_h
+  image_path: components/pictures/npc/man_young_h
   dialogue:
   - 道具屋「旅の準備は整ったかい？」
   role: item_shop
 
 merchant:
   name: 商人
-  image_path: components/pictures/npc/boy_0_v
+  image_path: components/pictures/npc/man_rich_h
   dialogue:
   - 商人「ダンジョンで拾ったお宝は俺が買い取ってやるぜ！」
   role: merchant
 
 storage:
   name: 預かり屋
-  image_path: components/pictures/npc/gentleman_0_v
+  image_path: components/pictures/npc/man_gentleman_v
   dialogue:
   - 預かり屋「荷物を預かろうか？」
   role: storage
 
 inn:
   name: 宿屋
-  image_path: components/pictures/npc/maid_0_v
+  image_path: components/pictures/npc/woman_maid_h
   dialogue:
   - 宿屋「ゆっくり休んでいってね。」
   role: inn
 
 blacksmith:
   name: 鍛冶屋
-  image_path: components/pictures/npc/artisan_0_v
+  image_path: components/pictures/npc/man_artisan_v
   dialogue:
   - 鍛冶屋「俺ぁ鍛冶屋だ。鉱石を持ってこれば装備を叩き直してやるぜ。」
   role: blacksmith
 
 villager:
   name: 村人
-  image_path: components/pictures/npc/town_girl_0_v
+  image_path: components/pictures/npc/girl_town_v
   dialogue:
   - 村人「この先は危険だよ。1Fへ行くするには右の階段を使ってね。」
 
+guild_receptionist:
+  name: ギルド受付
+  image_path: components/pictures/npc/girl_town_v
+  dialogue:
+  - ギルド受付「ようこそ冒険者ギルドへ。」
+  role: guild_receptionist
+
 guild_master:
   name: ギルドマスター
-  image_path: components/pictures/npc/sage_0_v
+  image_path: components/pictures/npc/man_middleage_h
   dialogue:
-  - ギルドマスター「ようこそ冒険者ギルドへ。」
-  role: guild_master
+  - ギルドマスター「よくぞ来た、若き冒険者よ。ギルドへ歓迎する！」
+  role: guild_receptionist
 
 doctor:
   name: 医者
-  image_path: components/pictures/npc/doctor_0_h
+  image_path: components/pictures/npc/man_doctor_h
   dialogue:
   - 医者「……気がついたかい？無茶はしちゃいけないよ。」
   role: doctor
 
 bank:
   name: 銀行員
-  image_path: components/pictures/npc/old_woman_0_v
+  image_path: components/pictures/npc/woman_old_v
   dialogue:
   - 銀行員「大切なお金をお預かりします。」
   role: bank
 
 wizard:
   name: 魔法屋
-  image_path: components/pictures/npc/witch_0_h
+  image_path: components/pictures/npc/woman_witch_h
   dialogue:
   - 魔導士「ほっほっほ、若き冒険者よ。魔法の真髄を知りたいか？」
   - 魔導士「このダンジョンには、時として魔力の残滓が渦巻く場所があるのじゃ。」
@@ -85,97 +92,94 @@ wizard:
 
 teleport_wizard:
   name: テレポート屋
-  image_path: components/pictures/npc/witch_0_h
+  image_path: components/pictures/npc/man_wizard_h
   dialogue:
   - テレポート屋「フフフ……。世界の理を超えて、お望みの場所へ飛ばしてやろう。」
   - テレポート屋「ただし……それなりの『対価』はもらうぞ？」
   role: teleport
 
 # --- チュートリアル担当NPC群 ---
-guide_weapon:
-  name: 武器屋の案内人
-  image_path: components/pictures/npc/middleage_man_0_h
+crank_adventurer:
+  name: 中堅冒険者
+  image_path: components/pictures/npc/man_fighter_v
   dialogue:
-  - 案内人「武器屋では、強力な武器や防具、盾が売られているよ。」
-  - 案内人「買っただけでは意味がないから、装備するのを忘れないでね！」
+  - 中堅冒険者「よぉ新人！ 冒険の準備は進んでるか？ まずはギルドに所属しないとダンジョンに入ることすらできないぞ。」
+  - 中堅冒険者「それと、装備はケチるなよ。身の丈に合った武器と防具を武器屋できちんと揃えるんだ。裸同然で潜るのは自殺志願者だけだ。」
+  - 中堅冒険者「あと、一番大事なのは『引き際』だ。欲張って深くに行きすぎるなよ。自分の限界を感じたら、早めに引き返すのがプロの冒険者ってやつだ！」
 
-guide_item:
-  name: 道具屋の案内人
-  image_path: components/pictures/npc/young_man_0_h
+crank_adventurer2:
+  name: 先輩冒険者
+  image_path: components/pictures/npc/woman_fighter_v
   dialogue:
-  - 案内人「道具屋には、回復薬や便利な『杖』が揃っているよ。」
-  - 案内人「特に杖は、遠くの敵を眠らせたり吹き飛ばしたりできるから、ピンチの時に役立つよ。」
+  - 先輩冒険者「あら、新人君？ 冒険者らしくなってきたじゃない。先輩から一つ、身に染みるアドバイスをあげるね。」
+  - 先輩冒険者「手に入れたコインは、持ち歩かずにすぐ銀行へ預けること！ ダンジョンで力尽きると、手持ちのコインは半分になっちゃうの。……私、これで何度泣いたか分からないわ。」
+  - 先輩冒険者「あと、HPが減ったら絶対に無理しないで、すぐに街へ戻るか回復すること。回復薬をケチって全滅するなんて、一番ダサいんだからね？」
 
-guide_merchant:
-  name: 換金のアドバイザー
-  image_path: components/pictures/npc/boy_0_v
+crank_adventurer3:
+  name: 先輩冒険者
+  image_path: components/pictures/npc/woman_fighter_v
   dialogue:
-  - 案内人「不要なアイテムは商人に売って、お金（コイン）に換えよう。」
-  - 案内人「売値は買値の半分になっちゃうけど、カバンがいっぱいなら整理も大事だよ。」
-
-guide_storage:
-  name: 倉庫の管理人
-  image_path: components/pictures/npc/gentleman_0_v
-  dialogue:
-  - 案内人「大事な装備やアイテムは『預かり屋』に預けておこう。」
-  - 案内人「万が一ダンジョンで倒れても、預けてあるものは無くならないから安心だよ。」
+  - 先輩冒険者「ふふっ。冒険者って意外に安全な職業なのよ。」
+  - 先輩冒険者「だって、ダンジョンの中で死んでも、死んだらそこで終わり…じゃないわよ？ちゃんと街まで戻ってこられるんだから。」
+  - 先輩冒険者「もちろん、ちょっとだけ呪われるけどね。……まあ、ギルドで治療もできるし、大したことないわ。」
 
 guide_inn:
   name: 宿屋の看板娘
-  image_path: components/pictures/npc/maid_0_v
+  image_path: components/pictures/npc/woman_maid_h
   dialogue:
-  - 案内人「宿屋で休むと、HPが全回復して『永続セーブ』が行われるわ。」
-  - 案内人「ダンジョンの中でも自動で『中断セーブ』はされるけど、あちらは再開したら消えてしまうし、もし倒れたらその記録も消えてしまうの。」
-  - 案内人「絶対に失いたくない大切な記録は、ここでしっかり休んで残していってね。」
-
-guide_blacksmith:
-  name: 鍛冶の助っ人
-  image_path: components/pictures/npc/artisan_0_v
-  dialogue:
-  - 案内人「鍛冶屋では、鉱石を消費して装備を『強化』できるんだ。」
-  - 案内人「強化値が上がれば攻撃力や防御力が格段にアップするから、こまめに通うといいよ。」
+  - 案内人「宿屋で休むと、HPが全回復して記録も行われるわ。」
+  - 案内人「貴重な装備品を手に入れたり、大切なアイテムを手に入れたら、泊まっていくといいわ。」
 
 guide_guild:
-  name: ギルドの受付嬢
-  image_path: components/pictures/npc/town_girl_0_v
+  name: ギルド職員
+  image_path: components/pictures/npc/woman_ordinary_h
   dialogue:
   - 案内人「まずはギルドで『クエスト』を受けて、冒険の目的を決めましょう。」
   - 案内人「クエストを達成してポイントを貯めれば、より深い階層への通行許可が下りるわよ。」
 
 guide_doctor:
   name: 医療助手
-  image_path: components/pictures/npc/doctor_0_h
+  image_path: components/pictures/npc/woman_ordinary_h
   dialogue:
   - 案内人「もしダンジョンでHPが0になっても、お医者様がここまで運んでくれるわ。」
   - 案内人「ただし、持っていたコインや一部のアイテムを失うこともあるから注意してね。」
 
 guide_bank:
   name: 村人
-  image_path: components/pictures/npc/town_girl_0_v
+  image_path: components/pictures/npc/man_young_h
   dialogue:
   - 案内人「手持ちのコインを銀行に預けておけば、倒れた時でも没収されずに済むよ。」
   - 案内人「まとまったお金が手に入ったら、こまめに預けに来るのが冒険者の知恵だね。」
 
 apprentice:
   name: 見習い冒険者
-  image_path: components/pictures/npc/young_boy_0_v
+  image_path: components/pictures/npc/boy_young_v
   dialogue:
   - 見習い「ぼくもいつか、あなたみたいな強い冒険者になりたいな！」
   - 見習い「まずは基本の『移動』と『攻撃』をマスターしなきゃ。」
   - 見習い「矢印キーで移動して、敵の隣に行けば自動で攻撃できるんだよね？」
 
 guild_guide:
-  name: ギルド案内人
-  image_path: components/pictures/npc/middleage_man_0_h
+  name: ギルド職員
+  image_path: components/pictures/npc/woman_ordinary_h
   dialogue:
-  - 案内人「ここは冒険者の拠点となる村だよ。まずは右上のギルドへ行ってみるといいわ。」
-  - 案内人「ギルドマスターに話しかければ、最初のクエストを受けられるはずよ。」
+  - 案内人「冒険者ギルドへようこそ。」
+  - 案内人 "新たな冒険者さんを歓迎するわ"
   - 案内人「クエストを達成してランクを上げれば、より深い階層へ進めるようになるわ！」
+  - 案内人「受付でクエストを受注できますよランクアップ目指して頑張ってくださいね。」
 
-dungeon_expert:
-  name: ダンジョン物知り博士
-  image_path: components/pictures/npc/sage_0_v
+pub_master:
+  name: パブのマスター
+  image_path: components/pictures/npc/woman_ordinary2_h
   dialogue:
-  - 博士「おぉ、若き冒険者よ。ダンジョンの掟を知りたいか？\nこの場所は不思議な力に満ちていて、入るたびにその姿を変えると言われているぞ。\n奥深くには、誰も見たことがないような財宝が眠っているという噂じゃ。\nただし気をつけよ。各エリアの節目には強力なボスが待ち構えておる。\n十分な準備をしてから挑むのじゃぞ！\n\n…さて、さらに詳しい話を聞きたいか？\nダンジョン内では空腹にも気をつけるのじゃぞ。お腹が空くとHPが減っていくからの。\nそれと、怪しい床のタイルには罠が仕掛けられていることもある。\n罠を見つけるには、その場で足踏み（スペースキー）をすると周囲を調べられるぞ。\n冒険は慎重かつ大胆に進めるのじゃ。幸運を祈っておるぞ！」
+  - マスター「ようこそいらっしゃい、冒険者さん。ここは冒険者の疲れを癒すパブさ。」
+  - マスター「冒険者は危険も少なく稼ぎもでかい。いい仕事だね」
+  - マスター「嫌なことがあったらここにきて、うまい酒を飲んで忘れちまいな」
 
-
+guild_staff:
+  name: ギルド職員
+  image_path: components/pictures/npc/woman_scientist_v
+  dialogue:
+  - 看護師「ダンジョンで死んでも諦めないでください。ダンジョンの呪いはかかりますが生きて帰れます。」
+  - 看護師「ギルドでは呪いを解くことも可能です。安心して冒険に行ってください。」
+  - 看護師「とはいえ迷宮から帰ってこない冒険者もいます。お気をつけて」

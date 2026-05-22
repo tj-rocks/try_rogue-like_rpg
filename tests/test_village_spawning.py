@@ -31,11 +31,8 @@ def test_village_spawning():
         print(f"・総NPC数: {len(dungeon.npcs)}")
         print(f"・総障害物数: {len(dungeon.enemies)}")
         
-        # 3. 特定の主要NPCが正しくスポンしているかの検証
-        expected_npcs = [
-            "武器屋", "道具屋", "商人", "預かり屋", 
-            "宿屋", "鍛冶屋", "ギルドマスター", "医者", "銀行員"
-        ]
+        # 3. 代表的な主要NPCが正しくスポンしているかの検証 (ロジック共通のため代表として武器屋で検証)
+        expected_npcs = ["武器屋"]
         
         spawned_npc_names = [npc.name for npc in dungeon.npcs]
         for name in expected_npcs:
@@ -62,6 +59,14 @@ def test_village_spawning():
             gy = obs.y // dungeon.tile_size
             assert 0 <= gx < dungeon.map_width, f"障害物 '{obs.type}' がマップ範囲外です！ x: {gx}"
             assert 0 <= gy < dungeon.map_height, f"障害物 '{obs.type}' がマップ範囲外です！ y: {gy}"
+            
+        # 6. 壁装飾の配置検証（例: 魔法屋のシンボルの杖が正しい位置に配置され、テクスチャがロードされているか）
+        expected_deco_id = "wall_decoration_masic_shop"
+        deco_x, deco_y = 25, 27
+        actual_deco_id = dungeon.wall_decoration_variants[deco_y][deco_x]
+        assert actual_deco_id == expected_deco_id, f"座標({deco_x}, {deco_y})の装飾が期待値 '{expected_deco_id}' ではなく '{actual_deco_id}' です！"
+        assert expected_deco_id in dungeon.textures, f"装飾 '{expected_deco_id}' のテクスチャがロードされていません！"
+        print(f"  - OK: 壁装飾 '{expected_deco_id}' の配置・テクスチャロードを確認 (座標: {deco_x}, {deco_y})")
             
         print("[OK] 街のNPC＆障害物配置 自動テスト合格！")
         

@@ -164,9 +164,98 @@ header h1 {
   display: flex;
   justify-content: space-between;
 }
+/* ランク設定ポップアップ */
+#rank-popup {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  background: #1a1f35;
+  border: 1px solid #3b82f6;
+  border-radius: 10px;
+  padding: 14px 16px;
+  min-width: 240px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(59,130,246,0.3);
+  font-family: 'Outfit', sans-serif;
+}
+#rank-popup h4 {
+  font-size: 12px;
+  color: #60a5fa;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#rank-popup label {
+  font-size: 11px;
+  color: #9ca3af;
+  display: block;
+  margin-bottom: 4px;
+}
+#rank-popup select {
+  background: #0f111a;
+  color: #f3f4f6;
+  border: 1px solid #374151;
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 12px;
+  width: 100%;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+#rank-popup select:focus { outline: none; border-color: #3b82f6; }
+#rank-popup .rank-row { display: flex; gap: 8px; }
+#rank-popup .rank-col { flex: 1; }
+#rank-popup .rank-actions { display: flex; gap: 6px; margin-top: 4px; }
+#rank-popup .btn-rank-ok   { background: #2563eb; color:#fff; flex:1; }
+#rank-popup .btn-rank-clear{ background: #374151; color:#9ca3af; flex:1; }
+#rank-popup .btn-rank-close{ background: transparent; border:none; color:#6b7280; font-size:14px; cursor:pointer; margin-left:auto; padding:0; }
 </style>
 </head>
 <body>
+
+<!-- ランク設定ポップアップ -->
+<div id="rank-popup">
+  <h4>📊 出現ランク設定 <button class="btn-rank-close" onclick="closeRankPopup()">✕</button></h4>
+  <div class="rank-row">
+    <div class="rank-col">
+      <label>Min ランク (これ以上)</label>
+      <select id="rank-min-sel">
+        <option value="">-- なし --</option>
+        <option value="-">- (初期)</option>
+        <option value="F">F</option>
+        <option value="E">E</option>
+        <option value="D">D</option>
+        <option value="C">C</option>
+        <option value="B">B</option>
+        <option value="A">A</option>
+        <option value="S">S</option>
+        <option value="SS">SS</option>
+      </select>
+    </div>
+    <div class="rank-col">
+      <label>Max ランク (これ以下)</label>
+      <select id="rank-max-sel">
+        <option value="">-- なし --</option>
+        <option value="-">- (初期)</option>
+        <option value="F">F</option>
+        <option value="E">E</option>
+        <option value="D">D</option>
+        <option value="C">C</option>
+        <option value="B">B</option>
+        <option value="A">A</option>
+        <option value="S">S</option>
+        <option value="SS">SS</option>
+      </select>
+    </div>
+  </div>
+  <div class="rank-actions">
+    <button class="btn btn-rank-ok" onclick="applyRankPopup()">✔ 適用</button>
+    <button class="btn btn-rank-clear" onclick="clearRankPopup()">🗑 クリア</button>
+  </div>
+</div>
 
 <header>
   <h1>🏡 村マップグラフィックエディタ</h1>
@@ -250,71 +339,71 @@ const GROUPS = {
 // ==============================================================================
 const TILE = {
   // --- 地面・床 ---
-  '.': ['#1c2a1c', '#3a5a3a', '.', '外床 (芝生)', '../components/pictures/dungeon/home/floor_0.png', '', 'floor'],
-  ',': ['#2a2a1a', '#6a6a2a', ',', '内床 (フローリング)', '../components/pictures/dungeon/home/floor_1.png', '', 'floor'],
-  '[': ['#1c1c1c', '#555',   '[', '内床2 (石床グレー)', '../components/pictures/dungeon/home/floor_2.png', '', 'floor'],
-  ':': ['#2c1c2c', '#656',   ':', '内床3 (石床赤紫)', '../components/pictures/dungeon/home/floor_3.png', '', 'floor'],
-  '_': ['#2a1a0a', '#6a4a2a', '_', '砂 (砂漠床)', '../components/pictures/dungeon/home/floor_4.png', '', 'floor'],
-  '~': ['#1a2a3a', '#4a8aaa', '~', '水', '../components/pictures/dungeon/home/floor_5.png', '', 'floor'],
-  '^': ['#2c2c2c', '#444',   '^', '内床6 (ダンジョン床)', '../components/pictures/dungeon/home/floor_6.png', '', 'floor'],
-  '*': ['#3c3c3c', '#666',   '*', '内床7', '../components/pictures/dungeon/home/floor_7.png', '', 'floor'],
-  '+': ['#3c3c3c', '#666',   '+', '内床8', '../components/pictures/dungeon/home/floor_8.png', '', 'floor'],
-  '=': ['#3c3c3c', '#666',   '=', '内床9', '../components/pictures/dungeon/home/floor_9.png', '', 'floor'],
-  '-': ['#3c3c3c', '#666',   '-', '内床10', '../components/pictures/dungeon/home/floor_10.png', '', 'floor'],
-  '/': ['#3c3c3c', '#666',   '/', '内床11', '../components/pictures/dungeon/home/floor_11.png', '', 'floor'],
-  '\\': ['#3c3c3c', '#666',  '\\', '内床12', '../components/pictures/dungeon/home/floor_12.png', '', 'floor'],
-  '|': ['#3c3c3c', '#666',   '|', '内床13', '../components/pictures/dungeon/home/floor_13.png', '', 'floor'],
-  '{': ['#3c3c3c', '#666',   '{', '内床14', '../components/pictures/dungeon/home/floor_14.png', '', 'floor'],
-  '}': ['#3c3c3c', '#666',   '}', '内床15', '../components/pictures/dungeon/home/floor_15.png', '', 'floor'],
-  ']': ['#3c3c3c', '#666',   ']', '内床16', '../components/pictures/dungeon/home/floor_16.png', '', 'floor'],
-  '%': ['#3c3c3c', '#666',   '%', '内床17', '../components/pictures/dungeon/home/floor_17.png', '', 'floor'],
+  '.': ['#1c2a1c', '#3a5a3a', '.', '外床 (芝生)', '../components/pictures/dungeon/home/floor_lawn.png', '', 'floor'],
+  ',': ['#2a2a1a', '#6a6a2a', ',', '内床 (フローリング)', '../components/pictures/dungeon/home/floor_wooden.png', '', 'floor'],
+  '[': ['#1c1c1c', '#555',   '[', '内床2 (石床グレー)', '../components/pictures/dungeon/home/old/floor_2.png', '', 'floor'],
+  ':': ['#2c1c2c', '#656',   ':', '内床3 (石床赤紫)', '../components/pictures/dungeon/home/floor_purple_stone.png', '', 'floor'],
+  '_': ['#2a1a0a', '#6a4a2a', '_', '砂 (砂漠床)', '../components/pictures/dungeon/home/old/floor_4.png', '', 'floor'],
+  '~': ['#1a2a3a', '#4a8aaa', '~', '水', '../components/pictures/dungeon/home/floor_water.png', '', 'floor'],
+  '^': ['#2c2c2c', '#444',   '^', '内床6 (ダンジョン床)', '../components/pictures/dungeon/home/old/floor_6.png', '', 'floor'],
+  '*': ['#3c3c3c', '#666',   '*', '内床7', '../components/pictures/dungeon/home/floor_dark_stone.png', '', 'floor'],
+  '+': ['#3c3c3c', '#666',   '+', '内床8', '../components/pictures/dungeon/home/old/floor_8.png', '', 'floor'],
+  '=': ['#3c3c3c', '#666',   '=', '内床9', '../components/pictures/dungeon/home/old/floor_9.png', '', 'floor'],
+  '-': ['#3c3c3c', '#666',   '-', '内床10', '../components/pictures/dungeon/home/old/floor_10.png', '', 'floor'],
+  '/': ['#3c3c3c', '#666',   '/', '内床11', '../components/pictures/dungeon/home/old/floor_11.png', '', 'floor'],
+  '\\': ['#3c3c3c', '#666',  '\\', '内床12', '../components/pictures/dungeon/home/old/floor_12.png', '', 'floor'],
+  '|': ['#3c3c3c', '#666',   '|', '内床13', '../components/pictures/dungeon/home/old/floor_13.png', '', 'floor'],
+  '{': ['#3c3c3c', '#666',   '{', '内床14', '../components/pictures/dungeon/home/old/floor_14.png', '', 'floor'],
+  '}': ['#3c3c3c', '#666',   '}', '内床15', '../components/pictures/dungeon/home/old/floor_15.png', '', 'floor'],
+  ']': ['#3c3c3c', '#666',   ']', '内床16', '../components/pictures/dungeon/home/old/floor_16.png', '', 'floor'],
+  '%': ['#3c3c3c', '#666',   '%', '内床17', '../components/pictures/dungeon/home/old/floor_17.png', '', 'floor'],
   'K': ['#2a1a2a', '#cc88cc', 'K', '通路 (石タイル)', '../components/pictures/dungeon/home/corridor.png', '', 'floor'],
   'L': ['#2a1a2a', '#cc88cc', 'L', '通路 (石タイル2)', '../components/pictures/dungeon/home/corridor.png', '', 'floor'],
 
   // --- 壁・屋根 ---
-  'a': ['#3a2a1a', '#8a6a4a', 'a', '壁0 (茶木目壁)', '../components/pictures/dungeon/home/wall_top_0.png', '', 'wall_top'],
-  'b': ['#3a2a1a', '#8a6a4a', 'b', '壁1', '../components/pictures/dungeon/home/wall_top_1.png', '', 'wall_top'],
-  'c': ['#3a2a1a', '#8a6a4a', 'c', '壁2', '../components/pictures/dungeon/home/wall_top_2.png', '', 'wall_top'],
-  'd': ['#3a2a1a', '#8a6a4a', 'd', '壁6', '../components/pictures/dungeon/home/wall_top_6.png', '', 'wall_top'],
-  'e': ['#3a2a1a', '#8a6a4a', 'e', '壁4', '../components/pictures/dungeon/home/wall_top_4.png', '', 'wall_top'],
-  'f': ['#3a2a1a', '#8a6a4a', 'f', '壁5', '../components/pictures/dungeon/home/wall_top_5.png', '', 'wall_top'],
-  'g': ['#3a2a1a', '#8a6a4a', 'g', '壁7', '../components/pictures/dungeon/home/wall_top_7.png', '', 'wall_top'],
-  'h': ['#3a2a1a', '#8a6a4a', 'h', '壁8', '../components/pictures/dungeon/home/wall_top_8.png', '', 'wall_top'],
-  'i': ['#3a2a1a', '#8a6a4a', 'i', '壁9', '../components/pictures/dungeon/home/wall_top_9.png', '', 'wall_top'],
-  'j': ['#3a2a1a', '#8a6a4a', 'j', '壁10', '../components/pictures/dungeon/home/wall_top_10.png', '', 'wall_top'],
-  'n': ['#3a2a1a', '#8a6a4a', 'n', '壁11', '../components/pictures/dungeon/home/wall_top_11.png', '', 'wall_top'],
-  'p': ['#3a2a1a', '#8a6a4a', 'p', '壁12', '../components/pictures/dungeon/home/wall_top_12.png', '', 'wall_top'],
-  'q': ['#3a2a1a', '#8a6a4a', 'q', '壁13', '../components/pictures/dungeon/home/wall_top_13.png', '', 'wall_top'],
-  'r': ['#3a2a1a', '#8a6a4a', 'r', '壁14', '../components/pictures/dungeon/home/wall_top_14.png', '', 'wall_top'],
-  's': ['#3a2a1a', '#8a6a4a', 's', '壁15', '../components/pictures/dungeon/home/wall_top_15.png', '', 'wall_top'],
+  'a': ['#3a2a1a', '#8a6a4a', 'a', '壁0 (茶木目壁)', '../components/pictures/dungeon/home/wall_top_wood_classic.png', '', 'wall_top'],
+  'b': ['#3a2a1a', '#8a6a4a', 'b', '壁1', '../components/pictures/dungeon/home/wall_top_wood_fine.png', '', 'wall_top'],
+  'c': ['#3a2a1a', '#8a6a4a', 'c', '壁2', '../components/pictures/dungeon/home/old/wall_top_2.png', '', 'wall_top'],
+  'd': ['#3a2a1a', '#8a6a4a', 'd', '壁6', '../components/pictures/dungeon/home/wall_top_wood_stripes.png', '', 'wall_top'],
+  'e': ['#3a2a1a', '#8a6a4a', 'e', '壁4', '../components/pictures/dungeon/home/wall_top_wood_grand.png', '', 'wall_top'],
+  'f': ['#3a2a1a', '#8a6a4a', 'f', '壁5', '../components/pictures/dungeon/home/wall_top_wood_shabby.png', '', 'wall_top'],
+  'g': ['#3a2a1a', '#8a6a4a', 'g', '壁7', '../components/pictures/dungeon/home/wall_top_wood_block.png', '', 'wall_top'],
+  'h': ['#3a2a1a', '#8a6a4a', 'h', '壁8', '../components/pictures/dungeon/home/wall_top_wood_horizontal.png', '', 'wall_top'],
+  'i': ['#3a2a1a', '#8a6a4a', 'i', '壁9', '../components/pictures/dungeon/home/wall_top_wood_vertical.png', '', 'wall_top'],
+  'j': ['#3a2a1a', '#8a6a4a', 'j', '壁10 (赤茶レンガ壁)', '../components/pictures/dungeon/home/wall_top_wood_frame.png', '', 'wall_top'],
+  't': ['#2a2a2a', '#888',    't', '壁11 (石ブロック壁)', '../components/pictures/dungeon/home/wall_top_stone_blocks.png', '', 'wall_top'],
+  'n': ['#3a2a1a', '#8a6a4a', 'n', '壁11', '../components/pictures/dungeon/home/old/wall_top_11.png', '', 'wall_top'],
+  'p': ['#3a2a1a', '#8a6a4a', 'p', '壁12', '../components/pictures/dungeon/home/old/wall_top_12.png', '', 'wall_top'],
+  'q': ['#3a2a1a', '#8a6a4a', 'q', '壁13', '../components/pictures/dungeon/home/old/wall_top_13.png', '', 'wall_top'],
+  'r': ['#3a2a1a', '#8a6a4a', 'r', '壁14', '../components/pictures/dungeon/home/old/wall_top_14.png', '', 'wall_top'],
+  's': ['#3a2a1a', '#8a6a4a', 's', '壁15', '../components/pictures/dungeon/home/old/wall_top_15.png', '', 'wall_top'],
   '0': ['#3a1a1a', '#aa5a3a', '0', '扉・ゲート0 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_0.png', '', 'wall_pass'],
-  '1': ['#3a1a1a', '#aa5a3a', '1', '扉・ゲート1 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_1.png', '', 'wall_pass'],
-  '2': ['#3a1a1a', '#aa5a3a', '2', '扉・ゲート2 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_2.png', '', 'wall_pass'],
-  '3': ['#3a1a1a', '#aa5a3a', '3', '扉・ゲート3 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_3.png', '', 'wall_pass'],
-  '4': ['#3a1a1a', '#aa5a3a', '4', '扉・ゲート4 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_4.png', '', 'wall_pass'],
-  '5': ['#3a1a1a', '#aa5a3a', '5', '扉・ゲート5 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_5.png', '', 'wall_pass'],
-  '6': ['#3a1a1a', '#aa5a3a', '6', '扉・ゲート6 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_6.png', '', 'wall_pass'],
-  '7': ['#3a1a1a', '#aa5a3a', '7', '扉・ゲート7 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_7.png', '', 'wall_pass'],
-  '8': ['#3a1a1a', '#aa5a3a', '8', '扉・ゲート8 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_8.png', '', 'wall_pass'],
-  '9': ['#3a1a1a', '#aa5a3a', '9', '扉・ゲート9 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_9.png', '', 'wall_pass'],
-  '<': ['#3a1a1a', '#aa5a3a', '<', '扉・ゲート10 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_10.png', '', 'wall_pass'],
-  '"': ['#3a1a1a', '#aa5a3a', '"', '扉・ゲート11 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_11.png', '', 'wall_pass'],
-  '`': ['#3a1a1a', '#aa5a3a', '`', '扉・ゲート12 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_12.png', '', 'wall_pass'],
-  '◆': ['#3a1a1a', '#aa5a3a', '◆', '扉・ゲート13 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_13.png', '', 'wall_pass'],
-  '◇': ['#3a1a1a', '#aa5a3a', '◇', '扉・ゲート14 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_14.png', '', 'wall_pass'],
-  '▲': ['#3a1a1a', '#aa5a3a', '▲', '扉・ゲート15 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_15.png', '', 'wall_pass'],
-  '▼': ['#3a1a1a', '#aa5a3a', '▼', '扉・ゲート16 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_16.png', '', 'wall_pass'],
-  '●': ['#3a1a1a', '#aa5a3a', '●', '扉・ゲート17 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_17.png', '', 'wall_pass'],
-  '○': ['#3a1a1a', '#aa5a3a', '○', '扉・ゲート18 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_18.png', '', 'wall_pass'],
-  '◈': ['#3a1a1a', '#aa5a3a', '◈', '扉・ゲート19 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_19.png', '', 'wall_pass'],
-  'm': ['#1a1a3a', '#4a4a8a', 'm', 'D壁 (ダンジョン壁)', '../components/pictures/dungeon/home/wall_top_3.png', '', 'wall_top'],
+  '1': ['#3a1a1a', '#aa5a3a', '1', '扉・ゲート1 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_gate_wooden.png', '', 'wall_pass'],
+  '2': ['#3a1a1a', '#aa5a3a', '2', '扉・ゲート2 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_gate_iron.png', '', 'wall_pass'],
+  '3': ['#3a1a1a', '#aa5a3a', '3', '扉・ゲート3 (すり抜け可能)', '../components/pictures/dungeon/home/wall_pass_gate_stone.png', '', 'wall_pass'],
+  '4': ['#3a1a1a', '#aa5a3a', '4', '扉・ゲート4 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_4.png', '', 'wall_pass'],
+  '5': ['#3a1a1a', '#aa5a3a', '5', '扉・ゲート5 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_5.png', '', 'wall_pass'],
+  '6': ['#3a1a1a', '#aa5a3a', '6', '扉・ゲート6 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_6.png', '', 'wall_pass'],
+  '7': ['#3a1a1a', '#aa5a3a', '7', '扉・ゲート7 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_7.png', '', 'wall_pass'],
+  '8': ['#3a1a1a', '#aa5a3a', '8', '扉・ゲート8 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_8.png', '', 'wall_pass'],
+  '9': ['#3a1a1a', '#aa5a3a', '9', '扉・ゲート9 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_9.png', '', 'wall_pass'],
+  '<': ['#3a1a1a', '#aa5a3a', '<', '扉・ゲート10 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_10.png', '', 'wall_pass'],
+  '"': ['#3a1a1a', '#aa5a3a', '"', '扉・ゲート11 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_11.png', '', 'wall_pass'],
+  '`': ['#3a1a1a', '#aa5a3a', '`', '扉・ゲート12 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_12.png', '', 'wall_pass'],
+  '◆': ['#3a1a1a', '#aa5a3a', '◆', '扉・ゲート13 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_13.png', '', 'wall_pass'],
+  '◇': ['#3a1a1a', '#aa5a3a', '◇', '扉・ゲート14 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_14.png', '', 'wall_pass'],
+  '▲': ['#3a1a1a', '#aa5a3a', '▲', '扉・ゲート15 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_15.png', '', 'wall_pass'],
+  '▼': ['#3a1a1a', '#aa5a3a', '▼', '扉・ゲート16 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_16.png', '', 'wall_pass'],
+  '●': ['#3a1a1a', '#aa5a3a', '●', '扉・ゲート17 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_17.png', '', 'wall_pass'],
+  '○': ['#3a1a1a', '#aa5a3a', '○', '扉・ゲート18 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_18.png', '', 'wall_pass'],
+  '◈': ['#3a1a1a', '#aa5a3a', '◈', '扉・ゲート19 (すり抜け可能)', '../components/pictures/dungeon/home/old/wall_pass_19.png', '', 'wall_pass'],
   ';': ['#08080c', '#333',   ';', '虚無・暗闇背景', '', '', 'wall_none'],
   'k': ['#08080c', '#333',   'k', '背景虚無1', '', '', 'wall_none'],
   'l': ['#08080c', '#333',   'l', '背景虚無2', '', '', 'wall_none'],
   'w': ['#08080c', '#333',   'w', '背景虚無3', '', '', 'wall_none'],
 
   // --- システム・特殊 ---
-  'P': ['#2244cc', '#fff',   'P', 'プレイヤー開始地点', '../components/pictures/player/walk/down_idel.png', '../components/pictures/dungeon/home/floor_0.png', 'special'],
+  'P': ['#2244cc', '#fff',   'P', 'プレイヤー開始地点', '../components/pictures/player/walk/down_idel.png', '../components/pictures/dungeon/home/floor_lawn.png', 'special'],
   'D': ['#cc2244', '#fff',   'D', 'ダンジョン入口階段 (Stairs Down)', '../components/pictures/dungeon/stairs/stairs_down.png', '', 'special'],
   'U': ['#44cc22', '#fff',   'U', '街出口階段 (Stairs Up)', '../components/pictures/dungeon/stairs/stairs_up.png', '', 'special'],
 
@@ -324,6 +413,7 @@ const DEFAULT_TILE = ['#111', '#555', '.', '未定義', '', '', 'floor'];
 let baseMapData = [];
 let entityMapData = [];
 let entityFlipMapData = [];
+let entityRankMapData = []; // {min_rank, max_rank} per cell
 let charToId = {};
 let activeLayer = 'base'; // 'base' or 'entity' // 2D array of chars
 let selectedChar = '.';
@@ -492,6 +582,7 @@ function renderFromText() {
   baseMapData = [];
   entityMapData = [];
   entityFlipMapData = [];
+  entityRankMapData = [];
   
   lines.forEach((line, ri) => {
     if (line.startsWith('//')) return; // コメント行はスキップ
@@ -539,6 +630,7 @@ function renderFromText() {
     baseMapData.push(baseRow);
     entityMapData.push(entityRow);
     entityFlipMapData.push(entityFlipRow);
+    entityRankMapData.push(entityFlipRow.map(() => null)); // ランクは初期null
   });
   drawGrid();
 }
@@ -599,7 +691,19 @@ function drawGrid() {
       }
       
       cell.style.color = fg;
-      cell.textContent = entCh ? (TILE[charToId[entCh] || entCh]?.[2] || label) : label || '';
+      
+      // Apply flip transform from entityFlipMapData
+      const isFlipped = entityFlipMapData[ri] && entityFlipMapData[ri][ci];
+      if (isFlipped) {
+        cell.style.transform = 'scaleX(-1)';
+      }
+      
+      const textVal = entCh ? (TILE[charToId[entCh] || entCh]?.[2] || label) : label || '';
+      if (textVal) {
+        cell.innerHTML = `<span style="display:inline-block; transform: ${isFlipped ? 'scaleX(-1)' : 'none'}">${textVal}</span>`;
+      } else {
+        cell.innerHTML = '';
+      }
       cell.dataset.r = ri;
       cell.dataset.c = ci;
 
@@ -617,6 +721,13 @@ function drawGrid() {
           setCell(ri, ci, selectedChar, cell);
         }
         e.preventDefault();
+      });
+
+      cell.addEventListener('dblclick', e => {
+        e.stopPropagation();
+        if (entityMapData[ri][ci]) {
+          openRankPopup(ri, ci, e.clientX, e.clientY);
+        }
       });
 
       cell.addEventListener('mouseenter', e => {
@@ -640,6 +751,15 @@ function drawGrid() {
       cell.addEventListener('contextmenu', e => {
         e.preventDefault();
       });
+
+      // ランク表示（かぶるのでバッジ表示はやめ、title属性のツールチップに変更）
+      const rankInfo = entityRankMapData[ri] && entityRankMapData[ri][ci];
+      if (rankInfo && entityMapData[ri][ci]) {
+        const titleText = [rankInfo.min_rank ? rankInfo.min_rank+'↑' : '', rankInfo.max_rank ? rankInfo.max_rank+'↓' : ''].filter(Boolean).join(' ');
+        if (titleText) {
+          cell.title = 'ランク制限: ' + titleText;
+        }
+      }
 
       rowDiv.appendChild(cell);
     });
@@ -766,12 +886,15 @@ function saveToServer() {
   for (let r = 0; r < entityMapData.length; r++) {
     for (let c = 0; c < entityMapData[r].length; c++) {
         if (entityMapData[r][c]) {
+            const rankInfo = entityRankMapData[r] && entityRankMapData[r][c];
             entities.push({
                 id: entityMapData[r][c],
                 char: entityMapData[r][c],
                 x: c,
                 y: r,
-                flip: entityFlipMapData[r] ? (entityFlipMapData[r][c] || false) : false
+                flip: entityFlipMapData[r] ? (entityFlipMapData[r][c] || false) : false,
+                min_rank: rankInfo ? (rankInfo.min_rank || null) : null,
+                max_rank: rankInfo ? (rankInfo.max_rank || null) : null,
             });
         }
     }
@@ -802,6 +925,8 @@ function clearAll() {
   if (confirm('マップグリッドとテキストをクリアしますか？')) {
     baseMapData = [];
     entityMapData = [];
+    entityFlipMapData = [];
+    entityRankMapData = [];
     document.getElementById('map-grid').innerHTML = '';
     document.getElementById('raw-text').value = '';
   }
@@ -835,6 +960,19 @@ async function loadTileDefinitions() {
         delete TILE[key];
       }
       
+      // --- グラフィック更新前の flip 状態を保持するため現在の状態をスナップショット ---
+      const currentFlipSnapshot = {};
+      for (let r = 0; r < entityMapData.length; r++) {
+        for (let c = 0; c < entityMapData[r].length; c++) {
+          const entId = entityMapData[r][c];
+          if (entId) {
+            currentFlipSnapshot[`${r},${c}`] = { id: entId, flip: entityFlipMapData[r] ? (entityFlipMapData[r][c] || false) : false };
+          }
+        }
+      }
+
+      storedPositions.length = 0; // リセット（重複防止）
+      
       // APIから取得したマッピングで追加
       Object.entries(data.tiles).forEach(([ch, val]) => {
         if (val.char) {
@@ -842,16 +980,35 @@ async function loadTileDefinitions() {
         }
         if (val.positions) {
           val.positions.forEach(pos => {
-            storedPositions.push({ id: ch, x: pos.x, y: pos.y, flip: pos.flip || false });
+            const key = `${pos.y},${pos.x}`;
+            // 現在エディタ上でflipが変更済みの場合はその値を優先する
+            const current = currentFlipSnapshot[key];
+            const flip = (current && current.id === ch) ? current.flip : (pos.flip || false);
+            storedPositions.push({ id: ch, x: pos.x, y: pos.y, flip,
+              min_rank: pos.min_rank || null,
+              max_rank: pos.max_rank || null });
           });
         }
         const imgPath = val.image_path ? `../${val.image_path}` : '';
         const bgImgPath = val.bg_image_path ? `../${val.bg_image_path}` : '';
+
+        let displayChar = val.char;
+        if (!displayChar) {
+          if (val.category === 'npc') {
+            displayChar = (val.subcategory === 'npc_facility') ? '🏪' : '💬';
+          } else if (val.category === 'obstacle') {
+            displayChar = '📦';
+          } else if (val.category === 'wall_decoration') {
+            displayChar = '🖼️';
+          } else {
+            displayChar = ch;
+          }
+        }
         
         TILE[ch] = [
           val.bg_color || '#222',
           val.fg_color || '#fff',
-          val.char || ch,
+          displayChar,
           val.desc || '',
           imgPath,
           bgImgPath,
@@ -909,14 +1066,62 @@ async function initEditor() {
 function applyStoredPositions() {
   for (const p of storedPositions) {
     if (p.y < entityMapData.length && p.x < entityMapData[p.y].length) {
-      // テキストから読み込んだエンティティがなければ、positionsで上書き
       if (!entityMapData[p.y][p.x]) {
         entityMapData[p.y][p.x] = p.id;
         entityFlipMapData[p.y][p.x] = p.flip;
       }
+      // ランク情報は常に復元
+      if (p.min_rank || p.max_rank) {
+        if (!entityRankMapData[p.y]) entityRankMapData[p.y] = [];
+        entityRankMapData[p.y][p.x] = { min_rank: p.min_rank || null, max_rank: p.max_rank || null };
+      }
     }
   }
 }
+
+// ランクポップアップ
+let rankPopupTarget = null;
+function openRankPopup(ri, ci, px, py) {
+  rankPopupTarget = { ri, ci };
+  const pop = document.getElementById('rank-popup');
+  const rankInfo = (entityRankMapData[ri] && entityRankMapData[ri][ci]) || {};
+  document.getElementById('rank-min-sel').value = rankInfo.min_rank || '';
+  document.getElementById('rank-max-sel').value = rankInfo.max_rank || '';
+  // 画面端に収まるよう調整
+  pop.style.display = 'block';
+  const pw = pop.offsetWidth || 250, ph = pop.offsetHeight || 160;
+  let x = px + 10, y = py + 10;
+  if (x + pw > window.innerWidth) x = px - pw - 10;
+  if (y + ph > window.innerHeight) y = py - ph - 10;
+  pop.style.left = x + 'px';
+  pop.style.top = y + 'px';
+}
+function closeRankPopup() {
+  document.getElementById('rank-popup').style.display = 'none';
+  rankPopupTarget = null;
+}
+function applyRankPopup() {
+  if (!rankPopupTarget) return;
+  const { ri, ci } = rankPopupTarget;
+  const minR = document.getElementById('rank-min-sel').value;
+  const maxR = document.getElementById('rank-max-sel').value;
+  if (!entityRankMapData[ri]) entityRankMapData[ri] = [];
+  entityRankMapData[ri][ci] = (minR || maxR) ? { min_rank: minR || null, max_rank: maxR || null } : null;
+  closeRankPopup();
+  drawGrid();
+}
+function clearRankPopup() {
+  if (!rankPopupTarget) return;
+  const { ri, ci } = rankPopupTarget;
+  if (!entityRankMapData[ri]) entityRankMapData[ri] = [];
+  entityRankMapData[ri][ci] = null;
+  closeRankPopup();
+  drawGrid();
+}
+document.addEventListener('click', e => {
+  const pop = document.getElementById('rank-popup');
+  if (pop.style.display !== 'none' && !pop.contains(e.target)) closeRankPopup();
+});
 
 // エディタ起動
 initEditor();

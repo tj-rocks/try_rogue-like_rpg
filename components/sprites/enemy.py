@@ -603,3 +603,14 @@ class Enemy(Entity):
                         if not any(set(nm.get_occupied_grids(dungeon.tile_size)) & set(e.get_occupied_grids(dungeon.tile_size)) for e in dungeon.enemies):
                             nm.x += (dungeon.tile_size-nm.width)//2; nm.y += (dungeon.tile_size-nm.height)//2; nm.target_x, nm.target_y = nm.x, nm.y
                             dungeon.enemies.append(nm); dungeon.spawn_counts[mtp] = dungeon.spawn_counts.get(mtp,0)+1; return
+
+    def get_occupied_grids_at(self, tx, ty, tile_size):
+        if self.is_static:
+            # 障害物（is_static）の場合は描画スケーリング（image_scale）に関わらず1x1グリッドのみを占有する。
+            # タイル中央へのセンタリングオフセット（(tile_size - width) // 2）により、
+            # tx, ty が元タイルの左上座標からずれるため、物体の中心座標から本来のグリッドを正確に逆算する。
+            gx = int((tx + self.width // 2) // tile_size)
+            gy = int((ty + self.height // 2) // tile_size)
+            return [(gx, gy)]
+        return super().get_occupied_grids_at(tx, ty, tile_size)
+
