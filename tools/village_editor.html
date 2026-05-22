@@ -751,13 +751,13 @@ function drawGrid() {
         e.preventDefault();
       });
 
-      // ランク表示バッジ
+      // ランク表示（かぶるのでバッジ表示はやめ、title属性のツールチップに変更）
       const rankInfo = entityRankMapData[ri] && entityRankMapData[ri][ci];
       if (rankInfo && entityMapData[ri][ci]) {
-        const badge = document.createElement('div');
-        badge.style.cssText = 'position:absolute;bottom:0;right:0;background:rgba(59,130,246,0.85);color:#fff;font-size:6px;line-height:1;padding:1px 2px;border-radius:2px 0 0 0;font-family:monospace;pointer-events:none;z-index:5;';
-        badge.textContent = [rankInfo.min_rank ? rankInfo.min_rank+'↑' : '', rankInfo.max_rank ? rankInfo.max_rank+'↓' : ''].filter(Boolean).join(' ');
-        cell.appendChild(badge);
+        const titleText = [rankInfo.min_rank ? rankInfo.min_rank+'↑' : '', rankInfo.max_rank ? rankInfo.max_rank+'↓' : ''].filter(Boolean).join(' ');
+        if (titleText) {
+          cell.title = 'ランク制限: ' + titleText;
+        }
       }
 
       rowDiv.appendChild(cell);
