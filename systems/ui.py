@@ -1121,8 +1121,15 @@ class InventoryDialog(BaseListDialog):
         lines = []
         S_MAP = {"attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
                  "dex_bonus": "器用さ", "eva_bonus": "回避率", "crit_bonus": "会心率",
-                 "block_chance": "回避率", "block_chance_close": "近距離回避率", 
+                 "block_chance": "回避率", "block_chance_close": "近距離回避率",
                  "block_chance_ranged": "遠距離回避率", "stave_bonus": "杖回数"}
+        MAGIC_MAP = {
+            "magic_fire_damage":    "🔥炎ダメージ",
+            "magic_fire_range":     "🔥炎射程",
+            "magic_heal_ratio":     "💚回復量",
+            "magic_knockback_damage":"💨吹飛ダメージ",
+            "magic_invincible_turns":"✨無敵ターン",
+        }
         if itype in ("weapon", "armor", "shield", "lantern", "stave"):
             inv = getattr(player, itype + "_inventory", [])
             inst = player._find_equip_inst(inv, key)
@@ -1135,6 +1142,14 @@ class InventoryDialog(BaseListDialog):
                 if val:
                     is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged")
                     lines.append(f"{label}: +{int(val*100)}%" if is_pct else f"{label}: +{val}")
+            # 魔法ボーナスの表示
+            for mk, mlabel in MAGIC_MAP.items():
+                mval = inst.get_stat(mk, 0)
+                if mval:
+                    if mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage"):
+                        lines.append(f"{mlabel}: +{int(mval*100)}%")
+                    else:
+                        lines.append(f"{mlabel}: +{mval}")
             desc = inst.get_stat("describe", "")
             if desc: lines.extend(["", desc])
         else:
@@ -1144,6 +1159,7 @@ class InventoryDialog(BaseListDialog):
             desc = info.get("describe", "")
             if desc: lines.extend(["", desc])
         return lines
+
 
     # --- イベント処理 ---
     def handle_events(self, events):

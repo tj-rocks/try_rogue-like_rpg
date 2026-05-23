@@ -26,7 +26,7 @@ CONSUMABLE_DATA:
     name: 帰還の道標
     effect: warp_home
     price: 5000
-    min_rank: G
+    min_rank: F
     rarity: 7
     image_path: components/pictures/icon/hane.png
     sound: components/sounds/sfx/stairs.wav
@@ -78,7 +78,7 @@ CONSUMABLE_DATA:
     name: 転移の石
     price: 2000
     min_rank: F
-    rarity: 3
+    rarity: 7
     image_path: components/pictures/icon/item.png
     sound: components/sounds/sfx/recharge.wav
     shop_buyable: true
@@ -309,6 +309,7 @@ STAVE_DATA:
     - 200
     - 200
     - 255
+    damage_mult: 0.5    # 吹き飛ばしダメージ倍率（装備ボーナスで加算可能）
     max_distance: 10
     shop_buyable: true
     describe: 前方の敵を激しく弾き飛ばす魔法の杖。囲まれた時の脱出に役立つ。

@@ -38,18 +38,19 @@ SHIELD_DATA:
     min_rank: F
     max_floor: 999
     rarity: 2
-    block_chance: 0.01
-    block_chance_close: 0.01
-    block_chance_ranged: 0.01
     price: 100
     image_dir: components/pictures/shield/wooden_round_shield
     shop_buyable: false
     describe: 大きくひび割れた盾. 気休め程度にはなる.
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    bonus:
+      common:
+        hp: 0
+        defense: 0
+        block_chance_close: 0.01
+        block_chance_ranged: 0.01
+
   wooden_round_shield:
     name: 木の円盾
     category: round_shield
@@ -57,111 +58,114 @@ SHIELD_DATA:
     max_rank: E
     rarity: 1
     price: 50
-    block_chance: 0.05
-    block_chance_close: 0.05
-    block_chance_ranged: 0.05
     image_dir: components/pictures/shield/wooden_round_shield
     shop_buyable: true
     describe: 木板を張り合わせただけの簡素な盾. 初心者向け.
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    bonus:
+      common:
+        hp: 0
+        defense: 0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
+
   leather_round_shield:
     name: 皮の円盾
     category: round_shield
     min_rank: F
     max_rank: D
     rarity: 2
-    hp_bonus: 10
-    aggro_mod: -2
-    block_chance: 0.08
-    block_chance_close: 0.08
-    block_chance_ranged: 0.12
     price: 200
+    aggro_mod: -2
     image_dir: components/pictures/shield/leather_round_shield
     shop_buyable: true
     describe: 丈夫な皮を張った円盾.
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    bonus:
+      common:
+        hp: 10
+        defense: 0
+        block_chance_close: 0.08
+        block_chance_ranged: 0.12
+
   iron_round_shield:
     name: 鉄の円盾
     category: round_shield
     min_rank: F
     max_rank: D
     rarity: 2
-    defense_bonus: 1
-    block_chance: 0.08
-    block_chance_close: 0.12
-    block_chance_ranged: 0.08
-    aggro_mod: 0
     price: 300
+    aggro_mod: 0
     image_dir: components/pictures/shield/iron_round_shield
     shop_buyable: true
     describe: 鉄で作られた頑丈な盾.
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    bonus:
+      common:
+        hp: 0
+        defense: 1
+        block_chance_close: 0.12
+        block_chance_ranged: 0.08
+
   fullmetal_round_shield:
     name: 鋼の円盾
     category: round_shield
     min_rank: E
     max_rank: C
     rarity: 3
-    block_chance: 0.1
-    block_chance_close: 0.12
-    block_chance_ranged: 0.12
-    aggro_mod: 1
     price: 500
+    aggro_mod: 1
     image_dir: components/pictures/shield/fullmetal_round_shield
     shop_buyable: false
     describe: 硬い鋼の盾. 近接攻撃を弾きやすい.
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    bonus:
+      common:
+        hp: 0
+        defense: 0
+        block_chance_close: 0.12
+        block_chance_ranged: 0.12
+
   leather_kite_shield:
     name: 硬革のカイトシールド
     category: kite_shield
     min_rank: E
     max_rank: D
     rarity: 3
-    block_chance: 0.12
-    block_chance_close: 0.1
-    block_chance_ranged: 0.14
-    aggro_mod: -1
     price: 450
+    aggro_mod: -1
     image_dir: components/pictures/shield/leather_kite_shield
     shop_buyable: false
     describe: 硬い革のカイトシールド. 攻撃を受け止めやすいく動きやすい
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    bonus:
+      common:
+        hp: 0
+        defense: 0
+        block_chance_close: 0.10
+        block_chance_ranged: 0.14
+
   fullmetal_kite_shield:
     name: 鋼のカイトシールド
     category: kite_shield
     min_rank: E
     max_rank: C
     rarity: 4
-    block_chance: 0.12
-    block_chance_close: 0.14
-    block_chance_ranged: 0.1
-    aggro_mod: 3
     price: 650
+    aggro_mod: 3
     image_dir: components/pictures/shield/fullmetal_kite_shield
     shop_buyable: false
     describe: 硬い鋼のカイトシールド. 攻撃を防ぎやすいが重く音が気になる
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    bonus:
+      common:
+        hp: 0
+        defense: 0
+        block_chance_close: 0.14
+        block_chance_ranged: 0.10

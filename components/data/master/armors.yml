@@ -35,88 +35,140 @@ ARMOR_DATA:
     min_rank: F
     max_floor: 999
     rarity: 2
-    defense_bonus: 1
     price: 100
     image_dir: components/pictures/armor/adventurers_clothes
     shop_buyable: false
     describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    hp_bonus: 0
-    accuracy_bonus: 0
-    eva_bonus: 0
+    bonus:
+      common:
+        defense: 1
+        hp: 0
+        eva: 0
+        accuracy: 0
+        regen: 0
+
   adventurers_clothes:
     name: 冒険者の服
     category: robe
     min_rank: F
     rarity: 1
-    defense_bonus: 7.5
-    attack_bonus: 0
-    stave_bonus: 0
     price: 150
     image_dir: components/pictures/armor/adventurers_clothes
     shop_buyable: false
     describe: 丈夫な布で作られた一般的な服.
-    hp_bonus: 0
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    evasion_bonus: 0
-    accuracy_bonus: 0
+    bonus:
+      common:
+        defense: 7.5
+        hp: 0
+        eva: 0
+        accuracy: 0
+        regen: 0
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+
   leather_breastplate:
     name: 皮の胸当て
     category: light
     min_rank: F
     rarity: 1
-    defense_bonus: 10
-    price: 200
-    eva_bonus: 0.05
+    price: 490
     aggro_mod: -1
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
     describe: なめし革を重ねて作られた防具.
-    hp_bonus: 0
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus: 0
+    bonus:
+      common:
+        defense: 10
+        hp: 0
+        eva: 0.05
+        accuracy: 0
+        regen: 0
+
   iron_breastplate:
     name: 鉄の胸当て
     category: medium
     min_rank: F
     rarity: 2
-    defense_bonus: 11
-    price: 220
+    price: 550
     image_dir: components/pictures/armor/iron_armor
     shop_buyable: true
     describe: 鉄板を胸部に当てた実戦的な防具.
-    hp_bonus: 0
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus: 0
-    eva_bonus: 0
+    bonus:
+      common:
+        defense: 11
+        hp: 0
+        eva: 0
+        accuracy: 0
+        regen: 0
+
   fullmetal_breastplate:
     name: 鋼の胸当て
     category: medium
     min_rank: E
     rarity: 3
-    defense_bonus: 15
-    price: 360
+    price: 1800
     image_dir: components/pictures/armor/fullmetal_armor
     shop_buyable: false
     describe: 硬い鋼で作られた胸当て.
-    hp_bonus: 0
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus: 0
-    eva_bonus: 0
+    bonus:
+      common:
+        defense: 15
+        hp: 0
+        eva: 0
+        accuracy: 0
+        regen: 0
+
   hard_leather_armor:
     name: 堅牢な革鎧
     category: light
     min_rank: E
     max_rank: D
     rarity: 4
-    defense_bonus: 14
-    price: 350
-    eva_bonus: 0.05
-    aggro_mod: -1
+    price: 1500
+    aggro_mod: 0
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
     describe: なめし革を重ねて作られた防具.
-    hp_bonus: 0
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    evasion_bonus: 0
-    accuracy_bonus: 0
+    bonus:
+      common:
+        defense: 14
+        hp: 0
+        eva: 0.05
+        accuracy: 0
+        regen: 0
+
+  pilgrim_robe:
+    name: 巡礼者のローブ
+    category: robe
+    min_rank: D
+    max_rank: E
+    rarity: 6
+    price: 2000
+    aggro_mod: 0
+    image_dir: components/pictures/armor/leather_armor
+    shop_buyable: true
+    describe: 巡礼者が旅の安全を祈って着る聖なるローブ。魔法の効果を高める力がある。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    bonus:
+      common:
+        defense: 15
+        hp: 0
+        eva: 0.05
+        accuracy: 0
+        regen: 0
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0

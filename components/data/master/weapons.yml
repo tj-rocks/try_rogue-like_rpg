@@ -59,7 +59,6 @@ WEAPON_DATA:
     min_rank: F
     max_floor: 999
     rarity: 2
-    attack_bonus: 5
     price: 70
     armor_penetration: false
     image_path: components/pictures/weapon/broken_sword.png
@@ -67,17 +66,20 @@ WEAPON_DATA:
     image_scale: 1.2
     describe: 刃がボロボロで、今にも折れそうな剣。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus_close: 15
-    accuracy_bonus_ranged: 0
-    crit_rate: 0.05
     type: onehanded_sword
+    bonus:
+      common:
+        attack: 5
+        accuracy_close: 15
+        accuracy_range: 0
+        crit_rate: 0.05
+
   iron_sword:
     name: 鉄の剣
     category: onehanded_sword
     min_rank: F
     max_rank: E
     rarity: 2
-    attack_bonus: 11
     price: 300
     armor_penetration: false
     image_path: components/pictures/weapon/iron_sword.png
@@ -86,17 +88,20 @@ WEAPON_DATA:
     shop_buyable: true
     describe: 鉄製の標準的な剣。丈夫で扱いやすい。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus_close: 5
-    accuracy_bonus_ranged: 0
-    crit_rate: 0.05
     type: onehanded_sword
+    bonus:
+      common:
+        attack: 11
+        accuracy_close: 5
+        accuracy_range: 0
+        crit_rate: 0.05
+
   old_sword:
     name: 古びた剣
     category: onehanded_sword
     min_rank: F
     max_rank: D
     rarity: 8
-    attack_bonus: 6
     price: 150
     armor_penetration: false
     image_path: components/pictures/weapon/old_sword.png
@@ -105,17 +110,20 @@ WEAPON_DATA:
     shop_buyable: false
     describe: 長年放置され、刃がこぼれた古い剣。戦うには心もとない。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus_close: 5
-    accuracy_bonus_ranged: 0
-    crit_rate: 0.05
     type: onehanded_sword
+    bonus:
+      common:
+        attack: 6
+        accuracy_close: 5
+        accuracy_range: 0
+        crit_rate: 0.05
+
   wooden_stick:
     name: 木の棍棒
     category: axe
     min_rank: F
     max_rank: E
     rarity: 1
-    attack_bonus: 6
     price: 120
     armor_penetration: false
     image_path: components/pictures/weapon/wooden_stick.png
@@ -124,17 +132,20 @@ WEAPON_DATA:
     shop_buyable: true
     describe: その辺の木を削って作った鈍器。不恰好だが威力はそれなり？
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus_close: 0
-    accuracy_bonus_ranged: 0
-    crit_rate: 0.08
     type: axe
+    bonus:
+      common:
+        attack: 6
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.08
+
   fullmetal_sword:
     name: 鋼の剣
     category: onehanded_sword
     min_rank: E
     max_rank: D
     rarity: 3
-    attack_bonus: 15
     price: 200
     armor_penetration: false
     image_path: components/pictures/weapon/fullmetal_sword.png
@@ -143,17 +154,20 @@ WEAPON_DATA:
     shop_buyable: false
     describe: 鉄を鍛え上げて打った剣。鉄より鋭く重い。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus_close: 5
-    accuracy_bonus_ranged: 0
-    crit_rate: 0.05
     type: onehanded_sword
+    bonus:
+      common:
+        attack: 15
+        accuracy_close: 5
+        accuracy_range: 0
+        crit_rate: 0.05
+
   damascus_sword:
     name: ダマスカス鋼の剣
     category: onehanded_sword
     min_rank: E
     max_rank: D
     rarity: 3
-    attack_bonus: 20
     price: 300
     armor_penetration: false
     image_path: components/pictures/weapon/tempered_sword.png
@@ -162,26 +176,32 @@ WEAPON_DATA:
     shop_buyable: false
     describe: 職人が鉄を何層にも重ねて打った剣。波打つような文様が特徴。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus_close: 5
-    accuracy_bonus_ranged: 0
-    crit_rate: 0.05
     type: onehanded_sword
+    bonus:
+      common:
+        attack: 20
+        accuracy_close: 5
+        accuracy_range: 0
+        crit_rate: 0.05
+
   thiefs_knife:
     name: 盗賊のダガー
     category: dagger
     min_rank: E
     rarity: 3
-    attack_bonus: 11
     price: 400
     armor_penetration: true
     image_path: components/pictures/weapon/thiefs_knife.png
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
     shop_buyable: true
+    aggro_mod: -3
     describe: 音もなく獲物を屠るための特殊な刀。装備するとモンスターに気づかれにくくなる。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus_close: 20
-    accuracy_bonus_ranged: 10
-    crit_rate: 0.2
-    aggro_mod: -3
     type: dagger
+    bonus:
+      common:
+        attack: 11
+        accuracy_close: 20
+        accuracy_range: 10
+        crit_rate: 0.2

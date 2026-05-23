@@ -162,6 +162,38 @@ def get_normalized_equipment_data(floor_map):
     armor = raw_armors.get("ARMOR_DATA", {})
     shields = raw_shields.get("SHIELD_DATA", {})
     
+    # bonus.common のキーを既存のフラットキーに変換するマッピング
+    COMMON_KEY_MAP = {
+        "attack":             "attack_bonus",
+        "defense":            "defense_bonus",
+        "hp":                 "hp_bonus",
+        "eva":                "eva_bonus",
+        "accuracy_close":     "accuracy_bonus_close",
+        "accuracy_range":     "accuracy_bonus_ranged",
+        "accuracy":           "accuracy_bonus",
+        "crit_rate":          "crit_rate",
+        "regen":              "regen_bonus",
+        "block_chance_close": "block_chance_close",
+        "block_chance_ranged":"block_chance_ranged",
+    }
+
+    def _flatten_bonus(item_dict):
+        """bonus.common / bonus.magic をフラットなキーに展開してアイテム辞書にマージする"""
+        bonus = item_dict.pop("bonus", None)
+        if not isinstance(bonus, dict):
+            return
+        # common ボーナスを既存キーに変換してマージ
+        common = bonus.get("common", {})
+        if isinstance(common, dict):
+            for short_key, flat_key in COMMON_KEY_MAP.items():
+                if short_key in common:
+                    item_dict.setdefault(flat_key, common[short_key])
+        # magic ボーナスを magic_<key> としてマージ
+        magic = bonus.get("magic", {})
+        if isinstance(magic, dict):
+            for mk, mv in magic.items():
+                item_dict.setdefault(f"magic_{mk}", mv)
+
     def normalize_no_scaling(data_dict, category_map):
         normalized = {}
         for key, v in data_dict.items():
@@ -170,6 +202,8 @@ def get_normalized_equipment_data(floor_map):
             merged = category_map.get(cat_key, {}).copy() if cat_key else {}
             for k, val in v.items():
                 merged[k] = val
+            # bonus ネスト構造をフラット化
+            _flatten_bonus(merged)
             normalized[key] = merged
         return normalized
 
