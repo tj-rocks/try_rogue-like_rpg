@@ -123,6 +123,7 @@ class Text:
         OVERFLOW_SENSE = "モンスター氾濫の 予感がする……"
         OVERFLOW_START = "モンスター氾濫が 発生した"
         OVERFLOW_SURVIVE = "大量のモンスターを前に、生き残れるか"
+        OUTBREAK_BLOCKED = "魔物の氾濫（アウトブレイク）が発生している！\n安全が確保されるまで、元来た階段は使用できない！"
 
     class Combat:
         BLOCK = "{target} は 盾で 攻撃を ブロックした"

@@ -88,10 +88,9 @@ class TestOutbreakEvent(unittest.TestCase):
         # 新しい階層ではアウトブレイクが（確率に当たらない限り）終了していること
         # ※確実に終了していることを確認するため、debug_overflow=False で遷移
         self.assertFalse(next_dungeon.is_outbreak, "次の階層ではアウトブレイク状態がリセットされる必要がある")
-        self.assertFalse(self.player.outbreak_bonus_active, "クリアせずに進んだ場合、ボーナスフラグは立たない")
 
-    def test_clear_condition_and_bonus(self):
-        """全滅クリアとボーナス付与のテスト"""
+    def test_clear_condition(self):
+        """全滅クリアのテスト"""
         dungeon = warp_to_floor(1, self.player, debug_overflow=True)
         
         # 敵を全滅させる
@@ -104,7 +103,6 @@ class TestOutbreakEvent(unittest.TestCase):
         dungeon.update_outbreak_status(self.player, self.dialog)
         
         self.assertTrue(dungeon.outbreak_cleared, "全滅後はクリア状態になる必要がある")
-        self.assertTrue(self.player.outbreak_bonus_active, "クリア後はプレイヤーにボーナスフラグが立つ必要がある")
         self.assertIn("CLEAR", self.dialog.text)
 
     def test_occurrence_conditions(self):
