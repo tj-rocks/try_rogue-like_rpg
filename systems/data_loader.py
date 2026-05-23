@@ -128,25 +128,15 @@ import math
 from systems.math_utils import hardcore_round
 
 def get_normalized_enemy_data(floor_map):
-    """モンスターデータを読み込み、カテゴリベースの継承を適用して返す（自動スケーリング無効化版）"""
+    """モンスターデータを読み込み、返す（カテゴリベースの継承を廃止）"""
     raw_enemies = load_master_data("enemies.yml")
-    categories = raw_enemies.get("ENEMY_CATEGORIES", {})
     enemies_dict = raw_enemies.get("ENEMY_DATA", {})
     
     normalized_enemies = {}
     
     for key, v in enemies_dict.items():
         if not isinstance(v, dict): continue
-        
-        # カテゴリデータの継承
-        cat_key = v.get("category")
-        merged = categories.get(cat_key, {}).copy() if cat_key else {}
-        
-        # 個体データのマージ（YAMLの値が最終値）
-        for k, val in v.items():
-            merged[k] = val
-        
-        normalized_enemies[key] = merged
+        normalized_enemies[key] = v.copy()
 
     # 障害物を統合
     obstacles = load_master_data("obstacles.yml")

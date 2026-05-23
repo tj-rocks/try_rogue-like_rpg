@@ -122,7 +122,7 @@ well:
   image_path: components/pictures/obstacles/well.png
   image_scale: 1.2
 
-skeleton:
+skeleton_obstacle:
   name: 骸骨
   min_rank: "E"
   rarity: 2

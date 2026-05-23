@@ -1,196 +1,251 @@
-ENEMY_CATEGORIES:
-  slime: {name: スライム種, hp: 10, attack: 7, defense: 1, evasion: 5, exp: 5, reward_gold: 20,
-    accuracy_close: 100, accuracy_ranged: 100, attack_range: 1, stupidity: 3, image_scale: 1.0,
-    close_attack_effect: physical_light, ranged_attack_effect: strange_mucus, attack_priority: close}
-  animal: {name: 獣種, hp: 15, attack: 10, defense: 2, evasion: 0, exp: 8, reward_gold: 25,
-    accuracy_close: 100, accuracy_ranged: 100, attack_range: 1, stupidity: 3, image_scale: 1.0,
-    close_attack_effect: physical_heavy, ranged_attack_effect: sonic_wave, attack_priority: close}
-  monster: {name: 魔物種, hp: 22, attack: 12, defense: 0, evasion: 25, exp: 10, reward_gold: 100,
-    accuracy_close: 100, accuracy_ranged: 100, attack_range: 4, stupidity: 5, image_scale: 1.0,
-    close_attack_effect: physical_heavy, ranged_attack_effect: dark_bolt, attack_priority: ranged}
-  humanoid: {name: 亜人種, hp: 30, attack: 10, defense: 5, evasion: 5, exp: 15, reward_gold: 150,
-    accuracy_close: 100, accuracy_ranged: 100, attack_range: 1, stupidity: 5, image_scale: 1.0,
-    close_attack_effect: physical_light, ranged_attack_effect: arrow, attack_priority: ranged}
-  undead: {name: 不死種, hp: 25, attack: 15, defense: 3, evasion: 0, exp: 12, reward_gold: 200,
-    accuracy_close: 90, accuracy_ranged: 90, attack_range: 2, stupidity: 5, image_scale: 1.0,
-    close_attack_effect: physical_heavy, ranged_attack_effect: dark_bolt, attack_priority: close}
 ENEMY_DATA:
 # Fランクーーーーーーーーーー
   slime:
     name: スライム
-    category: slime
     min_rank: F
     image_folder: components/pictures/enemies/slime
     crit_rate: 0.05
     drops:
     - {item: hp_potion}
     - {item: rotten_potion}
-    - {item: expired_potion}
     hp: 11
-    defense: 1
     attack: 21
+    defense: 1
+    evasion: 5
+    exp: 5
+    reward_gold: 20
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: strange_mucus
+    attack_priority: close
   mawaru_kame:
     name: まわるがめ
-    category: animal
     min_rank: F
     max_rank: E
     image_folder: components/pictures/enemies/kame
-    attack_range: 1
     crit_rate: 0.05
     drops:
     - {item: broken_shield}
     - {item: broken_armor}
-    - {item: broken_sword}
+    - {item: wooden_round_shield, rate: 0.05}
     hp: 15
-    defense: 4
     attack: 23
+    defense: 4
+    evasion: 0
+    exp: 8
+    reward_gold: 25
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
     stupidity: 1
+    image_scale: 1.0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: sonic_wave
+    attack_priority: close
   normal_tako:
     name: ふつうたこ
-    category: animal
     min_rank: F
     image_folder: components/pictures/enemies/tako_doku
-    image_scale: 0.8
     status: poison
-    attack_priority: close
-    attack_range: 2
     status_chance: 0
-    close_attack_effect: physical_light
-    ranged_attack_effect: strange_mucus
     drops:
     - {item: expired_potion}
     - {item: broken_sword}
+    - {item: wooden_round_shield, rate: 0.03}
     hp: 15
-    defense: 2
     attack: 23
+    defense: 2
+    evasion: 0
+    exp: 8
+    reward_gold: 25
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 2
     stupidity: 2
+    image_scale: 0.8
+    close_attack_effect: physical_light
+    ranged_attack_effect: strange_mucus
+    attack_priority: close
 # Eランクーーーーーーーーーー
   kowai_kusa:
     name: こわいくさ
-    category: monster
     min_rank: E
     image_folder: components/pictures/enemies/kowai_kusa
-    image_scale: 1.0
     status: poison
-    attack_priority: ranged
-    attack_range: 2
     status_chance: 0
-    close_attack_effect: physical_heavy
-    ranged_attack_effect: arrow
     drops:
     - {item: expired_potion}
-    - {item: broken_sword}
+    - {item: wooden_stick}
+    - {item: adventurers_clothes, rate: 0.03}
     hp: 21
-    defense: 1
     attack: 26
+    defense: 1
+    evasion: 25
+    exp: 10
+    reward_gold: 100
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 2
+    stupidity: 5
+    image_scale: 1.0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: arrow
+    attack_priority: ranged
   slime_red:
     name: あかいスライム
-    category: slime
     min_rank: E
     image_folder: components/pictures/enemies/slime
     image_color: '#FF6666'
     crit_rate: 0.05
     drops:
     - {item: broken_stave}
+    - {item: hp_potion}
     hp: 21
-    defense: 1
     attack: 23
+    defense: 1
+    evasion: 5
+    exp: 5
+    reward_gold: 20
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: strange_mucus
+    attack_priority: close
   bakudan_man:
     name: バクダンマン
-    category: monster
     min_rank: E
     image_folder: components/pictures/enemies/bakudan_man
     crit_rate: 0.05
     drops:
+    - {item: broken_sword}
     - {item: hp_potion}
+    - {item: iron_sword, rate: 0.03}
     hp: 30
-    defense: 4
     attack: 25
+    defense: 4
+    evasion: 25
+    exp: 10
+    reward_gold: 100
+    accuracy_close: 100
+    accuracy_ranged: 100
     attack_range: 3
+    stupidity: 5
+    image_scale: 1.0
     close_attack_effect: explosion
     ranged_attack_effect: explosion
+    attack_priority: ranged
   doku_kame:
     name: どくがめ
-    category: animal
     min_rank: E
     image_folder: components/pictures/enemies/kame
     image_color: '#FFCCCC'
-    attack_range: 1
     status: poison
     status_chance: 20
-    close_attack_effect: strange_mucus
-    ranged_attack_effect: strange_mucus
     drops:
     - {item: rotten_potion}
     - {item: broken_armor}
+    - {item: leather_breastplate, rate: 0.05}
     hp: 30
-    defense: 6
     attack: 25
+    defense: 6
+    evasion: 0
+    exp: 8
+    reward_gold: 25
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: strange_mucus
+    ranged_attack_effect: strange_mucus
+    attack_priority: close
 # Dランクーーーーーーーーーー
   skeleton:
     name: スケルトン
-    category: undead
     min_rank: D
     image_folder: components/pictures/enemies/skeleton
-    attack_range: 1
-    close_attack_effect: physical_heavy
     drops:
     - {item: broken_sword}
     - {item: broken_armor}
+    - {item: old_sword, rate: 0.02}
     hp: 25
-    defense: 3
     attack: 15
+    defense: 3
+    evasion: 0
+    exp: 12
+    reward_gold: 200
+    accuracy_close: 90
+    accuracy_ranged: 90
+    attack_range: 1
+    stupidity: 5
+    image_scale: 1.0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: dark_bolt
+    attack_priority: close
 # BOSS------------------------------
   suisui_slime:
     name: スイスイスライム
-    category: slime
     min_rank: F
     min_floor: 10
     max_floor: 10
     max_concurrent: 1
     max_spawns: 1
     is_boss: true
-    stupidity: 0
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/suisui_slime
-    image_scale: 2.0
-    hp: 100
-    attack: 23
-    attack_range: 4
-    close_attack_effect: physical_light
-    ranged_attack_effect: strange_mucus
-    defense: 4
-    exp: 50
-    reward_gold: 500
     drops:
     - {item: hp_potion}
     - {item: iron_sword}
-  sukesuke_skeleton:
-    name: スケスケスケルトン
-    category: undead
-    is_boss: true
+    hp: 100
+    attack: 23
+    defense: 4
+    evasion: 5
+    exp: 50
+    reward_gold: 500
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 4
     stupidity: 0
     image_scale: 2.0
-    detect_range: 15
+    close_attack_effect: physical_light
+    ranged_attack_effect: strange_mucus
+    attack_priority: close
+  sukesuke_skeleton:
+    name: スケスケスケルトン
     min_rank: E
     min_floor: 20
     max_floor: 20
     max_concurrent: 1
-    image_folder: components/pictures/enemies/skeleton
+    is_boss: true
     bgm: components/sounds/bgm/get_hornor.mp3
-    attack_range: 1
-    close_attack_effect: physical_heavy
-    hp: 150
-    defense: 6
-    attack: 28
-    reward_gold: 1000
-    exp: 50
+    image_folder: components/pictures/enemies/skeleton
+    detect_range: 15
     drops:
     - {item: hp_potion}
     - {item: iron_sword}
+    hp: 150
+    attack: 28
+    defense: 6
+    evasion: 0
+    exp: 50
+    reward_gold: 1000
+    accuracy_close: 90
+    accuracy_ranged: 90
+    attack_range: 1
+    stupidity: 0
+    image_scale: 2.0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: dark_bolt
+    attack_priority: close
   undead_father:
     name: 父の亡霊
-    category: undead
     min_rank: B
     min_floor: 50
     max_floor: 50
@@ -198,9 +253,19 @@ ENEMY_DATA:
     is_boss: true
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/skeleton
-    image_scale: 1.5
+    drops:
+    - {item: fathers_keepsake, rate: 1.0}
     hp: 250
     attack: 55
     defense: 25
-    drops:
-    - {item: fathers_keepsake, rate: 1.0}
+    evasion: 0
+    exp: 12
+    reward_gold: 200
+    accuracy_close: 90
+    accuracy_ranged: 90
+    attack_range: 2
+    stupidity: 5
+    image_scale: 1.5
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: dark_bolt
+    attack_priority: close

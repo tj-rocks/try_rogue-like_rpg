@@ -598,9 +598,9 @@ TILE_MAPPINGS:
   well:
     category: obstacle
     id: well
-  skeleton:
+  skeleton_obstacle:
     category: obstacle
-    id: skeleton
+    id: skeleton_obstacle
   crystal:
     category: obstacle
     id: crystal
@@ -736,6 +736,18 @@ TILE_MAPPINGS:
   guild_receptionist:
     category: npc
     id: guild_receptionist
+    positions:
+      - x: 29
+        y: 4
+        flip: false
+      - x: 31
+        y: 4
+        flip: false
+        min_rank: F
+        max_rank: SS
+      - x: 33
+        y: 4
+        flip: false
   doctor:
     category: npc
     id: doctor
@@ -773,18 +785,6 @@ TILE_MAPPINGS:
   guide_guild:
     category: npc
     id: guide_guild
-    positions:
-      - x: 29
-        y: 4
-        flip: false
-      - x: 31
-        y: 4
-        flip: false
-        min_rank: F
-        max_rank: SS
-      - x: 33
-        y: 4
-        flip: false
   guide_doctor:
     category: npc
     id: guide_doctor
