@@ -17,7 +17,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 3
+    stupidity: 7
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
@@ -41,7 +41,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 1
+    stupidity: 4
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: sonic_wave
@@ -65,7 +65,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 2
-    stupidity: 2
+    stupidity: 3
     image_scale: 0.8
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus

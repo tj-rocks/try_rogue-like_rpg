@@ -66,7 +66,7 @@ ENEMY_AI:
   ENEMY_WANDER_CHANCE: 0.5          # 非戦闘時に敵がうろつく確率 (0.0〜1.0)
 
   # スポーン数設定
-  ENEMY_SPAWN_MIN: 1                # 1部屋に初期配置される敵の最小数
+  ENEMY_SPAWN_MIN: 0               # 1部屋に初期配置される敵の最小数
   ENEMY_SPAWN_MAX: 2                # 1部屋に初期配置される敵の最大数
   ENEMY_TOTAL_MAX: 2                # 1部屋あたりの敵数倍率（部屋数 × この値 がフロア全体の合計上限になる）
   ENEMY_RESPAWN_INTERVAL: 20.0      # 新しい敵がリスポーンするまでの基本間隔（ターン数）
@@ -74,7 +74,7 @@ ENEMY_AI:
   ENEMY_RESPAWN_SCALE_SUB: 0.2      # 1階層進むごとにリスポーン間隔を何ターン短縮するか（0.1 = 10階で1ターン短縮）
 
   # 階層に応じた難易度スケーリング
-  ENEMY_SPAWN_SCALE_EVERY: 3       # 何階ごとに1部屋あたりの最大出現数を +1 するか
+  ENEMY_SPAWN_SCALE_EVERY: 5       # 何階ごとに1部屋あたりの最大出現数を +1 するか
   ENEMY_SPAWN_SCALE_ADD: 1
   ENEMY_TOTAL_SCALE_EVERY: 3        # 何階ごとにフロア全体の合計上限を増やすか
   ENEMY_TOTAL_SCALE_ADD: 1          # 増加量 (+1)
