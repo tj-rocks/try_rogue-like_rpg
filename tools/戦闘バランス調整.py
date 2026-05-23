@@ -85,6 +85,17 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             param = post_data.get("param")
             value = post_data.get("value")
             
+            KEY_MAP_TO_NEW = {
+                "attack_bonus": "attack",
+                "defense_bonus": "defense",
+                "hp_bonus": "hp",
+                "evasion_bonus": "eva",
+                "accuracy_bonus_close": "accuracy_close",
+                "accuracy_bonus_ranged": "accuracy_range",
+                "block_chance_close": "block_chance_close",
+                "block_chance_ranged": "block_chance_ranged",
+            }
+            
             if file_type == "equipment":
                 weapons_raw = load_master_data("weapons.yml")
                 armors_raw = load_master_data("armors.yml")
@@ -138,6 +149,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 else:
                     section_key = None
                 
+                new_key = KEY_MAP_TO_NEW.get(param, param) if file_type == "equipment" else param
+                
                 new_lines = []
                 for line in lines:
                     stripped = line.strip()
@@ -159,14 +172,15 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                         if stripped != f"{target_id}:":
                             # パラメータが見つからなかった場合、ブロックの最後に追加する
                             if not param_found:
-                                new_lines.append(f"    {param}: {value}\n")
+                                # 新キーの場合はbonus.commonの下に無い場合、直下にフォールバック追加される
+                                new_lines.append(f"    {new_key}: {value}\n")
                                 updated = True
                             in_target_block = False
                     
                     # パラメータの書き換え
-                    if in_target_block and stripped.startswith(f"{param}:"):
-                        indent = line[:line.find(param)]
-                        new_lines.append(f"{indent}{param}: {value}\n")
+                    if in_target_block and stripped.startswith(f"{new_key}:"):
+                        indent = line[:line.find(new_key)]
+                        new_lines.append(f"{indent}{new_key}: {value}\n")
                         param_found = True
                         updated = True
                     else:
@@ -174,13 +188,13 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 
                 # ファイルの最後がターゲットブロックで終わっている場合の処理
                 if in_target_block and not param_found:
-                    new_lines.append(f"    {param}: {value}\n")
+                    new_lines.append(f"    {new_key}: {value}\n")
                     updated = True
                 
                 if updated:
                     with open(path, "w", encoding="utf-8") as f:
                         f.writelines(new_lines)
-                    print(f"  [SURGICAL SAVE SUCCESS] {filename}: {target_id}.{param} -> {value}")
+                    print(f"  [SURGICAL SAVE SUCCESS] {filename}: {target_id}.{new_key} -> {value}")
                     
                     self.send_response(200)
                     self.send_header('Content-type', 'application/json')
@@ -200,10 +214,22 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                         raw_data[section][target_id][param] = value
                         updated = True; break
             elif file_type == "equipment":
-                for section in ["WEAPON_DATA", "WEAPON_CATEGORIES", "ARMOR_DATA", "ARMOR_CATEGORIES", "SHIELD_DATA", "SHIELD_CATEGORIES"]:
+                for section in ["WEAPON_DATA", "ARMOR_DATA", "SHIELD_DATA"]:
                     if section in raw_data and target_id in raw_data[section]:
-                        raw_data[section][target_id][param] = value
+                        item = raw_data[section][target_id]
+                        if "bonus" not in item:
+                            item["bonus"] = {"common": {}, "magic": {}}
+                        if "common" not in item["bonus"]:
+                            item["bonus"]["common"] = {}
+                        new_key = KEY_MAP_TO_NEW.get(param, param)
+                        item["bonus"]["common"][new_key] = value
                         updated = True; break
+                
+                if not updated:
+                    for section in ["WEAPON_CATEGORIES", "ARMOR_CATEGORIES", "SHIELD_CATEGORIES"]:
+                        if section in raw_data and target_id in raw_data[section]:
+                            raw_data[section][target_id][param] = value
+                            updated = True; break
             
             if updated:
                 with open(path, "w", encoding="utf-8") as f:
