@@ -6,8 +6,13 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/slime
     crit_rate: 0.05
     drops:
-    - {item: hp_potion}
-    - {item: rotten_potion}
+      normal:
+      - hp_potion
+      - rotten_potion
+      rare:
+      - iron_sword
+    normal_drop_rate: 0.1
+    rare_drop_rate: 0.01
     hp: 11
     attack: 21
     defense: 1
@@ -29,9 +34,14 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/kame
     crit_rate: 0.05
     drops:
-    - {item: broken_shield}
-    - {item: broken_armor}
-    - {item: wooden_round_shield, rate: 0.05}
+      normal:
+      - broken_shield
+      - rotten_potion
+      rare:
+      - wooden_round_shield
+      - iron_breastplate
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.03
     hp: 15
     attack: 23
     defense: 4
@@ -53,9 +63,13 @@ ENEMY_DATA:
     status: poison
     status_chance: 0
     drops:
-    - {item: expired_potion}
-    - {item: broken_sword}
-    - {item: wooden_round_shield, rate: 0.03}
+      normal:
+      - rotten_potion
+      - expired_potion
+      rare:
+      - thiefs_knife
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.03
     hp: 15
     attack: 23
     defense: 2
@@ -78,9 +92,13 @@ ENEMY_DATA:
     status: poison
     status_chance: 0
     drops:
-    - {item: expired_potion}
-    - {item: wooden_stick}
-    - {item: adventurers_clothes, rate: 0.03}
+      normal:
+      - expired_potion
+      - wooden_stick
+      rare:
+      - adventurers_clothes
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.03
     hp: 21
     attack: 26
     defense: 1
@@ -102,8 +120,12 @@ ENEMY_DATA:
     image_color: '#FF6666'
     crit_rate: 0.05
     drops:
-    - {item: broken_stave}
-    - {item: hp_potion}
+      normal:
+      - hp_potion
+      rare:
+      - iron_sword
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.03
     hp: 21
     attack: 23
     defense: 1
@@ -124,9 +146,13 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/bakudan_man
     crit_rate: 0.05
     drops:
-    - {item: broken_sword}
-    - {item: hp_potion}
-    - {item: iron_sword, rate: 0.03}
+      normal:
+      - broken_sword
+      - hp_potion
+      rare:
+      - fullmetal_sword
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.03
     hp: 30
     attack: 25
     defense: 4
@@ -149,9 +175,13 @@ ENEMY_DATA:
     status: poison
     status_chance: 20
     drops:
-    - {item: rotten_potion}
-    - {item: broken_armor}
-    - {item: leather_breastplate, rate: 0.05}
+      normal:
+      - rotten_potion
+      - broken_armor
+      rare:
+      - leather_breastplate
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.03
     hp: 30
     attack: 25
     defense: 6
@@ -172,9 +202,14 @@ ENEMY_DATA:
     min_rank: D
     image_folder: components/pictures/enemies/skeleton
     drops:
-    - {item: broken_sword}
-    - {item: broken_armor}
-    - {item: old_sword, rate: 0.02}
+      normal:
+      - broken_sword
+      - broken_armor
+      rare:
+      - old_sword
+      - iron_sword
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.03
     hp: 25
     attack: 15
     defense: 3
@@ -201,8 +236,12 @@ ENEMY_DATA:
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/suisui_slime
     drops:
-    - {item: hp_potion}
-    - {item: iron_sword}
+      normal:
+      - hp_potion
+      rare:
+      - iron_sword
+    normal_drop_rate: 0.25
+    rare_drop_rate: 0.15
     hp: 100
     attack: 23
     defense: 4
@@ -228,8 +267,12 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/skeleton
     detect_range: 15
     drops:
-    - {item: hp_potion}
-    - {item: iron_sword}
+      normal:
+      - hp_potion
+      rare:
+      - iron_sword
+    normal_drop_rate: 0.25
+    rare_drop_rate: 0.15
     hp: 150
     attack: 28
     defense: 6
@@ -254,7 +297,11 @@ ENEMY_DATA:
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/skeleton
     drops:
-    - {item: fathers_keepsake, rate: 1.0}
+      normal: []
+      rare:
+      - fathers_keepsake
+    normal_drop_rate: 0.0
+    rare_drop_rate: 1.0
     hp: 250
     attack: 55
     defense: 25
