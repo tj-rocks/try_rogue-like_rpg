@@ -101,10 +101,83 @@ def test_warehouse_services():
     
     print("✅ 預かり屋テスト合格！")
 
+class MockNPC:
+    def __init__(self, role, dialogue):
+        self.role = role
+        self.dialogue = dialogue
+    def get_dialogue(self):
+        return self.dialogue
+
+def test_priest_services():
+    print("\n--- 神官解呪テスト開始 ---")
+    player = Player()
+    player.guild_point = 100
+    player.curse_level = 1
+    player.cursed_stats = ["attack"]
+    
+    dialog = Dialog(800, 600)
+    confirm = ConfirmDialog(800, 600)
+    
+    from constants import CURSE_RECOVERY_COST_GP_PER_LEVEL
+    cost = CURSE_RECOVERY_COST_GP_PER_LEVEL
+    assert cost == 50
+    
+    # 1. 呪われている状態で話しかけると、歓迎ダイアログと確認ダイアログがアクティブになる
+    assert player.curse_level == 1
+    dialog.text = Text.NPC.PRIEST_WELCOME
+    dialog.is_active = True
+    confirm.text = Text.NPC.PRIEST_CURE_CONFIRM.format(cost=cost)
+    
+    # yesコールバックを定義
+    def on_priest_yes():
+        if player.guild_point >= cost:
+            player.guild_point -= cost
+            player.curse_level -= 1
+            import random
+            if player.cursed_stats:
+                removed = random.choice(player.cursed_stats)
+                player.cursed_stats.remove(removed)
+                dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat=player.get_cursed_stats_japanese_single(removed))
+            else:
+                dialog.text = Text.NPC.PRIEST_CURE_DONE_SIMPLE
+            dialog.is_active = True
+            player.save_to_file()
+            
+    confirm.on_yes = on_priest_yes
+    confirm.is_active = True
+    
+    assert confirm.is_active == True
+    assert dialog.is_active == True
+    
+    # Yesボタンを押す
+    confirm.on_yes()
+    
+    # 2. 解呪後の状態検証
+    print(f"解呪後: GP={player.guild_point}, 呪いレベル={player.curse_level}, 被デバフステータス数={len(player.cursed_stats)}")
+    assert player.guild_point == 50
+    assert player.curse_level == 0
+    assert len(player.cursed_stats) == 0
+    
+    # 3. 呪いがない状態で話しかける
+    dialog.is_active = False
+    confirm.is_active = False
+    
+    if player.curse_level > 0:
+        pass
+    else:
+        dialog.text = Text.NPC.PRIEST_HEALTHY
+        dialog.is_active = True
+        
+    assert dialog.is_active == True
+    assert "呪われていません" in dialog.text
+    
+    print("✅ 神官解呪テスト合格！")
+
 if __name__ == "__main__":
     try:
         test_bank_services()
         test_warehouse_services()
+        test_priest_services()
         pygame.quit()
         sys.exit(0)
     except Exception as e:

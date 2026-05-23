@@ -748,6 +748,13 @@ TILE_MAPPINGS:
       - x: 33
         y: 4
         flip: false
+  priest:
+    category: npc
+    id: priest
+    positions:
+      - x: 35
+        y: 4
+        flip: false
   doctor:
     category: npc
     id: doctor
