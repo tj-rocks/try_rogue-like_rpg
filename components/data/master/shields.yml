@@ -46,10 +46,25 @@ SHIELD_DATA:
     image_scale: 1.0
     bonus:
       common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
         defense: 0
+        eva: 0.0
+        block_chance: 0.0
         block_chance_close: 0.01
         block_chance_ranged: 0.01
+        stave_bonus: 0
+        lantern_bonus: 0
+        regen: 0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
 
   wooden_round_shield:
     name: 木の円盾
@@ -65,10 +80,25 @@ SHIELD_DATA:
     image_scale: 1.0
     bonus:
       common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
         defense: 0
+        eva: 0.0
+        block_chance: 0.0
         block_chance_close: 0.05
         block_chance_ranged: 0.05
+        stave_bonus: 0
+        lantern_bonus: 0
+        regen: 0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
 
   leather_round_shield:
     name: 皮の円盾
@@ -85,10 +115,25 @@ SHIELD_DATA:
     image_scale: 1.0
     bonus:
       common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 10
         defense: 0
+        eva: 0.0
+        block_chance: 0.0
         block_chance_close: 0.08
         block_chance_ranged: 0.12
+        stave_bonus: 0
+        lantern_bonus: 0
+        regen: 0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
 
   iron_round_shield:
     name: 鉄の円盾
@@ -105,10 +150,25 @@ SHIELD_DATA:
     image_scale: 1.0
     bonus:
       common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
         defense: 1
+        eva: 0.0
+        block_chance: 0.0
         block_chance_close: 0.12
         block_chance_ranged: 0.08
+        stave_bonus: 0
+        lantern_bonus: 0
+        regen: 0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
 
   fullmetal_round_shield:
     name: 鋼の円盾
@@ -125,10 +185,25 @@ SHIELD_DATA:
     image_scale: 1.0
     bonus:
       common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
         defense: 0
+        eva: 0.0
+        block_chance: 0.0
         block_chance_close: 0.12
         block_chance_ranged: 0.12
+        stave_bonus: 0
+        lantern_bonus: 0
+        regen: 0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
 
   leather_kite_shield:
     name: 硬革のカイトシールド
@@ -145,10 +220,25 @@ SHIELD_DATA:
     image_scale: 1.0
     bonus:
       common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
         defense: 0
+        eva: 0.0
+        block_chance: 0.0
         block_chance_close: 0.10
         block_chance_ranged: 0.14
+        stave_bonus: 0
+        lantern_bonus: 0
+        regen: 0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
 
   fullmetal_kite_shield:
     name: 鋼のカイトシールド
@@ -165,7 +255,22 @@ SHIELD_DATA:
     image_scale: 1.0
     bonus:
       common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
         defense: 0
+        eva: 0.0
+        block_chance: 0.0
         block_chance_close: 0.14
         block_chance_ranged: 0.10
+        stave_bonus: 0
+        lantern_bonus: 0
+        regen: 0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0

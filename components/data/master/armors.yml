@@ -42,11 +42,25 @@ ARMOR_DATA:
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     bonus:
       common:
-        defense: 1
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
-        eva: 0
-        accuracy: 0
+        defense: 1
+        eva: 0.0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        stave_bonus: 0
+        lantern_bonus: 0
         regen: 0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
 
   adventurers_clothes:
     name: 冒険者の服
@@ -60,16 +74,24 @@ ARMOR_DATA:
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     bonus:
       common:
-        defense: 7.5
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
-        eva: 0
-        accuracy: 0
+        defense: 7.5
+        eva: 0.0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        stave_bonus: 0
+        lantern_bonus: 0
         regen: 0
       magic:
-        fire_damage: 0
+        fire_damage: 0.0
         fire_range: 0
-        heal_ratio: 0
-        knockback_damage: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
         invincible_turns: 0
 
   leather_breastplate:
@@ -85,11 +107,25 @@ ARMOR_DATA:
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     bonus:
       common:
-        defense: 10
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
+        defense: 10
         eva: 0.05
-        accuracy: 0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        stave_bonus: 0
+        lantern_bonus: 0
         regen: 0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
 
   iron_breastplate:
     name: 鉄の胸当て
@@ -103,11 +139,25 @@ ARMOR_DATA:
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     bonus:
       common:
-        defense: 11
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
-        eva: 0
-        accuracy: 0
+        defense: 11
+        eva: 0.0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        stave_bonus: 0
+        lantern_bonus: 0
         regen: 0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
 
   fullmetal_breastplate:
     name: 鋼の胸当て
@@ -121,11 +171,25 @@ ARMOR_DATA:
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     bonus:
       common:
-        defense: 15
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
-        eva: 0
-        accuracy: 0
+        defense: 15
+        eva: 0.0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        stave_bonus: 0
+        lantern_bonus: 0
         regen: 0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
 
   hard_leather_armor:
     name: 堅牢な革鎧
@@ -141,11 +205,25 @@ ARMOR_DATA:
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     bonus:
       common:
-        defense: 14
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
+        defense: 14
         eva: 0.05
-        accuracy: 0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        stave_bonus: 0
+        lantern_bonus: 0
         regen: 0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
 
   pilgrim_robe:
     name: 巡礼者のローブ
@@ -161,14 +239,22 @@ ARMOR_DATA:
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     bonus:
       common:
-        defense: 15
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 0
+        defense: 15
         eva: 0.05
-        accuracy: 0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        stave_bonus: 0
+        lantern_bonus: 0
         regen: 0
       magic:
-        fire_damage: 0
+        fire_damage: 0.0
         fire_range: 0
-        heal_ratio: 0
-        knockback_damage: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
         invincible_turns: 0

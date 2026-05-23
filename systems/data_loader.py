@@ -175,6 +175,9 @@ def get_normalized_equipment_data(floor_map):
         "regen":              "regen_bonus",
         "block_chance_close": "block_chance_close",
         "block_chance_ranged":"block_chance_ranged",
+        "block_chance":       "block_chance",
+        "stave_bonus":        "stave_bonus",
+        "lantern_bonus":      "lantern_bonus",
     }
 
     def _flatten_bonus(item_dict):
