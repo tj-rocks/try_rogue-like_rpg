@@ -250,6 +250,7 @@ class Dungeon:
         self.outbreak_cleared = False
         self.outbreak_clear_rewarded = False
         self.outbreak_monster_initial_count = 0
+        self.entry_stairs = None
         
         # 発生判定（設定された階層範囲内、かつ村や固定マップ階層以外）
         if current_level > 0 and not is_fixed_map:
@@ -529,6 +530,8 @@ class Dungeon:
                 player.y = ry * ts
                 self.spawn_pos = (rx, ry)
 
+            self.entry_stairs = target_tile
+
     def reveal_floor(self):
         self.is_lighted = True
         self.reveal_all_tiles() # マップをすべて探索済みにする
@@ -680,11 +683,8 @@ class Dungeon:
         
         if len(alive_enemies) == 0:
             self.outbreak_cleared = True
-            from constants import OUTBREAK_GP_MULT
-            player.outbreak_bonus_active = True
-            player.outbreak_reward_mult = OUTBREAK_GP_MULT
             
-            dialog.text = "＜CLEAR＞\nフロアの魔物を一掃した！\nギルドでの報酬が特別に２倍になるようだ！"
+            dialog.text = "＜CLEAR＞\nフロアの魔物を一掃した！"
             dialog.is_active = True
             
             # BGMを元に戻すか、無音にする
@@ -1790,6 +1790,19 @@ class Dungeon:
 
         if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): return self
         ct = self.map_data[ty][tx]
+
+        # --- モンスターブレイクアウト時の進入元階段の封鎖 ---
+        if ct in (2, 3):
+            if self.is_outbreak and not self.outbreak_cleared and self.entry_stairs == ct:
+                if dialog:
+                    dialog.text = Text.System.OUTBREAK_BLOCKED
+                    dialog.is_active = True
+                player.x, player.y = player.prev_x, player.prev_y
+                player.target_x, player.target_y = player.x, player.y
+                player.is_moving = False
+                self.spawn_pos = (tx, ty)
+                return self
+
         if ct == 3:
             # --- ランク制限チェック ---
             target_floor = self.current_floor + 1

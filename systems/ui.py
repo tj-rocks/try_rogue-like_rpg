@@ -2226,11 +2226,7 @@ class GuildDialog:
             else:
                 player.coin += q["reward_gold"]
                 gp_reward = q["reward_gp"]
-                if getattr(player, "outbreak_bonus_active", False):
-                    gp_reward *= 2
-                    dialog.text = "見事に依頼を達成しましたね！\n魔物の氾濫を鎮圧した功績として、獲得GPを2倍にしました！"
-                else:
-                    dialog.text = "見事に依頼を達成しましたね！\nおめでとうございます！"
+                dialog.text = "見事に依頼を達成しましたね！\nおめでとうございます！"
                 
                 player.guild_point += gp_reward
                 if q.get("id"): player.completed_fixed_quests.append(q["id"])
