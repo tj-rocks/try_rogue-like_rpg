@@ -145,7 +145,7 @@ DUNGEON_IMAGES:
     image: standard
     sound: just_move.mp3
     brightness: 2
-    # map: first_rest_point.txt
+    map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '12':
     image: standard

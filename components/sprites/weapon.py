@@ -37,7 +37,13 @@ class Weapon:
         self.data = data or {}
         self.key = key
         self.name = self.data.get("name", "素手")
-        self.attack_bonus = self.data.get("attack_bonus", 0)
+        
+        # [NEW] common_bonus グループからの値取得とフォールバック
+        common = self.data.get("common_bonus", {})
+        self.attack_bonus = common.get("attack", self.data.get("attack_bonus", 0))
+        self.crit_rate = common.get("crit", self.data.get("crit_rate", 0.01))
+        self.accuracy_bonus_close = common.get("accuracy_close", self.data.get("accuracy_bonus_close", 0))
+        self.accuracy_bonus_ranged = common.get("accuracy_ranged", self.data.get("accuracy_bonus_ranged", 0))
         self.image_scale = self.data.get("image_scale", 1.0)
         
         # 武器種 (Sword, Bow等) に基づく共通設定の取得

@@ -134,6 +134,54 @@ def test_broken_stave():
     assert stave.charges == 0
     print("[OK] 壊れた杖テスト合格")
 
+def test_stave_bonuses():
+    print("--- 魔法・杖装備ボーナステスト ---")
+    player, dungeon, dialog = setup_test_environment()
+    
+    # モック装備を作成して魔法ボーナスを設定する
+    mock_armor = MagicMock()
+    mock_armor.get_stat.side_effect = lambda key, default=0: {
+        "stave_heal_bonus": 10,
+        "stave_invincible_bonus": 2,
+        "stave_damage_bonus": 5,
+        "stave_bonus": 3
+    }.get(key, default)
+    
+    # プレイヤーの装備をモック化 (鎧のときだけ mock_armor を返し、盾のときは二重加算を防ぐため None を返す)
+    player._find_equip_inst = MagicMock(side_effect=lambda inv, eid: mock_armor if inv == player.armor_inventory else None)
+    player.equipped_armor = 1 # 装備中フラグ
+    player.equipped_shield = None
+    
+    # 1. 杖回復ボーナス検証
+    player.hp = 10
+    player.max_hp = 200 # 回復限界キャップを避けるため最大HPを200にする
+    stave_heal = StaveInstance("heal_stave", charges=5)
+    # デフォルトの回復量は ratio 0.8 (200 * 0.8 = 160) 
+    # ボーナス 10 が加算され、160 + 10 = 170 回復するはず (HP 10 -> 180)
+    execute_stave(player, stave_heal, dungeon, dialog)
+    print(f"回復ボーナス検証: 期待値 180, 実際 {player.hp}")
+    assert player.hp == 180
+    
+    # 2. 杖無敵ターン延長ボーナス検証
+    player.invincible_turns = 0
+    stave_inv = StaveInstance("invincible_stave", charges=5)
+    # デフォルトのターン数は 10
+    # ボーナス 2 が加算され、10 + 2 = 12 ターン無敵になるはず
+    execute_stave(player, stave_inv, dungeon, dialog)
+    print(f"無敵ボーナス検証: 期待値 12, 実際 {player.invincible_turns}")
+    assert player.invincible_turns == 12
+
+    # 3. 杖取得時の回数ボーナス（stave_bonus）検証
+    player.stave_inventory = []
+    # デフォルト 5 回
+    # ボーナス 3 が加算され、5 + 3 = 8 回になるはず
+    player.add_stave_to_inventory("fire_stave", charges=5)
+    added_stave = player.stave_inventory[0]
+    print(f"杖回数ボーナス検証: 期待値 8, 実際 {added_stave.charges}")
+    assert added_stave.charges == 8
+    
+    print("[OK] 魔法・杖装備ボーナステスト合格")
+
 if __name__ == "__main__":
     try:
         test_light_stave()
@@ -142,6 +190,7 @@ if __name__ == "__main__":
         test_knockback_stave()
         test_invincible_stave()
         test_broken_stave()
+        test_stave_bonuses()
         print("\n🎉 全ての杖効果テストに合格しました！")
     except Exception as e:
         print(f"\n❌ テスト失敗: {e}")

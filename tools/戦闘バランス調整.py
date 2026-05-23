@@ -195,12 +195,12 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             # データの更新
             updated = False
             if file_type == "enemies":
-                for section in ["ENEMY_DATA", "ENEMY_CATEGORIES"]:
+                for section in ["ENEMY_DATA"]:
                     if section in raw_data and target_id in raw_data[section]:
                         raw_data[section][target_id][param] = value
                         updated = True; break
             elif file_type == "equipment":
-                for section in ["WEAPON_DATA", "WEAPON_CATEGORIES", "ARMOR_DATA", "ARMOR_CATEGORIES", "SHIELD_DATA", "SHIELD_CATEGORIES"]:
+                for section in ["WEAPON_DATA", "ARMOR_DATA", "SHIELD_DATA"]:
                     if section in raw_data and target_id in raw_data[section]:
                         raw_data[section][target_id][param] = value
                         updated = True; break

@@ -89,6 +89,10 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
         
     # 攻撃力の算出
     base_atk = getattr(attacker, "total_attack", attacker.attack)
+    if is_magic:
+        stave_dmg_bonus = getattr(attacker, "stave_damage_bonus", 0)
+        if isinstance(stave_dmg_bonus, (int, float)):
+            base_atk += stave_dmg_bonus
     base_atk = base_atk * damage_mult
     weapon = getattr(attacker, "weapon", None)
     
@@ -96,7 +100,7 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     crit_rate = getattr(attacker, "crit_rate", 0.01)
     
     if weapon:
-        crit_rate = weapon.data.get("crit_rate", 0.01)
+        crit_rate = getattr(weapon, "crit_rate", 0.01)
     
     # クリティカル率補正の加算
     crit_bonus = getattr(attacker, "crit_bonus", 0)
