@@ -32,17 +32,64 @@ def _save_yml(filename, data):
 
 def save_category_config(mode, cat_key, pos_data):
     filename = MODE_FILE[mode]
+    path = os.path.join(MASTER_DIR, filename)
     print(f"Saving {mode} Category '{cat_key}' -> {filename}")
-    full_data = _load_yml(filename)
+    
+    if not os.path.exists(path):
+        return False
+        
+    # 元ファイルをテキストとして読み込み、*_DATA セクションの開始行を探す
+    with open(path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+        
+    data_section_key = f"{mode}_DATA:"
+    split_index = -1
+    for i, line in enumerate(lines):
+        if line.strip().startswith(data_section_key):
+            split_index = i
+            break
+            
+    if split_index == -1:
+        # DATAセクションが見つからない場合はフォールバック（全体セーブ）
+        full_data = _load_yml(filename)
+        cat_section = f"{mode}_CATEGORIES"
+        if cat_section not in full_data:
+            full_data[cat_section] = {}
+        if cat_key not in full_data[cat_section]:
+            full_data[cat_section][cat_key] = {}
+        full_data[cat_section][cat_key]["position"] = pos_data
+        return _save_yml(filename, full_data)
+        
+    # *_DATA セクション以降のオリジナルテキストを保持（コメントを保護）
+    original_data_text = "".join(lines[split_index:])
+    
+    # カテゴリ部分のテキストのみをパースして更新
+    categories_text = "".join(lines[:split_index])
+    categories_data = yaml.safe_load(categories_text) or {}
     
     cat_section = f"{mode}_CATEGORIES"
-    if cat_section not in full_data:
-        full_data[cat_section] = {}
-    if cat_key not in full_data[cat_section]:
-        full_data[cat_section][cat_key] = {}
+    if cat_section not in categories_data:
+        categories_data[cat_section] = {}
+    if cat_key not in categories_data[cat_section]:
+        categories_data[cat_section][cat_key] = {}
         
-    full_data[cat_section][cat_key]["position"] = pos_data
-    return _save_yml(filename, full_data)
+    categories_data[cat_section][cat_key]["position"] = pos_data
+    
+    # カテゴリ部分をYAML文字列に変換
+    new_categories_text = yaml.safe_dump(categories_data, allow_unicode=True, sort_keys=False, indent=2)
+    
+    # 結合して保存
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(new_categories_text)
+            if not new_categories_text.endswith("\n"):
+                f.write("\n")
+            f.write("\n")  # カテゴリとデータの間に空行を入れる
+            f.write(original_data_text)
+        return True
+    except Exception as e:
+        print(f"YAML Semi-Save Error: {e}")
+        return False
 
 def run_viewer():
     pygame.init()
