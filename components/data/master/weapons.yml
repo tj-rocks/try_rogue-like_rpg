@@ -67,6 +67,7 @@ WEAPON_DATA:
     describe: 刃がボロボロで、今にも折れそうな剣。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
+    floor_spawnable: false
     bonus:
       common:
         attack: 5
@@ -104,6 +105,7 @@ WEAPON_DATA:
     describe: 鉄製の標準的な剣。丈夫で扱いやすい。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
+    floor_spawnable: true
     bonus:
       common:
         attack: 11
@@ -141,6 +143,7 @@ WEAPON_DATA:
     describe: 長年放置され、刃がこぼれた古い剣。戦うには心もとない。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
+    floor_spawnable: false
     bonus:
       common:
         attack: 6
@@ -178,6 +181,7 @@ WEAPON_DATA:
     describe: その辺の木を削って作った鈍器。不恰好だが威力はそれなり？
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: axe
+    floor_spawnable: true
     bonus:
       common:
         attack: 6
@@ -215,6 +219,7 @@ WEAPON_DATA:
     describe: 鉄を鍛え上げて打った剣。鉄より鋭く重い。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
+    floor_spawnable: true
     bonus:
       common:
         attack: 15
@@ -252,6 +257,7 @@ WEAPON_DATA:
     describe: 職人が鉄を何層にも重ねて打った剣。波打つような文様が特徴。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
+    floor_spawnable: true
     bonus:
       common:
         attack: 20
@@ -289,6 +295,7 @@ WEAPON_DATA:
     describe: 音もなく獲物を屠るための特殊な刀。装備するとモンスターに気づかれにくくなる。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: dagger
+    floor_spawnable: true
     bonus:
       common:
         attack: 11

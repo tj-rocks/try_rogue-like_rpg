@@ -40,6 +40,7 @@ ARMOR_DATA:
     shop_buyable: false
     describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: false
     bonus:
       common:
         attack: 0
@@ -72,6 +73,7 @@ ARMOR_DATA:
     shop_buyable: false
     describe: 丈夫な布で作られた一般的な服.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
     bonus:
       common:
         attack: 0
@@ -105,6 +107,7 @@ ARMOR_DATA:
     shop_buyable: true
     describe: なめし革を重ねて作られた防具.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
     bonus:
       common:
         attack: 0
@@ -137,6 +140,7 @@ ARMOR_DATA:
     shop_buyable: true
     describe: 鉄板を胸部に当てた実戦的な防具.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
     bonus:
       common:
         attack: 0
@@ -169,6 +173,7 @@ ARMOR_DATA:
     shop_buyable: false
     describe: 硬い鋼で作られた胸当て.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
     bonus:
       common:
         attack: 0
@@ -203,6 +208,7 @@ ARMOR_DATA:
     shop_buyable: true
     describe: なめし革を重ねて作られた防具.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
     bonus:
       common:
         attack: 0
@@ -237,6 +243,7 @@ ARMOR_DATA:
     shop_buyable: true
     describe: 巡礼者が旅の安全を祈って着る聖なるローブ。魔法の効果を高める力がある。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
     bonus:
       common:
         attack: 0

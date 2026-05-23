@@ -44,6 +44,7 @@ SHIELD_DATA:
     describe: 大きくひび割れた盾. 気休め程度にはなる.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    floor_spawnable: false
     bonus:
       common:
         attack: 0
@@ -78,6 +79,7 @@ SHIELD_DATA:
     describe: 木板を張り合わせただけの簡素な盾. 初心者向け.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    floor_spawnable: true
     bonus:
       common:
         attack: 0
@@ -113,6 +115,7 @@ SHIELD_DATA:
     describe: 丈夫な皮を張った円盾.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    floor_spawnable: true
     bonus:
       common:
         attack: 0
@@ -148,6 +151,7 @@ SHIELD_DATA:
     describe: 鉄で作られた頑丈な盾.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    floor_spawnable: true
     bonus:
       common:
         attack: 0
@@ -183,6 +187,7 @@ SHIELD_DATA:
     describe: 硬い鋼の盾. 近接攻撃を弾きやすい.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    floor_spawnable: true
     bonus:
       common:
         attack: 0
@@ -218,6 +223,7 @@ SHIELD_DATA:
     describe: 硬い革のカイトシールド. 攻撃を受け止めやすいく動きやすい
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    floor_spawnable: true
     bonus:
       common:
         attack: 0
@@ -253,6 +259,7 @@ SHIELD_DATA:
     describe: 硬い鋼のカイトシールド. 攻撃を防ぎやすいが重く音が気になる
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
+    floor_spawnable: true
     bonus:
       common:
         attack: 0
