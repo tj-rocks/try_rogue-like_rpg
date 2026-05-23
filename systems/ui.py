@@ -1860,6 +1860,46 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             # ダイアログが開いた後にテレポートUIを起動
                                             teleport_dialog.open(player)
                                             return
+                                    elif getattr(npc, "role", None) == "priest":
+                                        from constants import CURSE_RECOVERY_COST_GP_PER_LEVEL
+                                        cost = CURSE_RECOVERY_COST_GP_PER_LEVEL
+                                        if getattr(player, "curse_level", 0) > 0:
+                                            dialog.text = Text.NPC.PRIEST_WELCOME
+                                            dialog.is_active = True
+                                            if confirm_dialog:
+                                                confirm_dialog.text = Text.NPC.PRIEST_CURE_CONFIRM.format(cost=cost)
+                                                def on_priest_yes():
+                                                    if player.guild_point >= cost:
+                                                        player.guild_point -= cost
+                                                        player.curse_level -= 1
+                                                        import random
+                                                        if player.cursed_stats:
+                                                            removed = random.choice(player.cursed_stats)
+                                                            player.cursed_stats.remove(removed)
+                                                            dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat=player.get_cursed_stats_japanese_single(removed))
+                                                        else:
+                                                            dialog.text = Text.NPC.PRIEST_CURE_DONE_SIMPLE
+                                                        dialog.is_active = True
+                                                        from systems.sound_handler import sound_manager
+                                                        from constants import SOUND_SELECT
+                                                        sound_manager.play_sfx(SOUND_SELECT)
+                                                        player.save_to_file()
+                                                    else:
+                                                        dialog.text = Text.NPC.PRIEST_NO_GP.format(cost=cost)
+                                                        dialog.is_active = True
+                                                        from systems.audio_manager import play_sfx
+                                                        from constants import SOUND_CANCEL
+                                                        play_sfx(SOUND_CANCEL)
+                                                def on_priest_no():
+                                                    dialog.text = Text.NPC.PRIEST_DECLINE
+                                                    dialog.is_active = True
+                                                confirm_dialog.on_yes = on_priest_yes
+                                                confirm_dialog.on_no = on_priest_no
+                                                confirm_dialog.is_active = True
+                                        else:
+                                            dialog.text = Text.NPC.PRIEST_HEALTHY
+                                            dialog.is_active = True
+                                        return
                                     else:
                                         dialog.set_pages(npc.get_dialogue())
                                     return
@@ -1934,9 +1974,6 @@ class GuildDialog:
             self.items.append(("mode", "ACCEPT_FIXED", "特別な依頼を見る", "特定の条件で発生する特別な依頼を確認します。"))
             self.items.append(("mode", "ABANDON", "依頼破棄", "現在受けている依頼をキャンセルします。"))
             self.items.append(("mode", "SAVE", "💾 記録する", "現在の進行状況をセーブします。"))
-            if getattr(player, "curse_level", 0) > 0:
-                from constants import CURSE_RECOVERY_COST_GP_PER_LEVEL
-                self.items.append(("mode", "CURE_CURSE", "☠️ 死の呪いを解く", f"ギルドポイント({CURSE_RECOVERY_COST_GP_PER_LEVEL}GP)を支払って、呪いを1段階解除します。"))
             self.items.append(("cancel", None, "🚪 ギルドを出る", "ギルドメニューを終了します。"))
             
         elif self.mode == "REPORT":
@@ -2091,41 +2128,6 @@ class GuildDialog:
                 dialog.text = "これまでの冒険を記録しました！"
                 dialog.is_active = True
                 # セーブ完了後はメニューに戻る
-                self.mode = "MENU"
-            elif self.mode == "CURE_CURSE":
-                from constants import CURSE_RECOVERY_COST_GP_PER_LEVEL
-                cost = CURSE_RECOVERY_COST_GP_PER_LEVEL
-                if player.guild_point >= cost:
-                    player.guild_point -= cost
-                    if getattr(player, "curse_level", 0) > 0:
-                        import random
-                        player.curse_level -= 1
-                        if player.cursed_stats:
-                            removed = random.choice(player.cursed_stats)
-                            player.cursed_stats.remove(removed)
-                            dialog.text = f"死の呪いが一段階解除されました！\n【{player.get_cursed_stats_japanese_single(removed)}】の低下ペナルティが消失しました。"
-                        else:
-                            dialog.text = "死の呪いが一段階解除されました！"
-                    else:
-                        dialog.text = "死の呪いはかかっていません。"
-                    
-                    dialog.is_active = True
-                    # 🎵 効果音再生
-                    from systems.sound_handler import sound_manager
-                    from constants import SOUND_SELECT
-                    sound_manager.play_sfx(SOUND_SELECT)
-                    
-                    # オートセーブ
-                    player.save_to_file()
-                else:
-                    dialog.text = f"ギルドポイント(GP)が足りません！\n解除には {cost}GP 必要ですが、現在 {player.guild_point}GP です。"
-                    dialog.is_active = True
-                    # 🎵 効果音再生
-                    from systems.audio_manager import play_sfx
-                    from constants import SOUND_CANCEL
-                    play_sfx(SOUND_CANCEL)
-                
-                # 解除後はMENUに戻る
                 self.mode = "MENU"
                 
             self.cursor_idx = 0

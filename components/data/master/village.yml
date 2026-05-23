@@ -560,6 +560,18 @@ TILE_MAPPINGS:
     category: obstacle
     id: broken_pillar
     positions:
+      - x: 37
+        y: 4
+        flip: false
+      - x: 39
+        y: 4
+        flip: false
+      - x: 37
+        y: 5
+        flip: false
+      - x: 39
+        y: 5
+        flip: false
       - x: 28
         y: 14
         flip: false
@@ -748,6 +760,13 @@ TILE_MAPPINGS:
       - x: 33
         y: 4
         flip: false
+  priest:
+    category: npc
+    id: priest
+    positions:
+      - x: 38
+        y: 4
+        flip: false
   doctor:
     category: npc
     id: doctor
@@ -801,9 +820,6 @@ TILE_MAPPINGS:
       - x: 23
         y: 5
         flip: true
-      - x: 38
-        y: 5
-        flip: false
       - x: 32
         y: 7
         flip: false

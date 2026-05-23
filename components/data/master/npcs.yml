@@ -181,5 +181,12 @@ guild_staff:
   image_path: components/pictures/npc/woman_scientist_v
   dialogue:
   - 看護師「ダンジョンで死んでも諦めないでください。ダンジョンの呪いはかかりますが生きて帰れます。」
-  - 看護師「ギルドでは呪いを解くことも可能です。安心して冒険に行ってください。」
+  - 看護師「もし呪いにかかってしまったら、ギルドにいる神官様に解いてもらいましょう。」
   - 看護師「とはいえ迷宮から帰ってこない冒険者もいます。お気をつけて」
+
+priest:
+  name: 神官
+  image_path: components/pictures/npc/man_sage_v
+  dialogue:
+  - 神官「私は神の奇跡によって、あなたの死の呪いを祓うことができます。」
+  role: priest

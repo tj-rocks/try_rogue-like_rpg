@@ -196,6 +196,13 @@ class Text:
         WAREHOUSE_CONFIRM_DEPOSIT = "手数料 {fee} G で {name} を預けますか？"
         WAREHOUSE_CONFIRM_WITHDRAW = "手数料 {fee} G で {name} を引き出しますか？"
         GENERIC_FALLBACK = "私は {name} です"
+        PRIEST_WELCOME = "ようこそ。…おや、あなたには死の呪いがかかっているようですね。"
+        PRIEST_HEALTHY = "あなたは呪われていません。\n神の加護があらんことを。"
+        PRIEST_NO_GP = "ギルドポイント(GP)が足りないようです。\n呪いの解除には {cost} GP必要です。"
+        PRIEST_CURE_CONFIRM = "ギルドポイント(GP)を {cost} GP捧げることで、\n死の呪いを1段階解除できます。儀式を行いますか？"
+        PRIEST_CURE_DONE = "死の呪いが一段階解除されました！\n【{stat}】の低下ペナルティが消失しました。"
+        PRIEST_CURE_DONE_SIMPLE = "死の呪いが一段階解除されました！"
+        PRIEST_DECLINE = "神の加護があらんことを。"
 
     class Guild:
         QUEST_HUNT_TITLE = "[{rank}] {name}を{amount}匹討伐"
