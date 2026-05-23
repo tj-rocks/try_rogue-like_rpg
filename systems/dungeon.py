@@ -1700,8 +1700,6 @@ class Dungeon:
                     
                     # [NEW] 壁の装飾を描画
                     dec_key = self.wall_decoration_variants[y][x]
-                    if x == 25 and y == 25:
-                        print(f"[DEBUG-DRAW] (25, 25) dec_key={dec_key}, in_tex={dec_key in self.textures if dec_key else False}")
                     if dec_key and dec_key in self.textures:
                         dec_img = self.textures[dec_key]
                         if self.wall_decoration_flips[y][x]:
