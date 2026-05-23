@@ -22,9 +22,29 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             # 経験値システムは廃止されたため、ドロップ判定のみ行います。
             
             # 各アイテムのカテゴリ、レアリティ、および設定されたドロップ率を取得
-            drops = getattr(enemy, "drops", {})
-            normal_drop_rate = getattr(enemy, "normal_drop_rate", 0.1)
-            rare_drop_rate = getattr(enemy, "rare_drop_rate", 0.01)
+            drops = getattr(enemy, "drops", [])
+            drop_infos = []
+            for drop in drops:
+                item_key = drop.get("item")
+                # YAML で設定された個別確率を優先的に取得
+                specific_rate = drop.get("rate") 
+                
+                rarity = 1
+                if item_key in WEAPON_DATA: rarity = WEAPON_DATA[item_key].get("rarity", 1)
+                elif item_key in ARMOR_DATA: rarity = ARMOR_DATA[item_key].get("rarity", 1)
+                elif item_key in SHIELD_DATA: rarity = SHIELD_DATA[item_key].get("rarity", 1)
+                elif item_key in CONSUMABLE_DATA: rarity = CONSUMABLE_DATA[item_key].get("rarity", 1)
+                elif item_key in STAVE_DATA: rarity = STAVE_DATA[item_key].get("rarity", 1)
+                
+                drop_infos.append({
+                    "item": item_key, 
+                    "rarity": rarity, 
+                    "rank_val": rarity,
+                    "rate": specific_rate
+                })
+            
+            # 高レアリティ順（降順）にソート
+            drop_infos.sort(key=lambda x: x["rank_val"], reverse=True)
             
             # 1. 討伐の証（クエスト対象）の優先ドロップ判定
             dropped_token = False
@@ -38,64 +58,43 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                     break
             
             # 2. 通常のドロップ判定 (証を落とした場合は確実にスキップ)
-            if not dropped_token and isinstance(drops, dict):
+            if not dropped_token:
                 from constants import DROP_RATE_MULTIPLIER
                 from systems.game_state import game_state
-                
-                grid_x = int((enemy.x + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size
-                grid_y = int((enemy.y + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size
-                
-                def try_spawn_item(item_list):
-                    if not item_list:
-                        return False
-                        
-                    # 重みリストの作成
-                    weights = []
-                    for d in item_list:
-                        item_key = d.get("item") if isinstance(d, dict) else d
-                        rarity = 1
-                        if item_key in WEAPON_DATA: rarity = WEAPON_DATA[item_key].get("rarity", 1)
-                        elif item_key in ARMOR_DATA: rarity = ARMOR_DATA[item_key].get("rarity", 1)
-                        elif item_key in SHIELD_DATA: rarity = SHIELD_DATA[item_key].get("rarity", 1)
-                        elif item_key in CONSUMABLE_DATA: rarity = CONSUMABLE_DATA[item_key].get("rarity", 1)
-                        elif item_key in STAVE_DATA: rarity = STAVE_DATA[item_key].get("rarity", 1)
-                        
-                        weights.append(ITEM_DROP_RATES.get(rarity, 0.1))
-                        
-                    chosen = random.choices(item_list, weights=weights, k=1)[0]
-                    item_key = chosen.get("item") if isinstance(chosen, dict) else chosen
+                for dinfo in drop_infos:
+                    # YAML の個別確率があればそれを使用、なければレアリティ別テーブルから取得
+                    base_rate = dinfo["rate"] if dinfo["rate"] is not None else ITEM_DROP_RATES.get(dinfo["rank_val"], 0.30)
+                    target_rate = base_rate * DROP_RATE_MULTIPLIER
                     
-                    # グリッド重複チェック
-                    occupied = any(
-                        int((it.x + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size == grid_x and
-                        int((it.y + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size == grid_y
-                        for it in dungeon.dropped_items
-                        if not getattr(it, "is_collected", False)
-                    )
-                    if occupied:
-                        return False
+                    # デバッグモードなら確定、そうでなければ確率判定
+                    if random.random() <= target_rate or game_state.get("is_debug_mode"):
+                        grid_x = int((enemy.x + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size
+                        grid_y = int((enemy.y + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size
+    
+                        # ★ 同じグリッドに既存のアイテムがある場合はドロップしない
+                        occupied = any(
+                            int((it.x + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size == grid_x and
+                            int((it.y + dungeon.tile_size / 2) // dungeon.tile_size) * dungeon.tile_size == grid_y
+                            for it in dungeon.dropped_items
+                            if not getattr(it, "is_collected", False)
+                        )
+                        if occupied:
+                            break  # このドロップは諦める
+    
+                        item_key = dinfo["item"]
+                        if item_key in WEAPON_DATA:
+                            dungeon.dropped_items.append(DroppedWeapon(grid_x, grid_y, item_key, WEAPON_DATA[item_key]))
+                        elif item_key in ARMOR_DATA:
+                            dungeon.dropped_items.append(DroppedArmor(grid_x, grid_y, item_key, ARMOR_DATA[item_key]))
+                        elif item_key in SHIELD_DATA:
+                            dungeon.dropped_items.append(DroppedShield(grid_x, grid_y, item_key, SHIELD_DATA[item_key]))
+                        elif item_key in CONSUMABLE_DATA:
+                            dungeon.dropped_items.append(DroppedConsumable(grid_x, grid_y, item_key, CONSUMABLE_DATA[item_key]))
+                        elif item_key in STAVE_DATA:
+                            dungeon.dropped_items.append(DroppedStave(grid_x, grid_y, item_key, STAVE_DATA[item_key]))
                         
-                    if item_key in WEAPON_DATA:
-                        dungeon.dropped_items.append(DroppedWeapon(grid_x, grid_y, item_key, WEAPON_DATA[item_key]))
-                    elif item_key in ARMOR_DATA:
-                        dungeon.dropped_items.append(DroppedArmor(grid_x, grid_y, item_key, ARMOR_DATA[item_key]))
-                    elif item_key in SHIELD_DATA:
-                        dungeon.dropped_items.append(DroppedShield(grid_x, grid_y, item_key, SHIELD_DATA[item_key]))
-                    elif item_key in CONSUMABLE_DATA:
-                        dungeon.dropped_items.append(DroppedConsumable(grid_x, grid_y, item_key, CONSUMABLE_DATA[item_key]))
-                    elif item_key in STAVE_DATA:
-                        dungeon.dropped_items.append(DroppedStave(grid_x, grid_y, item_key, STAVE_DATA[item_key]))
-                    return True
-                
-                # A. レアドロップ判定
-                rare_rolled = random.random() <= rare_drop_rate * DROP_RATE_MULTIPLIER or game_state.get("is_debug_mode")
-                if rare_rolled and try_spawn_item(drops.get("rare", [])):
-                    pass # ドロップ成功
-                else:
-                    # B. ノーマルドロップ判定 (レアが外れた、または出現しなかった場合)
-                    normal_rolled = random.random() <= normal_drop_rate * DROP_RATE_MULTIPLIER or game_state.get("is_debug_mode")
-                    if normal_rolled:
-                        try_spawn_item(drops.get("normal", []))
+                        dropped_any = True
+                        break  # ★ 高レア順に計算し、1つでも落としたら即 break して終了
 
             # 敵の撃破処理
             # ボスの場合、特別な演出

@@ -274,8 +274,8 @@ RANK_FLOOR_MAP = generate_rank_floor_map(GUILD_RANKS)
 # --- 各種データの正規化読み込み ---
 # Data Source: components/data/master/ (enemies.json, obstacles.yml, equipment.json, items.json)
 ENEMY_DATA = get_normalized_enemy_data(RANK_FLOOR_MAP)
-WEAPON_DATA, ARMOR_DATA, SHIELD_DATA = get_normalized_equipment_data(RANK_FLOOR_MAP)
-WEAPON_TYPES = WEAPON_DATA # Fallback 
+WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, WEAPON_CATEGORIES, ARMOR_CATEGORIES, SHIELD_CATEGORIES = get_normalized_equipment_data(RANK_FLOOR_MAP)
+WEAPON_TYPES = WEAPON_CATEGORIES # 後方互換性
 CONSUMABLE_DATA, STAVE_DATA, LANTERN_DATA = get_normalized_item_data(RANK_FLOOR_MAP)
 
 # --- その他のマスタデータ ---

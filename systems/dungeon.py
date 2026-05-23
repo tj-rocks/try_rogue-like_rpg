@@ -725,17 +725,9 @@ class Dungeon:
                 self.npcs = []
                 self.rooms = []
                 ts = self.tile_size
-                # Load dynamic tile mappings from map-specific yml if exists, else village.yml
-                base_name = os.path.splitext(os.path.basename(map_name))[0]
-                master_file = "village.yml"
-                from systems.data_loader import load_master_data, MASTER_DATA_DIR
-                candidate = f"restpoint/{base_name}.yml"
-                if os.path.exists(os.path.join(MASTER_DATA_DIR, candidate)):
-                    master_file = candidate
-                elif os.path.exists(os.path.join(MASTER_DATA_DIR, f"{base_name}.yml")):
-                    master_file = f"{base_name}.yml"
-                
-                village_data = load_master_data(master_file) or {}
+                # Load dynamic tile mappings from village.yml
+                from systems.data_loader import load_master_data
+                village_data = load_master_data("village.yml") or {}
                 tile_mappings_raw = village_data.get("TILE_MAPPINGS", {})
                 
                 # 地形文字マッピング（village.txtのパース用）
@@ -761,15 +753,6 @@ class Dungeon:
                             if img_path:
                                 import os as _os
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
-                                if fk not in self.textures and _os.path.exists(img_path):
-                                    try:
-                                        img = pygame.image.load(img_path).convert_alpha()
-                                        if img.get_size() != (ts, ts):
-                                            img = pygame.transform.scale(img, (ts, ts))
-                                        self.textures[fk] = img
-                                        print(f"[Dungeon] Dynamic load success for {fk}: {img_path}")
-                                    except Exception as ex:
-                                        print(f"[Dungeon] Dynamic load failed for {img_path}: {ex}")
                             else:
                                 fk = f"wall_pass_{tile_mappings[char].get('tile_id', 0)}"
                             self.wall_top_variants[r][c] = fk
@@ -782,15 +765,6 @@ class Dungeon:
                             if img_path:
                                 import os as _os
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
-                                if fk not in self.textures and _os.path.exists(img_path):
-                                    try:
-                                        img = pygame.image.load(img_path).convert_alpha()
-                                        if img.get_size() != (ts, ts):
-                                            img = pygame.transform.scale(img, (ts, ts))
-                                        self.textures[fk] = img
-                                        print(f"[Dungeon] Dynamic load success for {fk}: {img_path}")
-                                    except Exception as ex:
-                                        print(f"[Dungeon] Dynamic load failed for {img_path}: {ex}")
                             else:
                                 fk = f"wall_top_{tile_mappings[char].get('tile_id', 0)}"
                             self.wall_top_variants[r][c] = fk
@@ -802,15 +776,6 @@ class Dungeon:
                             if img_path:
                                 import os as _os
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
-                                if fk not in self.textures and _os.path.exists(img_path):
-                                    try:
-                                        img = pygame.image.load(img_path).convert_alpha()
-                                        if img.get_size() != (ts, ts):
-                                            img = pygame.transform.scale(img, (ts, ts))
-                                        self.textures[fk] = img
-                                        print(f"[Dungeon] Dynamic load success for {fk}: {img_path}")
-                                    except Exception as ex:
-                                        print(f"[Dungeon] Dynamic load failed for {img_path}: {ex}")
                             else:
                                 fk = f"wall_none_{tile_mappings[char].get('tile_id', 0)}"
                             self.wall_none_variants[r][c] = fk
@@ -822,15 +787,6 @@ class Dungeon:
                             if img_path:
                                 import os as _os
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
-                                if fk not in self.textures and _os.path.exists(img_path):
-                                    try:
-                                        img = pygame.image.load(img_path).convert_alpha()
-                                        if img.get_size() != (ts, ts):
-                                            img = pygame.transform.scale(img, (ts, ts))
-                                        self.textures[fk] = img
-                                        print(f"[Dungeon] Dynamic load success for {fk}: {img_path}")
-                                    except Exception as ex:
-                                        print(f"[Dungeon] Dynamic load failed for {img_path}: {ex}")
                             else:
                                 fk = f"floor_{tile_mappings[char].get('tile_id', 0)}"
                             self.floor_variants[r][c] = fk
@@ -842,15 +798,6 @@ class Dungeon:
                             if img_path:
                                 import os as _os
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
-                                if fk not in self.textures and _os.path.exists(img_path):
-                                    try:
-                                        img = pygame.image.load(img_path).convert_alpha()
-                                        if img.get_size() != (ts, ts):
-                                            img = pygame.transform.scale(img, (ts, ts))
-                                        self.textures[fk] = img
-                                        print(f"[Dungeon] Dynamic load success for {fk}: {img_path}")
-                                    except Exception as ex:
-                                        print(f"[Dungeon] Dynamic load failed for {img_path}: {ex}")
                             else:
                                 fk = "corridor"
                             self.floor_variants[r][c] = fk
@@ -889,7 +836,7 @@ class Dungeon:
                 self.enemies = [e for e in self.enemies if getattr(e, "is_static", False)]
                 
                 # --- [NEW] 外部化されたエンティティ座標データ (positions) からキャラ/障害物を配置 ---
-                print(f"[DEBUG-NPC] Loading entities from TILE_MAPPINGS in {master_file}. Total entries: {len(tile_mappings_raw)}")
+                print(f"[DEBUG-NPC] Loading entities from TILE_MAPPINGS in village.yml. Total entries: {len(tile_mappings_raw)}")
                 for ent_id, tile_info in tile_mappings_raw.items():
                     if not isinstance(tile_info, dict): continue
                     positions = tile_info.get("positions", [])
@@ -897,7 +844,7 @@ class Dungeon:
                     
                     if not positions:
                         if cat in ("npc", "obstacle"):
-                            print(f"[DEBUG-NPC] Entity '{ent_id}' has NO positions listed in {master_file}!")
+                            print(f"[DEBUG-NPC] Entity '{ent_id}' has NO positions listed in village.yml!")
                         continue
                     
                     print(f"[DEBUG-NPC] Found entity '{ent_id}' ({cat}) with {len(positions)} positions.")
@@ -1085,24 +1032,24 @@ class Dungeon:
         candidates = []
         # Consumable
         for key, data in CONSUMABLE_DATA.items():
-            if data.get("category") != "event" and data.get("floor_spawnable", True):
+            if data.get("category") != "event":
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "consumable", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         # Weapon, Armor, Shield, Stave (default to common)
         for key, data in WEAPON_DATA.items():
-            if data.get("category") != "event" and data.get("floor_spawnable", True):
+            if data.get("category") != "event":
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "weapon", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         for key, data in ARMOR_DATA.items():
-            if data.get("category") != "event" and data.get("floor_spawnable", True):
+            if data.get("category") != "event":
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "armor", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         for key, data in SHIELD_DATA.items():
-            if data.get("category") != "event" and data.get("floor_spawnable", True):
+            if data.get("category") != "event":
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "shield", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         for key, data in STAVE_DATA.items():
-            if data.get("category") != "event" and data.get("floor_spawnable", True):
+            if data.get("category") != "event":
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "stave", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         if not candidates:

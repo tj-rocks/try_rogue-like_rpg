@@ -1,6 +1,13 @@
 ENEMY_DATA:
+# Fランクーーーーーーーーーー
   slime:
     name: スライム
+    min_rank: F
+    image_folder: components/pictures/enemies/slime
+    crit_rate: 0.05
+    drops:
+    - {item: hp_potion}
+    - {item: rotten_potion}
     hp: 11
     attack: 21
     defense: 1
@@ -15,19 +22,16 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
     attack_priority: close
-    min_rank: F
-    image_folder: components/pictures/enemies/slime
-    crit_rate: 0.05
-    drops:
-      normal:
-      - hp_potion
-      - rotten_potion
-      rare:
-      - iron_sword
-    normal_drop_rate: 0.1
-    rare_drop_rate: 0.01
   mawaru_kame:
     name: まわるがめ
+    min_rank: F
+    max_rank: E
+    image_folder: components/pictures/enemies/kame
+    crit_rate: 0.05
+    drops:
+    - {item: broken_shield}
+    - {item: broken_armor}
+    - {item: wooden_round_shield, rate: 0.05}
     hp: 15
     attack: 23
     defense: 4
@@ -42,21 +46,16 @@ ENEMY_DATA:
     close_attack_effect: physical_heavy
     ranged_attack_effect: sonic_wave
     attack_priority: close
-    min_rank: F
-    max_rank: E
-    image_folder: components/pictures/enemies/kame
-    crit_rate: 0.05
-    drops:
-      normal:
-      - broken_shield
-      - rotten_potion
-      rare:
-      - wooden_round_shield
-      - iron_breastplate
-    normal_drop_rate: 0.15
-    rare_drop_rate: 0.03
   normal_tako:
     name: ふつうたこ
+    min_rank: F
+    image_folder: components/pictures/enemies/tako_doku
+    status: poison
+    status_chance: 0
+    drops:
+    - {item: expired_potion}
+    - {item: broken_sword}
+    - {item: wooden_round_shield, rate: 0.03}
     hp: 15
     attack: 23
     defense: 2
@@ -71,20 +70,17 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
     attack_priority: close
-    min_rank: F
-    image_folder: components/pictures/enemies/tako_doku
+# Eランクーーーーーーーーーー
+  kowai_kusa:
+    name: こわいくさ
+    min_rank: E
+    image_folder: components/pictures/enemies/kowai_kusa
     status: poison
     status_chance: 0
     drops:
-      normal:
-      - rotten_potion
-      - expired_potion
-      rare:
-      - thiefs_knife
-    normal_drop_rate: 0.15
-    rare_drop_rate: 0.03
-  kowai_kusa:
-    name: こわいくさ
+    - {item: expired_potion}
+    - {item: wooden_stick}
+    - {item: adventurers_clothes, rate: 0.03}
     hp: 21
     attack: 26
     defense: 1
@@ -99,20 +95,15 @@ ENEMY_DATA:
     close_attack_effect: physical_heavy
     ranged_attack_effect: arrow
     attack_priority: ranged
-    min_rank: E
-    image_folder: components/pictures/enemies/kowai_kusa
-    status: poison
-    status_chance: 0
-    drops:
-      normal:
-      - expired_potion
-      - wooden_stick
-      rare:
-      - adventurers_clothes
-    normal_drop_rate: 0.15
-    rare_drop_rate: 0.03
   slime_red:
     name: あかいスライム
+    min_rank: E
+    image_folder: components/pictures/enemies/slime
+    image_color: '#FF6666'
+    crit_rate: 0.05
+    drops:
+    - {item: broken_stave}
+    - {item: hp_potion}
     hp: 21
     attack: 23
     defense: 1
@@ -127,19 +118,15 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
     attack_priority: close
-    min_rank: E
-    image_folder: components/pictures/enemies/slime
-    image_color: '#FF6666'
-    crit_rate: 0.05
-    drops:
-      normal:
-      - hp_potion
-      rare:
-      - iron_sword
-    normal_drop_rate: 0.15
-    rare_drop_rate: 0.03
   bakudan_man:
     name: バクダンマン
+    min_rank: E
+    image_folder: components/pictures/enemies/bakudan_man
+    crit_rate: 0.05
+    drops:
+    - {item: broken_sword}
+    - {item: hp_potion}
+    - {item: iron_sword, rate: 0.03}
     hp: 30
     attack: 25
     defense: 4
@@ -154,19 +141,17 @@ ENEMY_DATA:
     close_attack_effect: explosion
     ranged_attack_effect: explosion
     attack_priority: ranged
-    min_rank: E
-    image_folder: components/pictures/enemies/bakudan_man
-    crit_rate: 0.05
-    drops:
-      normal:
-      - broken_sword
-      - hp_potion
-      rare:
-      - fullmetal_sword
-    normal_drop_rate: 0.15
-    rare_drop_rate: 0.03
   doku_kame:
     name: どくがめ
+    min_rank: E
+    image_folder: components/pictures/enemies/kame
+    image_color: '#FFCCCC'
+    status: poison
+    status_chance: 20
+    drops:
+    - {item: rotten_potion}
+    - {item: broken_armor}
+    - {item: leather_breastplate, rate: 0.05}
     hp: 30
     attack: 25
     defense: 6
@@ -181,21 +166,15 @@ ENEMY_DATA:
     close_attack_effect: strange_mucus
     ranged_attack_effect: strange_mucus
     attack_priority: close
-    min_rank: E
-    image_folder: components/pictures/enemies/kame
-    image_color: '#FFCCCC'
-    status: poison
-    status_chance: 20
-    drops:
-      normal:
-      - rotten_potion
-      - broken_armor
-      rare:
-      - leather_breastplate
-    normal_drop_rate: 0.15
-    rare_drop_rate: 0.03
+# Dランクーーーーーーーーーー
   skeleton:
     name: スケルトン
+    min_rank: D
+    image_folder: components/pictures/enemies/skeleton
+    drops:
+    - {item: broken_sword}
+    - {item: broken_armor}
+    - {item: old_sword, rate: 0.02}
     hp: 25
     attack: 15
     defense: 3
@@ -210,19 +189,20 @@ ENEMY_DATA:
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
     attack_priority: close
-    min_rank: D
-    image_folder: components/pictures/enemies/skeleton
-    drops:
-      normal:
-      - broken_sword
-      - broken_armor
-      rare:
-      - old_sword
-      - iron_sword
-    normal_drop_rate: 0.15
-    rare_drop_rate: 0.03
+# BOSS------------------------------
   suisui_slime:
     name: スイスイスライム
+    min_rank: F
+    min_floor: 10
+    max_floor: 10
+    max_concurrent: 1
+    max_spawns: 1
+    is_boss: true
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/suisui_slime
+    drops:
+    - {item: hp_potion}
+    - {item: iron_sword}
     hp: 100
     attack: 23
     defense: 4
@@ -237,21 +217,19 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
     attack_priority: close
-    min_rank: F
-    min_floor: 10
-    max_floor: 10
-    max_concurrent: 1
-    max_spawns: 1
-    is_boss: true
-    bgm: components/sounds/bgm/get_hornor.mp3
-    image_folder: components/pictures/enemies/suisui_slime
-    drops:
-      normal: []
-      rare: []
-    normal_drop_rate: 0.1
-    rare_drop_rate: 0.01
   sukesuke_skeleton:
     name: スケスケスケルトン
+    min_rank: E
+    min_floor: 20
+    max_floor: 20
+    max_concurrent: 1
+    is_boss: true
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/skeleton
+    detect_range: 15
+    drops:
+    - {item: hp_potion}
+    - {item: iron_sword}
     hp: 150
     attack: 28
     defense: 6
@@ -266,21 +244,17 @@ ENEMY_DATA:
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
     attack_priority: close
-    is_boss: true
-    detect_range: 15
-    min_rank: E
-    min_floor: 20
-    max_floor: 20
-    max_concurrent: 1
-    image_folder: components/pictures/enemies/skeleton
-    bgm: components/sounds/bgm/get_hornor.mp3
-    drops:
-      normal: []
-      rare: []
-    normal_drop_rate: 0.1
-    rare_drop_rate: 0.01
   undead_father:
     name: 父の亡霊
+    min_rank: B
+    min_floor: 50
+    max_floor: 50
+    max_concurrent: 1
+    is_boss: true
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/skeleton
+    drops:
+    - {item: fathers_keepsake, rate: 1.0}
     hp: 250
     attack: 55
     defense: 25
@@ -295,15 +269,3 @@ ENEMY_DATA:
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
     attack_priority: close
-    min_rank: B
-    min_floor: 50
-    max_floor: 50
-    max_concurrent: 1
-    is_boss: true
-    bgm: components/sounds/bgm/get_hornor.mp3
-    image_folder: components/pictures/enemies/skeleton
-    drops:
-      normal: []
-      rare: []
-    normal_drop_rate: 0.1
-    rare_drop_rate: 0.01

@@ -598,9 +598,9 @@ TILE_MAPPINGS:
   well:
     category: obstacle
     id: well
-  skeleton:
+  skeleton_obstacle:
     category: obstacle
-    id: skeleton
+    id: skeleton_obstacle
   crystal:
     category: obstacle
     id: crystal

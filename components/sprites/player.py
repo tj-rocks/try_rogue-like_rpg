@@ -40,87 +40,6 @@ class EquipInstance:
         elif self.equip_type == "lantern":
             from constants import LANTERN_DATA
             data = LANTERN_DATA.get(self.key, {})
-        
-        # 防具（armor）における新ネスト構造（common_bonus, magic_bonus）への自動マッピング
-        if self.equip_type == "armor":
-            # 1. 共通ステータス (common_bonus)
-            common = data.get("common_bonus", {})
-            if isinstance(common, dict):
-                mapping = {
-                    "defense_bonus": "defense",
-                    "hp_bonus": "hp",
-                    "accuracy_close": "accuracy_close",
-                    "eva_bonus": "eva",
-                    "crit_bonus": "crit",
-                    "attack_bonus": "attack",
-                    "attack": "attack",
-                    "defense": "defense",
-                    "hp": "hp",
-                    "eva": "eva",
-                    "crit": "crit"
-                }
-                if stat_key in mapping:
-                    return common.get(mapping[stat_key], default)
-
-        # 武器（weapon）における新ネスト構造（common_bonus）への自動マッピング
-        if self.equip_type == "weapon":
-            common = data.get("common_bonus", {})
-            if isinstance(common, dict):
-                mapping = {
-                    "attack_bonus": "attack",
-                    "attack": "attack",
-                    "accuracy_bonus_close": "accuracy_close",
-                    "accuracy_close": "accuracy_close",
-                    "accuracy_bonus_ranged": "accuracy_ranged",
-                    "accuracy_ranged": "accuracy_ranged",
-                    "crit_rate": "crit",
-                    "crit": "crit"
-                }
-                if stat_key in mapping:
-                    return common.get(mapping[stat_key], default)
-
-        # 盾（shield）における新ネスト構造（common_bonus）への自動マッピング
-        if self.equip_type == "shield":
-            common = data.get("common_bonus", {})
-            if isinstance(common, dict):
-                mapping = {
-                    "block_chance": "block",
-                    "block": "block",
-                    "block_chance_close": "block_close",
-                    "block_close": "block_close",
-                    "block_chance_ranged": "block_ranged",
-                    "block_ranged": "block_ranged",
-                    "hp_bonus": "hp",
-                    "hp": "hp",
-                    "defense_bonus": "defense",
-                    "defense": "defense"
-                }
-                if stat_key in mapping:
-                    return common.get(mapping[stat_key], default)
-
-            # 2. 魔法ステータス (magic_bonus)
-            magic = data.get("magic_bonus", data.get("masic_bonus", {}))
-            if isinstance(magic, dict):
-                mapping = {
-                    "stave_bonus": "stave_bonus",
-                    "stave_damage_bonus": "fire_damage",
-                    "stave_knockback_bonus": "knockback_damage",
-                    "stave_fire_bonus": "fire_area",
-                    "stave_heal_bonus": "heal_bonus",
-                    "stave_invincible_bonus": "invincible_bonus",
-                    "stave_stupidity_bonus": "stupidity_bonus",
-                    "stupidity_bonus": "stupidity_bonus",
-                    "stupidly_bonus": "stupidity_bonus",
-                    "fire_damage": "fire_damage",
-                    "knockback_damage": "knockback_damage",
-                    "fire_area": "fire_area",
-                    "heal_bonus": "heal_bonus",
-                    "invincible_bonus": "invincible_bonus",
-                    "stupidity_bonus_key": "stupidity_bonus"
-                }
-                if stat_key in mapping:
-                    return magic.get(mapping[stat_key], default)
-
         return data.get(stat_key, default)
 
     def get_enhance_bonus(self, stat_key):
@@ -251,7 +170,7 @@ class Player(Entity):
         bonus = 0
         for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("accuracy_close", 0)
+            if inst: bonus += inst.get_stat("accuracy_bonus_close", inst.get_stat("accuracy_bonus", 0))
         val = int(base + bonus)
         if "accuracy" in getattr(self, "cursed_stats", []):
             from constants import CURSE_REDUCTION_RATE
@@ -265,7 +184,7 @@ class Player(Entity):
         bonus = 0
         for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("accuracy_ranged", 0)
+            if inst: bonus += inst.get_stat("accuracy_bonus_ranged", inst.get_stat("accuracy_bonus", 0))
         val = int(base + bonus)
         if "accuracy" in getattr(self, "cursed_stats", []):
             from constants import CURSE_REDUCTION_RATE
@@ -314,54 +233,6 @@ class Player(Entity):
         for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("stave_bonus", 0)
-        return bonus
-    
-    @property
-    def stave_stupidity_bonus(self):
-        bonus = 0
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
-            inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("stave_stupidity_bonus", 0)
-        return bonus
-    
-    @property
-    def stave_damage_bonus(self):
-        bonus = 0
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
-            inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("stave_damage_bonus", 0)
-        return bonus
-
-    @property
-    def stave_knockback_bonus(self):
-        bonus = 0
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
-            inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("stave_knockback_bonus", 0)
-        return bonus
-
-    @property
-    def stave_fire_bonus(self):
-        bonus = 0
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
-            inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("stave_fire_bonus", 0.0)
-        return bonus
-
-    @property
-    def stave_heal_bonus(self):
-        bonus = 0
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
-            inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("stave_heal_bonus", 0)
-        return bonus
-
-    @property
-    def stave_invincible_bonus(self):
-        bonus = 0
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
-            inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("stave_invincible_bonus", 0)
         return bonus
     
     @property
@@ -776,10 +647,10 @@ class Player(Entity):
         if not img: return
         
         # マスターデータからオフセットを取得
-        from constants import ARMOR_DATA
+        from constants import ARMOR_DATA, ARMOR_CATEGORIES
         inst = self._find_equip_inst(self.armor_inventory, self.equipped_armor)
         data = ARMOR_DATA.get(inst.key, {}) if inst else {}
-        cat_data = data
+        cat_data = ARMOR_CATEGORIES.get(data.get("category"), {})
         offsets = cat_data.get("position", {}).get("offsets", {}).get(self.facing, (0, 0))
 
         (fsx, fsy), phase = self.get_breathing_scale()
@@ -803,10 +674,10 @@ class Player(Entity):
         if not img: return
         
         # マスターデータからオフセットを取得
-        from constants import SHIELD_DATA
+        from constants import SHIELD_DATA, SHIELD_CATEGORIES
         inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
         data = SHIELD_DATA.get(inst.key, {}) if inst else {}
-        cat_data = data
+        cat_data = SHIELD_CATEGORIES.get(data.get("category"), {})
         offsets = cat_data.get("position", {}).get("offsets", {}).get(self.facing, (0, 0))
         is_back = self.facing in ("up", "right")
 
@@ -873,10 +744,7 @@ class Player(Entity):
 
     def add_stave_to_inventory(self, sk, charges=5):
         if len(self.stave_inventory) >= MAX_STAVE_SLOTS: return False
-        bonus_charges = self.stave_bonus
-        inst = StaveInstance(sk, charges + bonus_charges)
-        self.stave_inventory.append(inst)
-        return True
+        inst = StaveInstance(sk, charges); self.stave_inventory.append(inst); return True
 
     def equip_stave_by_key(self, sk, charges=5):
         return self.add_stave_to_inventory(sk, charges)
