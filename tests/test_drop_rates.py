@@ -26,15 +26,20 @@ class TestEnemyDropRates(unittest.TestCase):
         skeleton_info = ENEMY_DATA.get("skeleton")
         self.assertIsNotNone(skeleton_info, "skeleton のデータが ENEMY_DATA に存在しません")
         
-        drops = skeleton_info.get("drops", [])
-        self.assertTrue(len(drops) >= 3, "テスト用の skeleton ドロップリストが正しくありません")
+        drops = skeleton_info.get("drops", {})
+        self.assertIsInstance(drops, dict, "skeleton の drops は dict 構造である必要があります")
         
-        # drops データの構築 (systems/entity_handler.py と同じロジック)
-        drop_infos = []
-        for drop in drops:
-            item_key = drop.get("item")
-            specific_rate = drop.get("rate")
-            
+        normal_items = drops.get("normal", [])
+        rare_items = drops.get("rare", [])
+        
+        normal_drop_rate = skeleton_info.get("normal_drop_rate", 0.1)
+        rare_drop_rate = skeleton_info.get("rare_drop_rate", 0.01)
+        
+        target_normal_rate = normal_drop_rate * DROP_RATE_MULTIPLIER
+        target_rare_rate = rare_drop_rate * DROP_RATE_MULTIPLIER
+        
+        # 各種アイテムの重み計算ヘルパー
+        def get_item_rarity(item_key):
             rarity = 1
             if item_key in WEAPON_DATA:
                 rarity = WEAPON_DATA[item_key].get("rarity", 1)
@@ -46,35 +51,37 @@ class TestEnemyDropRates(unittest.TestCase):
                 rarity = CONSUMABLE_DATA[item_key].get("rarity", 1)
             elif item_key in STAVE_DATA:
                 rarity = STAVE_DATA[item_key].get("rarity", 1)
-            
-            drop_infos.append({
-                "item": item_key,
-                "rarity": rarity,
-                "rank_val": rarity,
-                "rate": specific_rate
-            })
-            
-        # 高レアリティ順（降順）にソート
-        drop_infos.sort(key=lambda x: x["rank_val"], reverse=True)
+            return rarity
+
+        # レア枠の重み
+        rare_weights = []
+        for item in rare_items:
+            r = get_item_rarity(item)
+            rare_weights.append(ITEM_DROP_RATES.get(r, 0.1))
+        sum_rare_weights = sum(rare_weights) if rare_weights else 1.0
+        
+        # 通常枠の重み
+        normal_weights = []
+        for item in normal_items:
+            r = get_item_rarity(item)
+            normal_weights.append(ITEM_DROP_RATES.get(r, 0.1))
+        sum_normal_weights = sum(normal_weights) if normal_weights else 1.0
         
         # 期待確率の計算
-        # 高レアリティ順にソートされた順序で判定され、どれか1つドロップしたら終了するため、遮蔽効果を考慮する
         expected_rates = {}
-        cumulative_not_dropped = 1.0
         
-        for dinfo in drop_infos:
-            item_key = dinfo["item"]
-            base_rate = dinfo["rate"] if dinfo["rate"] is not None else ITEM_DROP_RATES.get(dinfo["rank_val"], 0.30)
-            target_rate = base_rate * DROP_RATE_MULTIPLIER
+        # レア枠の期待値
+        for item, w in zip(rare_items, rare_weights):
+            # レア判定に当選し、かつそのアイテムが選ばれる確率
+            expected_rates[item] = target_rare_rate * (w / sum_rare_weights)
             
-            # このアイテムがドロップする期待確率
-            item_expected_rate = cumulative_not_dropped * target_rate
-            expected_rates[item_key] = item_expected_rate
+        # 通常枠の期待値
+        for item, w in zip(normal_items, normal_weights):
+            # レア判定に落選し、かつ通常判定に当選し、そのアイテムが選ばれる確率
+            expected_rates[item] = (1.0 - target_rare_rate) * target_normal_rate * (w / sum_normal_weights)
             
-            # 次のアイテムの判定に進む確率 (これまでがすべてドロップしなかった確率)
-            cumulative_not_dropped *= (1.0 - target_rate)
-            
-        expected_rates[None] = cumulative_not_dropped
+        # 何もドロップしない期待値
+        expected_rates[None] = (1.0 - target_rare_rate) * (1.0 - target_normal_rate)
         
         print("\n--- Expected Drop Rates (Theoretical) ---")
         for k, v in expected_rates.items():
@@ -83,7 +90,7 @@ class TestEnemyDropRates(unittest.TestCase):
         
         # シミュレーション実行
         n_trials = 100000
-        counts = {dinfo["item"]: 0 for dinfo in drop_infos}
+        counts = {item: 0 for item in normal_items + rare_items}
         counts[None] = 0
         
         # 再現性のために乱数シードを固定
@@ -91,24 +98,34 @@ class TestEnemyDropRates(unittest.TestCase):
         
         for _ in range(n_trials):
             dropped = False
-            for dinfo in drop_infos:
-                base_rate = dinfo["rate"] if dinfo["rate"] is not None else ITEM_DROP_RATES.get(dinfo["rank_val"], 0.30)
-                target_rate = base_rate * DROP_RATE_MULTIPLIER
-                
-                if random.random() <= target_rate:
-                    counts[dinfo["item"]] += 1
+            # 1. レアドロップ判定
+            if random.random() <= target_rare_rate:
+                if rare_items:
+                    chosen = random.choices(rare_items, weights=rare_weights, k=1)[0]
+                    counts[chosen] += 1
                     dropped = True
-                    break
+            
+            # 2. 通常ドロップ判定 (レアドロップしなかった場合)
+            if not dropped:
+                if random.random() <= target_normal_rate:
+                    if normal_items:
+                        chosen = random.choices(normal_items, weights=normal_weights, k=1)[0]
+                        counts[chosen] += 1
+                        dropped = True
+                        
             if not dropped:
                 counts[None] += 1
                 
         # 結果表示とアサーション
         print("\n--- Simulated Drop Rates (100k Trials) ---")
+        
+        # 誤差許容値 (設定値に合わせたスケール)
         tolerances = {
-            "old_sword": 0.005,      # 期待確率 2% に対し ±0.5% 誤差
-            "broken_sword": 0.008,   # 期待確率 14.7% に対し ±0.8% 誤差
-            "broken_armor": 0.008,   # 期待確率 12.5% に対し ±0.8% 誤差
-            None: 0.010              # 期待確率 70.8% に対し ±1.0% 誤差
+            "old_sword": 0.005,      # 期待確率 ~1.2% に対し ±0.5% 誤差
+            "iron_sword": 0.005,     # 期待確率 ~1.8% に対し ±0.5% 誤差
+            "broken_sword": 0.008,   # 期待確率 ~7.3% に対し ±0.8% 誤差
+            "broken_armor": 0.008,   # 期待確率 ~7.3% に対し ±0.8% 誤差
+            None: 0.010              # 期待確率 ~82.4% に対し ±1.0% 誤差
         }
         
         for k, count in counts.items():
