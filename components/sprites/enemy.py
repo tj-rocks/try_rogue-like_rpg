@@ -52,8 +52,8 @@ class Enemy(Entity):
         self.dash_distance = data.get("dash_distance", 50)
         self.is_long_range = False; self.attack_priority = data.get("attack_priority", "close")
         self.bgm = data.get("bgm"); self.crit_rate = data.get("crit_rate", 0.01)
-        self.accuracy_close = data.get("accuracy_close", 100)
-        self.accuracy_ranged = data.get("accuracy_ranged", 100)
+        self.accuracy_close = data.get("accuracy_close", data.get("accuracy_bonus", 100))
+        self.accuracy_ranged = data.get("accuracy_ranged", data.get("accuracy_bonus", 100))
         self.status_to_inflict = data.get("status"); self.status_chance = data.get("status_chance", 100)
         self.detect_range = data.get("detect_range", ENEMY_AGGRO_RADIUS)
         
@@ -355,14 +355,8 @@ class Enemy(Entity):
         rad = max(1, self.detect_range + player.get_aggro_modifier())
         if getattr(self, "damage_flash_timer", 0) > 0: rad = max(rad, 100)
         if abs(dx) > rad or abs(dy) > rad: return
-        # プレイヤーの装備効果により敵の stupidity を引き上げる
-        p_stupidity_bonus = getattr(player, "stave_stupidity_bonus", 0)
-        effective_stupidity = max(0, self.stupidity + p_stupidity_bonus)
-        
         # バカ度テーブルを参照してぼーっと確率を決定
-        wander_chance = STUPIDITY_WANDER_RATES.get(effective_stupidity, effective_stupidity / 10.0)
-        # 確率のオーバーフローを防ぐ上限キャップ（最大95%）
-        wander_chance = min(0.95, wander_chance)
+        wander_chance = STUPIDITY_WANDER_RATES.get(self.stupidity, self.stupidity / 10.0)
         if wander_chance > 0 and random.random() < wander_chance: self._move_randomly(dungeon, all_entities); return
 
         # ── [ESCAPE_BLOCK] 逃げ道封鎖AI + フランク (削除時はこのブロックごと除去) ──
@@ -394,7 +388,7 @@ class Enemy(Entity):
                             return
         # ── [/ESCAPE_BLOCK] ──────────────────────────────────────────
 
-        if effective_stupidity < 7:
+        if self.stupidity < 7:
             ideal = 1 if self.attack_priority == "close" else (2 if self.attack_range == 2 else max(1, self.attack_range - 1))
             los = self._is_in_attack_range(dx, dy) and self._is_line_of_sight_clear(dx, dy, dungeon, all_entities); gdist = abs(dx)+abs(dy)
             if gdist == ideal:

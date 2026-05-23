@@ -297,8 +297,6 @@ def _effect_knockback(player, settings, dungeon, dialog):
 
     # 吹き飛ばしロジック
     max_dist = settings.get("max_distance", 10)
-    kb_bonus = getattr(player, "stave_knockback_bonus", 0)
-    max_dist = max(1, max_dist + kb_bonus)
     current_gx, current_gy = target_gx, target_gy
     
     hit_other = None
@@ -386,8 +384,6 @@ def _effect_fire(player, settings, dungeon, dialog):
                     targets.append(e)
 
     mult = settings.get("damage_mult", 1.5)
-    fire_bonus = getattr(player, "stave_fire_bonus", 0.0)
-    mult = max(0.1, mult + fire_bonus)
     for t in targets:
         # 必中の魔法ダメージとして適用
         deal_damage(player, t, is_magic=True, damage_mult=mult)
@@ -398,8 +394,6 @@ def _effect_heal(player, settings, dungeon, dialog):
     """自己回復"""
     ratio = settings.get("heal_ratio", 0.5)
     amount = int(player.max_hp * ratio)
-    heal_bonus = getattr(player, "stave_heal_bonus", 0)
-    amount = max(1, amount + heal_bonus)
     old_hp = player.hp
     player.hp = min(player.max_hp, player.hp + amount)
     healed = player.hp - old_hp
@@ -409,8 +403,6 @@ def _effect_heal(player, settings, dungeon, dialog):
 def _effect_invincible(player, settings, dungeon, dialog):
     """無敵付与"""
     turns = settings.get("duration_turns", 3)
-    inv_bonus = getattr(player, "stave_invincible_bonus", 0)
-    turns = max(1, turns + inv_bonus)
     player.invincible_turns = turns
     dungeon.magic_effects.append(FlashEffect(color=settings.get("effect_color", [255, 255, 150])))
     return f"聖なる光が 守ってくれる！\n{turns}ターンの間 ダメージを受けない！"

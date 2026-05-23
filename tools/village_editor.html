@@ -278,16 +278,9 @@ header h1 {
   <!-- 左: テキスト -->
   <div class="panel-left">
     <h2>📄 village.txt テキスト</h2>
-    <div style="padding: 10px 16px; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.01);">
-      <label style="font-size: 11px; color: var(--text-secondary); font-weight: bold; text-transform: uppercase; letter-spacing: 0.03em;">🗺️ 編集対象マップ</label>
-      <select id="map-file-selector" onchange="switchMapFile(this.value)" style="background: #0f111a; color: #f3f4f6; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 12px; font-size: 12px; font-family: inherit; font-weight: bold; width: 100%; cursor: pointer; outline: none; transition: border-color 0.2s;">
-        <option value="village.txt">🏡 村マップ (village.txt)</option>
-        <option value="first_rest_point.txt">⛺ 休憩所マップ (first_rest_point.txt)</option>
-      </select>
-    </div>
     <textarea id="raw-text" spellcheck="false" placeholder="village.txtの内容をここに貼り付けてください..."></textarea>
     <div class="panel-left-buttons">
-      <button class="btn btn-blue" onclick="loadFile()">📂 外部ファイル読込</button>
+      <button class="btn btn-blue" onclick="loadFile()">📂 ファイル読込</button>
       <input type="file" id="file-input" style="display:none" accept=".txt" onchange="onFileLoad(event)">
     </div>
   </div>
@@ -944,78 +937,12 @@ function onFileLoad(e) {
   const file = e.target.files[0];
   if (!file) return;
   currentFilename = file.name;
-  
-  const selector = document.getElementById('map-file-selector');
-  if (selector) {
-    let matched = false;
-    for (let i = 0; i < selector.options.length; i++) {
-      if (selector.options[i].value === file.name) {
-        selector.selectedIndex = i;
-        matched = true;
-        break;
-      }
-    }
-    if (!matched) {
-      const opt = document.createElement('option');
-      opt.value = file.name;
-      opt.textContent = `📁 ${file.name} (外部読込)`;
-      selector.appendChild(opt);
-      selector.value = file.name;
-    }
-  }
-  
-  const titleEl = document.querySelector('.panel-left h2');
-  if (titleEl) {
-    titleEl.textContent = `📄 ${file.name} テキスト`;
-  }
-  
   const reader = new FileReader();
-  reader.onload = async ev => {
+  reader.onload = ev => {
     document.getElementById('raw-text').value = ev.target.result;
-    await loadTileDefinitions();
     renderFromText();
-    applyStoredPositions();
-    drawGrid();
   };
   reader.readAsText(file, 'utf-8');
-}
-
-async function switchMapFile(filename) {
-  currentFilename = filename;
-  
-  const titleEl = document.querySelector('.panel-left h2');
-  if (titleEl) {
-    titleEl.textContent = `📄 ${filename} テキスト`;
-  }
-  
-  const selector = document.getElementById('map-file-selector');
-  if (selector && selector.value !== filename) {
-    selector.value = filename;
-  }
-  
-  try {
-    const res = await fetch('../components/data/dungeon/' + filename);
-    if (res.ok) {
-      const text = await res.text();
-      document.getElementById('raw-text').value = text;
-      
-      await loadTileDefinitions();
-      buildPalette();
-      renderFromText();
-      applyStoredPositions();
-      drawGrid();
-      
-      const serverStatus = document.getElementById('server-status');
-      if (serverStatus) {
-        serverStatus.textContent = '● 接続状態: 良好';
-        serverStatus.style.color = '#10b981';
-      }
-    } else {
-      throw new Error();
-    }
-  } catch (e) {
-    alert(`❌ ${filename} のロードに失敗しました。`);
-  }
 }
 
 // ==============================================================================
@@ -1023,7 +950,7 @@ async function switchMapFile(filename) {
 // ==============================================================================
 async function loadTileDefinitions() {
   try {
-    const res = await fetch(`/api/tile_definitions?map_file=${currentFilename}`);
+    const res = await fetch('/api/tile_definitions');
     if (!res.ok) throw new Error();
     const data = await res.json();
     if (data.status === 'success' && data.tiles) {
@@ -1113,12 +1040,27 @@ async function initEditor() {
     console.log("⚠️ アセット一覧APIへの接続に失敗しました。全アセットをデフォルトで表示します。");
   }
 
-  // 2. パレット構築 & 初期キャラ選択
+  // 2. YAML定義の動的タイルマッピングを読み込む
+  await loadTileDefinitions();
+
+  // 3. パレット構築 & 初期キャラ選択
   buildPalette();
   selectChar('.');
 
-  // 3. デフォルトマップ village.txt をロード
-  await switchMapFile('village.txt');
+  // 4. village.txt を自動ロード
+  try {
+    const r = await fetch('../components/data/dungeon/village.txt');
+    if (r.ok) {
+      const text = await r.text();
+      document.getElementById('raw-text').value = text;
+      renderFromText();
+      // positionsデータをentityMapDataにマージ（renderFromTextでリセットされるため後から適用）
+      applyStoredPositions();
+      drawGrid();
+    }
+  } catch (e) {
+    document.getElementById('status-bar').textContent = '⚠️ village.txt のロードに失敗しました。ファイル読込ボタンから手動で読み込んでください。';
+  }
 }
 
 function applyStoredPositions() {

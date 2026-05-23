@@ -1,349 +1,145 @@
+ARMOR_CATEGORIES:
+  light:
+    name: 軽装
+    defense_bonus: 3
+    hp_bonus: 0
+    accuracy_bonus: 0
+    eva_bonus: 0
+    price: 200
+    image_dir: components/pictures/armor/leather_breastplate
+    describe: 動きやすさを重視した軽量防具.
+    position:
+      offsets:
+        down: [0, 0]
+        up: [0, 0]
+        left: [0, 0]
+        right: [0, 0]
+  medium:
+    name: 中装
+    defense_bonus: 5
+    hp_bonus: 0
+    accuracy_bonus: 0
+    eva_bonus: 0
+    price: 400
+    image_dir: components/pictures/armor/iron_breastplate
+    describe: 防御力と重量のバランスが取れた標準的な防具.
+    position:
+      offsets:
+        down: [0, 0]
+        up: [0, 0]
+        left: [0, 0]
+        right: [0, 0]
+  heavy:
+    name: 重装
+    defense_bonus: 12
+    hp_bonus: 0
+    accuracy_bonus: 0
+    eva_bonus: 0
+    aggro_mod: 0
+    price: 800
+    image_dir: components/pictures/armor/plate_armor
+    describe: 防御を最優先した重厚な鎧。物音がするため敵に気づかれやすい。
+    position:
+      offsets:
+        down: [0, 0]
+        up: [0, 0]
+        left: [0, 0]
+        right: [0, 0]
+  robe:
+    name: 法衣
+    defense_bonus: 2
+    hp_bonus: 0
+    attack_bonus: 5
+    stave_bonus: 2
+    eva_bonus: 0.05
+    price: 300
+    image_dir: components/pictures/armor/leather_armor
+    describe: 魔力を高める効果のある布製の防具.
+    position:
+      offsets:
+        down: [0, 0]
+        up: [0, 0]
+        left: [0, 0]
+        right: [0, 0]
 ARMOR_DATA:
   broken_armor:
     name: 壊れた鎧
-    position: &id001
-      offsets:
-        down:
-        - 0
-        - 0
-        up:
-        - 0
-        - 0
-        left:
-        - 0
-        - 0
-        right:
-        - 0
-        - 0
+    category: medium
     min_rank: F
     max_floor: 999
     rarity: 2
-    common_bonus:
-      defense: 1
-      hp: 0
-      accuracy_close: 0
-      eva: 0
-      crit: 0
-      attack: 0
-    magic_bonus:
-      stave_bonus: 0
-      fire_damage: 0
-      knockback_damage: 0
-      fire_area: 0.0
-      heal_bonus: 0
-      invincible_bonus: 0
-      stupidity_bonus: 0
+    defense_bonus: 1
     price: 100
     image_dir: components/pictures/armor/adventurers_clothes
     shop_buyable: false
     describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない。
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
-    floor_spawnable: false
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
   adventurers_clothes:
     name: 冒険者の服
-    position: &id003
-      offsets:
-        down:
-        - 0
-        - 0
-        up:
-        - 0
-        - 0
-        left:
-        - 0
-        - 0
-        right:
-        - 0
-        - 0
+    category: robe
     min_rank: F
     rarity: 1
-    common_bonus:
-      defense: 7.5
-      hp: 0
-      accuracy_close: 0
-      eva: 0
-      crit: 0
-      attack: 0
-    magic_bonus:
-      stave_bonus: 0
-      fire_damage: 0
-      knockback_damage: 0
-      fire_area: 0.0
-      heal_bonus: 0
-      invincible_bonus: 0
-      stupidity_bonus: 0
+    defense_bonus: 7.5
+    attack_bonus: 0
+    stave_bonus: 0
     price: 150
     image_dir: components/pictures/armor/adventurers_clothes
     shop_buyable: false
     describe: 丈夫な布で作られた一般的な服.
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
-    floor_spawnable: true
+    hp_bonus: 0
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    evasion_bonus: 0
   leather_breastplate:
     name: 皮の胸当て
-    position: &id002
-      offsets:
-        down:
-        - 0
-        - 0
-        up:
-        - 0
-        - 0
-        left:
-        - 0
-        - 0
-        right:
-        - 0
-        - 0
+    category: light
     min_rank: F
     rarity: 1
-    common_bonus:
-      defense: 10
-      hp: 0
-      accuracy_close: 0
-      eva: 0.05
-      crit: 0
-      attack: 0
-    magic_bonus:
-      stave_bonus: 0
-      fire_damage: 0
-      knockback_damage: 0
-      fire_area: 0.0
-      heal_bonus: 0
-      invincible_bonus: 0
-      stupidity_bonus: 0
-    aggro_mod: -1
+    defense_bonus: 10
     price: 200
+    eva_bonus: 0.05
+    aggro_mod: -1
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
     describe: なめし革を重ねて作られた防具.
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
-    floor_spawnable: true
+    hp_bonus: 0
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
   iron_breastplate:
     name: 鉄の胸当て
-    position: *id001
+    category: medium
     min_rank: F
     rarity: 2
-    common_bonus:
-      defense: 11
-      hp: 0
-      accuracy_close: 0
-      eva: 0
-      crit: 0
-      attack: 0
-    magic_bonus:
-      stave_bonus: 0
-      fire_damage: 0
-      knockback_damage: 0
-      fire_area: 0.0
-      heal_bonus: 0
-      invincible_bonus: 0
-      stupidity_bonus: 0
+    defense_bonus: 11
     price: 220
     image_dir: components/pictures/armor/iron_armor
     shop_buyable: true
     describe: 鉄板を胸部に当てた実戦的な防具.
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
-    floor_spawnable: true
+    hp_bonus: 0
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
   fullmetal_breastplate:
     name: 鋼の胸当て
-    position: *id001
+    category: medium
     min_rank: E
     rarity: 3
-    common_bonus:
-      defense: 15
-      hp: 0
-      accuracy_close: 0
-      eva: 0
-      crit: 0
-      attack: 0
-    magic_bonus:
-      stave_bonus: 0
-      fire_damage: 0
-      knockback_damage: 0
-      fire_area: 0.0
-      heal_bonus: 0
-      invincible_bonus: 0
-      stupidity_bonus: 0
+    defense_bonus: 15
     price: 360
     image_dir: components/pictures/armor/fullmetal_armor
     shop_buyable: false
     describe: 硬い鋼で作られた胸当て.
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
-    floor_spawnable: true
+    hp_bonus: 0
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
   hard_leather_armor:
     name: 堅牢な革鎧
-    position: *id002
+    category: light
     min_rank: E
     max_rank: D
     rarity: 4
-    common_bonus:
-      defense: 14
-      hp: 0
-      accuracy_close: 0
-      eva: 0.05
-      crit: 0
-      attack: 0
-    magic_bonus:
-      stave_bonus: 0
-      fire_damage: 0
-      knockback_damage: 0
-      fire_area: 0.0
-      heal_bonus: 0
-      invincible_bonus: 0
-      stupidity_bonus: 0
-    aggro_mod: -1
+    defense_bonus: 14
     price: 350
+    eva_bonus: 0.05
+    aggro_mod: -1
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
     describe: なめし革を重ねて作られた防具.
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
-    floor_spawnable: true
-  scouts_clothes:
-    name: スカウトの服
-    position: *id002
-    min_rank: D
-    rarity: 3
-    common_bonus:
-      defense: 16
-      hp: 0
-      accuracy_close: 0
-      eva: 0.08
-      crit: 0
-      attack: 0
-    magic_bonus:
-      stave_bonus: 0
-      fire_damage: 0
-      knockback_damage: 0
-      fire_area: 0.0
-      heal_bonus: 0
-      invincible_bonus: 0
-      stupidity_bonus: 0
-    aggro_mod: -2
-    price: 500
-    image_dir: components/pictures/armor/scouts_clothes
-    shop_buyable: true
-    describe: 隠密性と動きやすさを極限まで高めた斥候用の服。
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
-    floor_spawnable: true
-  warriors_armor:
-    name: 戦士の鎧
-    position: *id001
-    min_rank: D
-    rarity: 3
-    common_bonus:
-      defense: 22
-      hp: 15
-      accuracy_close: 0
-      eva: 0
-      crit: 0
-      attack: 0
-    magic_bonus:
-      stave_bonus: 0
-      fire_damage: 0
-      knockback_damage: 0
-      fire_area: 0.0
-      heal_bonus: 0
-      invincible_bonus: 0
-      stupidity_bonus: 0
-    price: 650
-    image_dir: components/pictures/armor/warriors_armor
-    shop_buyable: true
-    describe: 多くの戦場をくぐり抜けた戦士が愛用する、実戦本位の頑丈な鎧。
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
-    floor_spawnable: true
-  knights_heavy_armor:
-    name: 騎士の重鎧
-    position:
-      offsets:
-        down:
-        - 0
-        - 0
-        up:
-        - 0
-        - 0
-        left:
-        - 0
-        - 0
-        right:
-        - 0
-        - 0
-    min_rank: C
-    rarity: 4
-    common_bonus:
-      defense: 32
-      hp: 25
-      accuracy_close: 0
-      eva: 0
-      crit: 0
-      attack: 0
-    magic_bonus:
-      stave_bonus: 0
-      fire_damage: 0
-      knockback_damage: 0
-      fire_area: 0.0
-      heal_bonus: 0
-      invincible_bonus: 0
-      stupidity_bonus: 0
-    aggro_mod: 3
-    price: 950
-    image_dir: components/pictures/armor/knights_heavy_armor
-    shop_buyable: true
-    describe: 騎士団の重装歩兵が着用する極めて堅牢な板金鎧。敵の注意を引きつけやすい。
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
-    floor_spawnable: true
-  paladins_robe:
-    name: 巡礼者のローブ
-    position: *id003
-    min_rank: D
-    rarity: 3
-    common_bonus:
-      defense: 14
-      hp: 10
-      accuracy_close: 0
-      eva: 0
-      crit: 0
-      attack: 0
-    magic_bonus:
-      stave_bonus: 3
-      fire_damage: 2
-      knockback_damage: 0
-      fire_area: 0.0
-      heal_bonus: 12
-      invincible_bonus: 1
-      stupidity_bonus: 2
-    regen_bonus: 0.06
-    image_dir: components/pictures/armor/paladins_robe
-    shop_buyable: true
-    describe: 茶色いフードが特徴的な旅の巡礼者のローブ。かすかに施された祈りの刺繍が、傷ついた体を癒す。
-    growth:
-      bonus_limit: 2
-      times_limit: 50
-      over_limit_growth_rate: 0.003
-    floor_spawnable: true
+    hp_bonus: 0
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    evasion_bonus: 0

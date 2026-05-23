@@ -30,7 +30,7 @@ def test_equipment_offsets():
     def get_shield_draw_pos(p):
         inst = p._find_equip_inst(p.shield_inventory, p.equipped_shield)
         data = constants.SHIELD_DATA.get(inst.key, {})
-        cat_data = data
+        cat_data = constants.SHIELD_CATEGORIES.get(data.get("category"), {})
         offsets = cat_data.get("position", {}).get("offsets", {}).get(p.facing, (0, 0))
         # 簡易計算（Player._draw_shield_overlay と同様）
         off_x = offsets[0]
@@ -42,8 +42,9 @@ def test_equipment_offsets():
     print(f"初期オフセット (down): {ox1}, {oy1}")
 
     # マスターデータを直接書き換える
-    original_offsets = constants.SHIELD_DATA["wooden_round_shield"]["position"]["offsets"]["down"]
-    constants.SHIELD_DATA["wooden_round_shield"]["position"]["offsets"]["down"] = [ox1 + 10, oy1 + 20]
+    cat_key = constants.SHIELD_DATA["wooden_round_shield"]["category"]
+    original_offsets = constants.SHIELD_CATEGORIES[cat_key]["position"]["offsets"]["down"]
+    constants.SHIELD_CATEGORIES[cat_key]["position"]["offsets"]["down"] = [ox1 + 10, oy1 + 20]
     
     ox2, oy2 = get_shield_draw_pos(player)
     print(f"変更後オフセット (down): {ox2}, {oy2}")
@@ -52,7 +53,7 @@ def test_equipment_offsets():
     print("✓ 盾のオフセット反映成功")
 
     # 元に戻す
-    constants.SHIELD_DATA["wooden_round_shield"]["position"]["offsets"]["down"] = original_offsets
+    constants.SHIELD_CATEGORIES[cat_key]["position"]["offsets"]["down"] = original_offsets
 
     # --- 2. 鎧のオフセット検証 ---
     print("\n[Armor Offset Test]")
@@ -63,7 +64,7 @@ def test_equipment_offsets():
     def get_armor_draw_pos(p):
         inst = p._find_equip_inst(p.armor_inventory, p.equipped_armor)
         data = constants.ARMOR_DATA.get(inst.key, {})
-        cat_data = data
+        cat_data = constants.ARMOR_CATEGORIES.get(data.get("category"), {})
         offsets = cat_data.get("position", {}).get("offsets", {}).get(p.facing, (0, 0))
         return offsets[0], offsets[1]
 
@@ -71,7 +72,8 @@ def test_equipment_offsets():
     ax1, ay1 = get_armor_draw_pos(player)
     print(f"初期オフセット (left): {ax1}, {ay1}")
 
-    constants.ARMOR_DATA["adventurers_clothes"]["position"]["offsets"]["left"] = [ax1 - 5, ay1 + 15]
+    cat_key = constants.ARMOR_DATA["adventurers_clothes"]["category"]
+    constants.ARMOR_CATEGORIES[cat_key]["position"]["offsets"]["left"] = [ax1 - 5, ay1 + 15]
     
     ax2, ay2 = get_armor_draw_pos(player)
     print(f"変更後オフセット (left): {ax2}, {ay2}")
@@ -93,7 +95,8 @@ def test_equipment_offsets():
     print(f"初期武器オフセット (right): {wx1}, {wy1}")
 
     # 武器のカテゴリ（WEAPON_TYPES / WEAPON_CATEGORIES）を書き換える
-    constants.WEAPON_DATA[weapon.key]["position"]["hand_offsets"]["right"][0] = [wx1 + 30, wy1 - 10]
+    cat_key = constants.WEAPON_DATA[weapon.key]["category"]
+    constants.WEAPON_CATEGORIES[cat_key]["position"]["hand_offsets"]["right"][0] = [wx1 + 30, wy1 - 10]
     
     # 武器インスタンスを再生成して反映を確認（ゲーム内では装備時に生成される）
     new_weapon = player._get_weapon_instance(weapon.key)

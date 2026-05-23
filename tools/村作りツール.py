@@ -48,26 +48,15 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 response = {"status": "error", "message": str(e)}
                 self.wfile.write(json.dumps(response).encode('utf-8'))
-        elif self.path.startswith("/api/tile_definitions"):
+        elif self.path == "/api/tile_definitions":
             try:
-                import urllib.parse
-                parsed_url = urllib.parse.urlparse(self.path)
-                query_params = urllib.parse.parse_qs(parsed_url.query)
-                map_file = os.path.basename(query_params.get("map_file", ["village.txt"])[0])
-                master_file = "village.yml"
-                if map_file != "village.txt":
-                    candidate = f"restpoint/{map_file.replace('.txt', '.yml')}"
-                    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                    if os.path.exists(os.path.join(base_dir, "components/data/master", candidate)):
-                        master_file = candidate
-                
                 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                 if base_dir not in sys.path:
                     sys.path.append(base_dir)
                 from systems.data_loader import load_master_data
                 
-                # 1. Load base tile mappings and config from the dynamic master file
-                village_data = load_master_data(master_file) or {}
+                # 1. Load base tile mappings and config from village.yml
+                village_data = load_master_data("village.yml") or {}
                 tile_mappings = {}
                 # Shallow copy to avoid mutating cache
                 tile_mappings_raw = village_data.get("TILE_MAPPINGS", {})
@@ -182,12 +171,7 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                             pos_entry['max_rank'] = e['max_rank']
                         grouped.setdefault(ent_id, []).append(pos_entry)
 
-                master_file = "village.yml"
-                if filename != "village.txt":
-                    candidate = f"restpoint/{filename.replace('.txt', '.yml')}"
-                    if os.path.exists(os.path.join(base_dir, "components/data/master", candidate)):
-                        master_file = candidate
-                village_yml_path = os.path.join(base_dir, "components", "data", "master", master_file)
+                village_yml_path = os.path.join(base_dir, "components", "data", "master", "village.yml")
                 
                 try:
                     import importlib
