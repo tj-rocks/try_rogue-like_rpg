@@ -138,15 +138,7 @@ def get_normalized_enemy_data(floor_map):
     for key, v in enemies_dict.items():
         if not isinstance(v, dict): continue
         
-        # カテゴリデータの継承
-        cat_key = v.get("category")
-        merged = categories.get(cat_key, {}).copy() if cat_key else {}
-        
-        # 個体データのマージ（YAMLの値が最終値）
-        for k, val in v.items():
-            merged[k] = val
-        
-        normalized_enemies[key] = merged
+        normalized_enemies[key] = v.copy()
 
     # 障害物を統合
     obstacles = load_master_data("obstacles.yml")
@@ -164,34 +156,15 @@ def get_normalized_equipment_data(floor_map):
     raw_armors = load_master_data("armors.yml")
     raw_shields = load_master_data("shields.yml")
     
-    weapon_categories = raw_weapons.get("WEAPON_CATEGORIES", {})
-    armor_categories = raw_armors.get("ARMOR_CATEGORIES", {})
-    shield_categories = raw_shields.get("SHIELD_CATEGORIES", {})
-    
     weapons = raw_weapons.get("WEAPON_DATA", {})
     armor = raw_armors.get("ARMOR_DATA", {})
     shields = raw_shields.get("SHIELD_DATA", {})
     
-    def normalize_no_scaling(data_dict, category_map):
-        normalized = {}
-        for key, v in data_dict.items():
-            if not isinstance(v, dict): continue
-            cat_key = v.get("category")
-            merged = category_map.get(cat_key, {}).copy() if cat_key else {}
-            for k, val in v.items():
-                merged[k] = val
-            normalized[key] = merged
-        return normalized
-
-    normalized_weapons = normalize_no_scaling(weapons, weapon_categories)
-    normalized_armor = normalize_no_scaling(armor, armor_categories)
-    normalized_shields = normalize_no_scaling(shields, shield_categories)
+    apply_rank_floor_logic(weapons, floor_map)
+    apply_rank_floor_logic(armor, floor_map)
+    apply_rank_floor_logic(shields, floor_map)
     
-    apply_rank_floor_logic(normalized_weapons, floor_map)
-    apply_rank_floor_logic(normalized_armor, floor_map)
-    apply_rank_floor_logic(normalized_shields, floor_map)
-    
-    return normalized_weapons, normalized_armor, normalized_shields, weapon_categories, armor_categories, shield_categories
+    return weapons, armor, shields
 
 def get_normalized_item_data(floor_map):
     """消費アイテム・杖などのデータを読み込み、階層設定を適用して返す"""
