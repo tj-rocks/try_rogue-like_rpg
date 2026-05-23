@@ -236,10 +236,16 @@ class Player(Entity):
         return bonus
 
     def get_magic_bonus(self, key):
-        """装備品の bonus.magic 系ボーナスの合計を返す（例: get_magic_bonus("fire_damage")）"""
+        """装備品の bonus.magic 系ボーナスの合計を返す（例: get_magic_bonus("fire_damage")）
+        武器・防具・盾の全装備から合算する。yml側の bonus.magic で制御する。
+        """
         total = 0
         flat_key = f"magic_{key}"
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst:
                 total += inst.get_stat(flat_key, 0)
