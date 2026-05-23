@@ -92,6 +92,7 @@ TEST_FILES=(
     "tests/test_outbreak_event.py"
     "tests/test_teleport_system.py"
     "tests/test_village_spawning.py"
+    "tests/test_equipment_cross_stats.py"
 )
 
 SUCCESS_COUNT=0

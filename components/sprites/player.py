@@ -150,10 +150,9 @@ class Player(Entity):
     @property
     def max_hp(self):
         bonus = 0
-        armor_inst = self._find_equip_inst(self.armor_inventory, self.equipped_armor)
-        if armor_inst: bonus += armor_inst.get_stat("hp_bonus", 0)
-        shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
-        if shield_inst: bonus += shield_inst.get_stat("hp_bonus", 0)
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("hp_bonus", 0)
         val = int(self._base_max_hp + bonus)
         if "hp" in getattr(self, "cursed_stats", []):
             from constants import CURSE_REDUCTION_RATE
@@ -230,7 +229,7 @@ class Player(Entity):
     @property
     def stave_bonus(self):
         bonus = 0
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("stave_bonus", 0)
         return bonus
@@ -255,7 +254,7 @@ class Player(Entity):
     @property
     def lantern_bonus(self):
         bonus = 0
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("lantern_bonus", 0)
         return bonus
@@ -263,7 +262,7 @@ class Player(Entity):
     @property
     def regen_bonus(self):
         bonus = 0
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("regen_bonus", 0)
         return bonus
@@ -271,9 +270,9 @@ class Player(Entity):
     @property
     def total_defense(self):
         bonus = 0
-        for inv, eid, key in [(self.armor_inventory, self.equipped_armor, "defense_bonus"), (self.shield_inventory, self.equipped_shield, "defense_bonus")]:
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat(key, 0) + inst.get_enhance_bonus(key)
+            if inst: bonus += inst.get_stat("defense_bonus", 0) + inst.get_enhance_bonus("defense_bonus")
         val = round(self.defense + bonus, 1)
         if "defense" in getattr(self, "cursed_stats", []):
             from constants import CURSE_REDUCTION_RATE
@@ -283,15 +282,21 @@ class Player(Entity):
 
     @property
     def block_chance_close(self):
-        inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
-        if not inst: return 0.0
-        return inst.get_stat("block_chance_close", inst.get_stat("block_chance", 0.0)) + inst.get_enhance_bonus("block_chance_close")
+        total = 0.0
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst:
+                total += inst.get_stat("block_chance_close", inst.get_stat("block_chance", 0.0)) + inst.get_enhance_bonus("block_chance_close")
+        return total
 
     @property
     def block_chance_ranged(self):
-        inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
-        if not inst: return 0.0
-        return inst.get_stat("block_chance_ranged", inst.get_stat("block_chance", 0.0)) + inst.get_enhance_bonus("block_chance_ranged")
+        total = 0.0
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst:
+                total += inst.get_stat("block_chance_ranged", inst.get_stat("block_chance", 0.0)) + inst.get_enhance_bonus("block_chance_ranged")
+        return total
 
     def __init__(self):
         super().__init__(x=player_settings["x"], y=player_settings["y"], hp=PLAYER_HP, max_hp=PLAYER_HP, attack=PLAYER_ATTACK, width=64, height=64)
