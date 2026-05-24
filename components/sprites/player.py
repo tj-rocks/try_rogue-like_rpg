@@ -43,6 +43,11 @@ class EquipInstance:
         return data.get(stat_key, default)
 
     def get_enhance_bonus(self, stat_key):
+        # その装備品が元々持っていないステータスは、強化しても増えない（常に0）
+        base = self.get_stat(stat_key, 0)
+        if base <= 0:
+            return 0
+
         data = {}
         if self.equip_type == "weapon": data = WEAPON_DATA.get(self.key, {})
         elif self.equip_type == "armor": data = ARMOR_DATA.get(self.key, {})
@@ -50,10 +55,8 @@ class EquipInstance:
 
         growth = data.get("growth")
         if not growth or self.enhance == 0:
+            # growth がない場合は、単純に強化値を返す（古い互換用）
             return self.enhance
-
-        base = self.get_stat(stat_key, 0)
-        if base <= 0: return self.enhance
 
         bonus_limit = growth.get("bonus_limit", 2)
         times_limit = max(1, growth.get("times_limit", 50))
