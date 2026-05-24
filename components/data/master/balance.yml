@@ -205,7 +205,7 @@ GLOBAL_SCALING:
 OUTBREAK_CONFIG:
   min_floor: 2                  # 発生開始階層 (1階はチュートリアル的に除外)
   max_floor: 99                 # 発生終了階層
-  occurrence_chance: 0.04       # 発生確率 (0.04 = 4%)
+  occurrence_chance: 0.03       # 発生確率 (0.04 = 4%)
   enemy_multiplier: 3.0         # 敵の出現数倍率
   item_multiplier: 3.0          # アイテムの出現数倍率
   reward_gp_multiplier: 2.0     # クリア時のGP報酬倍率
