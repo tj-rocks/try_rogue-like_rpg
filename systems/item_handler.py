@@ -239,7 +239,7 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
                     # ワープ実行
                     from systems.dungeon import warp_to_floor
                     dialog.text = use_consumable(item_key_or_iid, player, current_dungeon)
-                    inventory_dialog.next_dungeon = warp_to_floor(0, player, spawn_reason="return")
+                    current_dungeon.next_dungeon = warp_to_floor(0, player, spawn_reason="return")
                 else:
                     dialog.text = use_consumable(item_key_or_iid, player, current_dungeon)
             
