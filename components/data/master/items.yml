@@ -103,7 +103,7 @@ CONSUMABLE_DATA:
     shop_buyable: true
     category: common
     max_stack: 10
-    describe: 傷を癒やす一般的な薬草 of 煎じ薬。
+    describe: 傷を癒やす一般的な薬草の煎じ薬。
     floor_spawnable: true
   antidote_potion:
     name: 毒消薬
@@ -265,7 +265,7 @@ CONSUMABLE_DATA:
     shop_buyable: false
     min_floor: 55
     max_floor: 55
-    describe: 'A級冒険者の証。一流 of 証であり、多くの冒険者の憧れの大。 '
+    describe: 'A級冒険者の証。一流の証であり、多くの冒険者の憧れの的。'
     floor_spawnable: true
   guild_cert_s:
     name: S級ギルド証
