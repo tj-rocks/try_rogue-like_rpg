@@ -1071,34 +1071,44 @@ class InventoryDialog(BaseListDialog):
         screen.blit(name_font.render(name_text, True, (255, 220, 100)), (sep_x + 30, self.y + 80 + detail_y_offset))
         
         # 2. パラメータの収集
+        from wordings import Text
         S_MAP = {"attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
                  "dex_bonus": "器用さ", "eva_bonus": "回避率", "crit_bonus": "会心率",
                  "block_chance": "回避率", "block_chance_close": "近距離回避",
-                 "block_chance_ranged": "遠距離回避", "stave_bonus": "杖回数"}
+                 "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正",
+                 "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON}
         MAGIC_MAP = {
             "magic_fire_damage":    "🔥炎ダメ",
             "magic_fire_range":     "🔥炎射程",
             "magic_heal_ratio":     "💚回復量",
             "magic_knockback_damage":"💨吹飛ダメ",
             "magic_invincible_turns":"✨無敵ターン",
+            "magic_stave_bonus":     "🔮杖回数",
         }
         
+        def fmt(val):
+            if val % 1 == 0:
+                val_str = str(int(val))
+            else:
+                val_str = str(round(val, 2))
+            return f"+{val_str}" if val > 0 else val_str
+
         param_texts = []
         for k, label in S_MAP.items():
             val = inst.get_stat(k, 0)
             if k == "attack_bonus" and inst.enhance > 0: val += inst.enhance
             if k == "defense_bonus" and inst.enhance > 0: val += inst.enhance
             if val:
-                is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged")
-                param_texts.append(f"{label}: +{int(val*100)}%" if is_pct else f"{label}: +{val}")
+                is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
+                val_to_use = val * 100 if is_pct and isinstance(val, float) and val <= 1.0 else val
+                param_texts.append(f"{label}: {fmt(val_to_use)}%" if is_pct else f"{label}: {fmt(val)}")
                 
         for mk, mlabel in MAGIC_MAP.items():
             mval = inst.get_stat(mk, 0)
             if mval:
-                if mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage"):
-                    param_texts.append(f"{mlabel}: +{int(mval*100)}%")
-                else:
-                    param_texts.append(f"{mlabel}: +{mval}")
+                is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
+                val_to_use = mval * 100 if is_pct and isinstance(mval, float) and mval < 1.0 else mval
+                param_texts.append(f"{mlabel}: {fmt(val_to_use)}%" if is_pct else f"{mlabel}: {fmt(mval)}")
 
         # 3. パラメータの2列描画
         start_x = sep_x + 30
@@ -1203,17 +1213,28 @@ class InventoryDialog(BaseListDialog):
     def _build_detail_lines(self, player, data):
         itype, key = data
         lines = []
+        from wordings import Text
         S_MAP = {"attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
                  "dex_bonus": "器用さ", "eva_bonus": "回避率", "crit_bonus": "会心率",
                  "block_chance": "回避率", "block_chance_close": "近距離回避率",
-                 "block_chance_ranged": "遠距離回避率", "stave_bonus": "杖回数"}
+                 "block_chance_ranged": "遠距離回避率", "aggro_mod": "感知補正",
+                 "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON}
         MAGIC_MAP = {
             "magic_fire_damage":    "🔥炎ダメージ",
             "magic_fire_range":     "🔥炎射程",
             "magic_heal_ratio":     "💚回復量",
             "magic_knockback_damage":"💨吹飛ダメージ",
             "magic_invincible_turns":"✨無敵ターン",
+            "magic_stave_bonus":     "🔮杖回数",
         }
+        
+        def fmt(val):
+            if val % 1 == 0:
+                val_str = str(int(val))
+            else:
+                val_str = str(round(val, 2))
+            return f"+{val_str}" if val > 0 else val_str
+
         if itype in ("weapon", "armor", "shield", "lantern", "stave"):
             inv = getattr(player, itype + "_inventory", [])
             inst = player._find_equip_inst(inv, key)
@@ -1224,16 +1245,16 @@ class InventoryDialog(BaseListDialog):
                 if k == "attack_bonus" and inst.enhance > 0: val += inst.enhance
                 if k == "defense_bonus" and inst.enhance > 0: val += inst.enhance
                 if val:
-                    is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged")
-                    lines.append(f"{label}: +{int(val*100)}%" if is_pct else f"{label}: +{val}")
+                    is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
+                    val_to_use = val * 100 if is_pct and isinstance(val, float) and val <= 1.0 else val
+                    lines.append(f"{label}: {fmt(val_to_use)}%" if is_pct else f"{label}: {fmt(val)}")
             # 魔法ボーナスの表示
             for mk, mlabel in MAGIC_MAP.items():
                 mval = inst.get_stat(mk, 0)
                 if mval:
-                    if mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage"):
-                        lines.append(f"{mlabel}: +{int(mval*100)}%")
-                    else:
-                        lines.append(f"{mlabel}: +{mval}")
+                    is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
+                    val_to_use = mval * 100 if is_pct and isinstance(mval, float) and mval < 1.0 else mval
+                    lines.append(f"{mlabel}: {fmt(val_to_use)}%" if is_pct else f"{mlabel}: {fmt(mval)}")
             desc = inst.get_stat("describe", "")
             if desc: lines.extend(["", desc])
         else:
@@ -2764,8 +2785,11 @@ class StatusDialog:
             total_crit = get_total_bonus("crit_rate")
             total_block_close = get_total_bonus("block_chance_close")
             total_block_ranged = get_total_bonus("block_chance_ranged")
-            total_stave = get_total_bonus("stave_bonus")
+            total_stave = get_total_bonus("magic_stave_bonus")
             total_regen = get_total_bonus("regen_bonus")
+            total_aggro = get_total_bonus("aggro_mod")
+            total_stupidity = get_total_bonus("stupidity")
+            total_penetration = get_total_bonus("armor_penetration")
 
             total_fire_dmg = get_total_bonus("magic_fire_damage")
             total_fire_range = get_total_bonus("magic_fire_range")
@@ -2774,7 +2798,11 @@ class StatusDialog:
             total_invincible = get_total_bonus("magic_invincible_turns")
 
             def format_val(val):
-                return f"+{int(val)}" if val > 0 else f"{int(val)}"
+                if val % 1 == 0:
+                    val_str = str(int(val))
+                else:
+                    val_str = str(round(val, 2))
+                return f"+{val_str}" if val > 0 else val_str
 
             # --- 左列: 基本ボーナス ---
             left_lines = ["【基本加護】"]
@@ -2791,42 +2819,62 @@ class StatusDialog:
                 has_any_bonus = True
             if total_eva != 0:
                 val = total_eva * 100 if isinstance(total_eva, float) and total_eva < 1.0 else total_eva
-                left_lines.append(f"回避率    +{int(round(val))}%")
+                left_lines.append(f"回避率    {format_val(val)}%")
                 has_any_bonus = True
             if total_acc_close != 0:
                 left_lines.append(f"近接命中  {format_val(total_acc_close)}")
                 has_any_bonus = True
             if total_crit != 0:
-                left_lines.append(f"会心率    +{int(round(total_crit * 100))}%")
+                val = total_crit * 100 if isinstance(total_crit, float) and total_crit < 1.0 else total_crit
+                left_lines.append(f"会心率    {format_val(val)}%")
                 has_any_bonus = True
             if total_block_close != 0:
-                left_lines.append(f"近接ガード +{int(round(total_block_close * 100))}%")
+                val = total_block_close * 100 if isinstance(total_block_close, float) and total_block_close < 1.0 else total_block_close
+                left_lines.append(f"近接ガード {format_val(val)}%")
                 has_any_bonus = True
             if total_block_ranged != 0:
-                left_lines.append(f"遠隔ガード +{int(round(total_block_ranged * 100))}%")
+                val = total_block_ranged * 100 if isinstance(total_block_ranged, float) and total_block_ranged < 1.0 else total_block_ranged
+                left_lines.append(f"遠隔ガード {format_val(val)}%")
                 has_any_bonus = True
             if total_stave != 0:
-                left_lines.append(f"杖使用回数 {format_val(total_stave)}")
-                has_any_bonus = True
+                pass # stave_bonus は魔法加護（右列）に移動
             if total_regen != 0:
                 left_lines.append(f"自然回復  {format_val(total_regen)}/ターン")
+                has_any_bonus = True
+            if total_aggro != 0:
+                left_lines.append(f"感知補正  {format_val(total_aggro)}")
+                has_any_bonus = True
+            if total_penetration != 0:
+                val = total_penetration * 100 if isinstance(total_penetration, float) and total_penetration <= 1.0 else total_penetration
+                from wordings import Text
+                left_lines.append(f"{Text.UI.STAT_ARMOR_PENETRATION_LABEL}  {format_val(val)}%")
+                has_any_bonus = True
+            if total_stupidity != 0:
+                from wordings import Text
+                left_lines.append(f"{Text.UI.STAT_CONFUSION_LABEL}      {format_val(total_stupidity)}")
                 has_any_bonus = True
 
             # --- 右列: 魔法加護 ---
             right_lines = ["【魔法加護】"]
             has_magic_bonus = False
 
+            if total_stave != 0:
+                right_lines.append(f"杖回数    {format_val(total_stave)}")
+                has_magic_bonus = True
             if total_fire_dmg != 0:
-                right_lines.append(f"火炎ダメ  +{int(round(total_fire_dmg * 100))}%")
+                val = total_fire_dmg * 100 if isinstance(total_fire_dmg, float) and total_fire_dmg < 1.0 else total_fire_dmg
+                right_lines.append(f"火炎ダメ  {format_val(val)}%")
                 has_magic_bonus = True
             if total_fire_range != 0:
                 right_lines.append(f"火炎射程  {format_val(total_fire_range)}マス")
                 has_magic_bonus = True
             if total_heal_ratio != 0:
-                right_lines.append(f"回復効果  +{int(round(total_heal_ratio * 100))}%")
+                val = total_heal_ratio * 100 if isinstance(total_heal_ratio, float) and total_heal_ratio < 1.0 else total_heal_ratio
+                right_lines.append(f"回復効果  {format_val(val)}%")
                 has_magic_bonus = True
             if total_knockback != 0:
-                right_lines.append(f"吹飛ダメ  +{int(round(total_knockback * 100))}%")
+                val = total_knockback * 100 if isinstance(total_knockback, float) and total_knockback < 1.0 else total_knockback
+                right_lines.append(f"吹飛ダメ  {format_val(val)}%")
                 has_magic_bonus = True
             if total_invincible != 0:
                 right_lines.append(f"無敵効果  {format_val(total_invincible)}ターン")

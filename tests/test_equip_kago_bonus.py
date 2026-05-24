@@ -75,7 +75,7 @@ class TestEquipKagoBonus(unittest.TestCase):
         "eva_bonus":             0.08,
         "block_chance_close":    0.0,
         "block_chance_ranged":   0.0,
-        "stave_bonus":           10,
+        "magic_stave_bonus":     10,
         "regen_bonus":            1,
         # magic
         "magic_fire_damage":     0.20,
@@ -95,7 +95,7 @@ class TestEquipKagoBonus(unittest.TestCase):
         "eva_bonus":             0.05,
         "block_chance_close":    0.0,
         "block_chance_ranged":   0.0,
-        "stave_bonus":            8,
+        "magic_stave_bonus":      8,
         "regen_bonus":            2,
         "magic_fire_damage":     0.10,
         "magic_fire_range":      0,
@@ -114,7 +114,7 @@ class TestEquipKagoBonus(unittest.TestCase):
         "eva_bonus":             0.03,
         "block_chance_close":    0.18,
         "block_chance_ranged":   0.18,
-        "stave_bonus":            5,
+        "magic_stave_bonus":      5,
         "regen_bonus":            1,
         "magic_fire_damage":     0.05,
         "magic_fire_range":      1,
@@ -134,7 +134,7 @@ class TestEquipKagoBonus(unittest.TestCase):
         "crit_rate",
         "block_chance_close",
         "block_chance_ranged",
-        "stave_bonus",
+        "magic_stave_bonus",
         "regen_bonus",
         "magic_fire_damage",
         "magic_fire_range",
@@ -253,7 +253,7 @@ class TestEquipKagoBonus(unittest.TestCase):
 
     def test_total_stave_bonus(self):
         """杖強化合計: 10 + 8 + 5 = 23"""
-        self.assertEqual(get_total_bonus(self.equips, "stave_bonus"), 23)
+        self.assertEqual(get_total_bonus(self.equips, "magic_stave_bonus"), 23)
 
     def test_total_regen_bonus(self):
         """自然回復合計: 1 + 2 + 1 = 4"""

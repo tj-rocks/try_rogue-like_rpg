@@ -176,8 +176,10 @@ def get_normalized_equipment_data(floor_map):
         "block_chance_close": "block_chance_close",
         "block_chance_ranged":"block_chance_ranged",
         "block_chance":       "block_chance",
-        "stave_bonus":        "stave_bonus",
         "lantern_bonus":      "lantern_bonus",
+        "aggro_mod":          "aggro_mod",
+        "stupidity":          "stupidity",
+        "armor_penetration":  "armor_penetration",
     }
 
     def _flatten_bonus(item_dict):

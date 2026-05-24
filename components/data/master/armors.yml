@@ -53,15 +53,17 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 0
         lantern_bonus: 0
         regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.0
         fire_range: 0
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
+        stave_bonus: 0
 
   adventurers_clothes:
     name: 冒険者の服
@@ -86,15 +88,17 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 0
         lantern_bonus: 0
         regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.0
         fire_range: 0
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
+        stave_bonus: 0
 
   leather_breastplate:
     name: 皮の胸当て
@@ -120,15 +124,17 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 0
         lantern_bonus: 0
         regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.0
         fire_range: 0
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
+        stave_bonus: 0
 
   iron_breastplate:
     name: 鉄の胸当て
@@ -153,15 +159,17 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 0
         lantern_bonus: 0
         regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.0
         fire_range: 0
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
+        stave_bonus: 0
 
   fullmetal_breastplate:
     name: 鋼の胸当て
@@ -186,15 +194,17 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 0
         lantern_bonus: 0
         regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.0
         fire_range: 0
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
+        stave_bonus: 0
 
   hard_leather_armor:
     name: 堅牢な革鎧
@@ -221,15 +231,17 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 0
         lantern_bonus: 0
         regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.0
         fire_range: 0
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
+        stave_bonus: 0
 
   pilgrim_robe:
     name: 巡礼者のローブ
@@ -256,15 +268,17 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 0
         lantern_bonus: 0
         regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.0
         fire_range: 0
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
+        stave_bonus: 0
 
   hunters_armor:
     name: 狩人の鎧
@@ -290,15 +304,17 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 0
         lantern_bonus: 1
         regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.0
         fire_range: 0
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
+        stave_bonus: 0
 
   fighters_armor:
     name: 戦士の鎧
@@ -324,15 +340,17 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 0
         lantern_bonus: 0
         regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.0
         fire_range: 0
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
+        stave_bonus: 0
 
   knight_heavy_armor:
     name: 騎士の重鎧
@@ -358,15 +376,17 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 0
         lantern_bonus: -1
         regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.0
         fire_range: 0
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
+        stave_bonus: 0
 
   pilgrims_robe:
     name: 巡礼者の衣
@@ -392,15 +412,17 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 10
         lantern_bonus: 0
         regen: 1
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.0
         fire_range: 0
         heal_ratio: 0.10
         knockback_damage: 0.0
         invincible_turns: 0
+        stave_bonus: 10
 
   scount_armor:
     name: スカウトの鎧
@@ -408,7 +430,6 @@ ARMOR_DATA:
     min_rank: C
     rarity: 3
     price: 2800
-    aggro_mod: -2
     image_dir: components/pictures/armor/scount_armor
     shop_buyable: true
     describe: 隠密性に特化した偵察用の軽装鎧。敵に見つかりにくくなり、回避率と会心率が高まる。
@@ -426,15 +447,18 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 0
         lantern_bonus: 0
         regen: 0
+        aggro_mod: -2
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.0
         fire_range: 0
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
+        stave_bonus: 0
 
   mages_robe:
     name: 魔術師の魔導衣
@@ -460,15 +484,17 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 20
         lantern_bonus: 0
         regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
       magic:
         fire_damage: 0.20
         fire_range: 1
         heal_ratio: 0.0
         knockback_damage: 0.20
         invincible_turns: 1
+        stave_bonus: 20
 
   test_all_bonus_armor:
     name: "[TEST]全加護の鎧"
@@ -493,12 +519,15 @@ ARMOR_DATA:
         block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        stave_bonus: 8
         lantern_bonus: 1
         regen: 2
+        aggro_mod: -5
+        stupidity: 1
+        armor_penetration: 0.3
       magic:
         fire_damage: 0.10
         fire_range: 0
         heal_ratio: 0.15
         knockback_damage: 0.10
         invincible_turns: 0
+        stave_bonus: 8

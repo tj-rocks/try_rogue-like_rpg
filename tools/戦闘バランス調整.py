@@ -99,6 +99,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 "block_chance_close": "block_chance_close",
                 "block_chance_ranged": "block_chance_ranged",
                 "regen_bonus": "regen",
+                "armor_penetration": "armor_penetration",
             }
             
             if file_type == "equipment":

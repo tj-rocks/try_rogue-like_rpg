@@ -234,7 +234,15 @@ class Player(Entity):
         bonus = 0
         for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("stave_bonus", 0)
+            if inst: bonus += inst.get_stat("magic_stave_bonus", 0)
+        return bonus
+
+    @property
+    def total_stupidity(self):
+        bonus = 0
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("stupidity", 0)
         return bonus
 
     def get_magic_bonus(self, key):
@@ -268,6 +276,14 @@ class Player(Entity):
         for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("regen_bonus", 0)
+        return bonus
+    
+    @property
+    def total_armor_penetration(self):
+        bonus = 0.0
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("armor_penetration", 0.0)
         return bonus
     
     @property

@@ -157,7 +157,7 @@ ENEMY_SPAWN_NEAR_RANDOM_FLOOR = _ai.get("ENEMY_SPAWN_NEAR_RANDOM_FLOOR", 20)
 ENEMY_SPAWN_NEAR_CHANCE       = _ai.get("ENEMY_SPAWN_NEAR_CHANCE", 1)
 ENEMY_SPAWN_NEAR_FLOOR        = _ai.get("ENEMY_SPAWN_NEAR_FLOOR", 50)
 
-# バカ度ごとのぼーっと確率テーブル (stupidity_level -> 0.0〜1.0)
+# 困惑度ごとのぼーっと確率テーブル (stupidity_level -> 0.0〜1.0)
 # balance.yml の STUPIDITY_WANDER_RATES を読み込む。キーを int に変換して使用。
 _default_wander = {0:0.00, 1:0.10, 2:0.20, 3:0.30, 4:0.40,
                    5:0.50, 6:0.60, 7:0.70, 8:0.80, 9:0.90, 10:1.00}

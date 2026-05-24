@@ -40,7 +40,7 @@ class TestEquipmentCrossStats(unittest.TestCase):
             "name": "特製ソード",
             "hp_bonus": 20,
             "defense_bonus": 5,
-            "stave_bonus": 2,
+            "magic_stave_bonus": 2,
             "lantern_bonus": 1,
             "regen_bonus": 3,
             "block_chance": 0.1,
@@ -54,7 +54,7 @@ class TestEquipmentCrossStats(unittest.TestCase):
             "block_chance": 0.05,
             "block_chance_close": 0.05,
             "block_chance_ranged": 0.05,
-            "stave_bonus": 3,
+            "magic_stave_bonus": 3,
             "lantern_bonus": 2,
             "regen_bonus": 4,
         }
@@ -65,7 +65,7 @@ class TestEquipmentCrossStats(unittest.TestCase):
             "block_chance": 0.2,
             "block_chance_close": 0.2,
             "block_chance_ranged": 0.2,
-            "stave_bonus": 4,
+            "magic_stave_bonus": 4,
             "lantern_bonus": 3,
             "regen_bonus": 5,
         }

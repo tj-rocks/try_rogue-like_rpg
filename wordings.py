@@ -115,6 +115,10 @@ class Text:
         GUILD_REPORT_CONFIRM_GENERIC = "クエストを報告しますか？"
         NOW_LOADING = "Now Loading..."
         SAVING = "Saving..."
+        STAT_ARMOR_PENETRATION = "🛡️防御無視"
+        STAT_ARMOR_PENETRATION_LABEL = "防御無視"
+        STAT_CONFUSION_ICON = "🧠困惑"
+        STAT_CONFUSION_LABEL = "困惑"
 
     class System:
         GAME_OVER = "死んでしまった\nアイテムや装備も全て失ってしまった"
@@ -130,6 +134,7 @@ class Text:
         DAMAGE = "{attacker} は {target} に {damage} ダメージを与えた"
         CRITICAL = "クリティカルヒット "
         MISS = "{attacker} の 攻撃は 外れた"
+        CONFUSED = "{target} は困惑し、意識が乱れている！（+{amount}）"
 
     class Items:
         GET = "{name} を 手に入れた！"
