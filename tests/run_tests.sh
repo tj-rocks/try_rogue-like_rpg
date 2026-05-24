@@ -96,6 +96,7 @@ TEST_FILES=(
     "tests/test_teleport_system.py"
     "tests/test_village_spawning.py"
     "tests/test_equipment_cross_stats.py"
+    "tests/test_equip_kago_bonus.py"
 )
 
 SUCCESS_COUNT=0

@@ -469,3 +469,36 @@ ARMOR_DATA:
         heal_ratio: 0.0
         knockback_damage: 0.20
         invincible_turns: 1
+
+  test_all_bonus_armor:
+    name: "[TEST]全加護の鎧"
+    category: light
+    min_rank: F
+    rarity: 1
+    price: 1
+    image_dir: components/pictures/armor/leather_armor
+    shop_buyable: false
+    floor_spawnable: false
+    describe: テスト用。全ボーナスが乗っている鎧。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    bonus:
+      common:
+        attack: 5
+        accuracy_close: 10
+        accuracy_range: 5
+        crit_rate: 0.10
+        hp: 30
+        defense: 15
+        eva: 0.05
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        stave_bonus: 8
+        lantern_bonus: 1
+        regen: 2
+      magic:
+        fire_damage: 0.10
+        fire_range: 0
+        heal_ratio: 0.15
+        knockback_damage: 0.10
+        invincible_turns: 0

@@ -423,3 +423,37 @@ SHIELD_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
 
+
+  test_all_bonus_shield:
+    name: "[TEST]全加護の盾"
+    category: round_shield
+    min_rank: F
+    rarity: 1
+    price: 1
+    image_dir: components/pictures/shield
+    shop_buyable: false
+    floor_spawnable: false
+    describe: テスト用。全ボーナスが乗っている盾。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    image_scale: 1.0
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 5
+        accuracy_range: 5
+        crit_rate: 0.05
+        hp: 10
+        defense: 5
+        eva: 0.03
+        block_chance: 0.0
+        block_chance_close: 0.18
+        block_chance_ranged: 0.18
+        stave_bonus: 5
+        lantern_bonus: 0
+        regen: 1
+      magic:
+        fire_damage: 0.05
+        fire_range: 1
+        heal_ratio: 0.05
+        knockback_damage: 0.05
+        invincible_turns: 1

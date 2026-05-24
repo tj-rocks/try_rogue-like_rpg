@@ -565,3 +565,40 @@ WEAPON_DATA:
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
+
+  test_all_bonus_weapon:
+    name: "[TEST]全加護の剣"
+    category: onehanded_sword
+    min_rank: F
+    rarity: 1
+    price: 1
+    armor_penetration: false
+    image_path: components/pictures/weapon/iron_sword.png
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.2
+    shop_buyable: false
+    floor_spawnable: false
+    describe: テスト用。全ボーナスが乗っている装備。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    type: onehanded_sword
+    bonus:
+      common:
+        attack: 15
+        accuracy_close: 20
+        accuracy_range: 10
+        crit_rate: 0.15
+        hp: 25
+        defense: 5
+        eva: 0.08
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        stave_bonus: 10
+        lantern_bonus: 0
+        regen: 1
+      magic:
+        fire_damage: 0.20
+        fire_range: 1
+        heal_ratio: 0.10
+        knockback_damage: 0.15
+        invincible_turns: 1
