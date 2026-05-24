@@ -120,9 +120,20 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
 
 
     
-    # [NEW] 武器の防御力貫通（Armor Penetration）判定
-    if weapon and weapon.data.get("armor_penetration"):
-        defense = 0
+    # 防御力無視（Armor Penetration）の割合による減算判定
+    penetration = 0.0
+    if hasattr(attacker, "total_armor_penetration"):
+        penetration = attacker.total_armor_penetration
+    elif weapon:
+        penetration = weapon.data.get("armor_penetration", 0.0)
+        
+    if isinstance(penetration, bool):
+        penetration = 1.0 if penetration else 0.0
+    elif not isinstance(penetration, (int, float)):
+        penetration = 0.0
+        
+    pen_rate = min(1.0, max(0.0, penetration))
+    defense = defense * (1.0 - pen_rate)
         
     base_dmg = max(0.1, calc_atk - defense) # 最低0.1ダメージ保証
     
@@ -177,6 +188,13 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                 target.condition = status_to_add
                 if status_to_add == "poison":
                     msg += f"\n{target_name}は毒を受けてしまった"
+
+    # --- 敵の困惑（stupidity）上昇効果 ---
+    if not is_miss and damage > 0:
+        stupidity_up = getattr(attacker, "total_stupidity", 0)
+        if isinstance(stupidity_up, (int, float)) and stupidity_up > 0 and hasattr(target, "stupidity"):
+            target.stupidity = min(10, target.stupidity + int(stupidity_up))
+            msg += "\n" + Text.Combat.CONFUSED.format(target=target_name, amount=int(stupidity_up))
 
     target_hp = getattr(target, 'hp', '?')
     target_cond = getattr(target, 'condition', 'normal')

@@ -331,8 +331,10 @@ def _effect_knockback(player, settings, dungeon, dialog):
     target_enemy.target_y = final_gy * dungeon.tile_size
     target_enemy.is_moving = True
     
-    # ダメージ計算（攻撃力の半分、必中）
-    msg_dmg, damage, is_crit, is_miss = deal_damage(player, target_enemy, is_magic=True, damage_mult=0.5)
+    # ダメージ計算（設定値＋装備ボーナス、必中）
+    base_mult = settings.get("damage_mult", 0.5)
+    bonus_mult = getattr(player, "get_magic_bonus", lambda k: 0)("knockback_damage")
+    msg_dmg, damage, is_crit, is_miss = deal_damage(player, target_enemy, is_magic=True, damage_mult=base_mult + bonus_mult)
     msg = f"{target_enemy.name} を 吹き飛ばした！\n" + msg_dmg
     
     # 演出2: 衝撃波エフェクトを追加
@@ -361,13 +363,35 @@ def _effect_fire(player, settings, dungeon, dialog):
     """範囲攻撃（炎）"""
     gx = int((player.x + player.width / 2) // dungeon.tile_size)
     gy = int((player.y + player.height / 2) // dungeon.tile_size)
-    
+
+    # 装備ボーナス: 奥方向に何列伸ばすか
+    range_ext = int(getattr(player, "get_magic_bonus", lambda k: 0)("fire_range"))
+
     # ターゲットとエフェクト追加
     if settings.get("is_surround"):
         offsets = [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
     else:
-        offsets = settings.get("range_offsets", {}).get(player.facing, [])
-    
+        base_offsets = list(settings.get("range_offsets", {}).get(player.facing, []))
+        # 奥方向ベクトル
+        face_dx = {"up": 0, "down": 0, "left": -1, "right": 1}.get(player.facing, 0)
+        face_dy = {"up": -1, "down": 1, "left": 0, "right": 0}.get(player.facing, 0)
+        # 現在の最大奥行き距離を特定して延長列を追加
+        if range_ext > 0 and base_offsets:
+            if player.facing in ("up", "down"):
+                max_depth = max(abs(oy) for ox, oy in base_offsets)
+                xs = sorted(set(ox for ox, oy in base_offsets if abs(oy) == max_depth))
+            else:
+                max_depth = max(abs(ox) for ox, oy in base_offsets)
+                xs = sorted(set(oy for ox, oy in base_offsets if abs(ox) == max_depth))
+            for step in range(1, range_ext + 1):
+                depth = max_depth + step
+                for x in xs:
+                    if player.facing in ("up", "down"):
+                        base_offsets.append((x, face_dy * depth))
+                    else:
+                        base_offsets.append((face_dx * depth, x))
+        offsets = base_offsets
+
     targets = []
     print(f"[MAGIC] Fire Offsets: {offsets}")
     for ox, oy in offsets:
@@ -375,7 +399,7 @@ def _effect_fire(player, settings, dungeon, dialog):
         tx, ty = tgx * dungeon.tile_size, tgy * dungeon.tile_size
         print(f"[MAGIC] Add FireEffect at Tile ({tgx}, {tgy})")
         dungeon.magic_effects.append(FireEffect(tx, ty, color=settings.get("effect_color", [255, 100, 0])))
-        
+
         for e in dungeon.enemies:
             if not getattr(e, "is_dead", False):
                 egx = int((e.x + e.width / 2) // dungeon.tile_size)
@@ -383,16 +407,17 @@ def _effect_fire(player, settings, dungeon, dialog):
                 if egx == tgx and egy == tgy:
                     targets.append(e)
 
-    mult = settings.get("damage_mult", 1.5)
+    # 装備ボーナス: ダメージ倍率加算
+    mult = settings.get("damage_mult", 1.5) + getattr(player, "get_magic_bonus", lambda k: 0)("fire_damage")
     for t in targets:
-        # 必中の魔法ダメージとして適用
         deal_damage(player, t, is_magic=True, damage_mult=mult)
-            
+
     return f"炎が 湧き上がった！\n{len(targets)}体 の 敵 に ダメージ！"
 
 def _effect_heal(player, settings, dungeon, dialog):
     """自己回復"""
-    ratio = settings.get("heal_ratio", 0.5)
+    # 装備ボーナス: 回復割合加算
+    ratio = settings.get("heal_ratio", 0.5) + getattr(player, "get_magic_bonus", lambda k: 0)("heal_ratio")
     amount = int(player.max_hp * ratio)
     old_hp = player.hp
     player.hp = min(player.max_hp, player.hp + amount)
@@ -402,7 +427,8 @@ def _effect_heal(player, settings, dungeon, dialog):
 
 def _effect_invincible(player, settings, dungeon, dialog):
     """無敵付与"""
-    turns = settings.get("duration_turns", 3)
+    # 装備ボーナス: 無敵ターン数加算
+    turns = settings.get("duration_turns", 3) + int(getattr(player, "get_magic_bonus", lambda k: 0)("invincible_turns"))
     player.invincible_turns = turns
     dungeon.magic_effects.append(FlashEffect(color=settings.get("effect_color", [255, 255, 150])))
     return f"聖なる光が 守ってくれる！\n{turns}ターンの間 ダメージを受けない！"

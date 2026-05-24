@@ -1032,24 +1032,24 @@ class Dungeon:
         candidates = []
         # Consumable
         for key, data in CONSUMABLE_DATA.items():
-            if data.get("category") != "event":
+            if data.get("category") != "event" and data.get("floor_spawnable", True):
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "consumable", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         # Weapon, Armor, Shield, Stave (default to common)
         for key, data in WEAPON_DATA.items():
-            if data.get("category") != "event":
+            if data.get("category") != "event" and data.get("floor_spawnable", True):
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "weapon", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         for key, data in ARMOR_DATA.items():
-            if data.get("category") != "event":
+            if data.get("category") != "event" and data.get("floor_spawnable", True):
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "armor", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         for key, data in SHIELD_DATA.items():
-            if data.get("category") != "event":
+            if data.get("category") != "event" and data.get("floor_spawnable", True):
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "shield", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         for key, data in STAVE_DATA.items():
-            if data.get("category") != "event":
+            if data.get("category") != "event" and data.get("floor_spawnable", True):
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "stave", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         if not candidates:

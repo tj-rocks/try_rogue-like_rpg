@@ -35,88 +35,499 @@ ARMOR_DATA:
     min_rank: F
     max_floor: 999
     rarity: 2
-    defense_bonus: 1
     price: 100
     image_dir: components/pictures/armor/adventurers_clothes
     shop_buyable: false
     describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    hp_bonus: 0
-    accuracy_bonus: 0
-    eva_bonus: 0
+    floor_spawnable: false
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 1
+        eva: 0.0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+
   adventurers_clothes:
     name: 冒険者の服
     category: robe
     min_rank: F
     rarity: 1
-    defense_bonus: 7.5
-    attack_bonus: 0
-    stave_bonus: 0
     price: 150
     image_dir: components/pictures/armor/adventurers_clothes
     shop_buyable: false
     describe: 丈夫な布で作られた一般的な服.
-    hp_bonus: 0
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    evasion_bonus: 0
-    accuracy_bonus: 0
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 7.5
+        eva: 0.0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+
   leather_breastplate:
     name: 皮の胸当て
     category: light
     min_rank: F
     rarity: 1
-    defense_bonus: 10
-    price: 200
-    eva_bonus: 0.05
+    price: 490
     aggro_mod: -1
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
     describe: なめし革を重ねて作られた防具.
-    hp_bonus: 0
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus: 0
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 10
+        eva: 0.05
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+
   iron_breastplate:
     name: 鉄の胸当て
     category: medium
     min_rank: F
     rarity: 2
-    defense_bonus: 11
-    price: 220
+    price: 550
     image_dir: components/pictures/armor/iron_armor
     shop_buyable: true
     describe: 鉄板を胸部に当てた実戦的な防具.
-    hp_bonus: 0
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus: 0
-    eva_bonus: 0
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 11
+        eva: 0.0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+
   fullmetal_breastplate:
     name: 鋼の胸当て
     category: medium
     min_rank: E
     rarity: 3
-    defense_bonus: 15
-    price: 360
+    price: 1800
     image_dir: components/pictures/armor/fullmetal_armor
     shop_buyable: false
     describe: 硬い鋼で作られた胸当て.
-    hp_bonus: 0
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    accuracy_bonus: 0
-    eva_bonus: 0
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 15
+        eva: 0.0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+
   hard_leather_armor:
     name: 堅牢な革鎧
     category: light
     min_rank: E
     max_rank: D
     rarity: 4
-    defense_bonus: 14
-    price: 350
-    eva_bonus: 0.05
-    aggro_mod: -1
+    price: 1500
+    aggro_mod: 0
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
     describe: なめし革を重ねて作られた防具.
-    hp_bonus: 0
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    evasion_bonus: 0
-    accuracy_bonus: 0
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 14
+        eva: 0.05
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+
+  pilgrim_robe:
+    name: 巡礼者のローブ
+    category: robe
+    min_rank: D
+    max_rank: E
+    rarity: 6
+    price: 2000
+    aggro_mod: 0
+    image_dir: components/pictures/armor/leather_armor
+    shop_buyable: true
+    describe: 巡礼者が旅の安全を祈って着る聖なるローブ。魔法の効果を高める力がある。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 15
+        eva: 0.05
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+
+  hunters_armor:
+    name: 狩人の鎧
+    category: light
+    min_rank: E
+    rarity: 3
+    price: 1200
+    aggro_mod: -2
+    image_dir: components/pictures/armor/hunters_armor
+    shop_buyable: true
+    describe: 隠密性に特化した深紺の軽装。防御力は極めて低いが、攻撃の命中率と会心率（10/100）が大きく向上する。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 15
+        accuracy_range: 25
+        crit_rate: 0.10
+        hp: 0
+        defense: 6
+        eva: 0.05
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 1
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+
+  fighters_armor:
+    name: 戦士の鎧
+    category: medium
+    min_rank: C
+    rarity: 3
+    price: 2500
+    aggro_mod: 0
+    image_dir: components/pictures/armor/fighters_armor
+    shop_buyable: true
+    describe: 標準的な戦士の鎧。特にバフやデバフはなく、扱いやすい。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 20
+        eva: 0.0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+
+  knight_heavy_armor:
+    name: 騎士の重鎧
+    category: heavy
+    min_rank: B
+    rarity: 4
+    price: 4500
+    aggro_mod: 4
+    image_dir: components/pictures/armor/knight_heavy_armor
+    shop_buyable: true
+    describe: 鉄板を重ねた非常に強固な鎧。重さゆえに敵に気づかれやすく、回避や命中、視野が低下する。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: -10
+        accuracy_range: -10
+        crit_rate: 0.0
+        hp: 0
+        defense: 35
+        eva: -0.10
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: -1
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+
+  pilgrims_robe:
+    name: 巡礼者の衣
+    category: robe
+    min_rank: C
+    rarity: 4
+    price: 3200
+    aggro_mod: 0
+    image_dir: components/pictures/armor/pilgrims_robe
+    shop_buyable: true
+    describe: 聖なる加護を受けた巡礼者の衣。最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 30
+        defense: 12
+        eva: 0.0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 1
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.10
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 10
+
+  scount_armor:
+    name: スカウトの鎧
+    category: light
+    min_rank: C
+    rarity: 3
+    price: 2800
+    image_dir: components/pictures/armor/scount_armor
+    shop_buyable: true
+    describe: 隠密性に特化した偵察用の軽装鎧。敵に見つかりにくくなり、回避率と会心率が高まる。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.10
+        hp: 0
+        defense: 14
+        eva: 0.05
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        aggro_mod: -2
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+
+  mages_robe:
+    name: 魔術師の魔導衣
+    category: robe
+    min_rank: C
+    rarity: 4
+    price: 3200
+    aggro_mod: 0
+    image_dir: components/pictures/armor/mages_robe
+    shop_buyable: true
+    describe: 魔力の流れを操る高貴な紫の魔導衣。軽装で動きやすく、火炎・吹飛などの攻撃魔法の威力・射程を極限まで引き出す。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 8
+        eva: 0.0
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.20
+        fire_range: 1
+        heal_ratio: 0.0
+        knockback_damage: 0.20
+        invincible_turns: 1
+        stave_bonus: 20
+
+  test_all_bonus_armor:
+    name: "[TEST]全加護の鎧"
+    category: light
+    min_rank: F
+    rarity: 1
+    price: 1
+    image_dir: components/pictures/armor/leather_armor
+    shop_buyable: false
+    floor_spawnable: false
+    describe: テスト用。全ボーナスが乗っている鎧。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    bonus:
+      common:
+        attack: 5
+        accuracy_close: 10
+        accuracy_range: 5
+        crit_rate: 0.10
+        hp: 30
+        defense: 15
+        eva: 0.05
+        block_chance: 0.0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 1
+        regen: 2
+        aggro_mod: -5
+        stupidity: 1
+        armor_penetration: 0.3
+      magic:
+        fire_damage: 0.10
+        fire_range: 0
+        heal_ratio: 0.15
+        knockback_damage: 0.10
+        invincible_turns: 0
+        stave_bonus: 8

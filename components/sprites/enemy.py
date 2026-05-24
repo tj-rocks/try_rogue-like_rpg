@@ -46,7 +46,7 @@ class Enemy(Entity):
         self.defense = data.get("defense", 0); self.evasion = data.get("evasion", 0)
         self.attack_pre_delay_timer = 0; self.attack_range = data.get("attack_range", 1)
         self.exp = data.get("exp", 5); self.drops = data.get("drops", []); self.is_boss = data.get("is_boss", False)
-        # ボスはアグレッシブに動くよう、stupidityを強制的に0にする
+        # ボスはアグレッシブに動くよう、困惑度（stupidity）を強制的に0にする
         if self.is_boss: self.stupidity = 0
         else: self.stupidity = data.get("stupidity", 0)
         self.dash_distance = data.get("dash_distance", 50)
@@ -355,7 +355,7 @@ class Enemy(Entity):
         rad = max(1, self.detect_range + player.get_aggro_modifier())
         if getattr(self, "damage_flash_timer", 0) > 0: rad = max(rad, 100)
         if abs(dx) > rad or abs(dy) > rad: return
-        # バカ度テーブルを参照してぼーっと確率を決定
+        # 困惑度テーブルを参照してぼーっと確率を決定
         wander_chance = STUPIDITY_WANDER_RATES.get(self.stupidity, self.stupidity / 10.0)
         if wander_chance > 0 and random.random() < wander_chance: self._move_randomly(dungeon, all_entities); return
 

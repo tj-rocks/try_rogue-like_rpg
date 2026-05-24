@@ -1024,6 +1024,11 @@ class BaseListDialog:
 
         lines = self.get_detail_lines(player)
         if lines:
+            self.draw_right_panel(screen, player, sep_x, detail_y_offset)
+
+    def draw_right_panel(self, screen, player, sep_x, detail_y_offset):
+        lines = self.get_detail_lines(player)
+        if lines:
             draw_text_wrapped(screen, self.font, "\n".join(lines),
                               sep_x + 30, self.y + 80 + detail_y_offset, self.width // 2 - 60, color=(220, 230, 240))
 
@@ -1039,6 +1044,95 @@ class InventoryDialog(BaseListDialog):
         self.item_data = []   # (itype, iid) と items を並行管理
         self.action_dialog = None
         self._path_cache = {} # 画像パスのキャッシュ { (itype, key): path }
+
+    def draw_right_panel(self, screen, player, sep_x, detail_y_offset):
+        if not player or self.cursor_idx >= len(self.item_data): return
+        data = self.item_data[self.cursor_idx]
+        if not data or data[0] == "cancel": return
+        
+        itype, key = data
+        if itype not in ("weapon", "armor", "shield", "lantern", "stave"):
+            # 消耗品は従来通り1列で描画
+            lines = self.get_detail_lines(player)
+            if lines:
+                draw_text_wrapped(screen, self.font, "\n".join(lines),
+                                  sep_x + 30, self.y + 80 + detail_y_offset, self.width // 2 - 60, color=(220, 230, 240))
+            return
+
+        # 装備品の場合は2列パラメータ＋最下部説明文の特別描画
+        inv = getattr(player, itype + "_inventory", [])
+        inst = player._find_equip_inst(inv, key)
+        if not inst: return
+
+        # 1. 装備名の描画
+        from systems.resources import font_small_bold
+        name_font = font_small_bold
+        name_text = inst.get_name()
+        screen.blit(name_font.render(name_text, True, (255, 220, 100)), (sep_x + 30, self.y + 80 + detail_y_offset))
+        
+        # 2. パラメータの収集
+        from wordings import Text
+        S_MAP = {"attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
+                 "dex_bonus": "器用さ", "eva_bonus": "回避率", "crit_bonus": "会心率",
+                 "block_chance": "回避率", "block_chance_close": "近距離回避",
+                 "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正",
+                 "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON}
+        MAGIC_MAP = {
+            "magic_fire_damage":    "🔥炎ダメ",
+            "magic_fire_range":     "🔥炎射程",
+            "magic_heal_ratio":     "💚回復量",
+            "magic_knockback_damage":"💨吹飛ダメ",
+            "magic_invincible_turns":"✨無敵ターン",
+            "magic_stave_bonus":     "🔮杖回数",
+        }
+        
+        def fmt(val):
+            if val % 1 == 0:
+                val_str = str(int(val))
+            else:
+                val_str = str(round(val, 2))
+            return f"+{val_str}" if val > 0 else val_str
+
+        param_texts = []
+        for k, label in S_MAP.items():
+            val = inst.get_stat(k, 0)
+            if k == "attack_bonus" and inst.enhance > 0: val += inst.enhance
+            if k == "defense_bonus" and inst.enhance > 0: val += inst.enhance
+            if val:
+                is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
+                val_to_use = val * 100 if is_pct and isinstance(val, float) and val <= 1.0 else val
+                param_texts.append(f"{label}: {fmt(val_to_use)}%" if is_pct else f"{label}: {fmt(val)}")
+                
+        for mk, mlabel in MAGIC_MAP.items():
+            mval = inst.get_stat(mk, 0)
+            if mval:
+                is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
+                val_to_use = mval * 100 if is_pct and isinstance(mval, float) and mval < 1.0 else mval
+                param_texts.append(f"{mlabel}: {fmt(val_to_use)}%" if is_pct else f"{mlabel}: {fmt(mval)}")
+
+        # 3. パラメータの2列描画
+        start_x = sep_x + 30
+        start_y = self.y + 80 + detail_y_offset + 35
+        cw = self.width // 2 - 60
+        line_h = self.font.get_height() + 4
+        
+        N = len(param_texts)
+        half = (N + 1) // 2
+        
+        max_y = start_y
+        for i, text in enumerate(param_texts):
+            col = 0 if i < half else 1
+            row = i if col == 0 else i - half
+            x = start_x if col == 0 else start_x + cw // 2 + 10
+            y = start_y + row * line_h
+            screen.blit(self.font.render(text, True, (220, 230, 240)), (x, y))
+            max_y = max(max_y, y + line_h)
+
+        # 4. 説明文の描画（最下部1列）
+        desc = inst.get_stat("describe", "")
+        if desc:
+            desc_y = max(max_y + 15, self.y + self.height - 85)
+            draw_text_wrapped(screen, self.font, desc, start_x, desc_y, cw, color=(170, 170, 170))
 
     def get_title(self): return Text.UI.INVENTORY_TITLE
 
@@ -1119,10 +1213,28 @@ class InventoryDialog(BaseListDialog):
     def _build_detail_lines(self, player, data):
         itype, key = data
         lines = []
+        from wordings import Text
         S_MAP = {"attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
                  "dex_bonus": "器用さ", "eva_bonus": "回避率", "crit_bonus": "会心率",
-                 "block_chance": "回避率", "block_chance_close": "近距離回避率", 
-                 "block_chance_ranged": "遠距離回避率", "stave_bonus": "杖回数"}
+                 "block_chance": "回避率", "block_chance_close": "近距離回避率",
+                 "block_chance_ranged": "遠距離回避率", "aggro_mod": "感知補正",
+                 "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON}
+        MAGIC_MAP = {
+            "magic_fire_damage":    "🔥炎ダメージ",
+            "magic_fire_range":     "🔥炎射程",
+            "magic_heal_ratio":     "💚回復量",
+            "magic_knockback_damage":"💨吹飛ダメージ",
+            "magic_invincible_turns":"✨無敵ターン",
+            "magic_stave_bonus":     "🔮杖回数",
+        }
+        
+        def fmt(val):
+            if val % 1 == 0:
+                val_str = str(int(val))
+            else:
+                val_str = str(round(val, 2))
+            return f"+{val_str}" if val > 0 else val_str
+
         if itype in ("weapon", "armor", "shield", "lantern", "stave"):
             inv = getattr(player, itype + "_inventory", [])
             inst = player._find_equip_inst(inv, key)
@@ -1133,8 +1245,16 @@ class InventoryDialog(BaseListDialog):
                 if k == "attack_bonus" and inst.enhance > 0: val += inst.enhance
                 if k == "defense_bonus" and inst.enhance > 0: val += inst.enhance
                 if val:
-                    is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged")
-                    lines.append(f"{label}: +{int(val*100)}%" if is_pct else f"{label}: +{val}")
+                    is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
+                    val_to_use = val * 100 if is_pct and isinstance(val, float) and val <= 1.0 else val
+                    lines.append(f"{label}: {fmt(val_to_use)}%" if is_pct else f"{label}: {fmt(val)}")
+            # 魔法ボーナスの表示
+            for mk, mlabel in MAGIC_MAP.items():
+                mval = inst.get_stat(mk, 0)
+                if mval:
+                    is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
+                    val_to_use = mval * 100 if is_pct and isinstance(mval, float) and mval < 1.0 else mval
+                    lines.append(f"{mlabel}: {fmt(val_to_use)}%" if is_pct else f"{mlabel}: {fmt(mval)}")
             desc = inst.get_stat("describe", "")
             if desc: lines.extend(["", desc])
         else:
@@ -1144,6 +1264,7 @@ class InventoryDialog(BaseListDialog):
             desc = info.get("describe", "")
             if desc: lines.extend(["", desc])
         return lines
+
 
     # --- イベント処理 ---
     def handle_events(self, events):
@@ -2457,9 +2578,9 @@ class StatusDialog:
         self.x, self.y, self.width, self.height = get_standard_upper_layout(screen_width, screen_height)
         from systems.resources import font_small
         self.font = font_small
-        self.mode = "MENU"
+        self.mode = "STATUS"
         self.cursor_idx = 0
-        self.categories = [("STATUS", "能力確認"), ("QUESTS", "クエスト進捗"), ("QUIT", Text.UI.QUIT)]
+        self.categories = [("STATUS", "基本ステータス"), ("BONUS", "装備の加護"), ("QUIT", Text.UI.QUIT)]
         self._back_dialog = None
 
     @property
@@ -2468,20 +2589,26 @@ class StatusDialog:
     def is_active(self, v):
         game_state["status_active"] = v
         if v:
-            print(f"[UI] Open StatusDialog (Mode: {self.mode})")
-            # 外部から mode が指定されていない場合（直接起動など）は MENU にする
-            if self.mode not in ("STATUS", "QUESTS"):
-                self.mode = "MENU"
+            # mode は呼び出し元が事前にセットする（未設定なら STATUS）
+            if self.mode not in ("STATUS", "QUESTS", "BONUS", "MENU"):
+                self.mode = "STATUS"
             
-            # モードに関わらず、詳細表示中は左側を「もどる」だけにする（迷わせない）
-            all_cats = [("STATUS", "能力確認"), ("QUESTS", "クエスト進捗"), ("QUIT", Text.UI.QUIT)]
-            if self.mode in ("STATUS", "QUESTS"):
+            if self.mode in ("MENU", "STATUS", "BONUS"):
+                # カテゴリ一覧から選ぶメニュー表示
+                self.categories = [("STATUS", "基本ステータス"), ("BONUS", "装備の加護"), ("QUIT", Text.UI.QUIT)]
+                if self.mode == "MENU" or self.mode == "STATUS":
+                    self.mode = "STATUS"
+                    self.cursor_idx = 0
+                elif self.mode == "BONUS":
+                    self.cursor_idx = 1
+            else:
+                # クエストなど詳細画面へ直行（左列は「もどる」のみ）
                 self.categories = [("QUIT", Text.UI.QUIT)]
                 self.cursor_idx = 0
-            else:
-                self.categories = all_cats
-                self.cursor_idx = 0
+            print(f"[UI] Open StatusDialog (Mode: {self.mode})")
         else:
+            # 閉じたら次回のために STATUS に戻す
+            self.mode = "STATUS"
             print(f"[UI] Close StatusDialog")
             game_state["dialog_just_closed"] = True
 
@@ -2497,28 +2624,26 @@ class StatusDialog:
         from constants import KEY_CANCEL, KEY_CONFIRM, KEY_MENU, KEY_MOVE_UP, KEY_MOVE_DOWN
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if self.mode == "MENU":
+                if len(self.categories) > 1:
+                    # 複数項目がある（カテゴリ一覧）の場合は、上下キーでカーソルと詳細表示（mode）を連動させる
                     if event.key == KEY_MOVE_UP:
                         self.cursor_idx = (self.cursor_idx - 1) % len(self.categories)
-                        cat_label = self.categories[self.cursor_idx][1]
-                        print(f"[UI] Status Cursor: {cat_label} (Idx: {self.cursor_idx})")
+                        cat = self.categories[self.cursor_idx][0]
+                        if cat != "QUIT":
+                            self.mode = cat
+                        print(f"[UI] Status Cursor: {self.categories[self.cursor_idx][1]} (Mode: {self.mode})")
                     elif event.key == KEY_MOVE_DOWN:
                         self.cursor_idx = (self.cursor_idx + 1) % len(self.categories)
-                        cat_label = self.categories[self.cursor_idx][1]
-                        print(f"[UI] Status Cursor: {cat_label} (Idx: {self.cursor_idx})")
-                    elif event.key == KEY_CONFIRM:
                         cat = self.categories[self.cursor_idx][0]
-                        label = self.categories[self.cursor_idx][1]
-                        print(f"[UI] Status Button Pressed: CONFIRM ({label})")
-                        if cat == "QUIT": self._close_back()
-                        else: self.mode = cat
-                    elif event.key in (KEY_CANCEL, KEY_MENU):
-                        print(f"[UI] Status Button Pressed: CANCEL")
+                        if cat != "QUIT":
+                            self.mode = cat
+                        print(f"[UI] Status Cursor: {self.categories[self.cursor_idx][1]} (Mode: {self.mode})")
+                    elif event.key in (KEY_CONFIRM, KEY_CANCEL, KEY_MENU):
+                        # 決定またはキャンセルで閉じる
                         self._close_back()
                 else:
-                    # 詳細表示中も、戻る（もどる/キャンセル）操作で直接閉じる
+                    # 直接詳細画面を開いた（categoriesが1つだけ）の場合は、どのキーでも閉じる
                     if event.key in (KEY_CANCEL, KEY_CONFIRM, KEY_MENU):
-                        # もし「もどる」にカーソルが合っている状態をシミュレートするならここでも閉じられるようにする
                         self._close_back()
 
     def draw(self, screen, player):
@@ -2529,17 +2654,15 @@ class StatusDialog:
         separator_x = self.x + 240
         pygame.draw.line(screen, (80, 100, 120), (separator_x, self.y + 30), (separator_x, self.y + self.height - 30), 2)
 
-        # --- 左側：カテゴリ (現在のモードに応じて制限されたリスト) ---
+        # --- 左側：カテゴリ ---
         for i, (code, label) in enumerate(self.categories):
             y_pos = self.y + 60 + i * 45
             color = (255, 255, 255)
-            # 現在表示中のモード、またはカーソルがあっている項目を強調
-            # 詳細モード（STATUS/QUESTS）の時は、唯一の項目である「もどる」を強制的に強調する
-            is_selected = (self.mode == "MENU" and i == self.cursor_idx)
-            is_active_mode = (self.mode == code)
-            is_detail_focused = (self.mode in ("STATUS", "QUESTS"))
             
-            if is_selected or is_active_mode or is_detail_focused:
+            # カーソルが合っている、または唯一の項目の場合はハイライト
+            is_highlighted = (len(self.categories) == 1) or (i == self.cursor_idx)
+            
+            if is_highlighted:
                 color = (255, 255, 100)
                 pygame.draw.rect(screen, (60, 70, 90), (self.x + 20, y_pos - 5, 200, 40), border_radius=5)
                 screen.blit(self.font.render(">", True, color), (self.x + 35, y_pos))
@@ -2637,6 +2760,141 @@ class StatusDialog:
                 f"盾  ：{shield_inst.get_name() if shield_inst else 'なし'}",
             ]
             draw_text_wrapped(screen, self.font, "\n".join(lines), content_x, content_y, cw)
+        
+        elif self.mode == "BONUS":
+            weapon_inst = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)
+            armor_inst = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
+            shield_inst = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
+            
+            equips = [inst for inst in [weapon_inst, armor_inst, shield_inst] if inst]
+            
+            def get_total_bonus(stat_key):
+                total = 0
+                for inst in equips:
+                    base = inst.get_stat(stat_key, 0)
+                    enhance = inst.get_enhance_bonus(stat_key) if hasattr(inst, "get_enhance_bonus") else 0
+                    total += base + enhance
+                return total
+
+            total_atk = get_total_bonus("attack_bonus")
+            total_def = get_total_bonus("defense_bonus")
+            total_hp = get_total_bonus("hp_bonus")
+            total_eva = get_total_bonus("eva_bonus")
+            total_acc_close = get_total_bonus("accuracy_bonus_close")
+            # total_acc_ranged は将来実装予定のため非表示
+            total_crit = get_total_bonus("crit_rate")
+            total_block_close = get_total_bonus("block_chance_close")
+            total_block_ranged = get_total_bonus("block_chance_ranged")
+            total_stave = get_total_bonus("magic_stave_bonus")
+            total_regen = get_total_bonus("regen_bonus")
+            total_aggro = get_total_bonus("aggro_mod")
+            total_stupidity = get_total_bonus("stupidity")
+            total_penetration = get_total_bonus("armor_penetration")
+
+            total_fire_dmg = get_total_bonus("magic_fire_damage")
+            total_fire_range = get_total_bonus("magic_fire_range")
+            total_heal_ratio = get_total_bonus("magic_heal_ratio")
+            total_knockback = get_total_bonus("magic_knockback_damage")
+            total_invincible = get_total_bonus("magic_invincible_turns")
+
+            def format_val(val):
+                if val % 1 == 0:
+                    val_str = str(int(val))
+                else:
+                    val_str = str(round(val, 2))
+                return f"+{val_str}" if val > 0 else val_str
+
+            # --- 左列: 基本ボーナス ---
+            left_lines = ["【基本加護】"]
+            has_any_bonus = False
+
+            if total_hp != 0:
+                left_lines.append(f"最大HP    {format_val(total_hp)}")
+                has_any_bonus = True
+            if total_atk != 0:
+                left_lines.append(f"攻撃力    {format_val(total_atk)}")
+                has_any_bonus = True
+            if total_def != 0:
+                left_lines.append(f"防御力    {format_val(total_def)}")
+                has_any_bonus = True
+            if total_eva != 0:
+                val = total_eva * 100 if isinstance(total_eva, float) and total_eva < 1.0 else total_eva
+                left_lines.append(f"回避率    {format_val(val)}%")
+                has_any_bonus = True
+            if total_acc_close != 0:
+                left_lines.append(f"近接命中  {format_val(total_acc_close)}")
+                has_any_bonus = True
+            if total_crit != 0:
+                val = total_crit * 100 if isinstance(total_crit, float) and total_crit < 1.0 else total_crit
+                left_lines.append(f"会心率    {format_val(val)}%")
+                has_any_bonus = True
+            if total_block_close != 0:
+                val = total_block_close * 100 if isinstance(total_block_close, float) and total_block_close < 1.0 else total_block_close
+                left_lines.append(f"近接ガード {format_val(val)}%")
+                has_any_bonus = True
+            if total_block_ranged != 0:
+                val = total_block_ranged * 100 if isinstance(total_block_ranged, float) and total_block_ranged < 1.0 else total_block_ranged
+                left_lines.append(f"遠隔ガード {format_val(val)}%")
+                has_any_bonus = True
+            if total_stave != 0:
+                pass # stave_bonus は魔法加護（右列）に移動
+            if total_regen != 0:
+                left_lines.append(f"自然回復  {format_val(total_regen)}/ターン")
+                has_any_bonus = True
+            if total_aggro != 0:
+                left_lines.append(f"感知補正  {format_val(total_aggro)}")
+                has_any_bonus = True
+            if total_penetration != 0:
+                val = total_penetration * 100 if isinstance(total_penetration, float) and total_penetration <= 1.0 else total_penetration
+                from wordings import Text
+                left_lines.append(f"{Text.UI.STAT_ARMOR_PENETRATION_LABEL}  {format_val(val)}%")
+                has_any_bonus = True
+            if total_stupidity != 0:
+                from wordings import Text
+                left_lines.append(f"{Text.UI.STAT_CONFUSION_LABEL}      {format_val(total_stupidity)}")
+                has_any_bonus = True
+
+            # --- 右列: 魔法加護 ---
+            right_lines = ["【魔法加護】"]
+            has_magic_bonus = False
+
+            if total_stave != 0:
+                right_lines.append(f"杖回数    {format_val(total_stave)}")
+                has_magic_bonus = True
+            if total_fire_dmg != 0:
+                val = total_fire_dmg * 100 if isinstance(total_fire_dmg, float) and total_fire_dmg < 1.0 else total_fire_dmg
+                right_lines.append(f"火炎ダメ  {format_val(val)}%")
+                has_magic_bonus = True
+            if total_fire_range != 0:
+                right_lines.append(f"火炎射程  {format_val(total_fire_range)}マス")
+                has_magic_bonus = True
+            if total_heal_ratio != 0:
+                val = total_heal_ratio * 100 if isinstance(total_heal_ratio, float) and total_heal_ratio < 1.0 else total_heal_ratio
+                right_lines.append(f"回復効果  {format_val(val)}%")
+                has_magic_bonus = True
+            if total_knockback != 0:
+                val = total_knockback * 100 if isinstance(total_knockback, float) and total_knockback < 1.0 else total_knockback
+                right_lines.append(f"吹飛ダメ  {format_val(val)}%")
+                has_magic_bonus = True
+            if total_invincible != 0:
+                right_lines.append(f"無敵効果  {format_val(total_invincible)}ターン")
+                has_magic_bonus = True
+
+            if not has_magic_bonus:
+                right_lines.append("なし")
+
+            if not has_any_bonus and not has_magic_bonus:
+                screen.blit(self.font.render("適用中の装備の加護はありません。", True, (200, 200, 200)), (content_x, content_y))
+            else:
+                line_h = self.font.get_height() + 5
+                col_w = cw // 2
+                for i, text in enumerate(left_lines):
+                    color = (255, 220, 80) if i == 0 else (220, 220, 220)
+                    screen.blit(self.font.render(text, True, color), (content_x, content_y + i * line_h))
+                right_x = content_x + col_w
+                for i, text in enumerate(right_lines):
+                    color = (180, 200, 255) if i == 0 else (220, 220, 220)
+                    screen.blit(self.font.render(text, True, color), (right_x, content_y + i * line_h))
         
         elif self.mode == "QUESTS":
             lines = [f"【受注中のクエスト】"]

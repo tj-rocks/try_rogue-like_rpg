@@ -43,6 +43,11 @@ class EquipInstance:
         return data.get(stat_key, default)
 
     def get_enhance_bonus(self, stat_key):
+        # その装備品が元々持っていないステータスは、強化しても増えない（常に0）
+        base = self.get_stat(stat_key, 0)
+        if base <= 0:
+            return 0
+
         data = {}
         if self.equip_type == "weapon": data = WEAPON_DATA.get(self.key, {})
         elif self.equip_type == "armor": data = ARMOR_DATA.get(self.key, {})
@@ -50,10 +55,8 @@ class EquipInstance:
 
         growth = data.get("growth")
         if not growth or self.enhance == 0:
+            # growth がない場合は、単純に強化値を返す（古い互換用）
             return self.enhance
-
-        base = self.get_stat(stat_key, 0)
-        if base <= 0: return self.enhance
 
         bonus_limit = growth.get("bonus_limit", 2)
         times_limit = max(1, growth.get("times_limit", 50))
@@ -150,10 +153,9 @@ class Player(Entity):
     @property
     def max_hp(self):
         bonus = 0
-        armor_inst = self._find_equip_inst(self.armor_inventory, self.equipped_armor)
-        if armor_inst: bonus += armor_inst.get_stat("hp_bonus", 0)
-        shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
-        if shield_inst: bonus += shield_inst.get_stat("hp_bonus", 0)
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("hp_bonus", 0)
         val = int(self._base_max_hp + bonus)
         if "hp" in getattr(self, "cursed_stats", []):
             from constants import CURSE_REDUCTION_RATE
@@ -230,15 +232,40 @@ class Player(Entity):
     @property
     def stave_bonus(self):
         bonus = 0
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("stave_bonus", 0)
+            if inst: bonus += inst.get_stat("magic_stave_bonus", 0)
         return bonus
+
+    @property
+    def total_stupidity(self):
+        bonus = 0
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("stupidity", 0)
+        return bonus
+
+    def get_magic_bonus(self, key):
+        """装備品の bonus.magic 系ボーナスの合計を返す（例: get_magic_bonus("fire_damage")）
+        武器・防具・盾の全装備から合算する。yml側の bonus.magic で制御する。
+        """
+        total = 0
+        flat_key = f"magic_{key}"
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst:
+                total += inst.get_stat(flat_key, 0)
+        return total
+
     
     @property
     def lantern_bonus(self):
         bonus = 0
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("lantern_bonus", 0)
         return bonus
@@ -246,17 +273,25 @@ class Player(Entity):
     @property
     def regen_bonus(self):
         bonus = 0
-        for inv, eid in [(self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("regen_bonus", 0)
         return bonus
     
     @property
+    def total_armor_penetration(self):
+        bonus = 0.0
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("armor_penetration", 0.0)
+        return bonus
+    
+    @property
     def total_defense(self):
         bonus = 0
-        for inv, eid, key in [(self.armor_inventory, self.equipped_armor, "defense_bonus"), (self.shield_inventory, self.equipped_shield, "defense_bonus")]:
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat(key, 0) + inst.get_enhance_bonus(key)
+            if inst: bonus += inst.get_stat("defense_bonus", 0) + inst.get_enhance_bonus("defense_bonus")
         val = round(self.defense + bonus, 1)
         if "defense" in getattr(self, "cursed_stats", []):
             from constants import CURSE_REDUCTION_RATE
@@ -266,15 +301,21 @@ class Player(Entity):
 
     @property
     def block_chance_close(self):
-        inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
-        if not inst: return 0.0
-        return inst.get_stat("block_chance_close", inst.get_stat("block_chance", 0.0)) + inst.get_enhance_bonus("block_chance_close")
+        total = 0.0
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst:
+                total += inst.get_stat("block_chance_close", inst.get_stat("block_chance", 0.0)) + inst.get_enhance_bonus("block_chance_close")
+        return total
 
     @property
     def block_chance_ranged(self):
-        inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
-        if not inst: return 0.0
-        return inst.get_stat("block_chance_ranged", inst.get_stat("block_chance", 0.0)) + inst.get_enhance_bonus("block_chance_ranged")
+        total = 0.0
+        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst:
+                total += inst.get_stat("block_chance_ranged", inst.get_stat("block_chance", 0.0)) + inst.get_enhance_bonus("block_chance_ranged")
+        return total
 
     def __init__(self):
         super().__init__(x=player_settings["x"], y=player_settings["y"], hp=PLAYER_HP, max_hp=PLAYER_HP, attack=PLAYER_ATTACK, width=64, height=64)

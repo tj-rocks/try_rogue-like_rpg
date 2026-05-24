@@ -1,6 +1,9 @@
 #!/bin/bash
 # run_tests.sh - 全ての自動テストを実行する
 
+# スクリプトのあるディレクトリの親ディレクトリ（プロジェクトルート）に移動
+cd "$(dirname "$0")/.."
+
 # VENV_PYTHON が未定義ならデフォルト値を設定
 if [ -z "$PYTHON_EXE" ]; then
     PYTHON_EXE="./venv/bin/python"
@@ -92,6 +95,9 @@ TEST_FILES=(
     "tests/test_outbreak_event.py"
     "tests/test_teleport_system.py"
     "tests/test_village_spawning.py"
+    "tests/test_equipment_cross_stats.py"
+    "tests/test_equip_kago_bonus.py"
+    "tests/test_armor_penetration.py"
 )
 
 SUCCESS_COUNT=0
