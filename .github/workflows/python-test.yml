@@ -37,5 +37,5 @@ jobs:
         PYTHON_EXE: python
         TEST_MODE: "1"
       run: |
-        chmod +x run_tests.sh
-        ./run_tests.sh
+        chmod +x tests/run_tests.sh
+        ./tests/run_tests.sh

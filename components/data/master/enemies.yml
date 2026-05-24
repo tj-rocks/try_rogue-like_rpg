@@ -19,7 +19,7 @@ ENEMY_DATA:
     evasion: 22
     exp: 5
     reward_gold: 20
-    accuracy_close: 100
+    accuracy_close: 89
     accuracy_ranged: 100
     attack_range: 1
     stupidity: 7
