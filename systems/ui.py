@@ -2475,7 +2475,7 @@ class StatusDialog:
         self.font = font_small
         self.mode = "MENU"
         self.cursor_idx = 0
-        self.categories = [("STATUS", "能力確認"), ("QUESTS", "クエスト進捗"), ("QUIT", Text.UI.QUIT)]
+        self.categories = [("STATUS", "基本ステータス"), ("BONUS", "装備の加護"), ("QUESTS", "クエスト進捗"), ("QUIT", Text.UI.QUIT)]
         self._back_dialog = None
 
     @property
@@ -2486,12 +2486,12 @@ class StatusDialog:
         if v:
             print(f"[UI] Open StatusDialog (Mode: {self.mode})")
             # 外部から mode が指定されていない場合（直接起動など）は MENU にする
-            if self.mode not in ("STATUS", "QUESTS"):
+            if self.mode not in ("STATUS", "QUESTS", "BONUS"):
                 self.mode = "MENU"
             
             # モードに関わらず、詳細表示中は左側を「もどる」だけにする（迷わせない）
-            all_cats = [("STATUS", "能力確認"), ("QUESTS", "クエスト進捗"), ("QUIT", Text.UI.QUIT)]
-            if self.mode in ("STATUS", "QUESTS"):
+            all_cats = [("STATUS", "基本ステータス"), ("BONUS", "装備の加護"), ("QUESTS", "クエスト進捗"), ("QUIT", Text.UI.QUIT)]
+            if self.mode in ("STATUS", "QUESTS", "BONUS"):
                 self.categories = [("QUIT", Text.UI.QUIT)]
                 self.cursor_idx = 0
             else:
@@ -2652,6 +2652,104 @@ class StatusDialog:
                 f"鎧  ：{armor_inst.get_name() if armor_inst else 'なし'}",
                 f"盾  ：{shield_inst.get_name() if shield_inst else 'なし'}",
             ]
+            draw_text_wrapped(screen, self.font, "\n".join(lines), content_x, content_y, cw)
+        
+        elif self.mode == "BONUS":
+            weapon_inst = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)
+            armor_inst = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
+            shield_inst = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
+            
+            equips = [inst for inst in [weapon_inst, armor_inst, shield_inst] if inst]
+            
+            def get_total_bonus(stat_key):
+                total = 0
+                for inst in equips:
+                    base = inst.get_stat(stat_key, 0)
+                    enhance = inst.get_enhance_bonus(stat_key) if hasattr(inst, "get_enhance_bonus") else 0
+                    total += base + enhance
+                return total
+
+            total_atk = get_total_bonus("attack_bonus")
+            total_def = get_total_bonus("defense_bonus")
+            total_hp = get_total_bonus("hp_bonus")
+            total_eva = get_total_bonus("eva_bonus")
+            total_acc_close = get_total_bonus("accuracy_bonus_close")
+            total_acc_ranged = get_total_bonus("accuracy_bonus_ranged")
+            total_crit = get_total_bonus("crit_rate")
+            total_block_close = get_total_bonus("block_chance_close")
+            total_block_ranged = get_total_bonus("block_chance_ranged")
+            total_stave = get_total_bonus("stave_bonus")
+            total_regen = get_total_bonus("regen_bonus")
+
+            total_fire_dmg = get_total_bonus("magic_fire_damage")
+            total_fire_range = get_total_bonus("magic_fire_range")
+            total_heal_ratio = get_total_bonus("magic_heal_ratio")
+            total_knockback = get_total_bonus("magic_knockback_damage")
+            total_invincible = get_total_bonus("magic_invincible_turns")
+
+            lines = ["【装備の加護・特殊効果】"]
+            has_any_bonus = False
+
+            def format_val(val):
+                return f"+{int(val)}" if val > 0 else f"{int(val)}"
+
+            if total_hp != 0:
+                lines.append(f"・最大HP  ：{format_val(total_hp)}")
+                has_any_bonus = True
+            if total_atk != 0:
+                lines.append(f"・攻撃力  ：{format_val(total_atk)}")
+                has_any_bonus = True
+            if total_def != 0:
+                lines.append(f"・防御力  ：{format_val(total_def)}")
+                has_any_bonus = True
+            if total_eva != 0:
+                val = total_eva
+                if isinstance(val, float) and val < 1.0:
+                    val = val * 100
+                lines.append(f"・回避率  ：+{int(round(val))}%")
+                has_any_bonus = True
+            if total_acc_close != 0:
+                lines.append(f"・近接命中：{format_val(total_acc_close)}")
+                has_any_bonus = True
+            if total_acc_ranged != 0:
+                lines.append(f"・遠隔命中：{format_val(total_acc_ranged)}")
+                has_any_bonus = True
+            if total_crit != 0:
+                lines.append(f"・会心率  ：+{int(round(total_crit * 100))}%")
+                has_any_bonus = True
+            if total_block_close != 0:
+                lines.append(f"・近接ｶﾞｰﾄﾞ：+{int(round(total_block_close * 100))}%")
+                has_any_bonus = True
+            if total_block_ranged != 0:
+                lines.append(f"・遠隔ｶﾞｰﾄﾞ：+{int(round(total_block_ranged * 100))}%")
+                has_any_bonus = True
+            if total_stave != 0:
+                lines.append(f"・杖使用回数：{format_val(total_stave)}")
+                has_any_bonus = True
+            if total_regen != 0:
+                lines.append(f"・自然回復：{format_val(total_regen)} (毎ターン)")
+                has_any_bonus = True
+
+            # 魔法加護
+            if total_fire_dmg != 0:
+                lines.append(f"・火炎ダメ：+{int(round(total_fire_dmg * 100))}%")
+                has_any_bonus = True
+            if total_fire_range != 0:
+                lines.append(f"・火炎射程：{format_val(total_fire_range)} マス")
+                has_any_bonus = True
+            if total_heal_ratio != 0:
+                lines.append(f"・回復効果：+{int(round(total_heal_ratio * 100))}%")
+                has_any_bonus = True
+            if total_knockback != 0:
+                lines.append(f"・吹飛ダメ：+{int(round(total_knockback * 100))}%")
+                has_any_bonus = True
+            if total_invincible != 0:
+                lines.append(f"・無敵効果：{format_val(total_invincible)} ターン")
+                has_any_bonus = True
+
+            if not has_any_bonus:
+                lines.append("適用中の装備の加護はありません。")
+
             draw_text_wrapped(screen, self.font, "\n".join(lines), content_x, content_y, cw)
         
         elif self.mode == "QUESTS":
