@@ -2484,20 +2484,22 @@ class StatusDialog:
     def is_active(self, v):
         game_state["status_active"] = v
         if v:
-            print(f"[UI] Open StatusDialog (Mode: {self.mode})")
-            # 外部から mode が指定されていない場合（直接起動など）は MENU にする
-            if self.mode not in ("STATUS", "QUESTS", "BONUS"):
+            # mode は呼び出し元が事前にセットする（未設定なら MENU）
+            if self.mode not in ("STATUS", "QUESTS", "BONUS", "MENU"):
                 self.mode = "MENU"
-            
-            # モードに関わらず、詳細表示中は左側を「もどる」だけにする（迷わせない）
             all_cats = [("STATUS", "基本ステータス"), ("BONUS", "装備の加護"), ("QUESTS", "クエスト進捗"), ("QUIT", Text.UI.QUIT)]
-            if self.mode in ("STATUS", "QUESTS", "BONUS"):
-                self.categories = [("QUIT", Text.UI.QUIT)]
-                self.cursor_idx = 0
-            else:
+            if self.mode == "MENU":
+                # メニュー一覧を表示
                 self.categories = all_cats
                 self.cursor_idx = 0
+            else:
+                # 詳細画面へ直行（左列は「もどる」のみ）
+                self.categories = [("QUIT", Text.UI.QUIT)]
+                self.cursor_idx = 0
+            print(f"[UI] Open StatusDialog (Mode: {self.mode})")
         else:
+            # 閉じたら次回のために MENU に戻す
+            self.mode = "MENU"
             print(f"[UI] Close StatusDialog")
             game_state["dialog_just_closed"] = True
 
@@ -2553,7 +2555,7 @@ class StatusDialog:
             # 詳細モード（STATUS/QUESTS）の時は、唯一の項目である「もどる」を強制的に強調する
             is_selected = (self.mode == "MENU" and i == self.cursor_idx)
             is_active_mode = (self.mode == code)
-            is_detail_focused = (self.mode in ("STATUS", "QUESTS"))
+            is_detail_focused = (self.mode in ("STATUS", "QUESTS", "BONUS"))
             
             if is_selected or is_active_mode or is_detail_focused:
                 color = (255, 255, 100)

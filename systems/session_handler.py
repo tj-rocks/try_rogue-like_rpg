@@ -53,7 +53,7 @@ def setup_ui_relations(ui_elements, player, dungeon, game_state):
     def on_staves(): stave_inv_dialog.is_active = True
     def on_event(): event_inv_dialog.is_active = True
     def on_status():
-        status_dialog.mode = "STATUS"
+        status_dialog.mode = "MENU"   # カテゴリ一覧から選ぶ
         status_dialog.is_active = True
     def on_quests():
         status_dialog.mode = "QUESTS"
