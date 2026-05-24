@@ -92,6 +92,8 @@ MAX_WAREHOUSE_SLOTS = _p.get("max_warehouse_slots", 20)
 PLAYER_ACCURACY_CLOSE = _p.get("accuracy_close", 100)
 PLAYER_ACCURACY_RANGED = _p.get("accuracy_ranged", 100)
 PLAYER_EVASION      = _p.get("evasion", 1)
+PLAYER_REGEN_BASE   = _p.get("regen_base", 0.1)
+PLAYER_REGEN_MULTIPLIER = _p.get("regen_multiplier", 0.05)
 
 # --- 呪いシステム設定 (Curse System) ---
 _curse = _balance.get("CURSE_SYSTEM", {})

@@ -183,7 +183,7 @@ def setup_gungeon_mode(dungeon, player):
         # [NEW] ギルドNPCの配置（Quest QAをさらに快適に）
         from components.sprites.npc import NPC
         dungeon.npcs = [
-            NPC("ギルド受付", 2 * ts, 2 * ts, sprite_type="guild_receptionist", image_path="components/pictures/npc/girl_town_v")
+            NPC("ギルド受付", (w + 1) * ts, 2 * ts, sprite_type="guild_receptionist", role="guild_receptionist", image_path="components/pictures/npc/girl_town_v")
         ]
         
         print(f"[Debug] Gungeon Mode Ready. MapSize:{dungeon.map_width}x{dungeon.map_height}")
