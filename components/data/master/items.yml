@@ -103,7 +103,7 @@ CONSUMABLE_DATA:
     shop_buyable: true
     category: common
     max_stack: 10
-    describe: 傷を癒やす一般的な薬草 of 煎じ薬。
+    describe: 傷を癒やす一般的な薬草の煎じ薬。
     floor_spawnable: true
   antidote_potion:
     name: 毒消薬
@@ -211,8 +211,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
-    min_floor: 21
-    max_floor: 21
+    min_floor: 11
+    max_floor: 11
     describe: E級冒険者の証。ギルドに認められた駆け出し冒険者の象徴。
     floor_spawnable: true
   guild_cert_d:
@@ -224,8 +224,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
-    min_floor: 30
-    max_floor: 30
+    min_floor: 21
+    max_floor: 21
     describe: D級冒険者の証。一通りの経験を積んだ冒険者として認められた証。
     floor_spawnable: true
   guild_cert_c:
@@ -237,8 +237,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
-    min_floor: 35
-    max_floor: 35
+    min_floor: 30
+    max_floor: 30
     describe: C級冒険者の証。中堅冒険者として、より危険な依頼への参加が許される。
     floor_spawnable: true
   guild_cert_b:
@@ -250,8 +250,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
-    min_floor: 55
-    max_floor: 55
+    min_floor: 35
+    max_floor: 35
     describe: B級冒険者の証。熟練の冒険者のみが手にできる栄誉ある証。
     floor_spawnable: true
   guild_cert_a:
@@ -263,9 +263,9 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
-    min_floor: 70
-    max_floor: 70
-    describe: 'A級冒険者の証。一流の証であり、多くの冒険者の憧れの大。 '
+    min_floor: 55
+    max_floor: 55
+    describe: 'A級冒険者の証。一流の証であり、多くの冒険者の憧れの的。'
     floor_spawnable: true
   guild_cert_s:
     name: S級ギルド証
@@ -276,8 +276,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
-    min_floor: 80
-    max_floor: 80
+    min_floor: 70
+    max_floor: 70
     describe: S級冒険者の証。英雄に等しい実力を持つ者だけに授与される。
     floor_spawnable: true
   guild_cert_ss:
@@ -289,8 +289,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
-    min_floor: 99
-    max_floor: 99
+    min_floor: 80
+    max_floor: 80
     describe: SS級冒険者の証。伝説に名を刻む、至高の冒険者の証。
     floor_spawnable: true
   adventurer_proof:

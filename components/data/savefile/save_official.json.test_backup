@@ -1,0 +1,135 @@
+{
+  "x": 384,
+  "y": 1856,
+  "hp": 82,
+  "max_hp": 100,
+  "coin": 114,
+  "bank_coin": 0,
+  "attack": 2,
+  "defense": 3,
+  "items": [
+    {
+      "key": "hp_potion",
+      "count": 3
+    },
+    {
+      "key": "rotten_potion",
+      "count": 1
+    },
+    {
+      "key": "trap_remover",
+      "count": 1
+    },
+    {
+      "key": "rotten_potion",
+      "count": 1
+    }
+  ],
+  "weapon_inventory": [
+    {
+      "iid": 1,
+      "type": "weapon",
+      "key": "iron_sword",
+      "enhance": 2,
+      "stats": {}
+    }
+  ],
+  "armor_inventory": [
+    {
+      "iid": 39,
+      "type": "armor",
+      "key": "leather_breastplate",
+      "enhance": 0,
+      "stats": {}
+    },
+    {
+      "iid": 48,
+      "type": "armor",
+      "key": "broken_armor",
+      "enhance": 0,
+      "stats": {}
+    },
+    {
+      "iid": 49,
+      "type": "armor",
+      "key": "leather_breastplate",
+      "enhance": 0,
+      "stats": {}
+    },
+    {
+      "iid": 50,
+      "type": "armor",
+      "key": "broken_armor",
+      "enhance": 0,
+      "stats": {}
+    },
+    {
+      "iid": 55,
+      "type": "armor",
+      "key": "adventurers_clothes",
+      "enhance": 0,
+      "stats": {}
+    }
+  ],
+  "shield_inventory": [
+    {
+      "iid": 3,
+      "type": "shield",
+      "key": "iron_round_shield",
+      "enhance": 0,
+      "stats": {}
+    }
+  ],
+  "equipped_weapon": 1,
+  "equipped_armor": 39,
+  "equipped_shield": 3,
+  "stave_inventory": [
+    {
+      "iid": 24,
+      "key": "heal_stave",
+      "charges": 5
+    },
+    {
+      "iid": 45,
+      "key": "heal_stave",
+      "charges": 5
+    },
+    {
+      "iid": 51,
+      "key": "light_stave",
+      "charges": 5
+    }
+  ],
+  "lantern_inventory": [],
+  "equipped_lantern": null,
+  "invincible_turns": 0,
+  "guild_point": 100,
+  "guild_rank": "F",
+  "active_quests": [
+    {
+      "id": "rank_up_E",
+      "type": "delivery",
+      "is_rank_up": true,
+      "target_key": "guild_cert_e",
+      "target_name": "E級ギルド証",
+      "amount": 1,
+      "reward_gold": 2500,
+      "reward_gp": 0,
+      "next_rank": "E",
+      "title": "Eランクへの昇格"
+    }
+  ],
+  "quest_tokens": {
+    "wood_barrel": 0
+  },
+  "completed_fixed_quests": [],
+  "has_seen_ending": false,
+  "warehouse_items": [],
+  "event_items": [],
+  "current_floor": 7,
+  "max_reached_floor": 11,
+  "equip_id_counter": 55,
+  "boss_message_shown": false,
+  "curse_level": 0,
+  "cursed_stats": []
+}

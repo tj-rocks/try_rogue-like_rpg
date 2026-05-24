@@ -80,15 +80,15 @@ def test_furthest_room_spawn():
         "is_rank_up": True,
         "target_key": "guild_cert_e"
     })
-    dungeon2 = warp_to_floor(21, player2, spawn_reason="test")
+    dungeon2 = warp_to_floor(11, player2, spawn_reason="test")
     
     found_cert = None
     for item in dungeon2.dropped_items:
         if getattr(item, "item_key", None) == "guild_cert_e":
             found_cert = item
             break
-    assert found_cert is not None, "21階にE級ギルド証がドロップしていません！"
-    print(f"[OK] 21階でE級ギルド証を発見！")
+    assert found_cert is not None, "11階にE級ギルド証がドロップしていません！"
+    print("[OK] 11階でE級ギルド証を発見！")
     print("--- テスト合格 ---")
 
 if __name__ == "__main__":
