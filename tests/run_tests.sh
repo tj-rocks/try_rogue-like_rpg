@@ -1,6 +1,9 @@
 #!/bin/bash
 # run_tests.sh - 全ての自動テストを実行する
 
+# スクリプトのあるディレクトリの親ディレクトリ（プロジェクトルート）に移動
+cd "$(dirname "$0")/.."
+
 # VENV_PYTHON が未定義ならデフォルト値を設定
 if [ -z "$PYTHON_EXE" ]; then
     PYTHON_EXE="./venv/bin/python"

@@ -16,7 +16,7 @@ ENEMY_DATA:
     hp: 11
     attack: 21
     defense: 1
-    evasion: 5
+    evasion: 22
     exp: 5
     reward_gold: 20
     accuracy_close: 100
@@ -45,7 +45,7 @@ ENEMY_DATA:
     hp: 15
     attack: 23
     defense: 4
-    evasion: 0
+    evasion: 22
     exp: 8
     reward_gold: 25
     accuracy_close: 100
@@ -73,7 +73,7 @@ ENEMY_DATA:
     hp: 15
     attack: 23
     defense: 2
-    evasion: 0
+    evasion: 17
     exp: 8
     reward_gold: 25
     accuracy_close: 100
@@ -129,7 +129,7 @@ ENEMY_DATA:
     hp: 21
     attack: 23
     defense: 1
-    evasion: 5
+    evasion: 21
     exp: 5
     reward_gold: 20
     accuracy_close: 100
@@ -245,7 +245,7 @@ ENEMY_DATA:
     hp: 100
     attack: 23
     defense: 4
-    evasion: 5
+    evasion: 16
     exp: 50
     reward_gold: 500
     accuracy_close: 100

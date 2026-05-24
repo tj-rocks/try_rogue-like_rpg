@@ -122,8 +122,35 @@
         .inline-edit {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             margin-top: 4px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .inline-edit::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .inline-edit::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .inline-edit::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+
+        .inline-edit-header {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dim);
+            margin: 8px 0 2px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 2px;
+            font-weight: 600;
         }
 
         .edit-row {
@@ -320,6 +347,38 @@
             z-index: 1000;
             font-size: 24px;
         }
+
+        .control-group-details {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .details-summary {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-weight: 600;
+            user-select: none;
+            outline: none;
+        }
+
+        .details-summary:hover {
+            color: var(--primary);
+        }
+
+        .control-group-details[open] .details-summary {
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
     </style>
 </head>
 
@@ -339,55 +398,111 @@
             <select id="rank-select" onchange="updateUI()"></select>
         </div>
 
-        <!-- Weapon -->
-        <div id="atk-controls" class="control-group">
-            <div class="section-title">Active Weapon</div>
-            <select id="weapon-select" onchange="updateUI()"></select>
-            <div class="inline-edit">
-                <div class="edit-row">
-                    <label>攻撃力 Bonus</label>
-                    <input type="number" id="edit-weapon-atk" step="0.5" oninput="livePreview()">
+        <!-- 装備の選択 (常時表示) -->
+        <div class="control-group">
+            <div class="section-title">Active Equipment</div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div>
+                    <label style="font-size: 10px; color: var(--text-dim); display: block; margin-bottom: 2px;">Weapon</label>
+                    <select id="weapon-select" onchange="updateUI()"></select>
                 </div>
-                <div class="edit-row">
-                    <label>命中率 Bonus</label>
-                    <input type="number" id="edit-weapon-accuracy" step="1" oninput="livePreview()">
+                <div>
+                    <label style="font-size: 10px; color: var(--text-dim); display: block; margin-bottom: 2px;">Armor</label>
+                    <select id="armor-select" onchange="updateUI()"></select>
+                </div>
+                <div>
+                    <label style="font-size: 10px; color: var(--text-dim); display: block; margin-bottom: 2px;">Shield</label>
+                    <select id="shield-select" onchange="updateUI()"></select>
                 </div>
             </div>
-            <button id="btn-save-weapon" class="side-save-btn" onclick="manualSaveEquipment('weapon')">SAVE
-                WEAPON</button>
         </div>
 
-        <!-- Armor / Shield -->
-        <div id="def-controls" style="display: none;">
-            <div class="control-group">
-                <div class="section-title">Active Armor</div>
-                <select id="armor-select" onchange="updateUI()"></select>
-                <div class="inline-edit defense-mode-input">
-                    <div class="edit-row"><label>Def Bonus</label><input type="number" id="edit-armor-def" step="0.5"
-                            oninput="livePreview()"></div>
-                    <div class="edit-row"><label>HP Bonus</label><input type="number" id="edit-armor-hp"
-                            oninput="livePreview()"></div>
-                    <div class="edit-row"><label>Evasion Bonus</label><input type="number" id="edit-armor-eva" step="1"
-                            oninput="livePreview()"></div>
-                </div>
-                <button id="btn-save-armor" class="side-save-btn" onclick="manualSaveEquipment('armor')">SAVE
-                    ARMOR</button>
+        <!-- 武器パラメータ編集 -->
+        <details class="control-group-details" open>
+            <summary class="details-summary">⚔️ Weapon Params</summary>
+            <div class="inline-edit">
+                <div class="inline-edit-header">共通ボーナス</div>
+                <div class="edit-row"><label>攻撃力</label><input type="number" id="edit-weapon-attack_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>防御力</label><input type="number" id="edit-weapon-defense_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>最大HP</label><input type="number" id="edit-weapon-hp_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>回避率</label><input type="number" id="edit-weapon-eva_bonus" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>近接命中</label><input type="number" id="edit-weapon-accuracy_bonus_close" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>遠隔命中</label><input type="number" id="edit-weapon-accuracy_bonus_ranged" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>会心率</label><input type="number" id="edit-weapon-crit_rate" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>基本ブロック</label><input type="number" id="edit-weapon-block_chance" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>近接ブロック</label><input type="number" id="edit-weapon-block_chance_close" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>遠隔ブロック</label><input type="number" id="edit-weapon-block_chance_ranged" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>杖威力</label><input type="number" id="edit-weapon-stave_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>ランタン視野</label><input type="number" id="edit-weapon-lantern_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>自然回復</label><input type="number" id="edit-weapon-regen_bonus" step="1" oninput="livePreview()"></div>
+                
+                <div class="inline-edit-header">魔法ボーナス</div>
+                <div class="edit-row"><label>火炎追加ダメ</label><input type="number" id="edit-weapon-magic_fire_damage" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>火炎射程</label><input type="number" id="edit-weapon-magic_fire_range" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>回復魔法割合</label><input type="number" id="edit-weapon-magic_heal_ratio" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>吹飛ダメ倍率</label><input type="number" id="edit-weapon-magic_knockback_damage" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>無敵ターン数</label><input type="number" id="edit-weapon-magic_invincible_turns" step="1" oninput="livePreview()"></div>
             </div>
-            <div class="control-group">
-                <div class="section-title">Active Shield</div>
-                <select id="shield-select" onchange="updateUI()"></select>
-                <div class="inline-edit defense-mode-input">
-                    <div class="edit-row"><label>Def Bonus</label><input type="number" id="edit-shield-def" step="0.5"
-                            oninput="livePreview()"></div>
-                    <div class="edit-row"><label>Block(C)</label><input type="number" id="edit-shield-block" step="0.01"
-                            oninput="livePreview()"></div>
-                    <div class="edit-row"><label>Block(R)</label><input type="number" id="edit-shield-block-ranged"
-                            step="0.01" oninput="livePreview()"></div>
-                </div>
-                <button id="btn-save-shield" class="side-save-btn" onclick="manualSaveEquipment('shield')">SAVE
-                    SHIELD</button>
+            <button id="btn-save-weapon" class="side-save-btn" onclick="manualSaveEquipment('weapon')">SAVE WEAPON</button>
+        </details>
+
+        <!-- 鎧パラメータ編集 -->
+        <details class="control-group-details">
+            <summary class="details-summary">🛡️ Armor Params</summary>
+            <div class="inline-edit defense-mode-input">
+                <div class="inline-edit-header">共通ボーナス</div>
+                <div class="edit-row"><label>攻撃力</label><input type="number" id="edit-armor-attack_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>防御力</label><input type="number" id="edit-armor-defense_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>最大HP</label><input type="number" id="edit-armor-hp_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>回避率</label><input type="number" id="edit-armor-eva_bonus" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>近接命中</label><input type="number" id="edit-armor-accuracy_bonus_close" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>遠隔命中</label><input type="number" id="edit-armor-accuracy_bonus_ranged" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>会心率</label><input type="number" id="edit-armor-crit_rate" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>基本ブロック</label><input type="number" id="edit-armor-block_chance" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>近接ブロック</label><input type="number" id="edit-armor-block_chance_close" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>遠隔ブロック</label><input type="number" id="edit-armor-block_chance_ranged" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>杖威力</label><input type="number" id="edit-armor-stave_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>ランタン視野</label><input type="number" id="edit-armor-lantern_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>自然回復</label><input type="number" id="edit-armor-regen_bonus" step="1" oninput="livePreview()"></div>
+                
+                <div class="inline-edit-header">魔法ボーナス</div>
+                <div class="edit-row"><label>火炎追加ダメ</label><input type="number" id="edit-armor-magic_fire_damage" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>火炎射程</label><input type="number" id="edit-armor-magic_fire_range" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>回復魔法割合</label><input type="number" id="edit-armor-magic_heal_ratio" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>吹飛ダメ倍率</label><input type="number" id="edit-armor-magic_knockback_damage" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>無敵ターン数</label><input type="number" id="edit-armor-magic_invincible_turns" step="1" oninput="livePreview()"></div>
             </div>
-        </div>
+            <button id="btn-save-armor" class="side-save-btn" onclick="manualSaveEquipment('armor')">SAVE ARMOR</button>
+        </details>
+
+        <!-- 盾パラメータ編集 -->
+        <details class="control-group-details">
+            <summary class="details-summary">🔰 Shield Params</summary>
+            <div class="inline-edit defense-mode-input">
+                <div class="inline-edit-header">共通ボーナス</div>
+                <div class="edit-row"><label>攻撃力</label><input type="number" id="edit-shield-attack_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>防御力</label><input type="number" id="edit-shield-defense_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>最大HP</label><input type="number" id="edit-shield-hp_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>回避率</label><input type="number" id="edit-shield-eva_bonus" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>近接命中</label><input type="number" id="edit-shield-accuracy_bonus_close" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>遠隔命中</label><input type="number" id="edit-shield-accuracy_bonus_ranged" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>会心率</label><input type="number" id="edit-shield-crit_rate" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>基本ブロック</label><input type="number" id="edit-shield-block_chance" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>近接ブロック</label><input type="number" id="edit-shield-block_chance_close" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>遠隔ブロック</label><input type="number" id="edit-shield-block_chance_ranged" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>杖威力</label><input type="number" id="edit-shield-stave_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>ランタン視野</label><input type="number" id="edit-shield-lantern_bonus" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>自然回復</label><input type="number" id="edit-shield-regen_bonus" step="1" oninput="livePreview()"></div>
+                
+                <div class="inline-edit-header">魔法ボーナス</div>
+                <div class="edit-row"><label>火炎追加ダメ</label><input type="number" id="edit-shield-magic_fire_damage" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>火炎射程</label><input type="number" id="edit-shield-magic_fire_range" step="1" oninput="livePreview()"></div>
+                <div class="edit-row"><label>回復魔法割合</label><input type="number" id="edit-shield-magic_heal_ratio" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>吹飛ダメ倍率</label><input type="number" id="edit-shield-magic_knockback_damage" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>無敵ターン数</label><input type="number" id="edit-shield-magic_invincible_turns" step="1" oninput="livePreview()"></div>
+            </div>
+            <button id="btn-save-shield" class="side-save-btn" onclick="manualSaveEquipment('shield')">SAVE SHIELD</button>
+        </details>
 
         <div style="margin-top: auto; font-size: 12px; color: var(--text-dim)">
             Status: <span id="status-text" style="color: var(--accent)">Connected</span>
@@ -429,8 +544,20 @@
             document.getElementById('mode-atk').classList.toggle('active', mode === 'atk');
             document.getElementById('mode-def').classList.toggle('active', mode === 'def');
             document.getElementById('mode-def').classList.toggle('defense', mode === 'def');
-            document.getElementById('atk-controls').style.display = mode === 'atk' ? 'flex' : 'none';
-            document.getElementById('def-controls').style.display = mode === 'def' ? 'block' : 'none';
+            
+            // モードに合わせてアコーディオンの初期開閉状態を切り替える
+            const detailsList = document.querySelectorAll('.control-group-details');
+            if (detailsList.length >= 3) {
+                if (mode === 'atk') {
+                    detailsList[0].open = true;  // Weapon open
+                    detailsList[1].open = false; // Armor closed
+                    detailsList[2].open = false; // Shield closed
+                } else {
+                    detailsList[0].open = false; // Weapon closed
+                    detailsList[1].open = true;  // Armor open
+                    detailsList[2].open = true;  // Shield open
+                }
+            }
             updateUI();
         }
 
@@ -467,21 +594,46 @@
             updateUI(true);
         }
 
+        const BONUS_PARAMS = [
+            'attack_bonus', 'defense_bonus', 'hp_bonus', 'eva_bonus',
+            'accuracy_bonus_close', 'accuracy_bonus_ranged', 'crit_rate',
+            'block_chance', 'block_chance_close', 'block_chance_ranged',
+            'stave_bonus', 'lantern_bonus', 'regen_bonus',
+            'magic_fire_damage', 'magic_fire_range', 'magic_heal_ratio',
+            'magic_knockback_damage', 'magic_invincible_turns'
+        ];
+
         async function manualSaveEquipment(type) {
             const id = document.getElementById(`${type}-select`).value;
             if (id === 'none') return;
-            if (type === 'weapon') {
-                await updateStat('equipment', id, 'attack_bonus', document.getElementById('edit-weapon-atk').value);
-                await updateStat('equipment', id, 'accuracy_bonus_close', document.getElementById('edit-weapon-accuracy').value);
-            } else if (type === 'armor') {
-                await updateStat('equipment', id, 'defense_bonus', document.getElementById('edit-armor-def').value);
-                await updateStat('equipment', id, 'hp_bonus', document.getElementById('edit-armor-hp').value);
-                await updateStat('equipment', id, 'evasion_bonus', document.getElementById('edit-armor-eva').value);
-            } else if (type === 'shield') {
-                await updateStat('equipment', id, 'defense_bonus', document.getElementById('edit-shield-def').value);
-                await updateStat('equipment', id, 'block_chance_close', document.getElementById('edit-shield-block').value);
-                await updateStat('equipment', id, 'block_chance_ranged', document.getElementById('edit-shield-block-ranged').value);
-            }
+            
+            const updates = {};
+            BONUS_PARAMS.forEach(p => {
+                const el = document.getElementById(`edit-${type}-${p}`);
+                if (el) {
+                    updates[p] = parseFloat(el.value) || 0;
+                }
+            });
+            
+            await updateStatBulk('equipment', id, updates);
+        }
+
+        async function updateStatBulk(file, id, updates) {
+            const status = document.getElementById('status-text');
+            status.innerText = "Saving...";
+            try {
+                const res = await fetch('/api/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ file, id, updates })
+                });
+                if (res.ok) {
+                    await fetchData();
+                    status.innerText = "Saved";
+                } else {
+                    status.innerText = "Error";
+                }
+            } catch (e) { status.innerText = "Error"; }
         }
 
         async function updateStat(file, id, param, value) {
@@ -511,28 +663,103 @@
             const tableBody = document.getElementById('table-body');
             const tableHead = document.getElementById('table-head');
 
+            const weaponId = document.getElementById('weapon-select').value;
+            const weapon = masterData.weapons[weaponId] || {};
+            const armorId = document.getElementById('armor-select').value;
+            const armor = masterData.armor[armorId] || {};
+            const shieldId = document.getElementById('shield-select').value;
+            const shield = masterData.shields[shieldId] || {};
+
+            // 全装備のパラメータ値をフォームへ読み込み
+            if (!isLive) {
+                BONUS_PARAMS.forEach(p => {
+                    // Weapon
+                    const elW = document.getElementById(`edit-weapon-${p}`);
+                    if (elW) {
+                        let val = 0;
+                        if (p === 'eva_bonus') {
+                            val = weapon.eva_bonus ?? weapon.eva ?? 0;
+                        } else {
+                            val = weapon[p] ?? 0;
+                        }
+                        elW.value = val;
+                    }
+                    // Armor
+                    const elA = document.getElementById(`edit-armor-${p}`);
+                    if (elA) {
+                        let val = 0;
+                        if (p === 'eva_bonus') {
+                            val = armor.eva_bonus ?? armor.eva ?? 0;
+                        } else {
+                            val = armor[p] ?? 0;
+                        }
+                        elA.value = val;
+                    }
+                    // Shield
+                    const elS = document.getElementById(`edit-shield-${p}`);
+                    if (elS) {
+                        let val = 0;
+                        if (p === 'eva_bonus') {
+                            val = shield.eva_bonus ?? shield.eva ?? 0;
+                        } else {
+                            val = shield[p] ?? 0;
+                        }
+                        elS.value = val;
+                    }
+                });
+            }
+
+            // 現在入力されているパラメータ値（ライブ編集反映後）をすべて取得
+            const finalWAtk = parseFloat(document.getElementById('edit-weapon-attack_bonus').value) || 0;
+            const finalAAtk = parseFloat(document.getElementById('edit-armor-attack_bonus').value) || 0;
+            const finalSAtk = parseFloat(document.getElementById('edit-shield-attack_bonus').value) || 0;
+
+            const finalWDef = parseFloat(document.getElementById('edit-weapon-defense_bonus').value) || 0;
+            const finalADef = parseFloat(document.getElementById('edit-armor-defense_bonus').value) || 0;
+            const finalSDef = parseFloat(document.getElementById('edit-shield-defense_bonus').value) || 0;
+
+            const finalWHp = parseFloat(document.getElementById('edit-weapon-hp_bonus').value) || 0;
+            const finalAHp = parseFloat(document.getElementById('edit-armor-hp_bonus').value) || 0;
+            const finalSHp = parseFloat(document.getElementById('edit-shield-hp_bonus').value) || 0;
+
+            const finalWAccuracyClose = parseFloat(document.getElementById('edit-weapon-accuracy_bonus_close').value) || 0;
+            const finalAAccuracyClose = parseFloat(document.getElementById('edit-armor-accuracy_bonus_close').value) || 0;
+            const finalSAccuracyClose = parseFloat(document.getElementById('edit-shield-accuracy_bonus_close').value) || 0;
+
+            const finalWCrit = parseFloat(document.getElementById('edit-weapon-crit_rate').value) || 0;
+            const finalACrit = parseFloat(document.getElementById('edit-armor-crit_rate').value) || 0;
+            const finalSCrit = parseFloat(document.getElementById('edit-shield-crit_rate').value) || 0;
+
+            const finalWEva = parseFloat(document.getElementById('edit-weapon-eva_bonus').value) || 0;
+            const finalAEva = parseFloat(document.getElementById('edit-armor-eva_bonus').value) || 0;
+            const finalSEva = parseFloat(document.getElementById('edit-shield-eva_bonus').value) || 0;
+
+            const finalSBlockC = parseFloat(document.getElementById('edit-shield-block_chance_close').value) || 0;
+
             if (currentMode === 'atk') {
                 document.getElementById('view-title').innerText = "Attack Simulator";
                 const baseAtk = masterData.balance.PLAYER.attack || 5;
-                const weaponId = document.getElementById('weapon-select').value;
-                const weapon = masterData.weapons[weaponId] || {};
 
-                const inputVal = document.getElementById('edit-weapon-atk');
-                const inputAccuracy = document.getElementById('edit-weapon-accuracy');
+                // 攻撃力合計
+                const totalAtk = baseAtk + finalWAtk + finalAAtk + finalSAtk;
+
+                // 命中力合計
+                const baseAccuracyClose = masterData.balance.PLAYER.accuracy_close || 100;
+                const totalAccuracyClose = baseAccuracyClose + finalWAccuracyClose + finalAAccuracyClose + finalSAccuracyClose;
+
+                // 会心率合計
+                const baseCrit = weapon.crit_rate !== undefined ? weapon.crit_rate : (masterData.balance.PLAYER.crit_rate || 0.01);
+                const totalCritRate = Math.min(70, Math.round((baseCrit + finalWCrit + finalACrit + finalSCrit) * 100));
                 
-                if (!isLive) {
-                    inputVal.value = weapon.attack_bonus || 0;
-                    inputAccuracy.value = weapon.accuracy_bonus_close || 0;
-                }
-                const finalWeaponAtk = parseFloat(inputVal.value) || 0;
-                const totalAtk = baseAtk + finalWeaponAtk;
-                const totalAccuracyClose = (masterData.balance.PLAYER.accuracy_close || 100) + (parseFloat(inputAccuracy.value) || 0);
-                const totalAccuracyRanged = (masterData.balance.PLAYER.accuracy_ranged || 100) + (weapon.accuracy_bonus_ranged || 0);
-                summary.innerHTML = `<span>Base: ${baseAtk}</span><span>Weapon: +${finalWeaponAtk}</span><span class="stat-val val-atk">Total: ${totalAtk}</span><span style="color:var(--text-dim)">ACC (C/R): ${totalAccuracyClose} / ${totalAccuracyRanged}</span>`;
+                summary.innerHTML = `<span>Base: ${baseAtk}</span><span>Equipment Atk: +${finalWAtk + finalAAtk + finalSAtk}</span><span class="stat-val val-atk">Total: ${totalAtk}</span><span style="color:var(--text-dim)">Accuracy: ${totalAccuracyClose}</span><span style="color:var(--secondary)">会心率: ${totalCritRate}%</span>`;
 
-                tableHead.innerHTML = `<tr><th>Enemy ID</th><th>Name</th><th>HP</th><th>DEF</th><th>Enemy EVA</th><th>Hit (C/R)</th><th>Hits to Kill</th><th>Actions</th></tr>`;
+                tableHead.innerHTML = `<tr><th>Enemy ID</th><th>Name</th><th>HP</th><th>DEF</th><th>Enemy EVA</th><th>命中率</th><th>会心率</th><th>Hits to Kill</th><th>Actions</th></tr>`;
                 const rankEnemies = Object.entries(masterData.enemies).filter(([id, e]) => (e.min_rank || e.rank) === rank && !e.is_static);
                 const hasPenetration = weapon.armor_penetration === true;
+
+                // 会心スコアの算出
+                const critScore = Math.round(totalCritRate);
+                const critColor = critScore >= 60 ? 'var(--secondary)' : (critScore >= 30 ? 'orange' : 'var(--text-dim)');
 
                 tableBody.innerHTML = rankEnemies.map(([id, e]) => {
                     const hp = liveEnemyOverrides[id]?.hp ?? e.hp;
@@ -546,15 +773,11 @@
                     const cls = hits <= 1 ? 'hit-1' : (hits === 2 ? 'hit-2' : (hits === 3 ? 'hit-3' : 'hit-danger'));
                     const penBadge = hasPenetration ? `<span class="badge" style="background: rgba(255,255,0,0.1); color: yellow; border: 1px solid yellow; margin-left: 4px;">貫通!</span>` : "";
 
-                    // 命中率計算: (プレイヤー精度 - 敵回避) → 5%〜99%にクランプ → /10で丸める
+                    // 命中率計算: (プレイヤー精度 - 敵回避) → 5%〜99%にクランプ
                     const enemyEva = liveEnemyOverrides[id]?.evasion ?? (e.evasion || 0);
                     const rawHitPctC = Math.min(99, Math.max(5, totalAccuracyClose - enemyEva));
-                    const hitScoreC = Math.round(rawHitPctC / 10);
-                    const hitColorC = hitScoreC >= 9 ? 'var(--accent)' : (hitScoreC >= 6 ? 'var(--primary)' : (hitScoreC >= 4 ? 'orange' : 'var(--danger)'));
-
-                    const rawHitPctR = Math.min(99, Math.max(5, totalAccuracyRanged - enemyEva));
-                    const hitScoreR = Math.round(rawHitPctR / 10);
-                    const hitColorR = hitScoreR >= 9 ? 'var(--accent)' : (hitScoreR >= 6 ? 'var(--primary)' : (hitScoreR >= 4 ? 'orange' : 'var(--danger)'));
+                    const hitScoreC = Math.round(rawHitPctC);
+                    const hitColorC = hitScoreC >= 90 ? 'var(--accent)' : (hitScoreC >= 60 ? 'var(--primary)' : (hitScoreC >= 40 ? 'orange' : 'var(--danger)'));
 
                     return `
                         <tr>
@@ -562,7 +785,8 @@
                             <td><input class="edit-input" type="number" value="${hp}" oninput="onEnemyInput('${id}', 'hp', this.value)" onblur="updateStat('enemies', '${id}', 'hp', this.value)"></td>
                             <td><input class="edit-input" type="number" value="${def}" oninput="onEnemyInput('${id}', 'defense', this.value)" onblur="updateStat('enemies', '${id}', 'defense', this.value)" style="${hasPenetration ? 'text-decoration: line-through; opacity: 0.5;' : ''}"></td>
                             <td><input class="edit-input" type="number" value="${enemyEva}" oninput="onEnemyInput('${id}', 'evasion', this.value)" onblur="updateStat('enemies', '${id}', 'evasion', this.value)"></td>
-                            <td><span style="font-family:'JetBrains Mono'; font-weight:700;"><span style="color:${hitColorC}">${hitScoreC}</span>/<span style="color:${hitColorR}">${hitScoreR}</span></span></td>
+                            <td><span style="font-family:'JetBrains Mono'; font-weight:700; color:${hitColorC}">${hitScoreC}/100</span></td>
+                            <td><span style="font-family:'JetBrains Mono'; font-weight:700; color:${critColor}">${critScore}/100</span></td>
                             <td><span class="badge ${cls}">${hits}撃</span></td>
                             <td><button class="save-btn" onclick="updateStat('enemies', '${id}', 'hp', this.parentNode.parentNode.querySelectorAll('input')[0].value)">Save All</button></td>
                         </tr>`;
@@ -573,44 +797,17 @@
                 const playerBaseDef = masterData.balance.PLAYER.defense || 0;
                 const playerBaseHp = masterData.balance.PLAYER.max_hp || 100;
 
-                const armorId = document.getElementById('armor-select').value;
-                const armor = masterData.armor[armorId] || {};
-                const inputADef = document.getElementById('edit-armor-def');
-                const inputAHp = document.getElementById('edit-armor-hp');
-                if (!isLive) {
-                    inputADef.value = armor.defense_bonus || 0;
-                    inputAHp.value = armor.hp_bonus || 0;
-                }
-                const finalADef = parseFloat(inputADef.value) || 0;
-                const finalAHp = parseFloat(inputAHp.value) || 0;
+                // 防御力合計
+                const totalDef = playerBaseDef + finalWDef + finalADef + finalSDef;
+                // HP合計
+                const totalHp = playerBaseHp + finalWHp + finalAHp + finalSHp;
 
-                const shieldId = document.getElementById('shield-select').value;
-                const shield = masterData.shields[shieldId] || {};
-                const inputSDef = document.getElementById('edit-shield-def');
-                if (!isLive) inputSDef.value = shield.defense_bonus || 0;
-                const finalSDef = parseFloat(inputSDef.value) || 0;
+                // 回避力合計（回避%とブロック%の合計値）
+                const playerEvasionBase = (masterData.balance.PLAYER.evasion || 1) + (finalWEva * 100) + (finalAEva * 100) + (finalSEva * 100);
+                const playerEvasionClose = playerEvasionBase + (finalSBlockC * 100);
 
-                const totalDef = playerBaseDef + finalADef + finalSDef;
-                const totalHp = playerBaseHp + finalAHp;
-
-                const inputArmorEva = document.getElementById('edit-armor-eva');
-                const inputShieldBlockC = document.getElementById('edit-shield-block');
-                const inputShieldBlockR = document.getElementById('edit-shield-block-ranged');
-                if (!isLive) {
-                    inputArmorEva.value = armor.evasion_bonus || 0;
-                    inputShieldBlockC.value = shield.block_chance_close || shield.block_chance || 0;
-                    inputShieldBlockR.value = shield.block_chance_ranged || shield.block_chance || 0;
-                }
-                const finalArmorEva = parseFloat(inputArmorEva.value) || 0;
-                const finalShieldBlockC = parseFloat(inputShieldBlockC.value) || 0;
-                const finalShieldBlockR = parseFloat(inputShieldBlockR.value) || 0;
-
-                const playerEvasionBase = (masterData.balance.PLAYER.evasion || 1) + finalArmorEva;
-                const playerEvasionClose = playerEvasionBase + (finalShieldBlockC * 100);
-                const playerEvasionRanged = playerEvasionBase + (finalShieldBlockR * 100);
-
-                summary.innerHTML = `<span>Total HP: <span class="stat-val val-hp">${totalHp}</span></span><span>Total DEF: <span class="stat-val val-def">${totalDef}</span></span><span style="color:var(--text-dim)">EVA (C/R): ${playerEvasionClose} / ${playerEvasionRanged}</span>`;
-                tableHead.innerHTML = `<tr><th>Enemy ID</th><th>Name</th><th>Enemy ATK</th><th>ACC (C/R)</th><th>Hit (C/R)</th><th>Survival Hits</th><th>Actions</th></tr>`;
+                summary.innerHTML = `<span>Total HP: <span class="stat-val val-hp">${totalHp}</span></span><span>Total DEF: <span class="stat-val val-def">${totalDef}</span></span><span style="color:var(--text-dim)">Evasion: ${playerEvasionClose}</span>`;
+                tableHead.innerHTML = `<tr><th>Enemy ID</th><th>Name</th><th>Enemy ATK</th><th>敵命中率</th><th>被命中率</th><th>Survival Hits</th><th>Actions</th></tr>`;
                 const rankEnemies = Object.entries(masterData.enemies).filter(([id, e]) => (e.min_rank || e.rank) === rank && !e.is_static);
                 tableBody.innerHTML = rankEnemies.map(([id, e]) => {
                     const atk = liveEnemyOverrides[id]?.attack ?? e.attack;
@@ -618,29 +815,21 @@
                     const hits = Math.floor(totalHp / dmg);
                     const cls = hits >= 10 ? 'hit-1' : (hits >= 5 ? 'hit-2' : (hits >= 3 ? 'hit-3' : 'hit-danger'));
 
-                    // 敵命中率計算: (敵精度 - プレイヤー回避) → 5%〜99%にクランプ → /10で丸める
+                    // 敵命中率計算: (敵精度 - プレイヤー回避) → 5%〜99%にクランプ
                     const enemyAccuracyC = liveEnemyOverrides[id]?.accuracy_close ?? (e.accuracy_close || 100);
-                    const enemyAccuracyR = liveEnemyOverrides[id]?.accuracy_ranged ?? (e.accuracy_ranged || 100);
 
                     const rawEnemyHitPctC = Math.min(99, Math.max(5, enemyAccuracyC - playerEvasionClose));
-                    const enemyHitScoreC = Math.round(rawEnemyHitPctC / 10);
-                    const hitColorC = enemyHitScoreC >= 9 ? 'var(--danger)' : (enemyHitScoreC >= 6 ? 'orange' : (enemyHitScoreC >= 4 ? 'var(--primary)' : 'var(--accent)'));
-
-                    const rawEnemyHitPctR = Math.min(99, Math.max(5, enemyAccuracyR - playerEvasionRanged));
-                    const enemyHitScoreR = Math.round(rawEnemyHitPctR / 10);
-                    const hitColorR = enemyHitScoreR >= 9 ? 'var(--danger)' : (enemyHitScoreR >= 6 ? 'orange' : (enemyHitScoreR >= 4 ? 'var(--primary)' : 'var(--accent)'));
+                    const enemyHitScoreC = Math.round(rawEnemyHitPctC);
+                    const hitColorC = enemyHitScoreC >= 90 ? 'var(--danger)' : (enemyHitScoreC >= 60 ? 'orange' : (enemyHitScoreC >= 40 ? 'var(--primary)' : 'var(--accent)'));
 
                     return `
                         <tr>
                             <td class="row-id">${id}</td><td class="row-name">${e.name}</td>
                             <td><input class="edit-input" type="number" value="${atk}" oninput="onEnemyInput('${id}', 'attack', this.value)" onblur="updateStat('enemies', '${id}', 'attack', this.value)"></td>
                             <td>
-                                <div style="display:flex; flex-direction:column; gap:2px;">
-                                    <input class="edit-input" type="number" value="${enemyAccuracyC}" oninput="onEnemyInput('${id}', 'accuracy_close', this.value)" onblur="updateStat('enemies', '${id}', 'accuracy_close', this.value)">
-                                    <input class="edit-input" type="number" value="${enemyAccuracyR}" oninput="onEnemyInput('${id}', 'accuracy_ranged', this.value)" onblur="updateStat('enemies', '${id}', 'accuracy_ranged', this.value)">
-                                </div>
+                                <input class="edit-input" type="number" value="${enemyAccuracyC}" oninput="onEnemyInput('${id}', 'accuracy_close', this.value)" onblur="updateStat('enemies', '${id}', 'accuracy_close', this.value)">
                             </td>
-                            <td><span style="font-family:'JetBrains Mono'; font-weight:700;"><span style="color:${hitColorC}">${enemyHitScoreC}</span>/<span style="color:${hitColorR}">${enemyHitScoreR}</span></span></td>
+                            <td><span style="font-family:'JetBrains Mono'; font-weight:700; color:${hitColorC}">${enemyHitScoreC}/100</span></td>
                             <td><span class="badge ${cls}">${hits}発耐える</span></td>
                             <td><button class="save-btn" onclick="updateStat('enemies', '${id}', 'attack', this.parentNode.parentNode.querySelector('input').value)">Save</button></td>
                         </tr>`;

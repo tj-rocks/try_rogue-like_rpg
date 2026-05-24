@@ -82,18 +82,23 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             
             file_type = post_data.get("file") # "enemies" or "equipment"
             target_id = post_data.get("id")
-            param = post_data.get("param")
-            value = post_data.get("value")
+            
+            # 単一更新と一括更新の両方に対応
+            updates = post_data.get("updates")
+            if not updates:
+                updates = {post_data.get("param"): post_data.get("value")}
             
             KEY_MAP_TO_NEW = {
                 "attack_bonus": "attack",
                 "defense_bonus": "defense",
                 "hp_bonus": "hp",
                 "evasion_bonus": "eva",
+                "eva_bonus": "eva",
                 "accuracy_bonus_close": "accuracy_close",
                 "accuracy_bonus_ranged": "accuracy_range",
                 "block_chance_close": "block_chance_close",
                 "block_chance_ranged": "block_chance_ranged",
+                "regen_bonus": "regen",
             }
             
             if file_type == "equipment":
@@ -120,14 +125,21 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 
             raw_data = load_master_data(filename)
             
-            # 数値変換
-            try:
-                if isinstance(value, str) and "." in value:
-                    value = float(value)
-                elif isinstance(value, str):
-                    value = int(value)
-            except:
-                pass
+            # パラメータマッピングと数値変換
+            mapped_updates = {}
+            for pk, pv in updates.items():
+                if pk is None: continue
+                try:
+                    if isinstance(pv, str) and "." in pv:
+                        pv = float(pv)
+                    elif isinstance(pv, str):
+                        pv = int(pv)
+                except:
+                    pass
+                new_key = KEY_MAP_TO_NEW.get(pk, pk) if file_type == "equipment" else pk
+                if file_type == "equipment" and new_key.startswith("magic_"):
+                    new_key = new_key.replace("magic_", "")
+                mapped_updates[new_key] = pv
             
             # サージカル・アップデート（行単位での置換）の試行
             path = os.path.join(MASTER_DATA_DIR, filename)
@@ -149,9 +161,9 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 else:
                     section_key = None
                 
-                new_key = KEY_MAP_TO_NEW.get(param, param) if file_type == "equipment" else param
-                
                 new_lines = []
+                param_found = {k: False for k in mapped_updates.keys()}
+                
                 for line in lines:
                     stripped = line.strip()
                     
@@ -166,35 +178,45 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     # ターゲット（個体）のブロックを確認
                     if in_data_section and stripped == f"{target_id}:":
                         in_target_block = True
-                        param_found = False
+                        param_found = {k: False for k in mapped_updates.keys()}
                     elif in_target_block and stripped.endswith(":") and line.startswith("  ") and not line.startswith("    "):
                         # 次の個体ブロックが来たら、またはセクションが終わったら
                         if stripped != f"{target_id}:":
                             # パラメータが見つからなかった場合、ブロックの最後に追加する
-                            if not param_found:
-                                # 新キーの場合はbonus.commonの下に無い場合、直下にフォールバック追加される
-                                new_lines.append(f"    {new_key}: {value}\n")
-                                updated = True
+                            for k, found in param_found.items():
+                                if not found:
+                                    new_lines.append(f"    {k}: {mapped_updates[k]}\n")
+                                    updated = True
                             in_target_block = False
                     
+                    # 複数パラメータのいずれかにマッチするか判定
+                    matched_key = None
+                    if in_target_block:
+                        for k in mapped_updates.keys():
+                            if stripped.startswith(f"{k}:"):
+                                matched_key = k
+                                break
+                    
                     # パラメータの書き換え
-                    if in_target_block and stripped.startswith(f"{new_key}:"):
-                        indent = line[:line.find(new_key)]
-                        new_lines.append(f"{indent}{new_key}: {value}\n")
-                        param_found = True
+                    if matched_key:
+                        indent = line[:line.find(matched_key)]
+                        new_lines.append(f"{indent}{matched_key}: {mapped_updates[matched_key]}\n")
+                        param_found[matched_key] = True
                         updated = True
                     else:
                         new_lines.append(line)
                 
                 # ファイルの最後がターゲットブロックで終わっている場合の処理
-                if in_target_block and not param_found:
-                    new_lines.append(f"    {new_key}: {value}\n")
-                    updated = True
+                if in_target_block:
+                    for k, found in param_found.items():
+                        if not found:
+                            new_lines.append(f"    {k}: {mapped_updates[k]}\n")
+                            updated = True
                 
                 if updated:
                     with open(path, "w", encoding="utf-8") as f:
                         f.writelines(new_lines)
-                    print(f"  [SURGICAL SAVE SUCCESS] {filename}: {target_id}.{new_key} -> {value}")
+                    print(f"  [SURGICAL SAVE SUCCESS] {filename}: {target_id}.updates -> {mapped_updates}")
                     
                     self.send_response(200)
                     self.send_header('Content-type', 'application/json')
@@ -211,7 +233,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             if file_type == "enemies":
                 for section in ["ENEMY_DATA", "ENEMY_CATEGORIES"]:
                     if section in raw_data and target_id in raw_data[section]:
-                        raw_data[section][target_id][param] = value
+                        for pk, pv in updates.items():
+                            raw_data[section][target_id][pk] = pv
                         updated = True; break
             elif file_type == "equipment":
                 for section in ["WEAPON_DATA", "ARMOR_DATA", "SHIELD_DATA"]:
@@ -221,14 +244,23 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                             item["bonus"] = {"common": {}, "magic": {}}
                         if "common" not in item["bonus"]:
                             item["bonus"]["common"] = {}
-                        new_key = KEY_MAP_TO_NEW.get(param, param)
-                        item["bonus"]["common"][new_key] = value
+                        if "magic" not in item["bonus"]:
+                            item["bonus"]["magic"] = {}
+                            
+                        for pk, pv in updates.items():
+                            new_key = KEY_MAP_TO_NEW.get(pk, pk)
+                            if new_key.startswith("magic_"):
+                                mk = new_key.replace("magic_", "")
+                                item["bonus"]["magic"][mk] = pv
+                            else:
+                                item["bonus"]["common"][new_key] = pv
                         updated = True; break
                 
                 if not updated:
                     for section in ["WEAPON_CATEGORIES", "ARMOR_CATEGORIES", "SHIELD_CATEGORIES"]:
                         if section in raw_data and target_id in raw_data[section]:
-                            raw_data[section][target_id][param] = value
+                            for pk, pv in updates.items():
+                                raw_data[section][target_id][pk] = pv
                             updated = True; break
             
             if updated:
