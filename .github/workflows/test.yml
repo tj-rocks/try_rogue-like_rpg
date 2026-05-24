@@ -33,5 +33,5 @@ jobs:
         SDL_AUDIODRIVER: dummy
         PYTHON_EXE: python
       run: |
-        chmod +x run_tests.sh
-        ./run_tests.sh
+        chmod +x tests/run_tests.sh
+        ./tests/run_tests.sh
