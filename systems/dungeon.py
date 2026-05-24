@@ -725,9 +725,17 @@ class Dungeon:
                 self.npcs = []
                 self.rooms = []
                 ts = self.tile_size
-                # Load dynamic tile mappings from village.yml
-                from systems.data_loader import load_master_data
-                village_data = load_master_data("village.yml") or {}
+                # Load dynamic tile mappings from map-specific yml if exists, else village.yml
+                base_name = os.path.splitext(os.path.basename(map_name))[0]
+                master_file = "village.yml"
+                from systems.data_loader import load_master_data, MASTER_DATA_DIR
+                candidate = f"restpoint/{base_name}.yml"
+                if os.path.exists(os.path.join(MASTER_DATA_DIR, candidate)):
+                    master_file = candidate
+                elif os.path.exists(os.path.join(MASTER_DATA_DIR, f"{base_name}.yml")):
+                    master_file = f"{base_name}.yml"
+                
+                village_data = load_master_data(master_file) or {}
                 tile_mappings_raw = village_data.get("TILE_MAPPINGS", {})
                 
                 # 地形文字マッピング（village.txtのパース用）
@@ -737,6 +745,22 @@ class Dungeon:
                         ch = v.get("char")
                         if ch:
                             tile_mappings[ch] = v
+
+                # --- [NEW] カスタムタイルのテクスチャ動的ロード ---
+                for ent_id, tile_info in tile_mappings_raw.items():
+                    if isinstance(tile_info, dict):
+                        img_path = tile_info.get("image_path")
+                        if img_path and os.path.exists(img_path):
+                            fk = os.path.splitext(os.path.basename(img_path))[0]
+                            if fk not in self.textures:
+                                try:
+                                    img = pygame.image.load(img_path).convert_alpha()
+                                    if img.get_size() != (ts, ts):
+                                        img = pygame.transform.scale(img, (ts, ts))
+                                    self.textures[fk] = img
+                                    print(f"[DEBUG-TEXTURE] Dynamically loaded custom tile texture: {fk} from {img_path}")
+                                except Exception as tex_ex:
+                                    print(f"[DEBUG-TEXTURE] Failed to load custom tile texture '{img_path}': {tex_ex}")
 
                 for r, line in enumerate(lines):
                     for c, char in enumerate(line):
@@ -836,7 +860,7 @@ class Dungeon:
                 self.enemies = [e for e in self.enemies if getattr(e, "is_static", False)]
                 
                 # --- [NEW] 外部化されたエンティティ座標データ (positions) からキャラ/障害物を配置 ---
-                print(f"[DEBUG-NPC] Loading entities from TILE_MAPPINGS in village.yml. Total entries: {len(tile_mappings_raw)}")
+                print(f"[DEBUG-NPC] Loading entities from TILE_MAPPINGS in {master_file}. Total entries: {len(tile_mappings_raw)}")
                 for ent_id, tile_info in tile_mappings_raw.items():
                     if not isinstance(tile_info, dict): continue
                     positions = tile_info.get("positions", [])
@@ -844,7 +868,7 @@ class Dungeon:
                     
                     if not positions:
                         if cat in ("npc", "obstacle"):
-                            print(f"[DEBUG-NPC] Entity '{ent_id}' has NO positions listed in village.yml!")
+                            print(f"[DEBUG-NPC] Entity '{ent_id}' has NO positions listed in {master_file}!")
                         continue
                     
                     print(f"[DEBUG-NPC] Found entity '{ent_id}' ({cat}) with {len(positions)} positions.")
@@ -1597,10 +1621,11 @@ class Dungeon:
                     max_f = guild.get_max_floor(player.guild_rank)
                     
                     # 進行中の昇格クエストがあれば、その目標ランクの制限まで緩和する
+                    # ※ただし、フライング防止のため、この緩和は最初のギルド加入試験（ランク "-" から F への昇格）のときのみ適用する。
                     for q in player.active_quests:
                         if q.get("is_rank_up"):
                             target_rank = q.get("next_rank")
-                            if target_rank:
+                            if target_rank and player.guild_rank == "-":
                                 exam_limit = guild.get_max_floor(target_rank)
                                 max_f = max(max_f, exam_limit)
 
@@ -1808,10 +1833,11 @@ class Dungeon:
             max_f = guild.get_max_floor(player.guild_rank)
             
             # 進行中の昇格クエストがあれば、その目標ランクの制限まで緩和する
+            # ※ただし、フライング防止のため、この緩和は最初のギルド加入試験（ランク "-" から F への昇格）のときのみ適用する。
             for q in player.active_quests:
                 if q.get("is_rank_up"):
                     target_rank = q.get("next_rank")
-                    if target_rank:
+                    if target_rank and player.guild_rank == "-":
                         exam_limit = guild.get_max_floor(target_rank)
                         max_f = max(max_f, exam_limit)
             

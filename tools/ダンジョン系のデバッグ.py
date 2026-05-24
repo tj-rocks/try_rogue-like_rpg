@@ -23,6 +23,10 @@ from systems.events import handle_events, active_direction_keys
 
 def setup_gungeon_mode(dungeon, player):
     """テクスチャ・アイテム確認用の特殊フロア設定"""
+    if dungeon.floor_info.get("map"):
+        print(f"[Debug] Skipping Gungeon Mode for Fixed Map on Floor {dungeon.current_floor}")
+        return dungeon
+
     theme_name = dungeon.floor_info.get("image", "unknown")
     print(f"[Debug] Gungeon Mode: Floor {dungeon.current_floor}, Theme: {theme_name}")
     

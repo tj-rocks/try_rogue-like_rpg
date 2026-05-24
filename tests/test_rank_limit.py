@@ -102,19 +102,55 @@ def test_rank_f_limits():
     dungeon_b11.check_stairs(player, confirm, dialog)
     assert dialog.is_active == True, "ランクF、クエストなしで制限超過(B12)がブロックされていない"
     
-    # 2. rank_up_E 受注中 -> 許可 & ワープ実行
+    # 2. rank_up_E 受注中であっても、まだFランクなのでB12Fへの進入はブロックされるべき（フライング防止）
     player.active_quests = [{"id": "rank_up_E", "is_rank_up": True, "next_rank": "E"}]
     player.x, player.y = 5 * 64, 5 * 64
     confirm, dialog = create_mocks()
     dungeon_b11.check_stairs(player, confirm, dialog)
-    assert confirm.is_active == True, "昇格クエスト(E)中なのにB12Fへの進入が許可されていない"
-    
-    # ワープ実行のシミュレーション
-    confirm.on_yes()
-    next_d = dungeon_b11.next_dungeon
-    assert next_d.current_floor == 12, f"ワープ先が B12F ではありません (Current: {next_d.current_floor})"
+    assert dialog.is_active == True, "FランクでE昇格クエスト中であっても、12Fへの進入はブロックされる必要があります"
     
     print("[OK] ランク 'F' の統合テスト通過")
+
+def test_promotion_relaxation_for_unranked():
+    print("--- [統合テスト] 未加入(-)ランク時の昇格試験中における緩和テスト ---")
+    from systems.game_state import game_state
+    game_state["is_paused"] = False
+    game_state["dialog_just_closed"] = False
+    
+    player = Player()
+    player.guild_rank = "-"
+    player.active_quests = [{"id": "rank_up_F", "is_rank_up": True, "next_rank": "F"}]
+    
+    # B0F (limit_floor 0) のはずだが、昇格試験中なので B1F への進入が許可されること
+    dungeon_b0 = setup_test_dungeon(0)
+    player.x, player.y = 5 * 64, 5 * 64
+    player.prev_x, player.prev_y = 4 * 64, 5 * 64
+    confirm, dialog = create_mocks()
+    
+    dungeon_b0.check_stairs(player, confirm, dialog)
+    assert confirm.is_active == True, "未加入(-)ランクの昇格試験中に、B1Fへの進入確認が出ません（緩和が機能していません）"
+    print("[OK] 未加入(-)ランクでの試験中緩和テスト合格")
+
+def test_promotion_no_relaxation_for_ranked():
+    print("--- [統合テスト] 既加入(F)ランク時の昇格試験中におけるフライングブロックテスト ---")
+    from systems.game_state import game_state
+    game_state["is_paused"] = False
+    game_state["dialog_just_closed"] = False
+    
+    player = Player()
+    player.guild_rank = "F"
+    player.active_quests = [{"id": "rank_up_E", "is_rank_up": True, "next_rank": "E"}]
+    
+    # E級試験中（next_rank E）であっても、現在のFランクの上限(B11F)を超えるB12Fへの進入はブロックされること
+    dungeon_b11 = setup_test_dungeon(11)
+    player.x, player.y = 5 * 64, 5 * 64
+    player.prev_x, player.prev_y = 4 * 64, 5 * 64
+    confirm, dialog = create_mocks()
+    
+    dungeon_b11.check_stairs(player, confirm, dialog)
+    assert dialog.is_active == True, "FランクでのE昇格試験中に、B12Fへの進入がフライングでブロックされていません"
+    assert player.x // 64 == 4, "フライング進入ブロック時に押し戻されていません"
+    print("[OK] 既加入(F)ランクでの試験中フライングブロックテスト合格")
 
 def test_pitfall_rank_limit():
     print("--- [統合テスト] 落とし穴(Pitfall)のランク制限テスト ---")
@@ -155,12 +191,35 @@ def test_pitfall_rank_limit():
     assert player.is_falling == True, "昇格クエスト中なのに落とし穴で落下しない"
     assert pitfall.is_triggered == True, "落とし穴が発動状態になっていない"
     
+    # 3. 既加入(F)ランクのE昇格クエスト中で、最大階層(B11F)の落とし穴を踏み込んだ場合 -> ブロックされて落下しない（フライング防止）
+    player3 = Player()
+    player3.guild_rank = "F"
+    player3.active_quests = [{"id": "rank_up_E", "is_rank_up": True, "next_rank": "E"}]
+    
+    dungeon_b11 = setup_test_dungeon(11)
+    px3, py3 = 5, 5
+    player3.x, player3.y = px3 * 64, py3 * 64
+    player3.prev_x, player3.prev_y = 4 * 64, py3 * 64
+    
+    pitfall3 = Trap(px3, py3, "pitfall")
+    dungeon_b11.traps.append(pitfall3)
+    confirm3, dialog3 = create_mocks()
+    
+    dungeon_b11.check_traps(player3, dialog3)
+    print(f"FランクE昇格試験中11F踏み込み: dialog.is_active={dialog3.is_active}, player3.x={player3.x//64}, player3.is_falling={player3.is_falling}")
+    assert dialog3.is_active == True, "FランクでのE昇格試験中に、11Fの落とし穴を踏んだが警告ダイアログが出ない"
+    assert player3.x // 64 == 4, "FランクでのE昇格試験中に、11Fの落とし穴を踏んだが押し戻されていない"
+    assert player3.is_falling == False, "FランクでのE昇格試験中に、11Fの落とし穴を踏んで落下状態になってしまっている"
+    assert pitfall3.is_triggered == False, "ブロックされた落とし穴が発動状態になってしまっている"
+    
     print("[OK] 落とし穴のランク制限テスト通過")
 
 if __name__ == "__main__":
     try:
         test_rank_minus_limits()
         test_rank_f_limits()
+        test_promotion_relaxation_for_unranked()
+        test_promotion_no_relaxation_for_ranked()
         test_pitfall_rank_limit()
         print("\n=== すべてのランク制限・遷移統合テストに合格しました！ ===")
     except AssertionError as e:
