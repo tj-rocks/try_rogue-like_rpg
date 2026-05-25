@@ -1078,13 +1078,13 @@ class InventoryDialog(BaseListDialog):
                  "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正",
                  "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON}
         MAGIC_MAP = {
-            "magic_fire_damage":    "🔥炎ダメ",
-            "magic_fire_range":     "🔥炎射程",
-            "magic_heal_ratio":     "💚回復量",
-            "magic_knockback_damage":"💨吹飛ダメ",
-            "magic_invincible_turns":"✨無敵ターン",
-            "magic_stave_bonus":     "🔮杖回数",
-            "magic_light_stave_bonus": "💡燈杖回",
+            "magic_fire_damage":    "[炎]ダメ",
+            "magic_fire_range":     "[炎]射程",
+            "magic_heal_ratio":     "[癒]回復量",
+            "magic_knockback_damage":"[風]吹飛ダメ",
+            "magic_invincible_turns":"[聖]無敵ターン",
+            "magic_stave_bonus":     "[魔]杖回数",
+            "magic_light_stave_bonus": "[光]燈杖回",
         }
         
         def fmt(val):
