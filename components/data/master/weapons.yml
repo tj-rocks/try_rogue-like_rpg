@@ -319,13 +319,13 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
     shop_buyable: true
-    aggro_mod: -3
     describe: 音もなく獲物を屠るための特殊な刀。装備するとモンスターに気づかれにくくなる。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: dagger
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: -3
         attack: 12
         accuracy_close: 20
         accuracy_range: 10
@@ -400,13 +400,13 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.2
     shop_buyable: true
-    aggro_mod: -2
     describe: 急所を突くことに特化した細身の刺突剣。攻撃力は低いが、高い命中率と会心率（15/100）を誇り、鎧を貫通する。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: -2
         attack: 15
         accuracy_close: 20
         accuracy_range: 20
@@ -441,13 +441,13 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.3
     shop_buyable: true
-    aggro_mod: 4
     describe: 強大な破壊力を持つ騎士の巨大な斧。攻撃力は凄まじいが、重量ゆえに回避率や命中率が低下し、敵に感知されやすくなる。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: axe
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 4
         attack: 52
         accuracy_close: -10
         accuracy_range: -10
@@ -562,13 +562,13 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
     shop_buyable: true
-    aggro_mod: -2
     describe: 隠密偵察用の小型ナイフ。攻撃力は控えめだが、非常に高い会心率（20/100）と回避率を持つ。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: dagger
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: -2
         attack: 16
         accuracy_close: 15
         accuracy_range: 10
