@@ -123,7 +123,7 @@ class TestEquipKagoBonus(unittest.TestCase):
         "magic_heal_ratio":      0.05,
         "magic_knockback_damage":0.05,
         "magic_invincible_turns":1,
-        "magic_light_stave_bonus":0,
+        "magic_light_stave_bonus":1,
     }
 
     # ui.py で合算している全キー
