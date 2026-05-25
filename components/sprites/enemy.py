@@ -303,36 +303,44 @@ class Enemy(Entity):
         return best[0], best[1]  # (target_gx, target_gy)
 
     def _move_toward_grid(self, tgx, tgy, dungeon, all_entities):
-        """指定グリッドに1歩近づく。移動できた場合 True を返す。"""
+        """指定グリッドに1歩近づく。直進が塞がれている場合は横移動など迂回ルートも試す。"""
         mx = int((self.x + self.width / 2) // dungeon.tile_size)
         my = int((self.y + self.height / 2) // dungeon.tile_size)
         dx = tgx - mx; dy = tgy - my
-        steps = []
-        if abs(dx) >= abs(dy):
-            steps = [("right" if dx > 0 else "left",  (1 if dx > 0 else -1) * dungeon.tile_size, 0),
-                     ("down"  if dy > 0 else "up",    0, (1 if dy > 0 else -1) * dungeon.tile_size)]
+        
+        # 進行方向と、その直角方向を決定する
+        dir_x = "right" if dx > 0 else "left" if dx < 0 else random.choice(["right", "left"])
+        dir_y = "down" if dy > 0 else "up" if dy < 0 else random.choice(["down", "up"])
+        
+        step_x = (dir_x, dungeon.tile_size if dir_x == "right" else -dungeon.tile_size, 0)
+        step_y = (dir_y, 0, dungeon.tile_size if dir_y == "down" else -dungeon.tile_size)
+        
+        # 距離が遠い軸を優先的に進む
+        if abs(dx) > abs(dy):
+            steps = [step_x, step_y]
+        elif abs(dy) > abs(dx):
+            steps = [step_y, step_x]
         else:
-            steps = [("down"  if dy > 0 else "up",    0, (1 if dy > 0 else -1) * dungeon.tile_size),
-                     ("right" if dx > 0 else "left",  (1 if dx > 0 else -1) * dungeon.tile_size, 0)]
-        if dx == 0: steps = steps[1:]
-        if dy == 0: steps = steps[:1]
+            steps = [step_x, step_y] if random.random() < 0.5 else [step_y, step_x]
+            
+        # x軸またはy軸が揃っている（dx==0 or dy==0）場合でも、前方が味方で塞がっている時は
+        # 横に避けて進めるように、直角方向の逆側もフォールバックとして追加する
+        if dx == 0:
+            alt_x = "left" if dir_x == "right" else "right"
+            steps.append((alt_x, dungeon.tile_size if alt_x == "right" else -dungeon.tile_size, 0))
+        if dy == 0:
+            alt_y = "up" if dir_y == "down" else "down"
+            steps.append((alt_y, 0, dungeon.tile_size if alt_y == "down" else -dungeon.tile_size))
+
         for facing, sdx, sdy in steps:
             tx, ty = self.x + sdx, self.y + sdy
+            # can_move_grid がすでに地形と他エンティティ（味方含む）との衝突を判定している
             if self.can_move_grid(tx, ty, dungeon):
-                # 他の敵と重ならないか確認
-                ngx = int((tx + self.width / 2) // dungeon.tile_size)
-                ngy = int((ty + self.height / 2) // dungeon.tile_size)
-                blocked = any(
-                    e is not self and not getattr(e, "is_dead", False) and
-                    int((e.x + e.width / 2) // dungeon.tile_size) == ngx and
-                    int((e.y + e.height / 2) // dungeon.tile_size) == ngy
-                    for e in all_entities
-                )
-                if not blocked:
-                    self.target_x = tx; self.target_y = ty
-                    self.facing = facing; self.is_moving = True
-                    self.step_toggle = not self.step_toggle
-                    return True
+                self.target_x, self.target_y = tx, ty
+                self.facing = facing; self.is_moving = True
+                self.step_toggle = not self.step_toggle
+                return True
+                
         return False
 
     def take_turn(self, player, dungeon, all_entities, dialog=None, occupied_cells=None):

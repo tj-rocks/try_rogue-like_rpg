@@ -47,6 +47,7 @@ SHIELD_DATA:
     floor_spawnable: false
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -85,6 +86,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -115,7 +117,6 @@ SHIELD_DATA:
     max_rank: E
     rarity: 2
     price: 200
-    aggro_mod: -2
     image_dir: components/pictures/shield
     shop_buyable: true
     describe: 丈夫な皮を張った円盾.
@@ -124,6 +125,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: -0.5
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -154,7 +156,6 @@ SHIELD_DATA:
     max_rank: E
     rarity: 2
     price: 300
-    aggro_mod: 0
     image_dir: components/pictures/shield
     shop_buyable: true
     describe: 鉄で作られた頑丈な盾.
@@ -163,6 +164,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -193,7 +195,6 @@ SHIELD_DATA:
     max_rank: C
     rarity: 3
     price: 500
-    aggro_mod: 1
     image_dir: components/pictures/shield
     shop_buyable: false
     describe: 硬い鋼の盾. 近接攻撃を弾きやすい.
@@ -202,6 +203,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 1
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -240,6 +242,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -270,7 +273,6 @@ SHIELD_DATA:
     max_rank: A
     rarity: 3
     price: 1200
-    aggro_mod: -2
     image_dir: components/pictures/shield
     shop_buyable: true
     describe: 隠密性と回避力を高めるため、極限まで軽量化された木製の盾。
@@ -279,6 +281,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: -2
         attack: 0
         accuracy_close: 15
         accuracy_range: 15
@@ -309,7 +312,6 @@ SHIELD_DATA:
     max_rank: A
     rarity: 4
     price: 4000
-    aggro_mod: 4
     image_dir: components/pictures/shield
     shop_buyable: true
     describe: 圧倒的なガード率を誇る重厚な盾。その大きさゆえに身動きが鈍くなり、敵に狙われやすい。
@@ -318,6 +320,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 4
         attack: 0
         accuracy_close: -10
         accuracy_range: -10
@@ -356,6 +359,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -394,6 +398,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -424,7 +429,6 @@ SHIELD_DATA:
     max_rank: A
     rarity: 3
     price: 2600
-    aggro_mod: -2
     image_dir: components/pictures/shield
     shop_buyable: true
     describe: 黒く染められた軽量の革盾。敵に見つかりにくくなり、高い回避率と会心率を誇る。
@@ -433,6 +437,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: -2
         attack: 0
         accuracy_close: 0
         accuracy_range: 0

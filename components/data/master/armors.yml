@@ -43,6 +43,7 @@ ARMOR_DATA:
     floor_spawnable: false
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -79,6 +80,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -108,7 +110,6 @@ ARMOR_DATA:
     min_rank: F
     rarity: 1
     price: 490
-    aggro_mod: -1
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
     describe: なめし革を重ねて作られた防具.
@@ -116,6 +117,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: -0.5
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -152,6 +154,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -188,6 +191,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -218,7 +222,6 @@ ARMOR_DATA:
     max_rank: D
     rarity: 4
     price: 1500
-    aggro_mod: 0
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
     describe: なめし革を重ねて作られた防具.
@@ -226,6 +229,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -256,7 +260,6 @@ ARMOR_DATA:
     max_rank: E
     rarity: 6
     price: 2000
-    aggro_mod: 0
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
     describe: 巡礼者が旅の安全を祈って着る聖なるローブ。魔法の効果を高める力がある。
@@ -264,6 +267,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -293,7 +297,6 @@ ARMOR_DATA:
     min_rank: E
     rarity: 3
     price: 1200
-    aggro_mod: -2
     image_dir: components/pictures/armor/hunters_armor
     shop_buyable: true
     describe: 隠密性に特化した深紺の軽装。防御力は極めて低いが、攻撃の命中率と会心率（10/100）が大きく向上する。
@@ -301,6 +304,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: -2
         attack: 0
         accuracy_close: 15
         accuracy_range: 25
@@ -330,7 +334,6 @@ ARMOR_DATA:
     min_rank: C
     rarity: 3
     price: 2500
-    aggro_mod: 0
     image_dir: components/pictures/armor/fighters_armor
     shop_buyable: true
     describe: 標準的な戦士の鎧。特にバフやデバフはなく、扱いやすい。
@@ -338,6 +341,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -367,7 +371,6 @@ ARMOR_DATA:
     min_rank: B
     rarity: 4
     price: 4500
-    aggro_mod: 4
     image_dir: components/pictures/armor/knight_heavy_armor
     shop_buyable: true
     describe: 鉄板を重ねた非常に強固な鎧。重さゆえに敵に気づかれやすく、回避や命中、視野が低下する。
@@ -375,6 +378,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 4
         attack: 0
         accuracy_close: -10
         accuracy_range: -10
@@ -404,7 +408,6 @@ ARMOR_DATA:
     min_rank: C
     rarity: 4
     price: 3200
-    aggro_mod: 0
     image_dir: components/pictures/armor/pilgrims_armor 
     shop_buyable: true
     describe: 聖なる加護を受けた巡礼者の軽防具。最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する。
@@ -412,6 +415,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -478,7 +482,6 @@ ARMOR_DATA:
     min_rank: C
     rarity: 4
     price: 3200
-    aggro_mod: 0
     image_dir: components/pictures/armor/mages_robe
     shop_buyable: true
     describe: 魔力の流れを操る高貴な紫の魔導衣。軽装で動きやすく、火炎・吹飛などの攻撃魔法の威力・射程を極限まで引き出す。
@@ -486,6 +489,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0

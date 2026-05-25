@@ -3079,7 +3079,19 @@ class ShopDialog(BaseListDialog):
             if guild_system and not guild_system.is_rank_at_least(player.guild_rank, item_data.get("rank", "F")):
                 dialog.text = Text.Items.RANK_REQUIRED.format(rank=item_data.get("rank", "F")); dialog.is_active = True; return
             if player.coin < price: dialog.text = Text.Items.NOT_ENOUGH_COIN; dialog.is_active = True; return
-            if player.get_total_item_count() >= 20: dialog.text = Text.Items.BAG_FULL_SHOP; dialog.is_active = True; return
+            
+            from constants import MAX_ITEM_SLOTS, MAX_EQUIP_SLOTS, MAX_STAVE_SLOTS
+            bag_full = False
+            if itype in ("weapon", "armor", "shield"):
+                if player.get_equipment_count() >= MAX_EQUIP_SLOTS: bag_full = True
+            elif itype == "stave":
+                if player.get_stave_count() >= MAX_STAVE_SLOTS: bag_full = True
+            elif itype == "consumable":
+                ms = item_data.get("max_stack", 1)
+                can_stack = any(it["key"] == key_or_iid and it["count"] < ms for it in player.items) if ms > 1 else False
+                if not can_stack and player.get_item_count() >= MAX_ITEM_SLOTS: bag_full = True
+                
+            if bag_full: dialog.text = Text.Items.BAG_FULL_SHOP; dialog.is_active = True; return
             if confirm_dialog:
                 confirm_dialog.text = Text.UI.SHOP_BUY_CONFIRM.format(name=name, price=price)
                 def do_buy():
@@ -3312,7 +3324,19 @@ class WarehouseDialog(BaseListDialog):
         if player.coin < WAREHOUSE_FEE:
             if dialog: dialog.text = Text.NPC.WAREHOUSE_NO_FEE.format(fee=WAREHOUSE_FEE); dialog.is_active = True
             return
-        if player.get_total_item_count() >= 20:
+            
+        from constants import MAX_ITEM_SLOTS, MAX_EQUIP_SLOTS, MAX_STAVE_SLOTS
+        bag_full = False
+        if itype in ("weapon_inst", "armor_inst", "shield_inst", "lantern_inst"):
+            if player.get_equipment_count() >= MAX_EQUIP_SLOTS: bag_full = True
+        elif itype == "stave_inst":
+            if player.get_stave_count() >= MAX_STAVE_SLOTS: bag_full = True
+        elif itype == "consumable":
+            ms = data.get("max_stack", 1) if isinstance(data, dict) else 1
+            can_stack = any(it["key"] == data["key"] and it["count"] < ms for it in player.items) if ms > 1 and isinstance(data, dict) and "key" in data else False
+            if not can_stack and player.get_item_count() >= MAX_ITEM_SLOTS: bag_full = True
+            
+        if bag_full:
             if dialog: dialog.text = Text.Items.BAG_FULL; dialog.is_active = True
             return
         if confirm_dialog:
