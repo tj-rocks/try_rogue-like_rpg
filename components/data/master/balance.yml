@@ -18,6 +18,10 @@ PLAYER:
   evasion: 1          # 基本回避率 (%)
   crit_rate: 0.01     # 基本会心率 (0.01 = 1%)
   
+  # 自然回復 (Regeneration)
+  regen_base: 0.0     # 1ターンごとの基本回復蓄積量 (基本は自然回復なし)
+  regen_multiplier: 0.01 # regen_bonus 1あたりの追加蓄積量 (ボーナス+10 で 0.1 = 10ターンで1回復)
+  
   # 初期リソース
   initial_coin: 100   # スタート時の所持金
   max_item_slots: 20  # アイテム（消耗品）の最大スロット数
@@ -215,9 +219,9 @@ OUTBREAK_CONFIG:
 # 🌀 TELEPORT_CONFIG (テレポート屋設定)
 # ------------------------------------------------------------------------------
 TELEPORT_CONFIG:
-  money_per_floor: 1000         # 1階層あたりの料金
+  money_per_floor: 100         # 1階層あたりの料金
   required_item_id: "teleport_stone" # 必要なアイテムID
-  return_village_money: 10000   # 休憩所から村への帰還料金 (超高額)
+  return_village_money: 2000   # 休憩所から村への帰還料金 (超高額)
 
 
 # 💀 CURSE_SYSTEM (呪いシステム設定)

@@ -106,6 +106,7 @@ WEAPON_DATA:
         knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   iron_sword:
     name: 鉄の剣
@@ -145,6 +146,7 @@ WEAPON_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   old_sword:
     name: 古びた剣
@@ -184,6 +186,7 @@ WEAPON_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   wooden_stick:
     name: 木の棍棒
@@ -223,6 +226,7 @@ WEAPON_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   fullmetal_sword:
     name: 鋼の剣
@@ -262,6 +266,7 @@ WEAPON_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   damascus_sword:
     name: ダマスカス鋼の剣
@@ -301,6 +306,7 @@ WEAPON_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   thiefs_knife:
     name: 盗賊のダガー
@@ -341,6 +347,7 @@ WEAPON_DATA:
         knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   fighters_sword:
     name: 戦士の剣
@@ -380,6 +387,7 @@ WEAPON_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   hunters_rapier:
     name: 狩人のレイピア
@@ -420,6 +428,7 @@ WEAPON_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   knight_heavy_axe:
     name: 騎士の重斧
@@ -460,6 +469,7 @@ WEAPON_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   mages_staff:
     name: 魔術師のスタッフ
@@ -499,6 +509,7 @@ WEAPON_DATA:
         knockback_damage: 0.20
         invincible_turns: 1
         stave_bonus: 20
+        light_stave_bonus: 0
 
   pilgrims_sword:
     name: 巡礼者の剣
@@ -538,6 +549,7 @@ WEAPON_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 10
+        light_stave_bonus: 0
 
   scount_small_knife:
     name: スカウトのスモールナイフ
@@ -578,6 +590,7 @@ WEAPON_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   test_all_bonus_weapon:
     name: "[TEST]全加護の剣"
@@ -617,3 +630,4 @@ WEAPON_DATA:
         knockback_damage: 0.15
         invincible_turns: 1
         stave_bonus: 10
+        light_stave_bonus: 0

@@ -943,7 +943,8 @@ class Player(Entity):
                 if dialog.is_active: dialog.text += "\n" + msg
                 else: dialog.text = msg; dialog.is_active = True; game_state["dialog_modal"] = False; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
         elif self.hp < self.max_hp:
-            self.regen_pool += 0.05 + self.regen_bonus
+            from constants import PLAYER_REGEN_BASE, PLAYER_REGEN_MULTIPLIER
+            self.regen_pool = round(self.regen_pool + PLAYER_REGEN_BASE + (self.regen_bonus * PLAYER_REGEN_MULTIPLIER), 3)
             if self.regen_pool >= 1.0: rec = int(self.regen_pool); self.hp = min(self.max_hp, self.hp + rec); self.regen_pool -= rec
 
     def start_falling(self, tile_size):

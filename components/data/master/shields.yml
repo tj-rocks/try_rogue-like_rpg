@@ -68,6 +68,7 @@ SHIELD_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   wooden_round_shield:
     name: 木の円盾
@@ -105,6 +106,7 @@ SHIELD_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   leather_round_shield:
     name: 皮の円盾
@@ -143,6 +145,7 @@ SHIELD_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   iron_round_shield:
     name: 鉄の円盾
@@ -181,6 +184,7 @@ SHIELD_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   fullmetal_round_shield:
     name: 鋼の円盾
@@ -219,6 +223,7 @@ SHIELD_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   fighters_sheld:
     name: 戦士の盾
@@ -256,6 +261,7 @@ SHIELD_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   hunters_wood_sheild:
     name: 狩人の木盾
@@ -294,6 +300,7 @@ SHIELD_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   knight_heavy_sheld:
     name: 騎士の重盾
@@ -332,6 +339,7 @@ SHIELD_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
   mages_sheld:
     name: 魔術師の魔導盾
@@ -369,6 +377,7 @@ SHIELD_DATA:
         knockback_damage: 0.15
         invincible_turns: 1
         stave_bonus: 15
+        light_stave_bonus: 0
 
   pilgrimss_round_sheld:
     name: 巡礼者の丸盾
@@ -406,6 +415,7 @@ SHIELD_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 10
+        light_stave_bonus: 0
 
   scount_blackleather_sheld:
     name: スカウトの黒革盾
@@ -444,6 +454,7 @@ SHIELD_DATA:
         knockback_damage: 0.0
         invincible_turns: 0
         stave_bonus: 0
+        light_stave_bonus: 0
 
 
   test_all_bonus_shield:
@@ -482,3 +493,4 @@ SHIELD_DATA:
         knockback_damage: 0.05
         invincible_turns: 1
         stave_bonus: 5
+        light_stave_bonus: 1

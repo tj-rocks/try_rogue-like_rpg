@@ -35,15 +35,34 @@ def test_light_stave():
     player, dungeon, dialog = setup_test_environment()
     dungeon.is_lighted = False
     
+    # 敵を配置して、感知範囲（バカ度）が下がるかテストする
+    enemy1 = Enemy(0, 0, "slime")
+    enemy2 = Enemy(0, 0, "goblin")
+    orig_detect = enemy1.detect_range
+    dungeon.enemies = [enemy1, enemy2]
+    
+    # 強化値+0 のテスト
     stave = StaveInstance("light_stave", charges=5)
+    stave.enhance = 0
     execute_stave(player, stave, dungeon, dialog)
     
     assert stave.charges == 4
     assert dungeon.is_lighted == True
-    # 全タイルが探索済みか
     for y in range(dungeon.map_height):
         for x in range(dungeon.map_width):
             assert dungeon.revealed_tiles[y][x] == True
+            
+    assert enemy1.detect_range == orig_detect, "強化値0なら感知範囲は変わらないはず"
+    
+    # 強化値+10 のテスト
+    stave.charges = 5
+    stave.enhance = 10
+    dungeon.is_lighted = False
+    execute_stave(player, stave, dungeon, dialog)
+    
+    expected_detect = max(1, orig_detect - 5.0)
+    assert enemy1.detect_range == expected_detect, f"強化値+10なら感知範囲は -5.0 されるはず (実際:{enemy1.detect_range})"
+    
     print("[OK] 燈の杖テスト合格")
 
 def test_heal_stave():

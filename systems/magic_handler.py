@@ -238,7 +238,7 @@ def execute_stave(player, stave, dungeon, dialog):
     elif effect_type == "invincible":
         msg += _effect_invincible(player, settings, dungeon, dialog)
     elif effect_type == "light_all":
-        msg += _effect_light_all(player, settings, dungeon, dialog)
+        msg += _effect_light_all(player, settings, dungeon, dialog, stave)
     else:
         msg += "しかし 何もおきなかった！"
 
@@ -433,7 +433,7 @@ def _effect_invincible(player, settings, dungeon, dialog):
     dungeon.magic_effects.append(FlashEffect(color=settings.get("effect_color", [255, 255, 150])))
     return f"聖なる光が 守ってくれる！\n{turns}ターンの間 ダメージを受けない！"
 
-def _effect_light_all(player, settings, dungeon, dialog):
+def _effect_light_all(player, settings, dungeon, dialog, stave=None):
     """フロア全体を明るく照らす"""
     if dungeon:
         # プレイヤーの目の前に光の演出を出す
@@ -449,5 +449,20 @@ def _effect_light_all(player, settings, dungeon, dialog):
         
         # 全体を照らす（罠の可視化とマップ全開）
         dungeon.reveal_floor()
-        return "フロア全体に まばゆい光が 広がった！\nすべての罠と マップが 見えるようになった！"
+        msg = "フロア全体に まばゆい光が 広がった！\nすべての罠と マップが 見えるようになった！"
+        
+        bonus_enhance = int(getattr(player, "get_magic_bonus", lambda k: 0)("light_stave_bonus"))
+        total_enhance = (stave.enhance if stave else 0) + bonus_enhance
+        
+        if total_enhance > 0:
+            reduction = total_enhance * 0.5
+            affected = 0
+            for e in dungeon.enemies:
+                if not getattr(e, "is_dead", False) and not getattr(e, "is_static", False):
+                    e.detect_range = max(1, e.detect_range - reduction)
+                    affected += 1
+            if affected > 0:
+                msg += f"\n強烈な光で {affected}体の敵の 感知能力が 低下した！"
+                
+        return msg
     return "しかし 何も 起こらなかった。"
