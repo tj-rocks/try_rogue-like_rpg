@@ -1101,14 +1101,14 @@ class InventoryDialog(BaseListDialog):
                 val += inst.get_enhance_bonus(k)
             if val:
                 is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
-                val_to_use = val * 100 if is_pct and isinstance(val, float) and val <= 1.0 else val
+                val_to_use = val * 100 if is_pct and isinstance(val, float) else val
                 param_texts.append(f"{label}: {fmt(val_to_use)}%" if is_pct else f"{label}: {fmt(val)}")
                 
         for mk, mlabel in MAGIC_MAP.items():
             mval = inst.get_stat(mk, 0)
             if mval:
                 is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
-                val_to_use = mval * 100 if is_pct and isinstance(mval, float) and mval < 1.0 else mval
+                val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
                 param_texts.append(f"{mlabel}: {fmt(val_to_use)}%" if is_pct else f"{mlabel}: {fmt(mval)}")
 
         # 3. パラメータの2列描画
@@ -1248,14 +1248,14 @@ class InventoryDialog(BaseListDialog):
                     val += inst.get_enhance_bonus(k)
                 if val:
                     is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
-                    val_to_use = val * 100 if is_pct and isinstance(val, float) and val <= 1.0 else val
+                    val_to_use = val * 100 if is_pct and isinstance(val, float) else val
                     lines.append(f"{label}: {fmt(val_to_use)}%" if is_pct else f"{label}: {fmt(val)}")
             # 魔法ボーナスの表示
             for mk, mlabel in MAGIC_MAP.items():
                 mval = inst.get_stat(mk, 0)
                 if mval:
                     is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
-                    val_to_use = mval * 100 if is_pct and isinstance(mval, float) and mval < 1.0 else mval
+                    val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
                     lines.append(f"{mlabel}: {fmt(val_to_use)}%" if is_pct else f"{mlabel}: {fmt(mval)}")
             desc = inst.get_stat("describe", "")
             if desc: lines.extend(["", desc])
