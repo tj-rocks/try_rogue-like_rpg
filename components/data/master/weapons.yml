@@ -85,6 +85,7 @@ WEAPON_DATA:
     floor_spawnable: false
     bonus:
       common:
+        aggro_mod: 0
         attack: 2
         accuracy_close: 15
         accuracy_range: 0
@@ -125,6 +126,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 11
         accuracy_close: 5
         accuracy_range: 0
@@ -165,6 +167,7 @@ WEAPON_DATA:
     floor_spawnable: false
     bonus:
       common:
+        aggro_mod: 0
         attack: 6
         accuracy_close: 5
         accuracy_range: 0
@@ -205,6 +208,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 6
         accuracy_close: 0
         accuracy_range: 0
@@ -245,6 +249,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 15
         accuracy_close: 5
         accuracy_range: 0
@@ -285,6 +290,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 20
         accuracy_close: 5
         accuracy_range: 0
@@ -366,6 +372,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 28
         accuracy_close: 5
         accuracy_range: 0
@@ -488,6 +495,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 10
         accuracy_close: 0
         accuracy_range: 0
@@ -528,6 +536,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
+        aggro_mod: 0
         attack: 22
         accuracy_close: 5
         accuracy_range: 0
