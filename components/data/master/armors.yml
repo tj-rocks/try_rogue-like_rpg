@@ -117,7 +117,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -1
+        aggro_mod: -0.5
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
