@@ -331,7 +331,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -3
+        aggro_mod: -1
         attack: 12
         accuracy_close: 20
         accuracy_range: 10
