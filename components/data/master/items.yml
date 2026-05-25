@@ -84,7 +84,7 @@ CONSUMABLE_DATA:
     name: 転移の石
     price: 2000
     min_rank: F
-    rarity: 7
+    rarity: 4
     image_path: components/pictures/icon/item.png
     sound: components/sounds/sfx/recharge.wav
     shop_buyable: true
