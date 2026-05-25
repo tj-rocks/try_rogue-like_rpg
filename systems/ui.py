@@ -1084,6 +1084,7 @@ class InventoryDialog(BaseListDialog):
             "magic_knockback_damage":"💨吹飛ダメ",
             "magic_invincible_turns":"✨無敵ターン",
             "magic_stave_bonus":     "🔮杖回数",
+            "magic_light_stave_bonus": "💡燈杖回",
         }
         
         def fmt(val):
@@ -1226,6 +1227,7 @@ class InventoryDialog(BaseListDialog):
             "magic_knockback_damage":"💨吹飛ダメージ",
             "magic_invincible_turns":"✨無敵ターン",
             "magic_stave_bonus":     "🔮杖回数",
+            "magic_light_stave_bonus": "💡燈杖回",
         }
         
         def fmt(val):

@@ -83,6 +83,7 @@ class TestEquipKagoBonus(unittest.TestCase):
         "magic_heal_ratio":      0.10,
         "magic_knockback_damage":0.15,
         "magic_invincible_turns":1,
+        "magic_light_stave_bonus":0,
     }
 
     ARMOR_EXPECTED = {
@@ -102,6 +103,7 @@ class TestEquipKagoBonus(unittest.TestCase):
         "magic_heal_ratio":      0.15,
         "magic_knockback_damage":0.10,
         "magic_invincible_turns":0,
+        "magic_light_stave_bonus":0,
     }
 
     SHIELD_EXPECTED = {
@@ -121,6 +123,7 @@ class TestEquipKagoBonus(unittest.TestCase):
         "magic_heal_ratio":      0.05,
         "magic_knockback_damage":0.05,
         "magic_invincible_turns":1,
+        "magic_light_stave_bonus":0,
     }
 
     # ui.py で合算している全キー
@@ -141,6 +144,7 @@ class TestEquipKagoBonus(unittest.TestCase):
         "magic_heal_ratio",
         "magic_knockback_damage",
         "magic_invincible_turns",
+        "magic_light_stave_bonus",
     ]
 
     def setUp(self):
