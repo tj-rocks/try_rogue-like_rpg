@@ -1097,8 +1097,8 @@ class InventoryDialog(BaseListDialog):
         param_texts = []
         for k, label in S_MAP.items():
             val = inst.get_stat(k, 0)
-            if k == "attack_bonus" and inst.enhance > 0: val += inst.enhance
-            if k == "defense_bonus" and inst.enhance > 0: val += inst.enhance
+            if inst.enhance > 0:
+                val += inst.get_enhance_bonus(k)
             if val:
                 is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
                 val_to_use = val * 100 if is_pct and isinstance(val, float) and val <= 1.0 else val
@@ -1244,8 +1244,8 @@ class InventoryDialog(BaseListDialog):
             lines.append(inst.get_name())
             for k, label in S_MAP.items():
                 val = inst.get_stat(k, 0)
-                if k == "attack_bonus" and inst.enhance > 0: val += inst.enhance
-                if k == "defense_bonus" and inst.enhance > 0: val += inst.enhance
+                if inst.enhance > 0:
+                    val += inst.get_enhance_bonus(k)
                 if val:
                     is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
                     val_to_use = val * 100 if is_pct and isinstance(val, float) and val <= 1.0 else val
