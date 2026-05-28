@@ -190,3 +190,25 @@ priest:
   dialogue:
   - 神官「私は神の奇跡によって、あなたの死の呪いを祓うことができます。」
   role: priest
+
+# --- レガシーNPC（殿堂入り） ---
+legacy_bat:
+  name: コウモリ先輩
+  image_path: components/pictures/enemies/bat
+  dialogue:
+  - コウモリ先輩「キィキィ...（昔はオレたちも、お前と一緒にバグと戦ったもんだぜ...）」
+  - コウモリ先輩「キィ...（入院中もよくデバッグしたよな。懐かしいぜ...）」
+
+legacy_dragon:
+  name: ドラゴン先輩
+  image_path: components/pictures/enemies/dragon
+  dialogue:
+  - ドラゴン先輩「グルル...（病院のベッドの上で、何度もクラッシュ画面を見たな...）」
+  - ドラゴン先輩「グルア！（あの頃のバグに比べれば、今のモンスターなんて可愛いもんさ！）」
+
+legacy_ghost:
+  name: ゴースト先輩
+  image_path: components/pictures/enemies/ghost
+  dialogue:
+  - ゴースト先輩「ヒュードロドロ...（エラーログの海をさまよった日々も、今となってはいい思い出さ...）」
+  - ゴースト先輩「ヒヒヒ...（たまには俺たちのことも思い出してくれよな...）」

@@ -953,6 +953,33 @@ TILE_MAPPINGS:
       - x: 19
         y: 35
         flip: false
+  legacy_bat:
+    category: npc
+    id: legacy_bat
+    positions:
+      - x: 8
+        y: 77
+        flip: false
+        min_rank: F
+        max_rank: SS
+  legacy_dragon:
+    category: npc
+    id: legacy_dragon
+    positions:
+      - x: 10
+        y: 79
+        flip: false
+        min_rank: F
+        max_rank: SS
+  legacy_ghost:
+    category: npc
+    id: legacy_ghost
+    positions:
+      - x: 12
+        y: 81
+        flip: false
+        min_rank: F
+        max_rank: SS
   wall_deco_ivy:
     category: wall_decoration
     desc: 壁のツタ
