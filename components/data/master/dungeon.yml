@@ -82,6 +82,9 @@ DUNGEON_IMAGES:
     brightness: 5
     map: village.txt
     wall_decoration_ratio: 0.2
+# ==========================================
+# Fランク 到達可能階層 (1F 〜 11F)
+# ==========================================
   '1':
     image: shallow
     sound: need_more_adventures.mp3
@@ -147,6 +150,10 @@ DUNGEON_IMAGES:
     brightness: 2
     # map: first_rest_point.txt
     wall_decoration_ratio: 0.3
+
+# ==========================================
+# Eランク 到達可能階層 (12F 〜 21F)
+# ==========================================
   '12':
     image: standard
     sound: just_move.mp3
@@ -205,6 +212,10 @@ DUNGEON_IMAGES:
 
 
 
+
+# ==========================================
+# Dランク 到達可能階層 (22F 〜 30F)
+# ==========================================
   "22":
     image: deesert_ruin
     sound: sandstone_floor2.mp3
@@ -250,6 +261,10 @@ DUNGEON_IMAGES:
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
+
+# ==========================================
+# Cランク 到達可能階層 (31F 〜 35F)
+# ==========================================
   "31":
     image: standard
     sound: just_move.mp3
@@ -275,6 +290,10 @@ DUNGEON_IMAGES:
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
+
+# ==========================================
+# Bランク 到達可能階層 (36F 〜 55F)
+# ==========================================
   "36":
     image: standard
     sound: just_move.mp3
@@ -375,6 +394,10 @@ DUNGEON_IMAGES:
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
+
+# ==========================================
+# Aランク 到達可能階層 (56F 〜 70F)
+# ==========================================
   "56":
     image: deesert_ruin
     sound: sandstone_floor2.mp3
@@ -450,6 +473,10 @@ DUNGEON_IMAGES:
     sound: sandstone_floor.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
+
+# ==========================================
+# Sランク 到達可能階層 (71F 〜 80F)
+# ==========================================
   "71":
     image: temple
     sound: sandstone_floor.mp3
@@ -500,6 +527,10 @@ DUNGEON_IMAGES:
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
+
+# ==========================================
+# SSランク 到達可能階層 (81F 〜 99F)
+# ==========================================
   "81":
     image: deesert_ruin
     sound: sandstone_floor2.mp3
