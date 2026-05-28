@@ -415,6 +415,10 @@
                     <select id="shield-select" onchange="updateUI()"></select>
                 </div>
             </div>
+            
+            <div id="equipment-desc" style="font-size: 11px; color: var(--text-dim); margin-top: 12px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 6px; border: 1px solid var(--border);">
+                <!-- Descriptions will be inserted here -->
+            </div>
         </div>
 
         <!-- 武器パラメータ編集 -->
@@ -710,6 +714,13 @@
                         elS.value = val;
                     }
                 });
+                
+                // 説明文の表示更新
+                const weaponDesc = weapon.describe ? `🗡️ ${weapon.describe}` : '';
+                const armorDesc = armor.describe ? `🛡️ ${armor.describe}` : '';
+                const shieldDesc = shield.describe ? `🔰 ${shield.describe}` : '';
+                const allDesc = [weaponDesc, armorDesc, shieldDesc].filter(Boolean).join('<br><br>');
+                document.getElementById('equipment-desc').innerHTML = allDesc || 'No description available.';
             }
 
             // 現在入力されているパラメータ値（ライブ編集反映後）をすべて取得
