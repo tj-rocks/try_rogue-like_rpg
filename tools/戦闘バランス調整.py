@@ -194,7 +194,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     matched_key = None
                     if in_target_block:
                         for k in mapped_updates.keys():
-                            if stripped.startswith(f"{k}:"):
+                            # 完全一致または空白付きでマッチするか確認 (evaがevasionにマッチするのを防ぐ)
+                            if stripped.startswith(f"{k}: ") or stripped == f"{k}:":
                                 matched_key = k
                                 break
                     

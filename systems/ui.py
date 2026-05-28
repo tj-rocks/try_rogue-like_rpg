@@ -1078,13 +1078,13 @@ class InventoryDialog(BaseListDialog):
                  "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正",
                  "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON}
         MAGIC_MAP = {
-            "magic_fire_damage":    "🔥炎ダメ",
-            "magic_fire_range":     "🔥炎射程",
-            "magic_heal_ratio":     "💚回復量",
-            "magic_knockback_damage":"💨吹飛ダメ",
-            "magic_invincible_turns":"✨無敵ターン",
-            "magic_stave_bonus":     "🔮杖回数",
-            "magic_light_stave_bonus": "💡燈杖回",
+            "magic_fire_damage":    "[炎]ダメ",
+            "magic_fire_range":     "[炎]射程",
+            "magic_heal_ratio":     "[癒]回復量",
+            "magic_knockback_damage":"[風]吹飛ダメ",
+            "magic_invincible_turns":"[聖]無敵ターン",
+            "magic_stave_bonus":     "[魔]杖回数",
+            "magic_light_stave_bonus": "[光]燈杖回",
         }
         
         def fmt(val):
@@ -1101,14 +1101,14 @@ class InventoryDialog(BaseListDialog):
                 val += inst.get_enhance_bonus(k)
             if val:
                 is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
-                val_to_use = val * 100 if is_pct and isinstance(val, float) and val <= 1.0 else val
+                val_to_use = val * 100 if is_pct and isinstance(val, float) else val
                 param_texts.append(f"{label}: {fmt(val_to_use)}%" if is_pct else f"{label}: {fmt(val)}")
                 
         for mk, mlabel in MAGIC_MAP.items():
             mval = inst.get_stat(mk, 0)
             if mval:
                 is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
-                val_to_use = mval * 100 if is_pct and isinstance(mval, float) and mval < 1.0 else mval
+                val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
                 param_texts.append(f"{mlabel}: {fmt(val_to_use)}%" if is_pct else f"{mlabel}: {fmt(mval)}")
 
         # 3. パラメータの2列描画
@@ -1248,14 +1248,14 @@ class InventoryDialog(BaseListDialog):
                     val += inst.get_enhance_bonus(k)
                 if val:
                     is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
-                    val_to_use = val * 100 if is_pct and isinstance(val, float) and val <= 1.0 else val
+                    val_to_use = val * 100 if is_pct and isinstance(val, float) else val
                     lines.append(f"{label}: {fmt(val_to_use)}%" if is_pct else f"{label}: {fmt(val)}")
             # 魔法ボーナスの表示
             for mk, mlabel in MAGIC_MAP.items():
                 mval = inst.get_stat(mk, 0)
                 if mval:
                     is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
-                    val_to_use = mval * 100 if is_pct and isinstance(mval, float) and mval < 1.0 else mval
+                    val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
                     lines.append(f"{mlabel}: {fmt(val_to_use)}%" if is_pct else f"{mlabel}: {fmt(mval)}")
             desc = inst.get_stat("describe", "")
             if desc: lines.extend(["", desc])
@@ -3699,10 +3699,9 @@ def draw_minimap(screen, dungeon, player):
     map_surf = pygame.Surface((map_w, map_h), pygame.SRCALPHA)
     
     # --- 背景と枠線 ---
-    # 少し厚みのある背景色 (ダークネイビー系)
-    map_surf.fill((10, 15, 30, 180)) 
-    # 境界線を描画
-    pygame.draw.rect(map_surf, (80, 100, 150, 255), (0, 0, map_w, map_h), 1)
+    # ユーザーの要望により、背景（ダークネイビー）と枠線は描画しない
+    # map_surf.fill((10, 15, 30, 180)) 
+    # pygame.draw.rect(map_surf, (80, 100, 150, 255), (0, 0, map_w, map_h), 1)
     
     # --- 1. 探索済みタイル（地形）の描画 ---
     for y in range(dungeon.map_height):

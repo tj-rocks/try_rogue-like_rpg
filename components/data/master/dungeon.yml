@@ -82,6 +82,9 @@ DUNGEON_IMAGES:
     brightness: 5
     map: village.txt
     wall_decoration_ratio: 0.2
+# ==========================================
+# Fランク 到達可能階層 (1F 〜 11F)
+# ==========================================
   '1':
     image: shallow
     sound: need_more_adventures.mp3
@@ -121,19 +124,19 @@ DUNGEON_IMAGES:
   '7':
     image: standard
     sound: goto_unknown_area.mp3
-    brightness: 3
+    brightness: 2
     map: null
     wall_decoration_ratio: 0.3
   '8':
     image: standard
     sound: goto_unknown_area.mp3
-    brightness: 3
+    brightness: 2
     map: null
     wall_decoration_ratio: 0.3
   '9':
     image: standard
     sound: goto_unknown_area.mp3
-    brightness: 3
+    brightness: 2
     map: null
     wall_decoration_ratio: 0.3
   '10':
@@ -147,10 +150,14 @@ DUNGEON_IMAGES:
     brightness: 2
     # map: first_rest_point.txt
     wall_decoration_ratio: 0.3
+
+# ==========================================
+# Eランク 到達可能階層 (12F 〜 21F)
+# ==========================================
   '12':
     image: standard
     sound: just_move.mp3
-    brightness: 5
+    brightness: 2
     map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '13':
@@ -171,32 +178,32 @@ DUNGEON_IMAGES:
   '16':
     image: deesert_ruin
     sound: sandstone_floor2.mp3
-    brightness: 3
+    brightness: 1
     wall_decoration_ratio: 0.3
   '17':
     image: deesert_ruin
     sound: sandstone_floor2.mp3
-    brightness: 3
+    brightness: 1
     wall_decoration_ratio: 0.3
   '18':
     image: deesert_ruin
     sound: sandstone_floor2.mp3
-    brightness: 3
+    brightness: 1
     wall_decoration_ratio: 0.3
   '19':
     image: deesert_ruin
     sound: sandstone_floor2.mp3
-    brightness: 3
+    brightness: 1
     wall_decoration_ratio: 0.3
   '20':
     image: deesert_ruin
     sound: sandstone_floor2.mp3
-    brightness: 3
+    brightness: 1
     wall_decoration_ratio: 0.3
   '21':
     image: deesert_ruin
     sound: sandstone_floor2.mp3
-    brightness: 3
+    brightness: 1
     wall_decoration_ratio: 0.3
 
 
@@ -205,3 +212,417 @@ DUNGEON_IMAGES:
 
 
 
+
+# ==========================================
+# Dランク 到達可能階層 (22F 〜 30F)
+# ==========================================
+  "22":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "23":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "24":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "25":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "26":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "27":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "28":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "29":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "30":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+
+# ==========================================
+# Cランク 到達可能階層 (31F 〜 35F)
+# ==========================================
+  "31":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "32":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "33":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "34":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "35":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+
+# ==========================================
+# Bランク 到達可能階層 (36F 〜 55F)
+# ==========================================
+  "36":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "37":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "38":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "39":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "40":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "41":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "42":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "43":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "44":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "45":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "46":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "47":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "48":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "49":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "50":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "51":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "52":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "53":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "54":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "55":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+
+# ==========================================
+# Aランク 到達可能階層 (56F 〜 70F)
+# ==========================================
+  "56":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "57":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "58":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "59":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "60":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "61":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "62":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "63":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "64":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "65":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "66":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "67":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "68":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "69":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "70":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+
+# ==========================================
+# Sランク 到達可能階層 (71F 〜 80F)
+# ==========================================
+  "71":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "72":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "73":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "74":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "75":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "76":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "77":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "78":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "79":
+    image: temple
+    sound: sandstone_floor.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "80":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+
+# ==========================================
+# SSランク 到達可能階層 (81F 〜 99F)
+# ==========================================
+  "81":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "82":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "83":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "84":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "85":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "86":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "87":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "88":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "89":
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "90":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "91":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "92":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "93":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "94":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "95":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "96":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "97":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "98":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+  "99":
+    image: standard
+    sound: just_move.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
