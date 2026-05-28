@@ -224,6 +224,236 @@ ENEMY_DATA:
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
     attack_priority: close
+  bat:
+    name: バット
+    min_rank: D
+    image_folder: components/pictures/enemies/bat
+    drops:
+      normal: []
+      rare: []
+    normal_drop_rate: 0.1
+    rare_drop_rate: 0.0
+    hp: 25
+    attack: 25
+    defense: 3
+    evasion: 10
+    exp: 15
+    reward_gold: 30
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: arrow
+    attack_priority: close
+  dragon:
+    name: ドラゴン
+    min_rank: D
+    image_folder: components/pictures/enemies/dragon
+    drops:
+      normal: []
+      rare: []
+    normal_drop_rate: 0.1
+    rare_drop_rate: 0.0
+    hp: 25
+    attack: 25
+    defense: 3
+    evasion: 10
+    exp: 15
+    reward_gold: 30
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: arrow
+    attack_priority: close
+  ghost:
+    name: ゴースト
+    min_rank: D
+    image_folder: components/pictures/enemies/ghost
+    drops:
+      normal: []
+      rare: []
+    normal_drop_rate: 0.1
+    rare_drop_rate: 0.0
+    hp: 25
+    attack: 25
+    defense: 3
+    evasion: 10
+    exp: 15
+    reward_gold: 30
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: arrow
+    attack_priority: close
+  kuchitanago:
+    name: クチタナゴ
+    min_rank: D
+    image_folder: components/pictures/enemies/kuchitanago
+    drops:
+      normal: []
+      rare: []
+    normal_drop_rate: 0.1
+    rare_drop_rate: 0.0
+    hp: 25
+    attack: 25
+    defense: 3
+    evasion: 10
+    exp: 15
+    reward_gold: 30
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: arrow
+    attack_priority: close
+  mini_dragon:
+    name: ミニドラゴン
+    min_rank: D
+    image_folder: components/pictures/enemies/mini_dragon
+    drops:
+      normal: []
+      rare: []
+    normal_drop_rate: 0.1
+    rare_drop_rate: 0.0
+    hp: 25
+    attack: 25
+    defense: 3
+    evasion: 10
+    exp: 15
+    reward_gold: 30
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: arrow
+    attack_priority: close
+  mushigumo:
+    name: ムシグモ
+    min_rank: D
+    image_folder: components/pictures/enemies/mushigumo
+    drops:
+      normal: []
+      rare: []
+    normal_drop_rate: 0.1
+    rare_drop_rate: 0.0
+    hp: 25
+    attack: 25
+    defense: 3
+    evasion: 10
+    exp: 15
+    reward_gold: 30
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: arrow
+    attack_priority: close
+  ohst:
+    name: オースト
+    min_rank: D
+    image_folder: components/pictures/enemies/ohst
+    drops:
+      normal: []
+      rare: []
+    normal_drop_rate: 0.1
+    rare_drop_rate: 0.0
+    hp: 25
+    attack: 25
+    defense: 3
+    evasion: 10
+    exp: 15
+    reward_gold: 30
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: arrow
+    attack_priority: close
+  potaro:
+    name: ポタロウ
+    min_rank: D
+    image_folder: components/pictures/enemies/potaro
+    drops:
+      normal: []
+      rare: []
+    normal_drop_rate: 0.1
+    rare_drop_rate: 0.0
+    hp: 25
+    attack: 25
+    defense: 3
+    evasion: 10
+    exp: 15
+    reward_gold: 30
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: arrow
+    attack_priority: close
+  skelton_sword:
+    name: スケルトン剣士
+    min_rank: D
+    image_folder: components/pictures/enemies/skelton_sword
+    drops:
+      normal: []
+      rare: []
+    normal_drop_rate: 0.1
+    rare_drop_rate: 0.0
+    hp: 25
+    attack: 25
+    defense: 3
+    evasion: 10
+    exp: 15
+    reward_gold: 30
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: arrow
+    attack_priority: close
+  skelton_sword_armor:
+    name: アーマースケルトン
+    min_rank: D
+    image_folder: components/pictures/enemies/skelton_sword_armor
+    drops:
+      normal: []
+      rare: []
+    normal_drop_rate: 0.1
+    rare_drop_rate: 0.0
+    hp: 25
+    attack: 25
+    defense: 3
+    evasion: 10
+    exp: 15
+    reward_gold: 30
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: arrow
+    attack_priority: close
 # BOSS------------------------------
   suisui_slime:
     name: スイスイスライム
