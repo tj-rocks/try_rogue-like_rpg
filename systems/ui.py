@@ -3699,10 +3699,9 @@ def draw_minimap(screen, dungeon, player):
     map_surf = pygame.Surface((map_w, map_h), pygame.SRCALPHA)
     
     # --- 背景と枠線 ---
-    # 少し厚みのある背景色 (ダークネイビー系)
-    map_surf.fill((10, 15, 30, 180)) 
-    # 境界線を描画
-    pygame.draw.rect(map_surf, (80, 100, 150, 255), (0, 0, map_w, map_h), 1)
+    # ユーザーの要望により、背景（ダークネイビー）と枠線は描画しない
+    # map_surf.fill((10, 15, 30, 180)) 
+    # pygame.draw.rect(map_surf, (80, 100, 150, 255), (0, 0, map_w, map_h), 1)
     
     # --- 1. 探索済みタイル（地形）の描画 ---
     for y in range(dungeon.map_height):
