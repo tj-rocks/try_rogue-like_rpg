@@ -18,8 +18,11 @@ def play_bgm(file_path, loop=-1, fade_ms=1000):
         return
 
     try:
+        # fadeout() は非同期で停止タイマーをセットするため、
+        # 直後にload()やplay()を呼ぶと、新しい曲がフェードアウトタイマーによって停止されてしまう問題(バグ)がある。
+        # 曲を即座に切り替える際は stop() を使って確実に停止させる。
         if pygame.mixer.music.get_busy():
-            pygame.mixer.music.fadeout(fade_ms)
+            pygame.mixer.music.stop()
         
         pygame.mixer.music.load(file_path)
         pygame.mixer.music.play(loop, fade_ms=fade_ms)
