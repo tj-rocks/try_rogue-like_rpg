@@ -1977,6 +1977,11 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             return
                                     elif getattr(npc, "role", None) == "teleport":
                                         if teleport_dialog:
+                                            teleport_dialog.setup_destinations(player)
+                                            if not teleport_dialog.items:
+                                                dialog.text = "「まだ転移できる場所がないようじゃな。\n もう少し深く潜ってみなされ。」"
+                                                dialog.is_active = True
+                                                return
                                             # 先に挨拶を表示
                                             dialog.text = "\n".join(npc.get_dialogue())
                                             dialog.is_active = True
