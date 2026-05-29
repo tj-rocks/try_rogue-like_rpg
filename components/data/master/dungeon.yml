@@ -205,59 +205,51 @@ DUNGEON_IMAGES:
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-
-
-
-
-
-
-
-
 # ==========================================
 # Dランク 到達可能階層 (22F 〜 30F)
 # ==========================================
   "22":
-    image: deesert_ruin
+    image: wood
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "23":
-    image: deesert_ruin
+    image: wood
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "24":
-    image: deesert_ruin
+    image: wood
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "25":
-    image: deesert_ruin
+    image: wood
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "26":
-    image: deesert_ruin
+    image: wood
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "27":
-    image: deesert_ruin
+    image: rock
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "28":
-    image: deesert_ruin
+    image: rock
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "29":
-    image: deesert_ruin
+    image: rock
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "30":
-    image: standard
+    image: rock
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
@@ -266,31 +258,30 @@ DUNGEON_IMAGES:
 # Cランク 到達可能階層 (31F 〜 35F)
 # ==========================================
   "31":
-    image: standard
+    image: evil_castle
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "32":
-    image: standard
+    image: evil_castle
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "33":
-    image: standard
+    image: evil_castle
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "34":
-    image: standard
+    image: evil_castle
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "35":
-    image: standard
+    image: evil_castle
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-
 # ==========================================
 # Bランク 到達可能階層 (36F 〜 55F)
 # ==========================================

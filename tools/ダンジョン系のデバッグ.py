@@ -242,6 +242,9 @@ def main():
         player.max_hp = 200
         player.guild_point = 1000
         player.guild_rank = "F"
+        player.max_reached_floor = 99 # デバッグ用に最初から全ての休憩所を解放
+        player.coin = 100000
+        player.add_item_to_inventory("teleport_stone", 50)
 
         # 2. ダンジョンの初期化 (1階から開始)
         dungeon = warp_to_floor(1, player)
@@ -276,6 +279,7 @@ def main():
                     if change != 0:
                         new_floor = max(0, dungeon.current_floor + change)
                         dungeon = warp_to_floor(new_floor, player, spawn_reason="debug")
+                        player.max_reached_floor = max(player.max_reached_floor, new_floor) # デバッグワープでも到達階を更新
                         dungeon.is_combat_qa = True
                         dungeon.is_quest_qa = True
                         dungeon = setup_gungeon_mode(dungeon, player)

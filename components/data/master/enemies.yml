@@ -210,9 +210,9 @@ ENEMY_DATA:
       - iron_sword
     normal_drop_rate: 0.15
     rare_drop_rate: 0.03
-    hp: 25
+    hp: 56
     attack: 15
-    defense: 3
+    defense: 12
     evasion: 0
     exp: 12
     reward_gold: 200

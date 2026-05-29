@@ -85,7 +85,7 @@ CONSUMABLE_DATA:
     price: 2000
     min_rank: F
     rarity: 4
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/gem.png
     sound: components/sounds/sfx/recharge.wav
     shop_buyable: true
     max_stack: 5

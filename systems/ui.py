@@ -619,6 +619,17 @@ class ItemActionDialog:
                     elif itype == "lantern" and getattr(self.player, "equipped_lantern", None) == iid_or_key: is_equipped = True
 
                     if self.cursor_idx == 0:
+                        if itype == "consumable":
+                            from constants import CONSUMABLE_DATA
+                            data = CONSUMABLE_DATA.get(iid_or_key, {})
+                            effect = data.get("effect")
+                            if not effect or effect == "material":
+                                from systems.audio_manager import play_sfx
+                                from constants import SOUND_ERROR
+                                play_sfx(SOUND_ERROR)
+                                self.is_active = True # 閉じない
+                                return
+                        
                         if is_equipped:
                             if self.on_unequip: self.on_unequip(itype, iid_or_key)
                         elif self.on_use:
@@ -641,6 +652,14 @@ class ItemActionDialog:
         elif itype == "lantern" and getattr(self.player, "equipped_lantern", None) == iid_or_key: is_equipped = True
 
         # 選択肢を中央に配置
+        is_unusable = False
+        if itype == "consumable":
+            from constants import CONSUMABLE_DATA
+            data = CONSUMABLE_DATA.get(iid_or_key, {})
+            effect = data.get("effect")
+            if not effect or effect == "material":
+                is_unusable = True
+                
         if itype == "stave":
             first_opt = Text.UI.WAVE
         elif is_equipped:
@@ -651,10 +670,16 @@ class ItemActionDialog:
         options = [first_opt, Text.UI.DISCARD, Text.UI.QUIT]
         for i, opt in enumerate(options):
             color = (255, 255, 255)
-            if i == self.cursor_idx:
-                color = (255, 255, 100)
-                cursor = self.font.render(">", True, color)
-                screen.blit(cursor, (self.x + self.width // 2 - 100, self.y + 60 + i * 50))
+            if i == 0 and is_unusable:
+                color = (120, 120, 120)
+                if i == self.cursor_idx:
+                    cursor = self.font.render(">", True, color)
+                    screen.blit(cursor, (self.x + self.width // 2 - 100, self.y + 60 + i * 50))
+            else:
+                if i == self.cursor_idx:
+                    color = (255, 255, 100)
+                    cursor = self.font.render(">", True, color)
+                    screen.blit(cursor, (self.x + self.width // 2 - 100, self.y + 60 + i * 50))
             
             text = self.font.render(opt, True, color)
             screen.blit(text, (self.x + self.width // 2 - 60, self.y + 60 + i * 50))
@@ -1986,7 +2011,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             dialog.text = "\n".join(npc.get_dialogue())
                                             dialog.is_active = True
                                             # ダイアログが開いた後にテレポートUIを起動
-                                            teleport_dialog.open(player)
+                                            teleport_dialog.is_active = True
                                             return
                                     elif getattr(npc, "role", None) == "priest":
                                         from constants import CURSE_RECOVERY_COST_GP_PER_LEVEL
@@ -3509,6 +3534,15 @@ class TeleportDialog(BaseListDialog):
         self.target_name = ""
         self.cost_money = 0
         self.required_item = ""
+
+    def open(self, player):
+        from systems.game_state import game_state
+        game_state["player_ref"] = player
+        self.setup_destinations(player)
+        if not self.items:
+            return False
+        self.is_active = True
+        return True
 
     def get_title(self):
         return "テレポート屋（転移）"
