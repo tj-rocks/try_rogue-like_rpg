@@ -27,6 +27,7 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
     attack_priority: close
+    damaged_detect_range: 8
   mawaru_kame:
     name: まわるがめ
     min_rank: F
@@ -56,6 +57,7 @@ ENEMY_DATA:
     close_attack_effect: physical_heavy
     ranged_attack_effect: sonic_wave
     attack_priority: close
+    damaged_detect_range: 6
   normal_tako:
     name: ふつうたこ
     min_rank: F
@@ -84,6 +86,7 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
     attack_priority: close
+    damaged_detect_range: 10
 # Eランクーーーーーーーーーー
   kowai_kusa:
     name: こわいくさ
@@ -113,6 +116,7 @@ ENEMY_DATA:
     close_attack_effect: physical_heavy
     ranged_attack_effect: arrow
     attack_priority: ranged
+    damaged_detect_range: 20
   slime_red:
     name: あかいスライム
     min_rank: E
@@ -140,6 +144,7 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
     attack_priority: close
+    damaged_detect_range: 8
   bakudan_man:
     name: バクダンマン
     min_rank: E
@@ -167,6 +172,7 @@ ENEMY_DATA:
     close_attack_effect: explosion
     ranged_attack_effect: explosion
     attack_priority: ranged
+    damaged_detect_range: 12
   doku_kame:
     name: どくがめ
     min_rank: E
@@ -196,6 +202,7 @@ ENEMY_DATA:
     close_attack_effect: strange_mucus
     ranged_attack_effect: strange_mucus
     attack_priority: close
+    damaged_detect_range: 6
 # Dランクーーーーーーーーーー
   skeleton:
     name: スケルトン
@@ -210,13 +217,13 @@ ENEMY_DATA:
       - iron_sword
     normal_drop_rate: 0.15
     rare_drop_rate: 0.03
-    hp: 56
-    attack: 15
+    hp: 25
+    attack: 28
     defense: 12
     evasion: 0
     exp: 12
     reward_gold: 200
-    accuracy_close: 90
+    accuracy_close: 100
     accuracy_ranged: 90
     attack_range: 1
     stupidity: 5
@@ -224,6 +231,7 @@ ENEMY_DATA:
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
     attack_priority: close
+    damaged_detect_range: 25
   kuchitanago:
     name: クチタナゴ
     min_rank: D
@@ -233,8 +241,8 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 25
-    attack: 25
+    hp: 30
+    attack: 26
     defense: 3
     evasion: 10
     exp: 15
@@ -247,6 +255,7 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
     attack_priority: close
+    damaged_detect_range: 12
   mushigumo:
     name: ムシグモ
     min_rank: D
@@ -257,7 +266,7 @@ ENEMY_DATA:
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
     hp: 25
-    attack: 25
+    attack: 26
     defense: 3
     evasion: 10
     exp: 15
@@ -270,6 +279,7 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
     attack_priority: close
+    damaged_detect_range: 20
   potaro:
     name: ポタロウ
     min_rank: D
@@ -279,8 +289,8 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 25
-    attack: 25
+    hp: 30
+    attack: 27
     defense: 3
     evasion: 10
     exp: 15
@@ -293,6 +303,7 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
     attack_priority: close
+    damaged_detect_range: 15
 
 # Cランクーーーーーーーーーー
   mini_dragon:
@@ -304,9 +315,9 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 25
-    attack: 25
-    defense: 3
+    hp: 32
+    attack: 29
+    defense: 10
     evasion: 10
     exp: 15
     reward_gold: 30
@@ -318,6 +329,7 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
     attack_priority: close
+    damaged_detect_range: 12
   ohst:
     name: オースト
     min_rank: C
@@ -327,10 +339,10 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 25
-    attack: 25
-    defense: 3
-    evasion: 10
+    hp: 32
+    attack: 29
+    defense: 0
+    evasion: 20
     exp: 15
     reward_gold: 30
     accuracy_close: 100
@@ -341,6 +353,7 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
     attack_priority: close
+    damaged_detect_range: 12
   skelton_sword:
     name: スケルトン剣士
     min_rank: C
@@ -350,10 +363,10 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 25
-    attack: 25
-    defense: 3
-    evasion: 10
+    hp: 32
+    attack: 29
+    defense: 10
+    evasion: 18
     exp: 15
     reward_gold: 30
     accuracy_close: 100
@@ -364,6 +377,7 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
     attack_priority: close
+    damaged_detect_range: 25
   skelton_sword_armor:
     name: アーマースケルトン
     min_rank: C
@@ -373,9 +387,9 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 25
-    attack: 25
-    defense: 3
+    hp: 35
+    attack: 29
+    defense: 12
     evasion: 10
     exp: 15
     reward_gold: 30
@@ -387,6 +401,7 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
     attack_priority: close
+    damaged_detect_range: 25
 # BOSS------------------------------
   suisui_slime:
     name: スイスイスライム
@@ -419,6 +434,7 @@ ENEMY_DATA:
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
     attack_priority: close
+    damaged_detect_range: 100
   sukesuke_skeleton:
     name: スケスケスケルトン
     min_rank: E
@@ -450,6 +466,7 @@ ENEMY_DATA:
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
     attack_priority: close
+    damaged_detect_range: 100
   undead_father:
     name: 父の亡霊
     min_rank: B
@@ -479,3 +496,4 @@ ENEMY_DATA:
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
     attack_priority: close
+    damaged_detect_range: 100

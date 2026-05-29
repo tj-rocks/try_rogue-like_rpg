@@ -440,6 +440,7 @@
                 <div class="edit-row"><label>ランタン視野</label><input type="number" id="edit-weapon-lantern_bonus" step="1" oninput="livePreview()"></div>
                 <div class="edit-row"><label>自然回復</label><input type="number" id="edit-weapon-regen_bonus" step="1" oninput="livePreview()"></div>
                 <div class="edit-row"><label>防御無視率</label><input type="number" id="edit-weapon-armor_penetration" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>ヘイト補正</label><input type="number" id="edit-weapon-aggro_mod" step="1" oninput="livePreview()"></div>
                 
                 <div class="inline-edit-header">魔法ボーナス</div>
                 <div class="edit-row"><label>火炎追加ダメ</label><input type="number" id="edit-weapon-magic_fire_damage" step="0.01" oninput="livePreview()"></div>
@@ -470,6 +471,7 @@
                 <div class="edit-row"><label>ランタン視野</label><input type="number" id="edit-armor-lantern_bonus" step="1" oninput="livePreview()"></div>
                 <div class="edit-row"><label>自然回復</label><input type="number" id="edit-armor-regen_bonus" step="1" oninput="livePreview()"></div>
                 <div class="edit-row"><label>防御無視率</label><input type="number" id="edit-armor-armor_penetration" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>ヘイト補正</label><input type="number" id="edit-armor-aggro_mod" step="1" oninput="livePreview()"></div>
                 
                 <div class="inline-edit-header">魔法ボーナス</div>
                 <div class="edit-row"><label>火炎追加ダメ</label><input type="number" id="edit-armor-magic_fire_damage" step="0.01" oninput="livePreview()"></div>
@@ -500,6 +502,7 @@
                 <div class="edit-row"><label>ランタン視野</label><input type="number" id="edit-shield-lantern_bonus" step="1" oninput="livePreview()"></div>
                 <div class="edit-row"><label>自然回復</label><input type="number" id="edit-shield-regen_bonus" step="1" oninput="livePreview()"></div>
                 <div class="edit-row"><label>防御無視率</label><input type="number" id="edit-shield-armor_penetration" step="0.01" oninput="livePreview()"></div>
+                <div class="edit-row"><label>ヘイト補正</label><input type="number" id="edit-shield-aggro_mod" step="1" oninput="livePreview()"></div>
                 
                 <div class="inline-edit-header">魔法ボーナス</div>
                 <div class="edit-row"><label>火炎追加ダメ</label><input type="number" id="edit-shield-magic_fire_damage" step="0.01" oninput="livePreview()"></div>
@@ -607,7 +610,7 @@
             'block_chance', 'block_chance_close', 'block_chance_ranged',
             'stave_bonus', 'lantern_bonus', 'regen_bonus', 'armor_penetration',
             'magic_fire_damage', 'magic_fire_range', 'magic_heal_ratio',
-            'magic_knockback_damage', 'magic_invincible_turns'
+            'magic_knockback_damage', 'magic_invincible_turns', 'aggro_mod'
         ];
 
         async function manualSaveEquipment(type) {

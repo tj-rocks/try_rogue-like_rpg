@@ -231,7 +231,7 @@ SHIELD_DATA:
     name: 戦士の盾
     category: round_shield
     min_rank: D
-    max_rank: A
+    max_rank: B
     rarity: 3
     price: 2000
     image_dir: components/pictures/shield
@@ -246,13 +246,13 @@ SHIELD_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
-        hp: 0
+        crit_rate: 0.05
+        hp: 5
         defense: 0
         eva: 0.0
         block_chance: 0.0
-        block_chance_close: 0.10
-        block_chance_ranged: 0.10
+        block_chance_close: 0.15
+        block_chance_ranged: 0.1
         lantern_bonus: 0
         regen: 0
         stupidity: 0
@@ -270,7 +270,7 @@ SHIELD_DATA:
     name: 狩人の木盾
     category: round_shield
     min_rank: D
-    max_rank: A
+    max_rank: B
     rarity: 3
     price: 1200
     image_dir: components/pictures/shield
@@ -283,9 +283,9 @@ SHIELD_DATA:
       common:
         aggro_mod: -2
         attack: 0
-        accuracy_close: 15
+        accuracy_close: 20
         accuracy_range: 15
-        crit_rate: 0.05
+        crit_rate: 0.15
         hp: 0
         defense: 0
         eva: 0.05
@@ -309,7 +309,7 @@ SHIELD_DATA:
     name: 騎士の重盾
     category: large_shield
     min_rank: D
-    max_rank: A
+    max_rank: B
     rarity: 4
     price: 4000
     image_dir: components/pictures/shield
@@ -321,16 +321,16 @@ SHIELD_DATA:
     bonus:
       common:
         aggro_mod: 4
-        attack: 0
-        accuracy_close: -10
+        attack: 2
+        accuracy_close: -5
         accuracy_range: -10
         crit_rate: 0.0
-        hp: 0
-        defense: 0
+        hp: -10
+        defense: 2
         eva: -0.05
         block_chance: 0.0
-        block_chance_close: 0.22
-        block_chance_ranged: 0.22
+        block_chance_close: 0.1
+        block_chance_ranged: 0.1
         lantern_bonus: 0
         regen: 0
         stupidity: 0
@@ -348,7 +348,7 @@ SHIELD_DATA:
     name: 魔術師の魔導盾
     category: round_shield
     min_rank: D
-    max_rank: A
+    max_rank: B
     rarity: 4
     price: 3000
     image_dir: components/pictures/shield
@@ -368,8 +368,8 @@ SHIELD_DATA:
         defense: 0
         eva: 0.0
         block_chance: 0.0
-        block_chance_close: 0.05
-        block_chance_ranged: 0.05
+        block_chance_close: 0.2
+        block_chance_ranged: 0.2
         lantern_bonus: 0
         regen: 0
         stupidity: 0
@@ -380,14 +380,14 @@ SHIELD_DATA:
         heal_ratio: 0.0
         knockback_damage: 0.15
         invincible_turns: 1
-        stave_bonus: 15
+        stave_bonus: 2
         light_stave_bonus: 0
 
   pilgrimss_round_sheld:
     name: 巡礼者の丸盾
     category: round_shield
     min_rank: D
-    max_rank: A
+    max_rank: B
     rarity: 4
     price: 3200
     image_dir: components/pictures/shield
@@ -407,8 +407,8 @@ SHIELD_DATA:
         defense: 0
         eva: 0.0
         block_chance: 0.0
-        block_chance_close: 0.08
-        block_chance_ranged: 0.08
+        block_chance_close: 0.1
+        block_chance_ranged: 0.1
         lantern_bonus: 0
         regen: 1
         stupidity: 0
@@ -419,14 +419,14 @@ SHIELD_DATA:
         heal_ratio: 0.10
         knockback_damage: 0.0
         invincible_turns: 0
-        stave_bonus: 10
+        stave_bonus: 0
         light_stave_bonus: 0
 
   scount_blackleather_sheld:
     name: スカウトの黒革盾
     category: round_shield
     min_rank: D
-    max_rank: A
+    max_rank: B
     rarity: 3
     price: 2600
     image_dir: components/pictures/shield
@@ -437,11 +437,11 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -2
+        aggro_mod: -1
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.10
+        crit_rate: 0.1
         hp: 0
         defense: 0
         eva: 0.05
@@ -451,7 +451,7 @@ SHIELD_DATA:
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0.1
       magic:
         fire_damage: 0.0
         fire_range: 0
