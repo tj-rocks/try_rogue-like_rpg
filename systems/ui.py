@@ -3574,13 +3574,7 @@ class TeleportDialog(BaseListDialog):
             lines.append("冒険者の拠点となる村へ帰還します。")
             lines.append("一度休息をとり、装備を整えましょう。")
         return lines
-
-    def open(self, player):
-        # player参照を保持し、リストを構築してからアクティブにする
-        self.setup_destinations(player)
-        if not self.items: return False
-        self.is_active = True
-        return True
+    # (Inherit open() from BaseListDialog to correctly set game_state[self.STATE_KEY] = True)
 
     def handle_input(self, events, player):
         if not self.is_active: return None
@@ -3595,6 +3589,8 @@ class TeleportDialog(BaseListDialog):
         if res == "cancel":
             play_sfx(SOUND_CANCEL)
             self.is_active = False
+            from systems.game_state import game_state
+            game_state[self.STATE_KEY] = False
             self.mode = "SELECT"
             return None
         elif res == "confirm":
@@ -3602,6 +3598,8 @@ class TeleportDialog(BaseListDialog):
             if selected["type"] == "cancel":
                 play_sfx(SOUND_CANCEL)
                 self.is_active = False
+                from systems.game_state import game_state
+                game_state[self.STATE_KEY] = False
                 return None
                 
             self.target_floor = selected["floor"]
@@ -3662,6 +3660,7 @@ class TeleportDialog(BaseListDialog):
         # 演出付き転移の開始
         warp_with_pitfall(self.target_floor, player, spawn_reason=reason)
         self.is_active = False
+        game_state[self.STATE_KEY] = False
 
     def draw(self, screen, player):
         if not self.is_active: return
