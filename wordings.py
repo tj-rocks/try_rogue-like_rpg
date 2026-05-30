@@ -21,6 +21,7 @@ class Text:
         GUILD_TITLE = "冒険者ギルド"
         ENHANCE_TITLE = "鍛冶屋"
         USE_WHICH_ORE = "使用する鉱石を選択してください"
+        WHICH_PARAM_TO_ENHANCE = "強化するパラメータを選択してください"
         NO_ORE = "鉱石を持っていません"
         WHICH_STAVE_RECHARGE = "修復する杖を選択してください"
         NO_STAVE = "杖を持っていません"

@@ -281,8 +281,8 @@ def make_enhance_callback(player, dialog, enhance_dialog):
     """
     鍛冶屋での強化実行処理
     """
-    def on_select(item_type, iid, ore_key):
-        if not iid or not ore_key: return
+    def on_select(item_type, iid, ore_key, stat_key):
+        if not iid or not ore_key or not stat_key: return
         
         # 選択された鉱石を1つ消費
         if not player.has_item(ore_key):
@@ -301,11 +301,10 @@ def make_enhance_callback(player, dialog, enhance_dialog):
             ore_data = CONSUMABLE_DATA.get(ore_key, {})
             bonus = ore_data.get("enhance_bonus", 1)
             
-            inst.enhance += bonus
+            inst.apply_upgrade(stat_key, bonus)
             player.remove_item_by_key(ore_key) 
             player.update_equipment_stats()
             
-            up_msg = f"+{bonus}" if bonus > 0 else "変化なし"
             dialog.text = Text.Items.ENHANCED.format(name=inst.get_name())
             dialog.is_active = True
             enhance_dialog.is_active = False

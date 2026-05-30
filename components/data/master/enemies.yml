@@ -218,7 +218,7 @@ ENEMY_DATA:
     normal_drop_rate: 0.15
     rare_drop_rate: 0.03
     hp: 25
-    attack: 28
+    attack: 30
     defense: 12
     evasion: 0
     exp: 12
@@ -242,7 +242,7 @@ ENEMY_DATA:
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
     hp: 30
-    attack: 26
+    attack: 29
     defense: 3
     evasion: 10
     exp: 15

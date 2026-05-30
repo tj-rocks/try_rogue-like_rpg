@@ -90,10 +90,7 @@ WEAPON_DATA:
         accuracy_close: 15
         accuracy_range: 0
         crit_rate: 0.05
-        hp: 0
         defense: 0
-        eva: 0
-        block_chance: 0
         block_chance_close: 0
         block_chance_ranged: 0
         lantern_bonus: 0
@@ -131,10 +128,7 @@ WEAPON_DATA:
         accuracy_close: 5
         accuracy_range: 0
         crit_rate: 0.05
-        hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -172,10 +166,7 @@ WEAPON_DATA:
         accuracy_close: 5
         accuracy_range: 0
         crit_rate: 0.05
-        hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -213,10 +204,7 @@ WEAPON_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.08
-        hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -254,10 +242,7 @@ WEAPON_DATA:
         accuracy_close: 5
         accuracy_range: 0
         crit_rate: 0.05
-        hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -295,10 +280,7 @@ WEAPON_DATA:
         accuracy_close: 5
         accuracy_range: 0
         crit_rate: 0.05
-        hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -336,10 +318,7 @@ WEAPON_DATA:
         accuracy_close: 20
         accuracy_range: 10
         crit_rate: 0.2
-        hp: 0
         defense: 0
-        eva: 0
-        block_chance: 0
         block_chance_close: 0
         block_chance_ranged: 0
         lantern_bonus: 0
@@ -379,8 +358,6 @@ WEAPON_DATA:
         crit_rate: 0.05
         hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -420,10 +397,8 @@ WEAPON_DATA:
         crit_rate: 0.15
         hp: 0
         defense: 0
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 0
         regen: 0
         stupidity: 0
@@ -461,10 +436,8 @@ WEAPON_DATA:
         crit_rate: -0.05
         hp: 5
         defense: 0
-        eva: -0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: -0.05
+        block_chance_ranged: -0.05
         lantern_bonus: 0
         regen: 0
         stupidity: 0
@@ -502,8 +475,6 @@ WEAPON_DATA:
         crit_rate: 0.0
         hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -543,8 +514,6 @@ WEAPON_DATA:
         crit_rate: 0.05
         hp: 10
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -584,10 +553,8 @@ WEAPON_DATA:
         crit_rate: 0.1
         hp: 0
         defense: 0
-        eva: 0.1
-        block_chance: 0.0
-        block_chance_close: 0.1
-        block_chance_ranged: 0.0
+        block_chance_close: 0.2
+        block_chance_ranged: 0.1
         lantern_bonus: 0
         regen: 0
         stupidity: 0
@@ -623,10 +590,8 @@ WEAPON_DATA:
         crit_rate: 0.15
         hp: 25
         defense: 5
-        eva: 0.08
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.08
+        block_chance_ranged: 0.08
         lantern_bonus: 0
         regen: 1
         aggro_mod: -2

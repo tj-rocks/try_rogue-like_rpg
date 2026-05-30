@@ -245,6 +245,20 @@ def main():
         player.max_reached_floor = 99 # デバッグ用に最初から全ての休憩所を解放
         player.coin = 100000
         player.add_item_to_inventory("teleport_stone", 50)
+        
+        # 強化用の石を追加
+        player.add_item_to_inventory("red_stone", 9)
+        player.add_item_to_inventory("blue_stone", 9)
+        player.add_item_to_inventory("green_stone", 9)
+        player.add_item_to_inventory("purple_stone", 9)
+        
+        # 検証用の武器・防具・盾を追加
+        from components.sprites.player import EquipInstance
+        player.weapon_inventory.append(EquipInstance("weapon", "scount_small_knife"))
+        player.weapon_inventory.append(EquipInstance("weapon", "iron_sword"))
+        player.weapon_inventory.append(EquipInstance("weapon", "test_all_bonus_weapon"))
+        player.armor_inventory.append(EquipInstance("armor", "test_all_bonus_armor"))
+        player.shield_inventory.append(EquipInstance("shield", "test_all_bonus_shield"))
 
         # 2. ダンジョンの初期化 (1階から開始)
         dungeon = warp_to_floor(1, player)

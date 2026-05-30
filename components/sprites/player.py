@@ -24,6 +24,24 @@ def _new_equip_id():
     _equip_id_counter += 1
     return _equip_id_counter
 
+ORE_STAT_CATEGORIES = {
+    "red_stone": {
+        "attack_bonus", "accuracy_bonus_close", "accuracy_bonus",
+        "crit_rate", "crit_bonus", "armor_penetration"
+    },
+    "blue_stone": {
+        "defense_bonus", "hp_bonus"
+    },
+    "green_stone": {
+        "block_chance_close", "block_chance_ranged", "regen_bonus", "lantern_bonus", "aggro_mod", "stupidity"
+    },
+    "purple_stone": {
+        "magic_stave_bonus", "magic_light_stave_bonus", "magic_heal_ratio",
+        "magic_fire_damage", "magic_fire_range", "magic_knockback_damage",
+        "magic_invincible_turns"
+    }
+}
+
 class EquipInstance:
     def __init__(self, equip_type, key, randomize=False):
         self.iid = _new_equip_id()
@@ -42,6 +60,42 @@ class EquipInstance:
             data = LANTERN_DATA.get(self.key, {})
         return data.get(stat_key, default)
 
+    def get_base_upgradeable_stats(self):
+        # 装備品が現在持っている（base > 0）かつ、いずれかの系統に属するステータス
+        all_upgradeable_keys = set()
+        for cats in ORE_STAT_CATEGORIES.values():
+            all_upgradeable_keys.update(cats)
+        
+        compatible = []
+        for k in all_upgradeable_keys:
+            if self.get_stat(k, 0) > 0:
+                compatible.append(k)
+        return compatible
+
+    def is_ore_compatible(self, ore_key):
+        base_stats = self.get_base_upgradeable_stats()
+        if not base_stats:
+            return False
+        if ore_key in ORE_STAT_CATEGORIES:
+            allowed_stats = ORE_STAT_CATEGORIES[ore_key]
+            return any(k in allowed_stats for k in base_stats)
+        return False
+
+    def apply_upgrade(self, stat_key, bonus):
+        base_stats = self.get_base_upgradeable_stats()
+        if not base_stats:
+            return
+        
+        # 過去データとの互換性のため、既存の enhance 値で初期化
+        for k in base_stats:
+            if k not in self.stats:
+                self.stats[k] = self.enhance
+        
+        if stat_key in self.stats:
+            self.stats[stat_key] += bonus
+            
+        self.enhance += bonus
+
     def get_enhance_bonus(self, stat_key):
         # その装備品が元々持っていないステータスは、強化しても増えない（常に0）
         base = self.get_stat(stat_key, 0)
@@ -54,9 +108,13 @@ class EquipInstance:
         elif self.equip_type == "shield": data = SHIELD_DATA.get(self.key, {})
 
         growth = data.get("growth")
-        if not growth or self.enhance == 0:
-            # growth がない場合は、単純に強化値を返す（古い互換用）
-            return self.enhance
+        if not growth:
+            # デフォルト成長設定
+            growth = {"bonus_limit": 2, "times_limit": 50, "over_limit_growth_rate": 0.003}
+
+        stat_enhance = self.stats.get(stat_key, self.enhance)
+        if stat_enhance == 0:
+            return 0
 
         bonus_limit = growth.get("bonus_limit", 2)
         times_limit = max(1, growth.get("times_limit", 50))
@@ -66,10 +124,10 @@ class EquipInstance:
         per_step      = growth_room / times_limit
         over_per_step = base * over_rate
 
-        if self.enhance <= times_limit:
-            bonus = self.enhance * per_step
+        if stat_enhance <= times_limit:
+            bonus = stat_enhance * per_step
         else:
-            bonus = growth_room + (self.enhance - times_limit) * over_per_step
+            bonus = growth_room + (stat_enhance - times_limit) * over_per_step
         return round(bonus, 3)
 
     def get_name(self):
@@ -193,26 +251,7 @@ class Player(Entity):
             val = int(val * (1.0 - CURSE_REDUCTION_RATE))
         return val
 
-    @property
-    def eva_bonus(self):
-        from constants import PLAYER_EVASION
-        base = PLAYER_EVASION
-        bonus = 0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
-            inst = self._find_equip_inst(inv, eid)
-            if inst:
-                # eva_bonus または block_chance を取得
-                val = inst.get_stat("eva_bonus", inst.get_stat("block_chance", 0))
-                # 小数の場合は100倍してパーセントにする
-                if isinstance(val, float) and val < 1.0:
-                    bonus += val * 100
-                else:
-                    bonus += val
-        val = int(base + bonus)
-        if "evasion" in getattr(self, "cursed_stats", []):
-            from constants import CURSE_REDUCTION_RATE
-            val = int(val * (1.0 - CURSE_REDUCTION_RATE))
-        return val
+
 
     @property
     def crit_bonus(self):
@@ -305,7 +344,10 @@ class Player(Entity):
         for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst:
-                total += inst.get_stat("block_chance_close", inst.get_stat("block_chance", 0.0)) + inst.get_enhance_bonus("block_chance_close")
+                total += inst.get_stat("block_chance_close", 0.0) + inst.get_enhance_bonus("block_chance_close")
+        if "evasion" in getattr(self, "cursed_stats", []):
+            from constants import CURSE_REDUCTION_RATE
+            total = total * (1.0 - CURSE_REDUCTION_RATE)
         return total
 
     @property
@@ -314,7 +356,10 @@ class Player(Entity):
         for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst:
-                total += inst.get_stat("block_chance_ranged", inst.get_stat("block_chance", 0.0)) + inst.get_enhance_bonus("block_chance_ranged")
+                total += inst.get_stat("block_chance_ranged", 0.0) + inst.get_enhance_bonus("block_chance_ranged")
+        if "evasion" in getattr(self, "cursed_stats", []):
+            from constants import CURSE_REDUCTION_RATE
+            total = total * (1.0 - CURSE_REDUCTION_RATE)
         return total
 
     def __init__(self):

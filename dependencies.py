@@ -7,6 +7,7 @@ from systems.entity_handler import update_dungeon_entities
 from systems.ui import (
     Dialog, ConfirmDialog, InventoryDialog, StatusBar, StatusDialog, 
     EnhanceDialog, ItemActionDialog, OreSelectionDialog, ShopDialog,
+    ParameterSelectionDialog,
     StaveSelectionDialog, GuildDialog, WarehouseDialog, BankDialog, handle_ui_events, draw_all_ui, 
     draw_vision_overlay, draw_opening_scene, draw_title_screen
 )

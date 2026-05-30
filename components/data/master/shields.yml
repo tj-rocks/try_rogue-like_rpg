@@ -52,10 +52,7 @@ SHIELD_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.0
-        hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.01
         block_chance_ranged: 0.01
         lantern_bonus: 0
@@ -91,10 +88,7 @@ SHIELD_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.0
-        hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.05
         block_chance_ranged: 0.05
         lantern_bonus: 0
@@ -130,10 +124,7 @@ SHIELD_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.1
-        hp: 10
         defense: 0
-        eva: 0
-        block_chance: 0
         block_chance_close: 0.08
         block_chance_ranged: 0.12
         lantern_bonus: 0
@@ -171,8 +162,6 @@ SHIELD_DATA:
         crit_rate: 0.0
         hp: 0
         defense: 1
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.12
         block_chance_ranged: 0.08
         lantern_bonus: 0
@@ -210,8 +199,6 @@ SHIELD_DATA:
         crit_rate: 0.0
         hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.12
         block_chance_ranged: 0.12
         lantern_bonus: 0
@@ -249,8 +236,6 @@ SHIELD_DATA:
         crit_rate: 0.05
         hp: 5
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.15
         block_chance_ranged: 0.1
         lantern_bonus: 0
@@ -288,10 +273,8 @@ SHIELD_DATA:
         crit_rate: 0.15
         hp: 0
         defense: 0
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.04
-        block_chance_ranged: 0.04
+        block_chance_close: 0.09
+        block_chance_ranged: 0.09
         lantern_bonus: 0
         regen: 0
         stupidity: 0
@@ -327,10 +310,8 @@ SHIELD_DATA:
         crit_rate: 0.0
         hp: -10
         defense: 2
-        eva: -0.05
-        block_chance: 0.0
-        block_chance_close: 0.1
-        block_chance_ranged: 0.1
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 0
         regen: 0
         stupidity: 0
@@ -366,8 +347,6 @@ SHIELD_DATA:
         crit_rate: 0.0
         hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.2
         block_chance_ranged: 0.2
         lantern_bonus: 0
@@ -405,8 +384,6 @@ SHIELD_DATA:
         crit_rate: 0.0
         hp: 20
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.1
         block_chance_ranged: 0.1
         lantern_bonus: 0
@@ -444,10 +421,8 @@ SHIELD_DATA:
         crit_rate: 0.1
         hp: 0
         defense: 0
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.08
-        block_chance_ranged: 0.08
+        block_chance_close: 0.13
+        block_chance_ranged: 0.13
         lantern_bonus: 0
         regen: 0
         stupidity: 0
@@ -482,10 +457,8 @@ SHIELD_DATA:
         crit_rate: 0.05
         hp: 10
         defense: 5
-        eva: 0.03
-        block_chance: 0.0
-        block_chance_close: 0.18
-        block_chance_ranged: 0.18
+        block_chance_close: 0.21
+        block_chance_ranged: 0.21
         lantern_bonus: 0
         regen: 1
         aggro_mod: -2

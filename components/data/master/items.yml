@@ -26,7 +26,7 @@ CONSUMABLE_DATA:
   return_wing:
     name: 帰還の道標
     effect: warp_home
-    price: 5000
+    price: 8000
     min_rank: F
     rarity: 7
     image_path: components/pictures/icon/hane.png
@@ -38,11 +38,12 @@ CONSUMABLE_DATA:
   revive_amulet:
     name: 復活のお守り
     effect: revive
-    price: 3000
+    price:  8000
     min_rank: D
     rarity: 7
     image_path: components/pictures/icon/omamori.png
     floor_spawnable: true
+    shop_buyable: false
   expired_potion:
     name: くさいポーション
     effect: heal_hp
@@ -85,9 +86,9 @@ CONSUMABLE_DATA:
     price: 2000
     min_rank: F
     rarity: 4
-    image_path: components/pictures/icon/gem.png
+    image_path: components/pictures/icon/gem_teleport.png
     sound: components/sounds/sfx/recharge.wav
-    shop_buyable: true
+    shop_buyable: false
     max_stack: 5
     describe: テレポート屋のサービスを利用するために必要な不思議な石。
     floor_spawnable: true
@@ -121,7 +122,7 @@ CONSUMABLE_DATA:
     name: ハイポーション
     effect: heal_hp
     heal_amount: 70
-    price: 200
+    price: 600
     min_rank: F
     rarity: 3
     image_path: components/pictures/icon/hi_potion.png
@@ -135,7 +136,7 @@ CONSUMABLE_DATA:
     name: 魔力の水晶
     effect: recharge
     recharge_amount: 5
-    price: 100
+    price: 2000
     min_rank: C
     rarity: 4
     image_path: components/pictures/icon/magic_crystal.png
@@ -144,41 +145,89 @@ CONSUMABLE_DATA:
     shop_buyable: true
     describe: 神秘的な光を放つ水晶。使い古した杖の魔力を回復させることができる。
     floor_spawnable: true
-  copper_ore:
-    name: 銅の鉱石
+  # copper_ore:
+  #   name: 銅の鉱石
+  #   effect: material
+  #   enhance_bonus: 1
+  #   price: 500
+  #   min_rank: F
+  #   rarity: 3
+  #   image_path: components/pictures/icon/copper_ore.png
+  #   max_stack: 99
+  #   shop_buyable: true
+  #   describe: どこにでもある一般的な銅の鉱石。鍛冶屋で装備の強化に利用できる。
+  #   floor_spawnable: true
+  # iron_ore:
+  #   name: 鉄の鉱石
+  #   effect: material
+  #   enhance_bonus: 1
+  #   price: 600
+  #   min_rank: D
+  #   rarity: 3
+  #   image_path: components/pictures/icon/iron_ore.png
+  #   max_stack: 99
+  #   shop_buyable: true
+  #   describe: 硬度の高い鉄の鉱石。装備をより強力に叩き直すための必需品。
+  #   floor_spawnable: true
+  # gold_ore:
+  #   name: 金の鉱石
+  #   effect: material
+  #   enhance_bonus: 2
+  #   price: 1000
+  #   min_rank: B
+  #   rarity: 2
+  #   image_path: components/pictures/icon/gold_ore.png
+  #   max_stack: 99
+  #   shop_buyable: true
+  #   describe: まばゆい輝きを放つ金の鉱石。非常に価値が高く、武具の性能を大幅に引き出す。
+  #   floor_spawnable: true
+  red_stone:
+    name: "赤い鉱石"
     effect: material
     enhance_bonus: 1
-    price: 500
+    price: 8000
     min_rank: F
-    rarity: 3
-    image_path: components/pictures/icon/copper_ore.png
-    max_stack: 99
-    shop_buyable: true
-    describe: どこにでもある一般的な銅の鉱石。鍛冶屋で装備の強化に利用できる。
+    rarity: 6
+    image_path: components/pictures/icon/red_stone.png
+    max_stack: 3
+    shop_buyable: false
+    describe: "加護が宿る石。鍛冶屋で攻撃関連のパラメータを1つ選択して強化できる。"
     floor_spawnable: true
-  iron_ore:
-    name: 鉄の鉱石
+  blue_stone:
+    name: "青い鉱石"
     effect: material
     enhance_bonus: 1
-    price: 600
-    min_rank: D
-    rarity: 3
-    image_path: components/pictures/icon/iron_ore.png
-    max_stack: 99
-    shop_buyable: true
-    describe: 硬度の高い鉄の鉱石。装備をより強力に叩き直すための必需品。
+    price: 8000
+    min_rank: F
+    rarity: 6
+    image_path: components/pictures/icon/blue_stone.png
+    max_stack: 3
+    shop_buyable: false
+    describe: "加護が宿る石。鍛冶屋で防御・HP関連のパラメータを1つ選択して強化できる。"
     floor_spawnable: true
-  gold_ore:
-    name: 金の鉱石
+  green_stone:
+    name: "緑の鉱石"
     effect: material
-    enhance_bonus: 2
-    price: 1000
-    min_rank: B
-    rarity: 2
-    image_path: components/pictures/icon/gold_ore.png
-    max_stack: 99
-    shop_buyable: true
-    describe: まばゆい輝きを放つ金の鉱石。非常に価値が高く、武具の性能を大幅に引き出す。
+    enhance_bonus: 1
+    price: 8000
+    min_rank: F
+    rarity: 6
+    image_path: components/pictures/icon/green_stone.png
+    max_stack: 3
+    shop_buyable: false
+    describe: "加護が宿る石。鍛冶屋で回避や回復、特殊効果などのパラメータを1つ選択して強化できる。"
+    floor_spawnable: true
+  purple_stone:
+    name: "紫の鉱石"
+    effect: material
+    enhance_bonus: 1
+    price: 8000
+    min_rank: F
+    rarity: 6
+    image_path: components/pictures/icon/purple_stone.png
+    max_stack: 3
+    shop_buyable: false
+    describe: "加護が宿る石。鍛冶屋で杖関連のパラメータを1つ選択して強化できる。"
     floor_spawnable: true
   basic_lantern:
     name: カンテラ

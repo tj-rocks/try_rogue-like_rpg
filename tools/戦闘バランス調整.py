@@ -92,8 +92,6 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 "attack_bonus": "attack",
                 "defense_bonus": "defense",
                 "hp_bonus": "hp",
-                "evasion_bonus": "eva",
-                "eva_bonus": "eva",
                 "accuracy_bonus_close": "accuracy_close",
                 "accuracy_bonus_ranged": "accuracy_range",
                 "block_chance_close": "block_chance_close",

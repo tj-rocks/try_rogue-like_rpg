@@ -89,7 +89,7 @@ class TestArmorPenetration(unittest.TestCase):
         attacker = MagicMock()
         attacker.total_armor_penetration = 0.60
         attacker.total_attack = 50 # 攻撃力50
-        attacker.crit_rate = 0.01
+        attacker.crit_rate = 0.0
         attacker.crit_bonus = 0.0
         attacker.status_to_inflict = None
         attacker.weapon = None
@@ -106,12 +106,12 @@ class TestArmorPenetration(unittest.TestCase):
         
         # 1. 防御無視60%によるダメージシミュレーション
         # 防御力 50 は 60%無視されて 20 になるはず
-        # 攻撃力 50 - 防御力 20 = ベースダメージ 30
-        # 乱数範囲: 30 * (0.9 ~ 1.0) = 27 ~ 30
-        # 最終ダメージは (27 ~ 30) の範囲に収まり、最低ダメージ 1 より確実に大きくなる
+        # 新式ベースダメージ: 50 * (50 / 70) = 35.71
+        # 乱数範囲: 35.71 * (0.9 ~ 1.0) = 32.14 ~ 35.71 -> 繰り上げにより 33 ~ 36
+        # 最終ダメージは (33 ~ 36) の範囲に収まり、最低ダメージ 1 より確実に大きくなる
         msg, dmg, is_crit, is_miss = deal_damage(attacker, target, is_magic=True)
         
-        self.assertTrue(27 <= dmg <= 30, f"Expected damage between 27 and 30, got {dmg}")
+        self.assertTrue(33 <= dmg <= 36, f"Expected damage between 33 and 36, got {dmg}")
         self.assertEqual(target.defense, 50) # 敵の元の防御力値は書き変わっていないこと
 
         # 2. 100%無視（防御無視率 1.0）のシミュレーション

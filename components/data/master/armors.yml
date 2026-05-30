@@ -48,10 +48,7 @@ ARMOR_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.0
-        hp: 0
         defense: 1
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -85,10 +82,7 @@ ARMOR_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.0
-        hp: 0
         defense: 7.5
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -124,10 +118,8 @@ ARMOR_DATA:
         crit_rate: 0.0
         hp: 0
         defense: 10
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 0
         regen: 1
         stupidity: 0
@@ -161,8 +153,6 @@ ARMOR_DATA:
         crit_rate: 0.0
         hp: 0
         defense: 11
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -198,8 +188,6 @@ ARMOR_DATA:
         crit_rate: 0.0
         hp: 0
         defense: 15
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -236,10 +224,8 @@ ARMOR_DATA:
         crit_rate: 0
         hp: 0
         defense: 14
-        eva: 0.05
-        block_chance: 0
-        block_chance_close: 0
-        block_chance_ranged: 0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 0
         regen: 0
         stupidity: 0
@@ -274,10 +260,8 @@ ARMOR_DATA:
         crit_rate: 0.0
         hp: 5
         defense: 15
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 0
         regen: 15
         stupidity: 0
@@ -312,10 +296,8 @@ ARMOR_DATA:
         crit_rate: 0.15
         hp: 0
         defense: 17
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 1
         regen: 0
         stupidity: 0
@@ -350,8 +332,6 @@ ARMOR_DATA:
         crit_rate: 0.0
         hp: 0
         defense: 18
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -388,10 +368,8 @@ ARMOR_DATA:
         crit_rate: 0.0
         hp: 5
         defense: 20
-        eva: -0.11
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: -0.11
+        block_chance_ranged: -0.11
         lantern_bonus: -1
         regen: 0
         stupidity: 0
@@ -426,8 +404,6 @@ ARMOR_DATA:
         crit_rate: 0.0
         hp: 30
         defense: 12
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -463,10 +439,8 @@ ARMOR_DATA:
         crit_rate: 0.1
         hp: 0
         defense: 14
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 0
         regen: 0
         aggro_mod: -1
@@ -502,8 +476,6 @@ ARMOR_DATA:
         crit_rate: 0.0
         hp: 0
         defense: 10
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -538,10 +510,8 @@ ARMOR_DATA:
         crit_rate: 0.10
         hp: 30
         defense: 15
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 1
         regen: 2
         aggro_mod: -5
