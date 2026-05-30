@@ -41,8 +41,13 @@ class AutoBalancerHandler(http.server.SimpleHTTPRequestHandler):
             with open(enemies_path, 'r', encoding='utf-8') as f:
                 raw_enemies = yaml.safe_load(f) or {}
 
+            weapons_path = os.path.join(MASTER_DATA_DIR, "weapons.yml")
+            with open(weapons_path, 'r', encoding='utf-8') as f:
+                raw_weapons = yaml.safe_load(f) or {}
+
             data = {
-                "enemies": raw_enemies.get("ENEMY_DATA", {})
+                "enemies": raw_enemies.get("ENEMY_DATA", {}),
+                "weapons": raw_weapons.get("WEAPON_DATA", {})
             }
             self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
         else:
