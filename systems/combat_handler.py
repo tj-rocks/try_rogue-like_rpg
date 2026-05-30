@@ -138,10 +138,10 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     base_dmg = calc_atk * (50.0 / (50.0 + defense))
     base_dmg = max(0.1, base_dmg) # 最低0.1ダメージ保証
     
-    # 乱数要素: 9割は保証、1割が乱数 (90-100%)
+    # 乱数要素: 7割は保証、3割が乱数 (70-100%)
     from systems.math_utils import hardcore_round
     # ダメージ計算も小数点第一位までで行い、第二位を繰り上げ
-    raw_damage = base_dmg * (0.9 + random.uniform(0, 0.1))
+    raw_damage = base_dmg * (0.7 + random.uniform(0, 0.3))
     rounded_damage = hardcore_round(raw_damage, is_hp=False)
     
     # HPは整数なので、最終ダメージはさらに整数に繰り上げ
