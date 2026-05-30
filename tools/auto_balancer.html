@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Balancer Console</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #00d4ff;
+            --secondary: #ff007a;
+            --accent: #00ff88;
+            --warning: #ffaa00;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
+            --glow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 10% 20%, rgba(0, 212, 255, 0.05) 0%, transparent 40%),
+                              radial-gradient(circle at 90% 80%, rgba(255, 0, 122, 0.05) 0%, transparent 40%);
+        }
+
+        /* Sidebar Controls */
+        .sidebar {
+            width: 380px;
+            background: rgba(15, 23, 42, 0.6);
+            border-right: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            animation: pulse 2s infinite alternate;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 2px var(--primary)); }
+            100% { transform: scale(1.08); filter: drop-shadow(0 0 8px var(--primary)); }
+        }
+
+        .rank-selector-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .rank-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .rank-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-dim);
+            padding: 8px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .rank-btn.active {
+            background: linear-gradient(135deg, var(--primary), #00a2ff);
+            color: #000;
+            border-color: var(--primary);
+            box-shadow: var(--glow);
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .input-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .input-label-name {
+            color: var(--text-dim);
+        }
+
+        .input-label-val {
+            font-family: 'JetBrains Mono';
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .input-label-val.secondary {
+            color: var(--secondary);
+        }
+
+        .input-label-val.accent {
+            color: var(--accent);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--card-border);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        /* Right Content Panel */
+        .content-panel {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-headline {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        /* Benchmark Summary Card */
+        .benchmark-summary {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(255, 0, 122, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .benchmark-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .benchmark-stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dim);
+        }
+
+        .benchmark-stat-val {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono';
+        }
+
+        /* Table Design */
+        .table-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 16px;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 14px;
+        }
+
+        .monster-id {
+            font-family: 'JetBrains Mono';
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .monster-name {
+            font-weight: 600;
+        }
+
+        .coeff-input {
+            width: 75px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--card-border);
+            color: white;
+            text-align: center;
+            padding: 6px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono';
+            font-weight: 700;
+        }
+
+        .coeff-input:focus {
+            border-color: var(--primary);
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .badge-standard {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .badge-weak {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .badge-strong {
+            background: rgba(255, 0, 122, 0.1);
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+        }
+
+        .badge-boss {
+            background: rgba(255, 170, 0, 0.1);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+            box-shadow: 0 0 10px rgba(255, 170, 0, 0.2);
+        }
+
+        .apply-btn {
+            background: linear-gradient(135deg, var(--accent), #00cc66);
+            color: #000;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+            transition: all 0.2s;
+        }
+
+        .apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .apply-btn:active {
+            transform: translateY(0);
+        }
+
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading-screen">⚡ Preparing Balancer Matrix...</div>
+
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo-container">
+            <span class="logo-icon">⚖️</span>
+            <span class="logo-text">Auto-Balancer</span>
+        </div>
+
+        <!-- Rank Selector -->
+        <div class="rank-selector-container">
+            <span class="section-label">Active Rank</span>
+            <div class="rank-grid">
+                <button class="rank-btn active" onclick="setRank('F')">F</button>
+                <button class="rank-btn" onclick="setRank('E')">E</button>
+                <button class="rank-btn" onclick="setRank('D')">D</button>
+                <button class="rank-btn" onclick="setRank('C')">C</button>
+                <button class="rank-btn" onclick="setRank('B')">B</button>
+                <button class="rank-btn" onclick="setRank('A')">A</button>
+                <button class="rank-btn" onclick="setRank('S')">S</button>
+            </div>
+        </div>
+
+        <!-- Anchor Target Monster -->
+        <div class="input-group">
+            <span class="section-label">Benchmark Anchor</span>
+            <select id="anchor-select" onchange="changeAnchor()"></select>
+        </div>
+
+        <!-- Player Benchmark Stats -->
+        <div class="glass-card">
+            <span class="section-label">Standard Player Profile</span>
+            
+            <div class="input-group">
+                <div class="input-label-row">
+                    <span class="input-label-name">Player Atk (Weapon included)</span>
+                    <span class="input-label-val" id="val-p-atk">10</span>
+                </div>
+                <input type="range" id="p-atk" min="5" max="300" value="10" oninput="recalculateAll()">
+            </div>
+
+            <div class="input-group">
+                <div class="input-label-row">
+                    <span class="input-label-name">Player Crit Rate</span>
+                    <span class="input-label-val secondary" id="val-p-crit">5%</span>
+                </div>
+                <input type="range" id="p-crit" min="0" max="1" step="0.01" value="0.05" oninput="recalculateAll()">
+            </div>
+
+            <div class="input-group">
+                <div class="input-label-row">
+                    <span class="input-label-name">Player HP</span>
+                    <span class="input-label-val accent" id="val-p-hp">100</span>
+                </div>
+                <input type="range" id="p-hp" min="50" max="500" value="100" oninput="recalculateAll()">
+            </div>
+
+            <div class="input-group">
+                <div class="input-label-row">
+                    <span class="input-label-name">Player Armor Defense</span>
+                    <span class="input-label-val" id="val-p-def">15</span>
+                </div>
+                <input type="range" id="p-def" min="0" max="200" value="15" oninput="recalculateAll()">
+            </div>
+        </div>
+
+        <!-- Combat Target Experiences -->
+        <div class="glass-card">
+            <span class="section-label">Combat Targets (Hits)</span>
+            
+            <div class="input-group">
+                <div class="input-label-row">
+                    <span class="input-label-name">Hits to Kill (Def = 0)</span>
+                    <span class="input-label-val" id="val-t-naked">3</span>
+                </div>
+                <input type="range" id="t-naked" min="1" max="15" value="3" oninput="recalculateAll()">
+            </div>
+
+            <div class="input-group">
+                <div class="input-label-row">
+                    <span class="input-label-name">Hits to Kill (Armored)</span>
+                    <span class="input-label-val secondary" id="val-t-def">5</span>
+                </div>
+                <input type="range" id="t-def" min="1" max="25" value="5" oninput="recalculateAll()">
+            </div>
+
+            <div class="input-group">
+                <div class="input-label-row">
+                    <span class="input-label-name">Survival Hits from Enemy</span>
+                    <span class="input-label-val accent" id="val-t-survival">6</span>
+                </div>
+                <input type="range" id="t-survival" min="1" max="40" value="6" oninput="recalculateAll()">
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT MAIN CONTENT PANEL -->
+    <div class="content-panel">
+        <div class="header-row">
+            <div>
+                <h1 class="dashboard-headline">Auto-Balancer Studio</h1>
+                <p style="margin: 4px 0 0 0; color: var(--text-dim); font-size: 14px;">逆算された基準ステータスに基づき、ランク全体のモンスターバランスを自動調整します。</p>
+            </div>
+            <button class="apply-btn" onclick="saveToYaml()">Apply to YAML (enemies.yml)</button>
+        </div>
+
+        <!-- Calculations Summary -->
+        <div class="benchmark-summary">
+            <div class="benchmark-stat">
+                <span class="benchmark-stat-label">Calculated Atk_avg</span>
+                <span class="benchmark-stat-val" id="summary-atk-avg" style="color: var(--primary)">10.50</span>
+            </div>
+            <div class="benchmark-stat">
+                <span class="benchmark-stat-label">Calculated Anchor HP</span>
+                <span class="benchmark-stat-val" id="summary-anchor-hp" style="color: var(--accent)">32</span>
+            </div>
+            <div class="benchmark-stat">
+                <span class="benchmark-stat-label">Calculated Anchor Def</span>
+                <span class="benchmark-stat-val" id="summary-anchor-def" style="color: var(--secondary)">33</span>
+            </div>
+            <div class="benchmark-stat">
+                <span class="benchmark-stat-label">Calculated Anchor Atk</span>
+                <span class="benchmark-stat-val" id="summary-anchor-atk" style="color: var(--warning)">22</span>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>HP Coeff</th>
+                        <th>Calculated HP</th>
+                        <th>Atk Coeff</th>
+                        <th>Calculated Atk</th>
+                        <th>Def Coeff</th>
+                        <th>Calculated Def</th>
+                        <th>Evasion (Abs)</th>
+                        <th>Accuracy (Abs)</th>
+                    </tr>
+                </thead>
+                <tbody id="monster-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let rawData = null;
+        let activeRank = 'F';
+        let rankConfigs = {
+            'F': { pAtk: 10, pCrit: 0.05, pHp: 100, pDef: 10, tNaked: 3, tDef: 5, tSurvival: 6, anchor: 'slime' },
+            'E': { pAtk: 23, pCrit: 0.05, pHp: 120, pDef: 15, tNaked: 3, tDef: 5, tSurvival: 6, anchor: 'slime_red' },
+            'D': { pAtk: 35, pCrit: 0.10, pHp: 150, pDef: 35, tNaked: 3, tDef: 5, tSurvival: 6, anchor: 'skeleton' },
+            'C': { pAtk: 50, pCrit: 0.12, pHp: 180, pDef: 45, tNaked: 3, tDef: 5, tSurvival: 6, anchor: 'skelton_sword' },
+            'B': { pAtk: 75, pCrit: 0.15, pHp: 220, pDef: 60, tNaked: 3, tDef: 5, tSurvival: 6, anchor: 'undead_father' },
+            'A': { pAtk: 110, pCrit: 0.18, pHp: 260, pDef: 80, tNaked: 3, tDef: 5, tSurvival: 6, anchor: '' },
+            'S': { pAtk: 150, pCrit: 0.20, pHp: 300, pDef: 100, tNaked: 3, tDef: 5, tSurvival: 6, anchor: '' }
+        };
+        // 各モンスターの係数テーブル
+        let monsterCoefficients = {};
+
+        async function init() {
+            try {
+                const res = await fetch('/api/data');
+                rawData = await res.json();
+                
+                // 初期の係数テーブルを既存のYAMLデータからブートストラップして初期化
+                bootstrapCoefficients();
+                
+                initUI();
+                document.getElementById('loading').style.display = 'none';
+            } catch (e) {
+                document.getElementById('loading').innerText = "❌ Auto-Balancer Matrix Connection Failed";
+            }
+        }
+
+        // 既存のステータスから係数を算出するブートストラップ処理
+        function bootstrapCoefficients() {
+            if (!rawData || !rawData.enemies) return;
+            
+            Object.entries(rawData.enemies).forEach(([id, enemy]) => {
+                const rank = enemy.min_rank || 'F';
+                
+                // そのランクのデフォルトアンカー候補を探す
+                if (!rankConfigs[rank].anchor) {
+                    rankConfigs[rank].anchor = id;
+                }
+            });
+
+            // 係数を算出
+            Object.entries(rawData.enemies).forEach(([id, enemy]) => {
+                const rank = enemy.min_rank || 'F';
+                const anchorId = rankConfigs[rank].anchor;
+                const anchorEnemy = rawData.enemies[anchorId] || enemy;
+
+                monsterCoefficients[id] = {
+                    hp: anchorEnemy.hp > 0 ? (enemy.hp / anchorEnemy.hp) : 1.0,
+                    atk: anchorEnemy.attack > 0 ? (enemy.attack / anchorEnemy.attack) : 1.0,
+                    def: anchorEnemy.defense > 0 ? (enemy.defense / anchorEnemy.defense) : 1.0,
+                    evasion: enemy.evasion ?? 0,
+                    accuracy_close: enemy.accuracy_close ?? 100
+                };
+            });
+        }
+
+        function initUI() {
+            // アンカーセレクトのロード
+            loadAnchorOptions();
+            
+            // スライダーに現在のランク設定を反映
+            const cfg = rankConfigs[activeRank];
+            document.getElementById('p-atk').value = cfg.pAtk;
+            document.getElementById('p-crit').value = cfg.pCrit;
+            document.getElementById('p-hp').value = cfg.pHp;
+            document.getElementById('p-def').value = cfg.pDef;
+            document.getElementById('t-naked').value = cfg.tNaked;
+            document.getElementById('t-def').value = cfg.tDef;
+            document.getElementById('t-survival').value = cfg.tSurvival;
+
+            recalculateAll(false);
+        }
+
+        function setRank(rank) {
+            // スライダーの値を現在の設定値で保存してから切り替え
+            saveCurrentSliders();
+            
+            activeRank = rank;
+            document.querySelectorAll('.rank-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === rank);
+            });
+            
+            initUI();
+        }
+
+        function saveCurrentSliders() {
+            const currentCfg = rankConfigs[activeRank];
+            currentCfg.pAtk = parseFloat(document.getElementById('p-atk').value);
+            currentCfg.pCrit = parseFloat(document.getElementById('p-crit').value);
+            currentCfg.pHp = parseFloat(document.getElementById('p-hp').value);
+            currentCfg.pDef = parseFloat(document.getElementById('p-def').value);
+            currentCfg.tNaked = parseFloat(document.getElementById('t-naked').value);
+            currentCfg.tDef = parseFloat(document.getElementById('t-def').value);
+            currentCfg.tSurvival = parseFloat(document.getElementById('t-survival').value);
+        }
+
+        function loadAnchorOptions() {
+            const select = document.getElementById('anchor-select');
+            const enemies = Object.entries(rawData.enemies).filter(([id, e]) => (e.min_rank || 'F') === activeRank);
+            
+            select.innerHTML = enemies.map(([id, e]) => `<option value="${id}">${e.name || id}</option>`).join('');
+            
+            const currentAnchor = rankConfigs[activeRank].anchor;
+            if (currentAnchor && select.querySelector(`option[value="${currentAnchor}"]`)) {
+                select.value = currentAnchor;
+            } else if (enemies.length > 0) {
+                select.value = enemies[0][0];
+                rankConfigs[activeRank].anchor = enemies[0][0];
+            }
+        }
+
+        function changeAnchor() {
+            const select = document.getElementById('anchor-select');
+            rankConfigs[activeRank].anchor = select.value;
+            
+            // アンカーが変わった際、現在のそのランクの敵の係数を既存データから再計算（リブートストラップ）
+            const anchorId = select.value;
+            const anchorEnemy = rawData.enemies[anchorId];
+            
+            if (anchorEnemy) {
+                Object.entries(rawData.enemies).forEach(([id, enemy]) => {
+                    if ((enemy.min_rank || 'F') === activeRank) {
+                        monsterCoefficients[id].hp = anchorEnemy.hp > 0 ? (enemy.hp / anchorEnemy.hp) : 1.0;
+                        monsterCoefficients[id].atk = anchorEnemy.attack > 0 ? (enemy.attack / anchorEnemy.attack) : 1.0;
+                        monsterCoefficients[id].def = anchorEnemy.defense > 0 ? (enemy.defense / anchorEnemy.defense) : 1.0;
+                    }
+                });
+            }
+            recalculateAll();
+        }
+
+        function onCoefficientInput(id, type, value) {
+            const val = parseFloat(value) || 0.0;
+            monsterCoefficients[id][type] = val;
+            recalculateAll(true);
+        }
+
+        function onAbsoluteInput(id, type, value) {
+            const val = parseInt(value) || 0;
+            monsterCoefficients[id][type] = val;
+            recalculateAll(true);
+        }
+
+        // 基準値＆他モンスターのリアルタイムステータス計算処理
+        function recalculateAll(fromInput = false) {
+            // スライダーラベル更新
+            const pAtk = parseFloat(document.getElementById('p-atk').value);
+            const pCrit = parseFloat(document.getElementById('p-crit').value);
+            const pHp = parseFloat(document.getElementById('p-hp').value);
+            const pDef = parseFloat(document.getElementById('p-def').value);
+            const tNaked = parseFloat(document.getElementById('t-naked').value);
+            const tDef = parseFloat(document.getElementById('t-def').value);
+            const tSurvival = parseFloat(document.getElementById('t-survival').value);
+
+            document.getElementById('val-p-atk').innerText = pAtk;
+            document.getElementById('val-p-crit').innerText = Math.round(pCrit * 100) + '%';
+            document.getElementById('val-p-hp').innerText = pHp;
+            document.getElementById('val-p-def').innerText = pDef;
+            document.getElementById('val-t-naked').innerText = tNaked;
+            document.getElementById('val-t-def').innerText = tDef;
+            document.getElementById('val-t-survival').innerText = tSurvival;
+
+            // --- 基準値（アンカー）の数学的計算 ---
+            const atkAvg = pAtk * (1.0 + pCrit);
+            const anchorHP = Math.max(1, Math.round(tNaked * atkAvg));
+            
+            // 防御力の閉形式逆算
+            const anchorDef = Math.max(0, Math.round(50 * (tDef / tNaked) - 50));
+            
+            // 敵の標準攻撃力の逆算 (PlayerがtSurvival撃耐える設定から算出)
+            const anchorAtk = Math.max(1, Math.round((pHp / tSurvival) * (50 + pDef) / 50));
+
+            // サマリー表示の更新
+            document.getElementById('summary-atk-avg').innerText = atkAvg.toFixed(2);
+            document.getElementById('summary-anchor-hp').innerText = anchorHP;
+            document.getElementById('summary-anchor-def').innerText = anchorDef;
+            document.getElementById('summary-anchor-atk').innerText = anchorAtk;
+
+            // テーブルの更新
+            const enemies = Object.entries(rawData.enemies).filter(([id, e]) => (e.min_rank || 'F') === activeRank);
+            const tableBody = document.getElementById('monster-table-body');
+            
+            tableBody.innerHTML = enemies.map(([id, e]) => {
+                const coeff = monsterCoefficients[id] || { hp: 1, atk: 1, def: 1, evasion: 0, accuracy_close: 100 };
+                const calcHp = Math.max(1, Math.round(anchorHP * coeff.hp));
+                const calcAtk = Math.max(1, Math.round(anchorAtk * coeff.atk));
+                const calcDef = Math.max(0, Math.round(anchorDef * coeff.def));
+
+                // 役割に応じたバッジ
+                let roleBadge = '<span class="badge badge-standard">Standard</span>';
+                if (id === rankConfigs[activeRank].anchor) {
+                    roleBadge = '<span class="badge badge-standard">Anchor (基準)</span>';
+                } else if (e.is_boss) {
+                    roleBadge = '<span class="badge badge-boss">BOSS</span>';
+                } else if (coeff.hp < 0.8 && coeff.atk < 0.8) {
+                    roleBadge = '<span class="badge badge-weak">ザコ (Weak)</span>';
+                } else if (coeff.hp > 1.3 || coeff.atk > 1.3) {
+                    roleBadge = '<span class="badge badge-strong">強敵 (Strong)</span>';
+                }
+
+                return `
+                    <tr>
+                        <td class="monster-id">${id}</td>
+                        <td class="monster-name">${e.name || id}</td>
+                        <td>${roleBadge}</td>
+                        <td>
+                            <input class="coeff-input" type="number" step="0.05" value="${coeff.hp.toFixed(2)}" oninput="onCoefficientInput('${id}', 'hp', this.value)">
+                        </td>
+                        <td style="font-family:'JetBrains Mono'; font-weight:700; color:var(--accent)">${calcHp}</td>
+                        <td>
+                            <input class="coeff-input" type="number" step="0.05" value="${coeff.atk.toFixed(2)}" oninput="onCoefficientInput('${id}', 'atk', this.value)">
+                        </td>
+                        <td style="font-family:'JetBrains Mono'; font-weight:700; color:var(--warning)">${calcAtk}</td>
+                        <td>
+                            <input class="coeff-input" type="number" step="0.05" value="${coeff.def.toFixed(2)}" oninput="onCoefficientInput('${id}', 'def', this.value)">
+                        </td>
+                        <td style="font-family:'JetBrains Mono'; font-weight:700; color:var(--secondary)">${calcDef}</td>
+                        <td>
+                            <input class="coeff-input" type="number" value="${coeff.evasion}" oninput="onAbsoluteInput('${id}', 'evasion', this.value)" style="color:var(--text-dim)">
+                        </td>
+                        <td>
+                            <input class="coeff-input" type="number" value="${coeff.accuracy_close}" oninput="onAbsoluteInput('${id}', 'accuracy_close', this.value)" style="color:var(--text-dim)">
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 最新の計算結果をYAMLへ書き込む
+        async function saveToYaml() {
+            // スライダーの値をセーブ
+            saveCurrentSliders();
+
+            const appliedEnemies = {};
+            
+            // すべての登録モンスターについて、絶対ステータスを逆算してパックする
+            Object.entries(rawData.enemies).forEach(([id, enemy]) => {
+                const rank = enemy.min_rank || 'F';
+                const cfg = rankConfigs[rank];
+                
+                // そのランクの基準ステータスを再算出
+                const atkAvg = cfg.pAtk * (1.0 + cfg.pCrit);
+                const anchorHP = Math.max(1, Math.round(cfg.tNaked * atkAvg));
+                const anchorDef = Math.max(0, Math.round(50 * (cfg.tDef / cfg.tNaked) - 50));
+                const anchorAtk = Math.max(1, Math.round((cfg.pHp / cfg.tSurvival) * (50 + cfg.pDef) / 50));
+
+                const coeff = monsterCoefficients[id];
+                if (coeff) {
+                    appliedEnemies[id] = {
+                        hp: Math.max(1, Math.round(anchorHP * coeff.hp)),
+                        attack: Math.max(1, Math.round(anchorAtk * coeff.atk)),
+                        defense: Math.max(0, Math.round(anchorDef * coeff.def)),
+                        evasion: coeff.evasion,
+                        accuracy_close: coeff.accuracy_close
+                    };
+                }
+            });
+
+            const statusBtn = document.querySelector('.apply-btn');
+            statusBtn.innerText = "Applying to YAML...";
+            statusBtn.style.background = "var(--warning)";
+
+            try {
+                const res = await fetch('/api/auto-apply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enemies: appliedEnemies })
+                });
+
+                if (res.ok) {
+                    statusBtn.innerText = "Applied Successfully!";
+                    statusBtn.style.background = "var(--accent)";
+                    
+                    // 最新データを再フェッチしてローカルキャッシュ更新
+                    const dataRes = await fetch('/api/data');
+                    rawData = await dataRes.json();
+                    
+                    setTimeout(() => {
+                        statusBtn.innerText = "Apply to YAML (enemies.yml)";
+                        statusBtn.style.background = "linear-gradient(135deg, var(--accent), #00cc66)";
+                    }, 2000);
+                } else {
+                    statusBtn.innerText = "Failed to Apply";
+                    statusBtn.style.background = "var(--secondary)";
+                }
+            } catch (e) {
+                statusBtn.innerText = "Network Error";
+                statusBtn.style.background = "var(--secondary)";
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
