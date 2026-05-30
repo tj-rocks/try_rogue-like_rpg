@@ -11,7 +11,7 @@ from urllib.parse import urlparse, parse_qs
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from systems.data_loader import get_normalized_enemy_data, get_normalized_equipment_data, load_master_data, MASTER_DATA_DIR, generate_rank_floor_map
 
-PORT = 5001
+PORT = 5005
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 class DashboardHandler(http.server.SimpleHTTPRequestHandler):
@@ -282,7 +282,24 @@ if __name__ == "__main__":
     os.chdir(project_root)
     
     socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), DashboardHandler) as httpd:
+    
+    httpd = None
+    for p in range(PORT, PORT + 10):
+        try:
+            httpd = socketserver.TCPServer(("", p), DashboardHandler)
+            PORT = p
+            break
+        except OSError as e:
+            if e.errno == 48 or "[Errno 48]" in str(e):
+                print(f"⚠️ Port {p} is already in use. Trying port {p + 1}...")
+                continue
+            raise e
+
+    if not httpd:
+        print("❌ Error: Could not find an available port to bind the server.")
+        sys.exit(1)
+        
+    with httpd:
         print(f"🚀 Dashboard Server running at http://localhost:{PORT}")
         print(f"Serving UI from: {os.path.join(DIRECTORY, 'dashboard.html')}")
         
