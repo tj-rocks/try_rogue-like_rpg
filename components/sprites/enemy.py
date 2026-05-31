@@ -475,6 +475,15 @@ class Enemy(Entity):
         # その階層がボスの出現開始階層(min_floor)であれば、最優先で1体配置する
         boss_types = [t for t in mt if ENEMY_DATA[t].get("is_boss") and ENEMY_DATA[t].get("min_floor") == floor]
         for b_type in boss_types:
+            has_quest = False
+            if player and hasattr(player, "active_quests"):
+                has_quest = any(q.get("target_key") == b_type for q in player.active_quests)
+            
+            if not has_quest and player is not None:
+                if random.random() >= 0.05:
+                    print(f"[Dungeon] Boss {b_type} skipped: no quest and did not roll 5% chance.")
+                    continue
+
             spawned = False
             # 全部屋（スタート部屋以外優先）を巡回して場所を探す
             shuffled_rooms = list(enumerate(dungeon.rooms))
