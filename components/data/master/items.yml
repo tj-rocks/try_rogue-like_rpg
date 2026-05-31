@@ -238,7 +238,7 @@ CONSUMABLE_DATA:
     rarity: 3
     image_path: components/pictures/icon/basic_lantern.png
     shop_buyable: true
-    describe: 冒メントの必需品。周囲の闇を照らし出し、視界を確保する。
+    describe: 周囲の闇を照らし出し、視界を確保する。
     floor_spawnable: true
   luxury_lantern:
     name: 上等なカンテラ

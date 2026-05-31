@@ -490,8 +490,9 @@ def _effect_yrden(player, settings, dungeon, dialog, stave=None):
         if stave: stave.charges += 1
         return "そこには 配置できない！"
         
-    # 2. 壁判定チェック (map_data が 1 以外のマスは床ではない＝配置不可)
-    if dungeon.map_data[target_gy][target_gx] != 1:
+    # 2. 壁判定チェック (1 または 4, 5, 6 のマスが床/通路であり、それ以外は配置不可)
+    tile_type = dungeon.map_data[target_gy][target_gx]
+    if tile_type != 1 and not (4 <= tile_type <= 6):
         if stave: stave.charges += 1
         return "そこには 配置できない！"
         
@@ -501,13 +502,14 @@ def _effect_yrden(player, settings, dungeon, dialog, stave=None):
         if stave: stave.charges += 1
         return "そこには 配置できない！"
         
-    # 4. 既存エネミーや障害物との重複チェック
+    # 4. 既存エネミーや障害物との重複チェック (動く敵は重ねて配置して閉じ込められるようにする。静止障害物は不可)
     for e in dungeon.enemies:
         if not getattr(e, "is_dead", False):
             e_grids = e.get_occupied_grids(tile_size)
             if (target_gx, target_gy) in e_grids:
-                if stave: stave.charges += 1
-                return "そこには 配置できない！"
+                if getattr(e, "is_static", False):
+                    if stave: stave.charges += 1
+                    return "そこには 配置できない！"
                 
     # 5. 防壁（障害物）の生成・追加
     from components.sprites.enemy import Enemy
