@@ -213,15 +213,15 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 6
+    hp: 20
     attack: 16
-    defense: 100
+    defense: 38
     evasion: 10
     exp: 15
     reward_gold: 30
     accuracy_close: 100
     accuracy_ranged: 100
-    attack_range: 1
+    attack_range: 2
     stupidity: 3
     image_scale: 1.0
     close_attack_effect: physical_light
@@ -235,9 +235,11 @@ ENEMY_DATA:
     drops:
       normal: []
       rare: []
+    status: poison
+    status_chance: 40
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 10
+    hp: 17
     attack: 13
     defense: 25
     evasion: 10
@@ -245,7 +247,7 @@ ENEMY_DATA:
     reward_gold: 30
     accuracy_close: 100
     accuracy_ranged: 100
-    attack_range: 1
+    attack_range: 2
     stupidity: 3
     image_scale: 1.0
     close_attack_effect: physical_light
@@ -261,7 +263,7 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 20
+    hp: 21
     attack: 18
     defense: 25
     evasion: 10
@@ -455,7 +457,7 @@ ENEMY_DATA:
     reward_gold: 1000
     accuracy_close: 90
     accuracy_ranged: 90
-    attack_range: 1
+    attack_range: 5
     stupidity: 0
     image_scale: 2.0
     close_attack_effect: dark_bolt
