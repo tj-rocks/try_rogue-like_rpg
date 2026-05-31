@@ -1,21 +1,17 @@
 ENEMY_DATA:
-# Fランクーーーーーーーーーー
   slime:
     name: スライム
     min_rank: F
     image_folder: components/pictures/enemies/slime
     crit_rate: 0.05
     drops:
-      normal:
-      - hp_potion
-      - rotten_potion
-      rare:
-      - iron_sword
+      normal: [hp_potion, rotten_potion]
+      rare: [iron_sword]
     normal_drop_rate: 0.1
     rare_drop_rate: 0.01
-    hp: 11
-    attack: 21
-    defense: 10
+    hp: 20
+    attack: 8
+    defense: 50
     evasion: 22
     exp: 5
     reward_gold: 20
@@ -35,17 +31,13 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/kame
     crit_rate: 0.05
     drops:
-      normal:
-      - broken_shield
-      - rotten_potion
-      rare:
-      - wooden_round_shield
-      - iron_breastplate
+      normal: [broken_shield, rotten_potion]
+      rare: [wooden_round_shield, iron_breastplate]
     normal_drop_rate: 0.15
     rare_drop_rate: 0.03
-    hp: 15
-    attack: 23
-    defense: 10
+    hp: 30
+    attack: 24
+    defense: 17
     evasion: 22
     exp: 8
     reward_gold: 25
@@ -65,16 +57,13 @@ ENEMY_DATA:
     status: poison
     status_chance: 0
     drops:
-      normal:
-      - rotten_potion
-      - expired_potion
-      rare:
-      - thiefs_knife
+      normal: [rotten_potion, expired_potion]
+      rare: [thiefs_knife]
     normal_drop_rate: 0.15
     rare_drop_rate: 0.03
-    hp: 15
-    attack: 23
-    defense: 2
+    hp: 30
+    attack: 16
+    defense: 25
     evasion: 17
     exp: 8
     reward_gold: 25
@@ -87,7 +76,6 @@ ENEMY_DATA:
     ranged_attack_effect: strange_mucus
     attack_priority: close
     damaged_detect_range: 10
-# Eランクーーーーーーーーーー
   kowai_kusa:
     name: こわいくさ
     min_rank: E
@@ -95,16 +83,13 @@ ENEMY_DATA:
     status: poison
     status_chance: 0
     drops:
-      normal:
-      - expired_potion
-      - wooden_stick
-      rare:
-      - adventurers_clothes
+      normal: [expired_potion, wooden_stick]
+      rare: [adventurers_clothes]
     normal_drop_rate: 0.15
     rare_drop_rate: 0.03
-    hp: 21
-    attack: 26
-    defense: 1
+    hp: 42
+    attack: 20
+    defense: 25
     evasion: 25
     exp: 10
     reward_gold: 100
@@ -124,15 +109,13 @@ ENEMY_DATA:
     image_color: '#FF6666'
     crit_rate: 0.05
     drops:
-      normal:
-      - hp_potion
-      rare:
-      - iron_sword
+      normal: [hp_potion]
+      rare: [iron_sword]
     normal_drop_rate: 0.15
     rare_drop_rate: 0.03
     hp: 21
-    attack: 23
-    defense: 1
+    attack: 10
+    defense: 50
     evasion: 21
     exp: 5
     reward_gold: 20
@@ -151,16 +134,13 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/bakudan_man
     crit_rate: 0.05
     drops:
-      normal:
-      - broken_sword
-      - hp_potion
-      rare:
-      - fullmetal_sword
+      normal: [broken_sword, hp_potion]
+      rare: [fullmetal_sword]
     normal_drop_rate: 0.15
     rare_drop_rate: 0.03
-    hp: 30
-    attack: 25
-    defense: 4
+    hp: 63
+    attack: 30
+    defense: 17
     evasion: 25
     exp: 10
     reward_gold: 100
@@ -181,16 +161,13 @@ ENEMY_DATA:
     status: poison
     status_chance: 20
     drops:
-      normal:
-      - rotten_potion
-      - broken_armor
-      rare:
-      - leather_breastplate
+      normal: [rotten_potion, broken_armor]
+      rare: [leather_breastplate]
     normal_drop_rate: 0.15
     rare_drop_rate: 0.03
-    hp: 30
-    attack: 25
-    defense: 6
+    hp: 42
+    attack: 20
+    defense: 25
     evasion: 0
     exp: 8
     reward_gold: 25
@@ -203,23 +180,18 @@ ENEMY_DATA:
     ranged_attack_effect: strange_mucus
     attack_priority: close
     damaged_detect_range: 6
-# Dランクーーーーーーーーーー
   skeleton:
     name: スケルトン
     min_rank: D
     image_folder: components/pictures/enemies/skeleton
     drops:
-      normal:
-      - broken_sword
-      - broken_armor
-      rare:
-      - old_sword
-      - iron_sword
+      normal: [broken_sword, broken_armor]
+      rare: [old_sword, iron_sword]
     normal_drop_rate: 0.15
     rare_drop_rate: 0.03
-    hp: 25
-    attack: 30
-    defense: 12
+    hp: 46
+    attack: 22
+    defense: 25
     evasion: 0
     exp: 12
     reward_gold: 200
@@ -241,9 +213,9 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 30
-    attack: 29
-    defense: 3
+    hp: 69
+    attack: 33
+    defense: 17
     evasion: 10
     exp: 15
     reward_gold: 30
@@ -265,9 +237,9 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 25
-    attack: 26
-    defense: 3
+    hp: 46
+    attack: 22
+    defense: 25
     evasion: 10
     exp: 15
     reward_gold: 30
@@ -289,9 +261,9 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 30
-    attack: 27
-    defense: 3
+    hp: 23
+    attack: 11
+    defense: 50
     evasion: 10
     exp: 15
     reward_gold: 30
@@ -304,8 +276,6 @@ ENEMY_DATA:
     ranged_attack_effect: arrow
     attack_priority: close
     damaged_detect_range: 15
-
-# Cランクーーーーーーーーーー
   mini_dragon:
     name: ミニドラゴン
     min_rank: C
@@ -315,9 +285,9 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 32
-    attack: 29
-    defense: 10
+    hp: 15
+    attack: 8
+    defense: 17
     evasion: 10
     exp: 15
     reward_gold: 30
@@ -363,9 +333,9 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 32
-    attack: 29
-    defense: 10
+    hp: 10
+    attack: 5
+    defense: 25
     evasion: 18
     exp: 15
     reward_gold: 30
@@ -387,9 +357,9 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 35
-    attack: 29
-    defense: 12
+    hp: 15
+    attack: 8
+    defense: 17
     evasion: 10
     exp: 15
     reward_gold: 30
@@ -402,7 +372,6 @@ ENEMY_DATA:
     ranged_attack_effect: arrow
     attack_priority: close
     damaged_detect_range: 25
-# BOSS------------------------------
   suisui_slime:
     name: スイスイスライム
     min_rank: F
@@ -414,10 +383,8 @@ ENEMY_DATA:
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/suisui_slime
     drops:
-      normal:
-      - hp_potion
-      rare:
-      - iron_sword
+      normal: [hp_potion]
+      rare: [iron_sword]
     normal_drop_rate: 0.25
     rare_drop_rate: 0.15
     hp: 100
@@ -446,10 +413,8 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/skeleton
     detect_range: 15
     drops:
-      normal:
-      - hp_potion
-      rare:
-      - iron_sword
+      normal: [hp_potion]
+      rare: [iron_sword]
     normal_drop_rate: 0.25
     rare_drop_rate: 0.15
     hp: 150
@@ -478,12 +443,11 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/skeleton
     drops:
       normal: []
-      rare:
-      - fathers_keepsake
+      rare: [fathers_keepsake]
     normal_drop_rate: 0.0
     rare_drop_rate: 1.0
-    hp: 250
-    attack: 55
+    hp: 10
+    attack: 5
     defense: 25
     evasion: 0
     exp: 12

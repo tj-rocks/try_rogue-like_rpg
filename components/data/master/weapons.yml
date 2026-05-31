@@ -86,7 +86,7 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 0
-        attack: 2
+        attack: 4
         accuracy_close: 15
         accuracy_range: 0
         crit_rate: 0.05
@@ -96,7 +96,7 @@ WEAPON_DATA:
         lantern_bonus: 0
         regen: 2
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -106,6 +106,7 @@ WEAPON_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
+    hp: 0
   iron_sword:
     name: 鉄の剣
     category: onehanded_sword
@@ -162,26 +163,27 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 0
-        attack: 6
+        attack: 10
         accuracy_close: 5
         accuracy_range: 0
         crit_rate: 0.05
         defense: 0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
 
+    hp: 0
   wooden_stick:
     name: 木の棍棒
     category: axe

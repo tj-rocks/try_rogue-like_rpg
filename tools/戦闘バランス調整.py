@@ -14,6 +14,167 @@ from systems.data_loader import get_normalized_enemy_data, get_normalized_equipm
 PORT = 5005
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
+def apply_surgical_update(file_type, target_id, updates):
+    KEY_MAP_TO_NEW = {
+        "attack_bonus": "attack",
+        "defense_bonus": "defense",
+        "hp_bonus": "hp",
+        "accuracy_bonus_close": "accuracy_close",
+        "accuracy_bonus_ranged": "accuracy_range",
+        "block_chance_close": "block_chance_close",
+        "block_chance_ranged": "block_chance_ranged",
+        "regen_bonus": "regen",
+        "armor_penetration": "armor_penetration",
+    }
+    
+    if file_type == "equipment":
+        weapons_raw = load_master_data("weapons.yml")
+        armors_raw = load_master_data("armors.yml")
+        shields_raw = load_master_data("shields.yml")
+        
+        if "WEAPON_DATA" in weapons_raw and target_id in weapons_raw["WEAPON_DATA"]:
+            filename = "weapons.yml"
+        elif "WEAPON_CATEGORIES" in weapons_raw and target_id in weapons_raw["WEAPON_CATEGORIES"]:
+            filename = "weapons.yml"
+        elif "ARMOR_DATA" in armors_raw and target_id in armors_raw["ARMOR_DATA"]:
+            filename = "armors.yml"
+        elif "ARMOR_CATEGORIES" in armors_raw and target_id in armors_raw["ARMOR_CATEGORIES"]:
+            filename = "armors.yml"
+        elif "SHIELD_DATA" in shields_raw and target_id in shields_raw["SHIELD_DATA"]:
+            filename = "shields.yml"
+        elif "SHIELD_CATEGORIES" in shields_raw and target_id in shields_raw["SHIELD_CATEGORIES"]:
+            filename = "shields.yml"
+        else:
+            filename = "equipment.yml"
+    else:
+        filename = f"{file_type}.yml"
+        
+    raw_data = load_master_data(filename)
+    
+    mapped_updates = {}
+    for pk, pv in updates.items():
+        if pk is None: continue
+        try:
+            if isinstance(pv, str) and "." in pv:
+                pv = float(pv)
+            elif isinstance(pv, str):
+                pv = int(pv)
+        except:
+            pass
+        new_key = KEY_MAP_TO_NEW.get(pk, pk) if file_type == "equipment" else pk
+        if file_type == "equipment" and new_key.startswith("magic_"):
+            new_key = new_key.replace("magic_", "")
+        mapped_updates[new_key] = pv
+    
+    path = os.path.join(MASTER_DATA_DIR, filename)
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+        
+        updated = False
+        in_data_section = False
+        in_target_block = False
+        if filename == "enemies.yml":
+            section_key = "ENEMY_DATA:"
+        elif filename == "weapons.yml":
+            section_key = "WEAPON_DATA:"
+        elif filename == "armors.yml":
+            section_key = "ARMOR_DATA:"
+        elif filename == "shields.yml":
+            section_key = "SHIELD_DATA:"
+        else:
+            section_key = None
+        
+        new_lines = []
+        param_found = {k: False for k in mapped_updates.keys()}
+        
+        for line in lines:
+            stripped = line.strip()
+            if section_key and stripped.startswith(section_key):
+                in_data_section = True
+            elif in_data_section and stripped.endswith(":") and not line.startswith(" "):
+                if not stripped.startswith(("#", section_key.split(":")[0])):
+                     in_data_section = False
+            
+            if in_data_section and stripped == f"{target_id}:":
+                in_target_block = True
+                param_found = {k: False for k in mapped_updates.keys()}
+            elif in_target_block and stripped.endswith(":") and line.startswith("  ") and not line.startswith("    "):
+                if stripped != f"{target_id}:":
+                    for k, found in param_found.items():
+                        if not found:
+                            new_lines.append(f"    {k}: {mapped_updates[k]}\n")
+                            updated = True
+                    in_target_block = False
+            
+            matched_key = None
+            if in_target_block:
+                for k in mapped_updates.keys():
+                    if stripped.startswith(f"{k}: ") or stripped == f"{k}:":
+                        matched_key = k
+                        break
+            
+            if matched_key:
+                indent = line[:line.find(matched_key)]
+                new_lines.append(f"{indent}{matched_key}: {mapped_updates[matched_key]}\n")
+                param_found[matched_key] = True
+                updated = True
+            else:
+                new_lines.append(line)
+        
+        if in_target_block:
+            for k, found in param_found.items():
+                if not found:
+                    new_lines.append(f"    {k}: {mapped_updates[k]}\n")
+                    updated = True
+        
+        if updated:
+            with open(path, "w", encoding="utf-8") as f:
+                f.writelines(new_lines)
+            print(f"  [SURGICAL SAVE SUCCESS] {filename}: {target_id}.updates -> {mapped_updates}")
+            return True
+            
+    # Naive fallback
+    print(f"  [SAVE FALLBACK] Using naive yaml dump for {filename}")
+    updated = False
+    if file_type == "enemies":
+        for section in ["ENEMY_DATA", "ENEMY_CATEGORIES"]:
+            if section in raw_data and target_id in raw_data[section]:
+                for pk, pv in updates.items():
+                    raw_data[section][target_id][pk] = pv
+                updated = True; break
+    elif file_type == "equipment":
+        for section in ["WEAPON_DATA", "ARMOR_DATA", "SHIELD_DATA"]:
+            if section in raw_data and target_id in raw_data[section]:
+                item = raw_data[section][target_id]
+                if "bonus" not in item:
+                    item["bonus"] = {"common": {}, "magic": {}}
+                if "common" not in item["bonus"]:
+                    item["bonus"]["common"] = {}
+                if "magic" not in item["bonus"]:
+                    item["bonus"]["magic"] = {}
+                for pk, pv in updates.items():
+                    new_key = KEY_MAP_TO_NEW.get(pk, pk)
+                    if new_key.startswith("magic_"):
+                        mk = new_key.replace("magic_", "")
+                        item["bonus"]["magic"][mk] = pv
+                    else:
+                        item["bonus"]["common"][new_key] = pv
+                updated = True; break
+        
+        if not updated:
+            for section in ["WEAPON_CATEGORIES", "ARMOR_CATEGORIES", "SHIELD_CATEGORIES"]:
+                if section in raw_data and target_id in raw_data[section]:
+                    for pk, pv in updates.items():
+                        raw_data[section][target_id][pk] = pv
+                    updated = True; break
+    
+    if updated:
+        with open(path, "w", encoding="utf-8") as f:
+            yaml.dump(raw_data, f, allow_unicode=True, sort_keys=False, default_flow_style=None, indent=2)
+        return True
+    return False
+
 class DashboardHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -76,7 +237,27 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             super().do_GET()
 
     def do_POST(self):
-        if self.path == '/api/update':
+        if self.path == '/api/bulk-save':
+            content_length = int(self.headers['Content-Length'])
+            post_data = json.loads(self.rfile.read(content_length).decode('utf-8'))
+            
+            enemies = post_data.get("enemies", {})
+            equipment = post_data.get("equipment", {})
+            
+            # Apply all updates
+            for eid, updates in enemies.items():
+                apply_surgical_update("enemies", eid, updates)
+                
+            for eqid, updates in equipment.items():
+                apply_surgical_update("equipment", eqid, updates)
+                
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "success"}).encode('utf-8'))
+            return
+            
+        elif self.path == '/api/update':
             content_length = int(self.headers['Content-Length'])
             post_data = json.loads(self.rfile.read(content_length).decode('utf-8'))
             
@@ -87,193 +268,15 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             updates = post_data.get("updates")
             if not updates:
                 updates = {post_data.get("param"): post_data.get("value")}
-            
-            KEY_MAP_TO_NEW = {
-                "attack_bonus": "attack",
-                "defense_bonus": "defense",
-                "hp_bonus": "hp",
-                "accuracy_bonus_close": "accuracy_close",
-                "accuracy_bonus_ranged": "accuracy_range",
-                "block_chance_close": "block_chance_close",
-                "block_chance_ranged": "block_chance_ranged",
-                "regen_bonus": "regen",
-                "armor_penetration": "armor_penetration",
-            }
-            
-            if file_type == "equipment":
-                weapons_raw = load_master_data("weapons.yml")
-                armors_raw = load_master_data("armors.yml")
-                shields_raw = load_master_data("shields.yml")
                 
-                if "WEAPON_DATA" in weapons_raw and target_id in weapons_raw["WEAPON_DATA"]:
-                    filename = "weapons.yml"
-                elif "WEAPON_CATEGORIES" in weapons_raw and target_id in weapons_raw["WEAPON_CATEGORIES"]:
-                    filename = "weapons.yml"
-                elif "ARMOR_DATA" in armors_raw and target_id in armors_raw["ARMOR_DATA"]:
-                    filename = "armors.yml"
-                elif "ARMOR_CATEGORIES" in armors_raw and target_id in armors_raw["ARMOR_CATEGORIES"]:
-                    filename = "armors.yml"
-                elif "SHIELD_DATA" in shields_raw and target_id in shields_raw["SHIELD_DATA"]:
-                    filename = "shields.yml"
-                elif "SHIELD_CATEGORIES" in shields_raw and target_id in shields_raw["SHIELD_CATEGORIES"]:
-                    filename = "shields.yml"
-                else:
-                    filename = "equipment.yml"
-            else:
-                filename = f"{file_type}.yml"
-                
-            raw_data = load_master_data(filename)
-            
-            # パラメータマッピングと数値変換
-            mapped_updates = {}
-            for pk, pv in updates.items():
-                if pk is None: continue
-                try:
-                    if isinstance(pv, str) and "." in pv:
-                        pv = float(pv)
-                    elif isinstance(pv, str):
-                        pv = int(pv)
-                except:
-                    pass
-                new_key = KEY_MAP_TO_NEW.get(pk, pk) if file_type == "equipment" else pk
-                if file_type == "equipment" and new_key.startswith("magic_"):
-                    new_key = new_key.replace("magic_", "")
-                mapped_updates[new_key] = pv
-            
-            # サージカル・アップデート（行単位での置換）の試行
-            path = os.path.join(MASTER_DATA_DIR, filename)
-            if os.path.exists(path):
-                with open(path, "r", encoding="utf-8") as f:
-                    lines = f.readlines()
-                
-                updated = False
-                in_data_section = False
-                in_target_block = False
-                if filename == "enemies.yml":
-                    section_key = "ENEMY_DATA:"
-                elif filename == "weapons.yml":
-                    section_key = "WEAPON_DATA:"
-                elif filename == "armors.yml":
-                    section_key = "ARMOR_DATA:"
-                elif filename == "shields.yml":
-                    section_key = "SHIELD_DATA:"
-                else:
-                    section_key = None
-                
-                new_lines = []
-                param_found = {k: False for k in mapped_updates.keys()}
-                
-                for line in lines:
-                    stripped = line.strip()
-                    
-                    # セクションの開始を確認
-                    if section_key and stripped.startswith(section_key):
-                        in_data_section = True
-                    elif in_data_section and stripped.endswith(":") and not line.startswith(" "):
-                        # 次のトップレベルキーが来たらセクション終了（簡易判定）
-                        if not stripped.startswith(("#", section_key.split(":")[0])):
-                             in_data_section = False
-                    
-                    # ターゲット（個体）のブロックを確認
-                    if in_data_section and stripped == f"{target_id}:":
-                        in_target_block = True
-                        param_found = {k: False for k in mapped_updates.keys()}
-                    elif in_target_block and stripped.endswith(":") and line.startswith("  ") and not line.startswith("    "):
-                        # 次の個体ブロックが来たら、またはセクションが終わったら
-                        if stripped != f"{target_id}:":
-                            # パラメータが見つからなかった場合、ブロックの最後に追加する
-                            for k, found in param_found.items():
-                                if not found:
-                                    new_lines.append(f"    {k}: {mapped_updates[k]}\n")
-                                    updated = True
-                            in_target_block = False
-                    
-                    # 複数パラメータのいずれかにマッチするか判定
-                    matched_key = None
-                    if in_target_block:
-                        for k in mapped_updates.keys():
-                            # 完全一致または空白付きでマッチするか確認 (evaがevasionにマッチするのを防ぐ)
-                            if stripped.startswith(f"{k}: ") or stripped == f"{k}:":
-                                matched_key = k
-                                break
-                    
-                    # パラメータの書き換え
-                    if matched_key:
-                        indent = line[:line.find(matched_key)]
-                        new_lines.append(f"{indent}{matched_key}: {mapped_updates[matched_key]}\n")
-                        param_found[matched_key] = True
-                        updated = True
-                    else:
-                        new_lines.append(line)
-                
-                # ファイルの最後がターゲットブロックで終わっている場合の処理
-                if in_target_block:
-                    for k, found in param_found.items():
-                        if not found:
-                            new_lines.append(f"    {k}: {mapped_updates[k]}\n")
-                            updated = True
-                
-                if updated:
-                    with open(path, "w", encoding="utf-8") as f:
-                        f.writelines(new_lines)
-                    print(f"  [SURGICAL SAVE SUCCESS] {filename}: {target_id}.updates -> {mapped_updates}")
-                    
-                    self.send_response(200)
-                    self.send_header('Content-type', 'application/json')
-                    self.end_headers()
-                    self.wfile.write(json.dumps({"status": "success"}).encode('utf-8'))
-                    return
-
-            # もし上記で失敗した場合は、フォールバックとして以前の（コメント非保持）方式
-            print(f"  [SAVE FALLBACK] Using naive yaml dump for {filename}")
-            raw_data = load_master_data(filename)
-            
-            # データの更新
-            updated = False
-            if file_type == "enemies":
-                for section in ["ENEMY_DATA", "ENEMY_CATEGORIES"]:
-                    if section in raw_data and target_id in raw_data[section]:
-                        for pk, pv in updates.items():
-                            raw_data[section][target_id][pk] = pv
-                        updated = True; break
-            elif file_type == "equipment":
-                for section in ["WEAPON_DATA", "ARMOR_DATA", "SHIELD_DATA"]:
-                    if section in raw_data and target_id in raw_data[section]:
-                        item = raw_data[section][target_id]
-                        if "bonus" not in item:
-                            item["bonus"] = {"common": {}, "magic": {}}
-                        if "common" not in item["bonus"]:
-                            item["bonus"]["common"] = {}
-                        if "magic" not in item["bonus"]:
-                            item["bonus"]["magic"] = {}
-                            
-                        for pk, pv in updates.items():
-                            new_key = KEY_MAP_TO_NEW.get(pk, pk)
-                            if new_key.startswith("magic_"):
-                                mk = new_key.replace("magic_", "")
-                                item["bonus"]["magic"][mk] = pv
-                            else:
-                                item["bonus"]["common"][new_key] = pv
-                        updated = True; break
-                
-                if not updated:
-                    for section in ["WEAPON_CATEGORIES", "ARMOR_CATEGORIES", "SHIELD_CATEGORIES"]:
-                        if section in raw_data and target_id in raw_data[section]:
-                            for pk, pv in updates.items():
-                                raw_data[section][target_id][pk] = pv
-                            updated = True; break
-            
-            if updated:
-                with open(path, "w", encoding="utf-8") as f:
-                    yaml.dump(raw_data, f, allow_unicode=True, sort_keys=False, default_flow_style=None, indent=2)
-                
+            success = apply_surgical_update(file_type, target_id, updates)
+            if success:
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps({"status": "success"}).encode('utf-8'))
             else:
-                print(f"  [SAVE FAILED] Target ID '{target_id}' not found in {filename}")
-                self.send_response(404)
+                self.send_response(500)
                 self.end_headers()
 
 if __name__ == "__main__":
