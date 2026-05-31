@@ -490,8 +490,9 @@ def _effect_yrden(player, settings, dungeon, dialog, stave=None):
         if stave: stave.charges += 1
         return "そこには 配置できない！"
         
-    # 2. 壁判定チェック (map_data が 1 以外のマスは床ではない＝配置不可)
-    if dungeon.map_data[target_gy][target_gx] != 1:
+    # 2. 壁判定チェック (1 または 4, 5, 6 のマスが床/通路であり、それ以外は配置不可)
+    tile_type = dungeon.map_data[target_gy][target_gx]
+    if tile_type != 1 and not (4 <= tile_type <= 6):
         if stave: stave.charges += 1
         return "そこには 配置できない！"
         
