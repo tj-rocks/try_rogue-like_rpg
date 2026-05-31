@@ -83,8 +83,7 @@ def handle_death_sequence(player, dungeon, dialog, game_state):
 
             curse_msg = ""
             if player.curse_level > 0:
-                jp_stats = player.get_cursed_stats_japanese()
-                curse_msg = f"\n\n🚨【死の呪い】段階 {player.curse_level}/5\n能力低下中(-10%): " + "、".join(jp_stats)
+                curse_msg = f"\n\n🚨【死の呪い】段階 {player.curse_level}/5\n最大HPが {player.curse_level * 10}% 低下中"
 
             dialog.text = Text.System.DOCTOR_REVIVE + curse_msg
             game_state["dialog_modal"] = True

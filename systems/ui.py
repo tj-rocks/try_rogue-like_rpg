@@ -2223,13 +2223,8 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                     if player.guild_point >= cost:
                                                         player.guild_point -= cost
                                                         player.curse_level -= 1
-                                                        import random
-                                                        if player.cursed_stats:
-                                                            removed = random.choice(player.cursed_stats)
-                                                            player.cursed_stats.remove(removed)
-                                                            dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat=player.get_cursed_stats_japanese_single(removed))
-                                                        else:
-                                                            dialog.text = Text.NPC.PRIEST_CURE_DONE_SIMPLE
+                                                        player.cursed_stats = ["hp"] if player.curse_level > 0 else []
+                                                        dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat="最大HP")
                                                         dialog.is_active = True
                                                         from systems.sound_handler import sound_manager
                                                         from constants import SOUND_SELECT

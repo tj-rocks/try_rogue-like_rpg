@@ -61,7 +61,8 @@ def test_death_penalty():
     # 検証: 呪い進行
     print(f"呪い検証: curse_level={player.curse_level}, cursed_stats={player.cursed_stats}")
     assert player.curse_level == 1
-    assert len(player.cursed_stats) == 1
+    assert player.max_hp == 90  # 10% reduction
+
 
     # 検証: 復活
     assert player.hp == player.max_hp
@@ -223,20 +224,12 @@ def test_comprehensive_curse_system():
     
     # 呪い進行の検証 (1段階目)
     assert player.curse_level == 1
-    assert len(player.cursed_stats) == 1
-    debuffed_stat_1 = player.cursed_stats[0]
-    print(f"1回目の死亡: 呪いレベル=1, デバフ対象={debuffed_stat_1}")
-    
-    # 低下補正が適用されていることの検証
-    if debuffed_stat_1 == "attack":
-        assert player.total_attack < base_attack
-    elif debuffed_stat_1 == "defense":
-        assert player.total_defense < base_defense
-    elif debuffed_stat_1 == "hp":
-        assert player.max_hp < base_hp
-    elif debuffed_stat_1 == "evasion":
-        assert player.block_chance_close < base_evasion_close
-        assert player.block_chance_ranged < base_evasion_ranged
+    assert player.max_hp == int(base_hp * 0.9)
+    # 他のステータスは低下しないことを検証
+    assert player.total_attack == base_attack
+    assert player.total_defense == base_defense
+    assert player.total_accuracy_close == base_accuracy
+    assert player.block_chance_close == base_evasion_close
     print("[OK] 1段階目デバフ適用検証成功！")
     
     # 2回目〜5回目の死亡（5段階マックスまで）
@@ -248,12 +241,16 @@ def test_comprehensive_curse_system():
             with patch("components.sprites.player.Player.save_to_file"):
                 handle_death_sequence(player, dungeon, dialog, game_state)
                 
-        # 呪い進行とデバフスロット数の検証
-        print(f"{death_idx}回目の死亡: 呪いレベル={player.curse_level}, デバフ対象リスト={player.cursed_stats}")
+        # 呪い進行と最大HP減少割合の検証
+        print(f"{death_idx}回目の死亡: 呪いレベル={player.curse_level}")
         assert player.curse_level == death_idx
-        assert len(player.cursed_stats) == death_idx
+        expected_hp = int(base_hp * (1.0 - death_idx * 0.1))
+        assert player.max_hp == expected_hp
+        # 他のステータスは低下しないことを検証
+        assert player.total_attack == base_attack
+        assert player.total_defense == base_defense
         
-    print("[OK] 5段階最大レベル到達＆重複なし5個デバフ検証成功！")
+    print("[OK] 5段階最大レベル到達＆HP 50%（半分）低下検証成功！")
     
     # 6回目の死亡（5段階上限でそれ以上進行しないことを検証）
     player.hp = 0
@@ -263,46 +260,32 @@ def test_comprehensive_curse_system():
         with patch("components.sprites.player.Player.save_to_file"):
             handle_death_sequence(player, dungeon, dialog, game_state)
             
-    print(f"6回目の死亡(上限チェック): 呪いレベル={player.curse_level}, デバフ対象={player.cursed_stats}")
+    print(f"6回目の死亡(上限チェック): 呪いレベル={player.curse_level}")
     assert player.curse_level == 5
-    assert len(player.cursed_stats) == 5
+    assert player.max_hp == int(base_hp * 0.5)
     
-    # 全てのステータスに低下補正が掛かっていることの検証
-    assert player.total_attack < base_attack
-    assert player.total_defense < base_defense
-    assert player.max_hp < base_hp
-    assert player.total_accuracy_close < base_accuracy
-    assert player.block_chance_close < base_evasion_close
-    assert player.block_chance_ranged < base_evasion_ranged
-    print("[OK] 5段階上限キャップ＆全ステータス低下補正検証成功！")
+    # 全てのステータスに対する検証（HPは50%固定、他は低下なし）
+    assert player.total_attack == base_attack
+    assert player.total_defense == base_defense
+    assert player.max_hp == int(base_hp * 0.5)
+    assert player.total_accuracy_close == base_accuracy
+    assert player.block_chance_close == base_evasion_close
+    assert player.block_chance_ranged == base_evasion_ranged
+    print("[OK] 5段階上限キャップ＆HPのみ50%低下検証成功！")
     
     # 3. ギルドでの治療シミュレーション (1段階ずつ治療してデバフ消失を確認)
-    import random
     while player.curse_level > 0:
         prev_level = player.curse_level
         
         # ギルド治療の実行
         player.curse_level -= 1
-        removed = random.choice(player.cursed_stats)
-        player.cursed_stats.remove(removed)
+        player.cursed_stats = ["hp"] if player.curse_level > 0 else []
         
-        print(f"ギルド治療: レベル {prev_level} -> {player.curse_level}, 解除デバフ={removed}")
+        print(f"ギルド治療: レベル {prev_level} -> {player.curse_level}")
         assert player.curse_level == prev_level - 1
-        assert removed not in player.cursed_stats
+        expected_hp = int(base_hp * (1.0 - player.curse_level * 0.1))
+        assert player.max_hp == expected_hp
         
-        # 治療されたステータスが元の正常値に戻っていることの検証
-        if removed == "attack":
-            assert player.total_attack == base_attack
-        elif removed == "defense":
-            assert player.total_defense == base_defense
-        elif removed == "hp":
-            assert player.max_hp == base_hp
-        elif removed == "accuracy":
-            assert player.total_accuracy_close == base_accuracy
-        elif removed == "evasion":
-            assert player.block_chance_close == base_evasion_close
-            assert player.block_chance_ranged == base_evasion_ranged
-            
     # 全快状態の検証
     assert player.curse_level == 0
     assert len(player.cursed_stats) == 0

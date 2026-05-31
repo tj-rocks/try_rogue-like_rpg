@@ -208,9 +208,6 @@ class Player(Entity):
             bonus += getattr(self, "attack_buff_val", 0)
 
         val = round(self.attack + bonus, 1)
-        if "attack" in getattr(self, "cursed_stats", []):
-            from constants import CURSE_REDUCTION_RATE
-            val = round(val * (1.0 - CURSE_REDUCTION_RATE), 1)
         return val
 
     @property
@@ -220,9 +217,9 @@ class Player(Entity):
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("hp_bonus", 0)
         val = int(self._base_max_hp + bonus)
-        if "hp" in getattr(self, "cursed_stats", []):
-            from constants import CURSE_REDUCTION_RATE
-            val = int(val * (1.0 - CURSE_REDUCTION_RATE))
+        if getattr(self, "curse_level", 0) > 0:
+            reduction = min(0.5, self.curse_level * 0.1)
+            val = int(val * (1.0 - reduction))
         return val
 
     @max_hp.setter
@@ -237,9 +234,6 @@ class Player(Entity):
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("accuracy_bonus_close", inst.get_stat("accuracy_bonus", 0))
         val = int(base + bonus)
-        if "accuracy" in getattr(self, "cursed_stats", []):
-            from constants import CURSE_REDUCTION_RATE
-            val = int(val * (1.0 - CURSE_REDUCTION_RATE))
         return val
 
     @property
@@ -251,9 +245,6 @@ class Player(Entity):
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("accuracy_bonus_ranged", inst.get_stat("accuracy_bonus", 0))
         val = int(base + bonus)
-        if "accuracy" in getattr(self, "cursed_stats", []):
-            from constants import CURSE_REDUCTION_RATE
-            val = int(val * (1.0 - CURSE_REDUCTION_RATE))
         return val
 
 
@@ -337,9 +328,6 @@ class Player(Entity):
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("defense_bonus", 0) + inst.get_enhance_bonus("defense_bonus")
         val = round(self.defense + bonus, 1)
-        if "defense" in getattr(self, "cursed_stats", []):
-            from constants import CURSE_REDUCTION_RATE
-            val = round(val * (1.0 - CURSE_REDUCTION_RATE), 1)
         return val
 
 
@@ -350,9 +338,6 @@ class Player(Entity):
             inst = self._find_equip_inst(inv, eid)
             if inst:
                 total += inst.get_stat("block_chance_close", 0.0) + inst.get_enhance_bonus("block_chance_close")
-        if "evasion" in getattr(self, "cursed_stats", []):
-            from constants import CURSE_REDUCTION_RATE
-            total = total * (1.0 - CURSE_REDUCTION_RATE)
         return total
 
     @property
@@ -362,9 +347,6 @@ class Player(Entity):
             inst = self._find_equip_inst(inv, eid)
             if inst:
                 total += inst.get_stat("block_chance_ranged", 0.0) + inst.get_enhance_bonus("block_chance_ranged")
-        if "evasion" in getattr(self, "cursed_stats", []):
-            from constants import CURSE_REDUCTION_RATE
-            total = total * (1.0 - CURSE_REDUCTION_RATE)
         return total
 
     def __init__(self):
@@ -426,10 +408,8 @@ class Player(Entity):
             self.max_reached_floor = floor
 
     def apply_curse(self):
-        import random
         self.curse_level = min(5, self.curse_level + 1)
-        all_possible = ["attack", "defense", "evasion", "accuracy", "hp"]
-        self.cursed_stats = random.sample(all_possible, self.curse_level)
+        self.cursed_stats = ["hp"] if self.curse_level > 0 else []
 
     def get_cursed_stats_japanese_single(self, key):
         jp_names = {
