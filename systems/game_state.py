@@ -19,6 +19,7 @@ game_state = {
     "shop_active": False,    # ショップ（売買）画面用
     "item_action_active": False, # 「使う・捨てる」メニュー用
     "ore_selection_active": False, # 鍛冶屋での「どの鉱石使う？」メニュー用
+    "parameter_selection_active": False, # 鍛冶屋での「どのパラメータを鍛える？」メニュー用
     "stave_selection_active": False, # 杖の回復対象選択用
     "bank_active": False,        # 銀行画面用
     "teleport_active": False,    # テレポート画面用
@@ -43,6 +44,8 @@ def is_paused():
             game_state["inventory_active"] or 
             game_state["enhance_active"] or
             game_state["status_active"] or
+            game_state.get("ore_selection_active", False) or
+            game_state.get("parameter_selection_active", False) or
             game_state["stave_selection_active"] or
             game_state["bank_active"] or
             game_state["shop_active"] or

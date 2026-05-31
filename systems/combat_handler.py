@@ -64,17 +64,16 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
         else:
             accuracy = getattr(attacker, "total_accuracy_close", getattr(attacker, "accuracy_close", 100))
             
-        evasion = getattr(target, "eva_bonus", 0)
-        hit_rate = (accuracy - evasion) / 100.0
+        hit_rate = accuracy / 100.0
         
         # [NEW] 盾によるブロック判定を命中率に統合（正面からの攻撃のみ）
         if _is_frontal_attack(attacker, target):
             if is_ranged:
-                block_chance = getattr(target, "block_chance_ranged", getattr(target, "block_chance", 0.0))
+                block_chance = getattr(target, "block_chance_ranged", 0.0)
             else:
-                block_chance = getattr(target, "block_chance_close", getattr(target, "block_chance", 0.0))
+                block_chance = getattr(target, "block_chance_close", 0.0)
             
-            if block_chance > 0.0:
+            if block_chance != 0.0:
                 hit_rate -= block_chance
     
     # 命中率の上下限 (魔法以外は最低5%は当たる、最大99%)
@@ -133,14 +132,16 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
         penetration = 0.0
         
     pen_rate = min(1.0, max(0.0, penetration))
+    # 割合軽減方式: Attack * (50 / (50 + Defense))
     defense = defense * (1.0 - pen_rate)
-        
-    base_dmg = max(0.1, calc_atk - defense) # 最低0.1ダメージ保証
+    defense = max(0.0, defense)
+    base_dmg = calc_atk * (50.0 / (50.0 + defense))
+    base_dmg = max(0.1, base_dmg) # 最低0.1ダメージ保証
     
-    # 乱数要素: 9割は保証、1割が乱数 (90-100%)
+    # 乱数要素: 7割は保証、3割が乱数 (70-100%)
     from systems.math_utils import hardcore_round
     # ダメージ計算も小数点第一位までで行い、第二位を繰り上げ
-    raw_damage = base_dmg * (0.9 + random.uniform(0, 0.1))
+    raw_damage = base_dmg * (0.7 + random.uniform(0, 0.3))
     rounded_damage = hardcore_round(raw_damage, is_hp=False)
     
     # HPは整数なので、最終ダメージはさらに整数に繰り上げ

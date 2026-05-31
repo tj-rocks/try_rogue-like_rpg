@@ -22,7 +22,7 @@ def test_combat_damage_calculation():
     print("\n[TEST] 戦闘ダメージ計算テストを開始 (実クラス使用版)...")
 
     # --- 1. プレイヤー攻撃のテスト (正面攻撃) ---
-    # 攻撃力 8, 敵防御 1 -> ベースダメージ 7
+    # 攻撃力 8, 敵防御 1 -> 新式ベースダメージ: 8 * (50 / 51) = 7.84 -> 繰り上げで 8.0
     player = Player()
     player.attack = 8
     player.x, player.y = 64, 0
@@ -34,16 +34,16 @@ def test_combat_damage_calculation():
     enemy.defense = 1
     enemy.facing = "right"
     
-    # 乱数制御: 1回目(Miss判定)は0.0, 2回目(Crit判定)は1.0, 3回目(ダメージ乱数)は1.0
-    with patch('random.random', side_effect=[0.0, 1.0, 1.0]): 
-        print(f"DEBUG: AttackerAtk={player.total_attack}, TargetDef={getattr(enemy, 'total_defense', enemy.defense)}")
-        dmg, is_crit, is_miss = calculate_damage(player, enemy)
-        print(f"プレイヤー攻撃テスト(正面): Damage={dmg}, Crit={is_crit}, Miss={is_miss}")
-        # (8 - 1) * (0.9 + 1.0 * 0.1) = 7 * 1.0 = 7.0
-        assert dmg == 7.0, f"ダメージ計算が異常です: {dmg} (Expected: 7.0)"
+    # 乱数制御: 1回目(Miss判定)は0.0, 2回目(Crit判定)は1.0. random.uniformは0.1(最大値)を返すよう固定
+    with patch('random.random', side_effect=[0.0, 1.0]): 
+        with patch('random.uniform', return_value=0.3):
+            print(f"DEBUG: AttackerAtk={player.total_attack}, TargetDef={getattr(enemy, 'total_defense', enemy.defense)}")
+            dmg, is_crit, is_miss = calculate_damage(player, enemy)
+            print(f"プレイヤー攻撃テスト(正面): Damage={dmg}, Crit={is_crit}, Miss={is_miss}")
+            assert dmg == 8.0, f"ダメージ計算が異常です: {dmg} (Expected: 8.0)"
 
     # --- 2. 敵攻撃のテスト (装備なし) ---
-    # 敵攻撃 12, プレイヤー防御 3 -> ベースダメージ 9
+    # 敵攻撃 12, プレイヤー防御 3 -> 新式ベースダメージ: 12 * (50 / 53) = 11.32 -> 繰り上げで 12.0
     enemy_atk = Enemy(0, 0, "mawaru_kame")
     enemy_atk.attack = 12
     enemy_atk.facing = "left"
@@ -54,14 +54,15 @@ def test_combat_damage_calculation():
     player_def.facing = "right"
     player_def.unequip_armor()
     
-    with patch('random.random', side_effect=[0.0, 1.0, 1.0]):
-        dmg, is_crit, is_miss = calculate_damage(enemy_atk, player_def)
-        print(f"敵攻撃テスト(装備なし): Damage={dmg}, Def={player_def.total_defense}")
-        assert player_def.total_defense == 3
-        assert dmg == 9.0, f"ダメージ計算が異常です: {dmg} (Expected: 9.0)"
+    with patch('random.random', side_effect=[0.0, 1.0]):
+        with patch('random.uniform', return_value=0.3):
+            dmg, is_crit, is_miss = calculate_damage(enemy_atk, player_def)
+            print(f"敵攻撃テスト(装備なし): Damage={dmg}, Def={player_def.total_defense}")
+            assert player_def.total_defense == 3
+            assert dmg == 12.0, f"ダメージ計算が異常です: {dmg} (Expected: 12.0)"
 
     # --- 3. 敵攻撃のテスト (防具装備時 - 二重加算バグの修正確認) ---
-    # 敵攻撃 23, プレイヤー防御 13 (3 + レザー10) -> ベースダメージ 10
+    # 敵攻撃 23, プレイヤー防御 13 (3 + レザー10) -> 新式ベースダメージ: 23 * (50 / 63) = 18.25 -> 繰り上げで 19.0
     player_equipped = Player()
     player_equipped.defense = 3
     player_equipped.x, player_equipped.y = 0, 0
@@ -80,10 +81,11 @@ def test_combat_damage_calculation():
     enemy_strong.attack = 23
     enemy_strong.facing = "left"
     
-    with patch('random.random', side_effect=[0.0, 1.0, 1.0]):
-        dmg, is_crit, is_miss = calculate_damage(enemy_strong, player_equipped)
-        print(f"敵攻撃テスト(防具あり): Damage={dmg}, TotalDef={player_equipped.total_defense}")
-        assert dmg == 10.0, f"ダメージ計算が異常です: {dmg} (Expected: 10.0)"
+    with patch('random.random', side_effect=[0.0, 1.0]):
+        with patch('random.uniform', return_value=0.3):
+            dmg, is_crit, is_miss = calculate_damage(enemy_strong, player_equipped)
+            print(f"敵攻撃テスト(防具あり): Damage={dmg}, TotalDef={player_equipped.total_defense}")
+            assert dmg == 19.0, f"ダメージ計算が異常です: {dmg} (Expected: 19.0)"
 
     print("[SUCCESS] ダメージ計算テストが正常に完了しました。")
 

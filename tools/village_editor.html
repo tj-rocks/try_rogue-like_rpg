@@ -260,10 +260,8 @@ header h1 {
 <header>
   <h1>🏡 村マップグラフィックエディタ</h1>
   <button class="btn btn-blue"  onclick="renderFromText()">▶ テキスト→描画</button>
-  <button class="btn btn-green" onclick="exportToText()">💾 描画→テキスト</button>
   <button class="btn btn-cyan"  id="btn-toggle-symbols" onclick="toggleSymbols()">🔤 記号OFF</button>
-  <button class="btn btn-gold"  onclick="saveToServer()">💾 直接ファイル保存</button>
-  <button class="btn btn-gold"  onclick="refreshAssets()">🔄 グラフィック更新</button>
+  <button class="btn"           onclick="refreshAssets()" style="background: #4b5563; color: #fff;">🔄 グラフィック更新</button>
   <button class="btn btn-red"   onclick="clearAll()">🗑 クリア</button>
   
   <span style="margin-left:auto; font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:8px;">
@@ -271,7 +269,9 @@ header h1 {
     <input type="range" id="zoom-slider" min="14" max="48" value="24" oninput="updateZoom(this.value)" style="width:90px; cursor:pointer;">
     <span id="zoom-val" style="width:34px; font-weight:bold; color:var(--accent-color);">24px</span>
   </span>
-  <span style="font-size:12px; color:var(--text-secondary); padding-left:10px; border-left:1px solid var(--border-color);">選択中: <span id="selected-char-disp" style="color:#60a5fa; font-weight:bold; font-family:monospace;">.</span></span>
+  <span style="font-size:12px; color:var(--text-secondary); padding-left:10px; border-left:1px solid var(--border-color); margin-right: 12px;">選択中: <span id="selected-char-disp" style="color:#60a5fa; font-weight:bold; font-family:monospace;">.</span></span>
+  
+  <button class="btn btn-green" onclick="saveToServer()" style="font-size: 13px; padding: 8px 16px;">💾 保存</button>
 </header>
 
 <div class="main">

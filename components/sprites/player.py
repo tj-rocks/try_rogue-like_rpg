@@ -24,6 +24,24 @@ def _new_equip_id():
     _equip_id_counter += 1
     return _equip_id_counter
 
+ORE_STAT_CATEGORIES = {
+    "red_stone": {
+        "attack_bonus", "accuracy_bonus_close", "accuracy_bonus",
+        "crit_rate", "crit_bonus", "armor_penetration"
+    },
+    "blue_stone": {
+        "defense_bonus", "hp_bonus"
+    },
+    "green_stone": {
+        "block_chance_close", "block_chance_ranged", "regen_bonus", "lantern_bonus", "aggro_mod", "stupidity"
+    },
+    "purple_stone": {
+        "magic_stave_bonus", "magic_light_stave_bonus", "magic_heal_ratio",
+        "magic_fire_damage", "magic_fire_range", "magic_knockback_damage",
+        "magic_invincible_turns"
+    }
+}
+
 class EquipInstance:
     def __init__(self, equip_type, key, randomize=False):
         self.iid = _new_equip_id()
@@ -42,6 +60,42 @@ class EquipInstance:
             data = LANTERN_DATA.get(self.key, {})
         return data.get(stat_key, default)
 
+    def get_base_upgradeable_stats(self):
+        # 装備品が現在持っている（base > 0）かつ、いずれかの系統に属するステータス
+        all_upgradeable_keys = set()
+        for cats in ORE_STAT_CATEGORIES.values():
+            all_upgradeable_keys.update(cats)
+        
+        compatible = []
+        for k in all_upgradeable_keys:
+            if self.get_stat(k, 0) > 0:
+                compatible.append(k)
+        return compatible
+
+    def is_ore_compatible(self, ore_key):
+        base_stats = self.get_base_upgradeable_stats()
+        if not base_stats:
+            return False
+        if ore_key in ORE_STAT_CATEGORIES:
+            allowed_stats = ORE_STAT_CATEGORIES[ore_key]
+            return any(k in allowed_stats for k in base_stats)
+        return False
+
+    def apply_upgrade(self, stat_key, bonus):
+        base_stats = self.get_base_upgradeable_stats()
+        if not base_stats:
+            return
+        
+        # 過去データとの互換性のため、既存の enhance 値で初期化
+        for k in base_stats:
+            if k not in self.stats:
+                self.stats[k] = self.enhance
+        
+        if stat_key in self.stats:
+            self.stats[stat_key] += bonus
+            
+        self.enhance += bonus
+
     def get_enhance_bonus(self, stat_key):
         # その装備品が元々持っていないステータスは、強化しても増えない（常に0）
         base = self.get_stat(stat_key, 0)
@@ -54,9 +108,13 @@ class EquipInstance:
         elif self.equip_type == "shield": data = SHIELD_DATA.get(self.key, {})
 
         growth = data.get("growth")
-        if not growth or self.enhance == 0:
-            # growth がない場合は、単純に強化値を返す（古い互換用）
-            return self.enhance
+        if not growth:
+            # デフォルト成長設定
+            growth = {"bonus_limit": 2, "times_limit": 50, "over_limit_growth_rate": 0.003}
+
+        stat_enhance = self.stats.get(stat_key, self.enhance)
+        if stat_enhance == 0:
+            return 0
 
         bonus_limit = growth.get("bonus_limit", 2)
         times_limit = max(1, growth.get("times_limit", 50))
@@ -66,10 +124,10 @@ class EquipInstance:
         per_step      = growth_room / times_limit
         over_per_step = base * over_rate
 
-        if self.enhance <= times_limit:
-            bonus = self.enhance * per_step
+        if stat_enhance <= times_limit:
+            bonus = stat_enhance * per_step
         else:
-            bonus = growth_room + (self.enhance - times_limit) * over_per_step
+            bonus = growth_room + (stat_enhance - times_limit) * over_per_step
         return round(bonus, 3)
 
     def get_name(self):
@@ -144,6 +202,11 @@ class Player(Entity):
         if armor_inst: bonus += armor_inst.get_stat("attack_bonus", 0)
         shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
         if shield_inst: bonus += shield_inst.get_stat("attack_bonus", 0)
+        
+        # 攻撃力バフの加算
+        if getattr(self, "attack_buff_turns", 0) > 0:
+            bonus += getattr(self, "attack_buff_val", 0)
+
         val = round(self.attack + bonus, 1)
         if "attack" in getattr(self, "cursed_stats", []):
             from constants import CURSE_REDUCTION_RATE
@@ -193,26 +256,7 @@ class Player(Entity):
             val = int(val * (1.0 - CURSE_REDUCTION_RATE))
         return val
 
-    @property
-    def eva_bonus(self):
-        from constants import PLAYER_EVASION
-        base = PLAYER_EVASION
-        bonus = 0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
-            inst = self._find_equip_inst(inv, eid)
-            if inst:
-                # eva_bonus または block_chance を取得
-                val = inst.get_stat("eva_bonus", inst.get_stat("block_chance", 0))
-                # 小数の場合は100倍してパーセントにする
-                if isinstance(val, float) and val < 1.0:
-                    bonus += val * 100
-                else:
-                    bonus += val
-        val = int(base + bonus)
-        if "evasion" in getattr(self, "cursed_stats", []):
-            from constants import CURSE_REDUCTION_RATE
-            val = int(val * (1.0 - CURSE_REDUCTION_RATE))
-        return val
+
 
     @property
     def crit_bonus(self):
@@ -305,7 +349,10 @@ class Player(Entity):
         for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst:
-                total += inst.get_stat("block_chance_close", inst.get_stat("block_chance", 0.0)) + inst.get_enhance_bonus("block_chance_close")
+                total += inst.get_stat("block_chance_close", 0.0) + inst.get_enhance_bonus("block_chance_close")
+        if "evasion" in getattr(self, "cursed_stats", []):
+            from constants import CURSE_REDUCTION_RATE
+            total = total * (1.0 - CURSE_REDUCTION_RATE)
         return total
 
     @property
@@ -314,7 +361,10 @@ class Player(Entity):
         for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
             inst = self._find_equip_inst(inv, eid)
             if inst:
-                total += inst.get_stat("block_chance_ranged", inst.get_stat("block_chance", 0.0)) + inst.get_enhance_bonus("block_chance_ranged")
+                total += inst.get_stat("block_chance_ranged", 0.0) + inst.get_enhance_bonus("block_chance_ranged")
+        if "evasion" in getattr(self, "cursed_stats", []):
+            from constants import CURSE_REDUCTION_RATE
+            total = total * (1.0 - CURSE_REDUCTION_RATE)
         return total
 
     def __init__(self):
@@ -333,6 +383,8 @@ class Player(Entity):
         self.equipped_lantern = None
         self.stave_inventory = []
         self.invincible_turns = 0
+        self.attack_buff_turns = 0
+        self.attack_buff_val = 0
         self.regen_pool = 0.0
         self.waving_stave_inst = None
         self._status = "normal"
@@ -454,6 +506,12 @@ class Player(Entity):
                 self.invincible_turns -= 1
                 if self.invincible_turns == 0 and dialog:
                     msg = "無敵状態が 切れた！"
+                    if dialog.is_active: dialog.text += "\n" + msg
+                    else: dialog.text = msg; dialog.is_active = True; game_state["dialog_modal"] = False; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+            if getattr(self, "attack_buff_turns", 0) > 0:
+                self.attack_buff_turns -= 1
+                if self.attack_buff_turns == 0 and dialog:
+                    msg = "攻撃力上昇の効果が 切れた！"
                     if dialog.is_active: dialog.text += "\n" + msg
                     else: dialog.text = msg; dialog.is_active = True; game_state["dialog_modal"] = False; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
             if self.is_moving: self.start_enemy_turn(dungeon)
@@ -676,6 +734,40 @@ class Player(Entity):
             import math; p = (math.sin(pygame.time.get_ticks()/150)+1)/2; gs = int(self.width*(1.1+p*0.3)); gsf = pygame.Surface((gs*2,gs*2), pygame.SRCALPHA)
             a = int(100+p*100); pygame.draw.circle(gsf, (255,215,0,a), (gs,gs), gs, 3); pygame.draw.circle(gsf, (255,255,200,a//2), (gs,gs), gs//2)
             screen.blit(gsf, (draw_x+self.width//2-gs, draw_y+self.height//2-gs))
+        if getattr(self, "attack_buff_turns", 0) > 0:
+            import math
+            import random
+            if not hasattr(self, "buff_particles"):
+                self.buff_particles = []
+            if random.random() < 0.15:
+                px = random.randint(-15, 15)
+                py = random.randint(10, 30)
+                self.buff_particles.append({
+                    "rel_x": px,
+                    "rel_y": py,
+                    "age": 0,
+                    "max_age": random.randint(30, 50),
+                    "speed": random.uniform(0.5, 1.2),
+                    "size": random.randint(2, 4)
+                })
+            for p in self.buff_particles[:]:
+                p["age"] += 1
+                if p["age"] >= p["max_age"]:
+                    self.buff_particles.remove(p)
+                    continue
+                p["rel_y"] -= p["speed"]
+                p["rel_x"] += math.sin(p["age"] / 5) * 0.3
+                alpha = int(200 * (1.0 - p["age"] / p["max_age"]))
+                p_surf = pygame.Surface((p["size"] * 2, p["size"] * 2), pygame.SRCALPHA)
+                pygame.draw.circle(p_surf, (100, 200, 255, alpha), (p["size"], p["size"]), p["size"])
+                screen.blit(p_surf, (draw_x + self.width // 2 + p["rel_x"] - p["size"], draw_y + self.height // 2 + p["rel_y"] - p["size"]))
+            p_val = (math.sin(pygame.time.get_ticks() / 150) + 1) / 2
+            gs = int(self.width * (1.0 + p_val * 0.2))
+            gsf = pygame.Surface((gs * 2, gs * 2), pygame.SRCALPHA)
+            a = int(60 + p_val * 60)
+            pygame.draw.circle(gsf, (100, 180, 255, a), (gs, gs), gs, 2)
+            pygame.draw.circle(gsf, (150, 220, 255, a // 2), (gs, gs), gs - 3)
+            screen.blit(gsf, (draw_x + self.width // 2 - gs, draw_y + self.height // 2 - gs))
         if self.weapon:
             over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
             if over:
@@ -961,7 +1053,10 @@ class Player(Entity):
             "items": [dict(it) for it in self.items], "weapon_inventory": [eq.to_dict() for eq in self.weapon_inventory], "armor_inventory": [eq.to_dict() for eq in self.armor_inventory],
             "shield_inventory": [eq.to_dict() for eq in self.shield_inventory], "equipped_weapon": self.equipped_weapon, "equipped_armor": self.equipped_armor, "equipped_shield": self.equipped_shield,
             "stave_inventory": [st.to_dict() for st in self.stave_inventory], "lantern_inventory": [eq.to_dict() for eq in self.lantern_inventory], "equipped_lantern": self.equipped_lantern,
-            "invincible_turns": self.invincible_turns, "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
+            "invincible_turns": self.invincible_turns,
+            "attack_buff_turns": getattr(self, "attack_buff_turns", 0),
+            "attack_buff_val": getattr(self, "attack_buff_val", 0),
+            "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
             "completed_fixed_quests": self.completed_fixed_quests, "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
             "current_floor": self.current_floor, "max_reached_floor": self.max_reached_floor, "equip_id_counter": globals().get("_equip_id_counter", 0),
             "boss_message_shown": getattr(self, "boss_message_shown", False),
@@ -988,7 +1083,10 @@ class Player(Entity):
         self.stave_inventory = [StaveInstance.from_dict(st) for st in data.get("stave_inventory", [])]
         self.lantern_inventory = [EquipInstance.from_dict(eq) for eq in data.get("lantern_inventory", [])]
         el = data.get("equipped_lantern"); self.change_lantern(el) if el is not None else self.unequip_lantern()
-        self.invincible_turns = int(data.get("invincible_turns", 0)); self.guild_point = int(data.get("guild_point", 0)); self.guild_rank = data.get("guild_rank", "F")
+        self.invincible_turns = int(data.get("invincible_turns", 0))
+        self.attack_buff_turns = int(data.get("attack_buff_turns", 0))
+        self.attack_buff_val = int(data.get("attack_buff_val", 0))
+        self.guild_point = int(data.get("guild_point", 0)); self.guild_rank = data.get("guild_rank", "F")
         self.active_quests = data.get("active_quests", [])
         for q in self.active_quests:
             if "reward_gold" not in q: q["reward_gold"] = 1

@@ -98,6 +98,7 @@ TEST_FILES=(
     "tests/test_equipment_cross_stats.py"
     "tests/test_equip_kago_bonus.py"
     "tests/test_armor_penetration.py"
+    "tests/test_blacksmith_stones.py"
 )
 
 SUCCESS_COUNT=0

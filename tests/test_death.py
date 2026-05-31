@@ -190,9 +190,10 @@ def test_comprehensive_curse_system():
     base_defense = player.total_defense
     base_hp = player.max_hp
     base_accuracy = player.total_accuracy_close
-    base_evasion = player.eva_bonus
+    base_evasion_close = player.block_chance_close
+    base_evasion_ranged = player.block_chance_ranged
     
-    print(f"初期ステータス: ATK={base_attack}, DEF={base_defense}, HP={base_hp}, ACC={base_accuracy}, EVA={base_evasion}")
+    print(f"初期ステータス: ATK={base_attack}, DEF={base_defense}, HP={base_hp}, ACC={base_accuracy}, EVA_C={base_evasion_close}, EVA_R={base_evasion_ranged}")
     
     # 2. 5回連続で死亡させて、呪い進行とステータス低下を追跡
     dungeon = MagicMock()
@@ -230,10 +231,9 @@ def test_comprehensive_curse_system():
         assert player.total_defense < base_defense
     elif debuffed_stat_1 == "hp":
         assert player.max_hp < base_hp
-    elif debuffed_stat_1 == "accuracy":
-        assert player.total_accuracy_close < base_accuracy
     elif debuffed_stat_1 == "evasion":
-        assert player.eva_bonus < base_evasion
+        assert player.block_chance_close < base_evasion_close
+        assert player.block_chance_ranged < base_evasion_ranged
     print("[OK] 1段階目デバフ適用検証成功！")
     
     # 2回目〜5回目の死亡（5段階マックスまで）
@@ -269,7 +269,8 @@ def test_comprehensive_curse_system():
     assert player.total_defense < base_defense
     assert player.max_hp < base_hp
     assert player.total_accuracy_close < base_accuracy
-    assert player.eva_bonus < base_evasion
+    assert player.block_chance_close < base_evasion_close
+    assert player.block_chance_ranged < base_evasion_ranged
     print("[OK] 5段階上限キャップ＆全ステータス低下補正検証成功！")
     
     # 3. ギルドでの治療シミュレーション (1段階ずつ治療してデバフ消失を確認)
@@ -296,7 +297,8 @@ def test_comprehensive_curse_system():
         elif removed == "accuracy":
             assert player.total_accuracy_close == base_accuracy
         elif removed == "evasion":
-            assert player.eva_bonus == base_evasion
+            assert player.block_chance_close == base_evasion_close
+            assert player.block_chance_ranged == base_evasion_ranged
             
     # 全快状態の検証
     assert player.curse_level == 0
@@ -305,7 +307,8 @@ def test_comprehensive_curse_system():
     assert player.total_defense == base_defense
     assert player.max_hp == base_hp
     assert player.total_accuracy_close == base_accuracy
-    assert player.eva_bonus == base_evasion
+    assert player.block_chance_close == base_evasion_close
+    assert player.block_chance_ranged == base_evasion_ranged
     print("[OK] ギルド呪い治療＆ステータス完全全快検証成功！")
     print("--- 呪いシステムの包括的結合テスト合格！ ---")
 

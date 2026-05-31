@@ -56,6 +56,7 @@ class Enemy(Entity):
         self.accuracy_ranged = data.get("accuracy_ranged", data.get("accuracy_bonus", 100))
         self.status_to_inflict = data.get("status"); self.status_chance = data.get("status_chance", 100)
         self.detect_range = data.get("detect_range", ENEMY_AGGRO_RADIUS)
+        self.damaged_detect_range = data.get("damaged_detect_range", 100)
         
         color_hex = data.get("image_color"); cache_key = (enemy_type, self.width, self.height, color_hex)
         if cache_key in Enemy._image_cache: self.images = Enemy._image_cache[cache_key]
@@ -344,7 +345,22 @@ class Enemy(Entity):
         return False
 
     def take_turn(self, player, dungeon, all_entities, dialog=None, occupied_cells=None):
-        if getattr(self, "is_dead", False) or self.is_static: return
+        if getattr(self, "is_dead", False): return
+        if self.is_static:
+            if hasattr(self, "lifetime_turns") and self.lifetime_turns is not None:
+                self.lifetime_turns -= 1
+                if self.lifetime_turns <= 0:
+                    self.is_dead = True
+                    if dialog:
+                        from constants import COMBAT_LOG_WAIT_FRAMES
+                        msg = f"{self.name} は 消滅した！"
+                        if dialog.is_active:
+                            dialog.text += "\n" + msg
+                        else:
+                            dialog.text = msg
+                            dialog.is_active = True
+                        dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+            return
         mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
         px, py = int((player.target_x+player.width/2)//dungeon.tile_size), int((player.target_y+player.height/2)//dungeon.tile_size)
         
@@ -361,7 +377,7 @@ class Enemy(Entity):
         
         dx, dy = best_dx, best_dy
         rad = max(1, self.detect_range + player.get_aggro_modifier())
-        if getattr(self, "damage_flash_timer", 0) > 0: rad = max(rad, 100)
+        if getattr(self, "damage_flash_timer", 0) > 0: rad = max(rad, self.damaged_detect_range)
         if abs(dx) > rad or abs(dy) > rad: return
         # 困惑度テーブルを参照してぼーっと確率を決定
         wander_chance = STUPIDITY_WANDER_RATES.get(self.stupidity, self.stupidity / 10.0)

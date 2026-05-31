@@ -619,6 +619,17 @@ class ItemActionDialog:
                     elif itype == "lantern" and getattr(self.player, "equipped_lantern", None) == iid_or_key: is_equipped = True
 
                     if self.cursor_idx == 0:
+                        if itype == "consumable":
+                            from constants import CONSUMABLE_DATA
+                            data = CONSUMABLE_DATA.get(iid_or_key, {})
+                            effect = data.get("effect")
+                            if not effect or effect == "material":
+                                from systems.audio_manager import play_sfx
+                                from constants import SOUND_ERROR
+                                play_sfx(SOUND_ERROR)
+                                self.is_active = True # 閉じない
+                                return
+                        
                         if is_equipped:
                             if self.on_unequip: self.on_unequip(itype, iid_or_key)
                         elif self.on_use:
@@ -641,6 +652,14 @@ class ItemActionDialog:
         elif itype == "lantern" and getattr(self.player, "equipped_lantern", None) == iid_or_key: is_equipped = True
 
         # 選択肢を中央に配置
+        is_unusable = False
+        if itype == "consumable":
+            from constants import CONSUMABLE_DATA
+            data = CONSUMABLE_DATA.get(iid_or_key, {})
+            effect = data.get("effect")
+            if not effect or effect == "material":
+                is_unusable = True
+                
         if itype == "stave":
             first_opt = Text.UI.WAVE
         elif is_equipped:
@@ -651,10 +670,16 @@ class ItemActionDialog:
         options = [first_opt, Text.UI.DISCARD, Text.UI.QUIT]
         for i, opt in enumerate(options):
             color = (255, 255, 255)
-            if i == self.cursor_idx:
-                color = (255, 255, 100)
-                cursor = self.font.render(">", True, color)
-                screen.blit(cursor, (self.x + self.width // 2 - 100, self.y + 60 + i * 50))
+            if i == 0 and is_unusable:
+                color = (120, 120, 120)
+                if i == self.cursor_idx:
+                    cursor = self.font.render(">", True, color)
+                    screen.blit(cursor, (self.x + self.width // 2 - 100, self.y + 60 + i * 50))
+            else:
+                if i == self.cursor_idx:
+                    color = (255, 255, 100)
+                    cursor = self.font.render(">", True, color)
+                    screen.blit(cursor, (self.x + self.width // 2 - 100, self.y + 60 + i * 50))
             
             text = self.font.render(opt, True, color)
             screen.blit(text, (self.x + self.width // 2 - 60, self.y + 60 + i * 50))
@@ -667,7 +692,11 @@ class OreSelectionDialog:
         self.cursor_idx = 0
         self.target_item_data = None # (type, iid) 強化対象
         self.available_ores = []     # (key, name, bonus)
-        self.on_confirm = None       # callback(item_type, iid, ore_key)
+        self.on_confirm = None       # callback(item_type, iid, ore_key, stat_key)
+        self.parameter_selection_dialog = None
+        self.confirm_dialog = None
+        self.player_ref = None
+        self.cutscene_manager = None
 
     def setup(self, enhance_dialog, confirm_dialog=None, player=None, cutscene_manager=None):
         """強化実行のコールバックと確認ダイアログを設定する"""
@@ -692,11 +721,24 @@ class OreSelectionDialog:
     def update_from_player(self, player):
         """インベントリから「鉱石系」を重複を除いてリストアップ"""
         from constants import CONSUMABLE_DATA
+        
+        # 選択された装備のインスタンスを探して、適合性をチェックする
+        inst = None
+        if self.target_item_data:
+            item_type, iid = self.target_item_data
+            if item_type == "weapon": inv = player.weapon_inventory
+            elif item_type == "armor": inv = player.armor_inventory
+            else: inv = getattr(player, "shield_inventory", [])
+            inst = player._find_equip_inst(inv, iid)
+
         ores = {} # key -> {name, bonus}
         for item in player.items:
             item_key = item["key"]
             data = CONSUMABLE_DATA.get(item_key, {})
             if data.get("effect") == "material":
+                # 装備がこの石を許容しない場合は選択肢に出さない
+                if inst is not None and not inst.is_ore_compatible(item_key):
+                    continue
                 if item_key not in ores:
                     ores[item_key] = {
                         "name": data.get("name", item_key),
@@ -724,63 +766,12 @@ class OreSelectionDialog:
                             self.is_active = False
                             return
                         self.is_active = False
-                        if self.on_confirm and self.target_item_data:
+                        if getattr(self, "parameter_selection_dialog", None) and getattr(self, "player_ref", None) and self.target_item_data:
+                            psd = self.parameter_selection_dialog
+                            player = self.player_ref
                             item_type, iid = self.target_item_data
-                            # confirm_dialog があればプレビューを表示してから実行
-                            if getattr(self, "confirm_dialog", None) and getattr(self, "player_ref", None):
-                                cd = self.confirm_dialog
-                                player = self.player_ref
-                                ore_bonus = self.available_ores[self.cursor_idx][2]
-                                if item_type == "weapon": inv = player.weapon_inventory
-                                elif item_type == "armor": inv = player.armor_inventory
-                                else: inv = getattr(player, "shield_inventory", [])
-                                inst = player._find_equip_inst(inv, iid)
-                                if inst:
-                                    if item_type == "weapon":
-                                        stat_key = "attack_bonus"
-                                        unit = ""
-                                    elif item_type == "armor":
-                                        stat_key = "defense_bonus"
-                                        unit = ""
-                                    else: # shield
-                                        stat_key = "block_chance"
-                                        unit = "%"
-                                    
-                                    before = inst.get_stat(stat_key, 0) + inst.get_enhance_bonus(stat_key)
-                                    # 仮に enhance を進めて after を計算
-                                    inst.enhance += ore_bonus
-                                    after = inst.get_stat(stat_key, 0) + inst.get_enhance_bonus(stat_key)
-                                    inst.enhance -= ore_bonus  # 戻す
-                                    
-                                    # 表示用に変換
-                                    if unit == "%":
-                                        display_before = before * 100
-                                        display_after = after * 100
-                                        stat_label = "ブロック率"
-                                    else:
-                                        display_before = before
-                                        display_after = after
-                                        stat_label = "能力ボーナス"
-                                    from wordings import Text
-                                    cd.text = Text.NPC.BLACKSMITH_ENHANCE_PREVIEW.format(
-                                        name=inst.get_name(),
-                                        label=stat_label,
-                                        unit=unit,
-                                        before=display_before, after=display_after,
-                                        enhance=inst.enhance + ore_bonus,
-                                        ore_bonus=ore_bonus
-                                    )
-                                    stored_type, stored_iid, stored_key = item_type, iid, ore_key
-                                    def do_enhance():
-                                        if getattr(self, "cutscene_manager", None):
-                                            self.cutscene_manager.start_blacksmith(lambda: self.on_confirm(stored_type, stored_iid, stored_key))
-                                        else:
-                                            self.on_confirm(stored_type, stored_iid, stored_key)
-                                    cd.on_yes = do_enhance
-                                    cd.on_no = None
-                                    cd.is_active = True
-                                    return
-                            self.on_confirm(item_type, iid, ore_key)
+                            psd.update_from_selection(player, item_type, iid, ore_key)
+                            psd.is_active = True
 
     def draw(self, screen):
         if not self.is_active: return
@@ -802,12 +793,12 @@ class OreSelectionDialog:
                 cursor = self.font.render(">", True, color)
                 screen.blit(cursor, (self.x + self.width // 2 - 120, self.y + 70 + i * 40))
             
-            
             if key == "cancel":
                 text = self.font.render(name, True, color)
             else:
                 text = self.font.render(f"{name} (+{bonus})", True, color)
             screen.blit(text, (self.x + self.width // 2 - 80, self.y + 70 + i * 40))
+
 
 class StaveSelectionDialog:
     """どの杖の使用回数を回復するかを選ぶダイアログ"""
@@ -1010,17 +1001,17 @@ class BaseListDialog:
         # 右パネルの詳細表示
         detail_y_offset = 0
         if self.items and 0 <= self.cursor_idx < len(self.items):
-            # 画像の描画
+            # 画像の描画 (80x80に縮小して縦スペースを節約)
             img_path = self.get_item_image_path(self.items[self.cursor_idx], self.cursor_idx, player)
             if img_path:
                 from systems.resources import load_image, scale_image_aspect
                 img = load_image(img_path)
                 if img:
-                    scaled_img = scale_image_aspect(img, 128, 128)
+                    scaled_img = scale_image_aspect(img, 80, 80)
                     # 中央寄せにするための計算
                     img_w, img_h = scaled_img.get_size()
-                    screen.blit(scaled_img, (sep_x + 30 + (128 - img_w) // 2, self.y + 60 + (128 - img_h) // 2))
-                    detail_y_offset = 140
+                    screen.blit(scaled_img, (sep_x + 30 + (80 - img_w) // 2, self.y + 50 + (80 - img_h) // 2))
+                    detail_y_offset = 90
 
         lines = self.get_detail_lines(player)
         if lines:
@@ -1031,6 +1022,233 @@ class BaseListDialog:
         if lines:
             draw_text_wrapped(screen, self.font, "\n".join(lines),
                               sep_x + 30, self.y + 80 + detail_y_offset, self.width // 2 - 60, color=(220, 230, 240))
+
+
+class ParameterSelectionDialog(BaseListDialog):
+    """鍛冶屋で装備と鉱石選択後に「どのステータスを強化するか」を選ぶダイアログ
+    BaseListDialog の2カラムレイアウトを使用:
+      左: パラメータ名リスト
+      右: 選択中パラメータの before → after プレビュー
+    """
+    STATE_KEY = "parameter_selection_active"
+
+    def __init__(self, screen_width, screen_height):
+        super().__init__(screen_width, screen_height)
+        self.row_height = 38
+        self.target_item_data = None   # (type, iid)
+        self.selected_ore_key = None   # 選択された鉱石
+        self.available_params = []     # (stat_key, label, before, after, is_pct)
+        self.on_confirm = None         # callback(item_type, iid, ore_key, stat_key)
+        self.confirm_dialog = None
+        self.player_ref = None
+        self.cutscene_manager = None
+        self._inst_ref = None          # 現在選択中の EquipInstance
+
+    def setup(self, enhance_dialog, confirm_dialog=None, player=None, cutscene_manager=None):
+        self.on_confirm = enhance_dialog.on_select
+        self.confirm_dialog = confirm_dialog
+        self.player_ref = player
+        self.cutscene_manager = cutscene_manager
+
+    # --- BaseListDialog フック ---
+    def get_title(self): return Text.UI.WHICH_PARAM_TO_ENHANCE
+
+    def get_item_label(self, item, idx):
+        if item == "cancel":
+            return Text.UI.QUIT
+        stat_key, label, before, after, is_pct = item
+        return label
+
+    def get_item_color(self, item, idx, is_selected):
+        if item == "cancel":
+            return (255, 255, 100) if is_selected else (200, 200, 200)
+        return (255, 255, 100) if is_selected else (255, 255, 255)
+
+    def get_detail_lines(self, player):
+        """右パネル: 選択中パラメータの before → after プレビュー"""
+        if not self.available_params or self.cursor_idx >= len(self.available_params):
+            return []
+        item = self.available_params[self.cursor_idx]
+        if item == "cancel":
+            return []
+        stat_key, label, before, after, is_pct = item
+        if is_pct:
+            before_val = before * 100 if isinstance(before, float) else before
+            after_val  = after  * 100 if isinstance(after,  float) else after
+            unit = "%"
+        else:
+            before_val, after_val, unit = before, after, ""
+
+        def fmt(v):
+            return str(int(v)) if v % 1 == 0 else str(round(v, 2))
+
+        # 装備名（右パネル上部）
+        lines = []
+        if self._inst_ref:
+            lines.append(self._inst_ref.get_name())
+            lines.append("")
+        lines.append(f"{label}")
+        lines.append(f"  {fmt(before_val)}{unit}  →  {fmt(after_val)}{unit}")
+        if self._inst_ref:
+            lines.append("")
+            lines.append(f"強化回数: +{self._inst_ref.enhance + 1}回目")
+        return lines
+
+    def get_item_image_path(self, item, idx, player):
+        """右パネル上部に装備画像を表示"""
+        if not self._inst_ref or not player:
+            return None
+        if not self.target_item_data:
+            return None
+        item_type, iid = self.target_item_data
+        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA
+        if item_type == "weapon":
+            data = WEAPON_DATA.get(self._inst_ref.key, {})
+        elif item_type == "armor":
+            data = ARMOR_DATA.get(self._inst_ref.key, {})
+        else:
+            data = SHIELD_DATA.get(self._inst_ref.key, {})
+        return data.get("image_path")
+
+    # --- データ更新 ---
+    def update_from_selection(self, player, item_type, iid, ore_key):
+        """強化対象アイテムと選択された石に基づき、強化可能なパラメータ一覧を算出"""
+        self.target_item_data = (item_type, iid)
+        self.selected_ore_key = ore_key
+        self._inst_ref = None
+
+        if item_type == "weapon":   inv = player.weapon_inventory
+        elif item_type == "armor":  inv = player.armor_inventory
+        else:                       inv = getattr(player, "shield_inventory", [])
+        inst = player._find_equip_inst(inv, iid)
+
+        if not inst:
+            self.items = [Text.UI.QUIT]
+            self.available_params = ["cancel"]
+            return
+
+        self._inst_ref = inst
+
+        from components.sprites.player import ORE_STAT_CATEGORIES
+        from constants import CONSUMABLE_DATA
+        ore_bonus = CONSUMABLE_DATA.get(ore_key, {}).get("enhance_bonus", 1)
+
+        base_stats = inst.get_base_upgradeable_stats()
+        target_stats = [k for k in base_stats if k in ORE_STAT_CATEGORIES.get(ore_key, set())]
+
+        ALL_LABEL_MAP = {
+            "attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
+            "dex_bonus": "器用さ",
+            "crit_bonus": "会心率", "crit_rate": "会心率",
+            "block_chance_close": "近距離回避",
+            "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正",
+            "armor_penetration": "防御無視", "stupidity": "混乱",
+            "regen_bonus": "自然回復", "lantern_bonus": "光源範囲",
+            "magic_fire_damage": "[炎]ダメ", "magic_fire_range": "[炎]射程",
+            "magic_heal_ratio": "[癒]回復量", "magic_knockback_damage": "[風]吹飛ダメ",
+            "magic_invincible_turns": "[聖]無敵ターン",
+            "magic_stave_bonus": "[魔]杖回数", "magic_light_stave_bonus": "[光]燈杖回",
+            "magic_yrden_turns": "[印]障壁ターン",
+            "accuracy_bonus_close": "命中率",
+            "accuracy_bonus": "命中率",
+        }
+        # %として表示するステータス（値が0〜1の float で格納されているもの、または命中率などの%表記パラメータ）
+        PCT_KEYS = {
+            "crit_bonus", "crit_rate",
+            "block_chance_close", "block_chance_ranged", "armor_penetration",
+            "magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage",
+            "accuracy_bonus_close",
+        }
+
+        orig_enhance = inst.enhance
+        orig_stats   = inst.stats.copy()
+
+        self.available_params = []
+        for k in target_stats:
+            # before
+            inst.enhance = orig_enhance
+            inst.stats   = orig_stats.copy()
+            before = inst.get_stat(k, 0) + inst.get_enhance_bonus(k)
+
+            # after（simulate apply_upgrade）
+            inst.enhance = orig_enhance + ore_bonus
+            inst.stats   = orig_stats.copy()
+            for bk in base_stats:
+                if bk not in inst.stats:
+                    inst.stats[bk] = orig_enhance
+            inst.stats[k] += ore_bonus
+            after = inst.get_stat(k, 0) + inst.get_enhance_bonus(k)
+
+            label   = ALL_LABEL_MAP.get(k, k)
+            is_pct  = k in PCT_KEYS
+            self.available_params.append((k, label, before, after, is_pct))
+
+        # 元に戻す
+        inst.enhance = orig_enhance
+        inst.stats   = orig_stats
+
+        self.available_params.append("cancel")
+
+        # BaseListDialog.items にラベルを同期（描画で使用）
+        self.items = self.available_params
+
+    # --- イベント処理 ---
+    def handle_events(self, events):
+        if not self.is_active: return
+        from systems.audio_manager import play_sfx
+        from constants import SOUND_CURSOR_MOVE, SOUND_SELECT, SOUND_CANCEL
+
+        action = self._navigate(events)
+        if action == "cancel":
+            play_sfx(SOUND_CANCEL)
+            self._close_back()
+        elif action == "confirm":
+            item = self.available_params[self.cursor_idx] if self.available_params else None
+            if item == "cancel":
+                play_sfx(SOUND_CANCEL)
+                self._close_back()
+                return
+            if item is None:
+                return
+
+            play_sfx(SOUND_SELECT)
+            self.is_active = False
+
+            stat_key, label, before, after, is_pct = item
+            cd = self.confirm_dialog
+            player = self.player_ref
+            if cd and player and self.target_item_data and self._inst_ref:
+                inst = self._inst_ref
+                if is_pct:
+                    bv = before * 100 if isinstance(before, float) else before
+                    av = after  * 100 if isinstance(after,  float) else after
+                    unit = "%"
+                else:
+                    bv, av, unit = before, after, ""
+
+                def fmt(v):
+                    return str(int(v)) if v % 1 == 0 else str(round(v, 2))
+
+                cd.text = "\n".join([
+                    inst.get_name(),
+                    f"{label}: {fmt(bv)}{unit} → {fmt(av)}{unit}",
+                    f"強化回数: +{inst.enhance + 1}回目 (+1)",
+                ])
+
+                s_type, s_iid = self.target_item_data
+                s_ore, s_stat = self.selected_ore_key, stat_key
+
+                def do_enhance():
+                    if getattr(self, "cutscene_manager", None):
+                        self.cutscene_manager.start_blacksmith(
+                            lambda: self.on_confirm(s_type, s_iid, s_ore, s_stat))
+                    else:
+                        self.on_confirm(s_type, s_iid, s_ore, s_stat)
+
+                cd.on_yes = do_enhance
+                cd.on_no  = None
+                cd.is_active = True
+
 
 
 class InventoryDialog(BaseListDialog):
@@ -1064,19 +1282,16 @@ class InventoryDialog(BaseListDialog):
         inst = player._find_equip_inst(inv, key)
         if not inst: return
 
-        # 1. 装備名の描画
-        from systems.resources import font_small_bold
-        name_font = font_small_bold
-        name_text = inst.get_name()
-        screen.blit(name_font.render(name_text, True, (255, 220, 100)), (sep_x + 30, self.y + 80 + detail_y_offset))
+        # 1. 装備名の描画 (左リストで選択中なので右側での描画は省略してスペースを節約)
         
         # 2. パラメータの収集
         from wordings import Text
         S_MAP = {"attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
-                 "dex_bonus": "器用さ", "eva_bonus": "回避率", "crit_bonus": "会心率",
-                 "block_chance": "回避率", "block_chance_close": "近距離回避",
+                 "dex_bonus": "器用さ", "crit_bonus": "会心率",
+                 "block_chance_close": "近距離回避",
                  "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正",
-                 "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON}
+                 "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON,
+                 "accuracy_bonus_close": "命中率"}
         MAGIC_MAP = {
             "magic_fire_damage":    "[炎]ダメ",
             "magic_fire_range":     "[炎]射程",
@@ -1085,6 +1300,7 @@ class InventoryDialog(BaseListDialog):
             "magic_invincible_turns":"[聖]無敵ターン",
             "magic_stave_bonus":     "[魔]杖回数",
             "magic_light_stave_bonus": "[光]燈杖回",
+            "magic_yrden_turns":     "[印]障壁ターン",
         }
         
         def fmt(val):
@@ -1100,7 +1316,7 @@ class InventoryDialog(BaseListDialog):
             if inst.enhance > 0:
                 val += inst.get_enhance_bonus(k)
             if val:
-                is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
+                is_pct = k in ("crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration", "accuracy_bonus_close")
                 val_to_use = val * 100 if is_pct and isinstance(val, float) else val
                 param_texts.append(f"{label}: {fmt(val_to_use)}%" if is_pct else f"{label}: {fmt(val)}")
                 
@@ -1111,11 +1327,11 @@ class InventoryDialog(BaseListDialog):
                 val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
                 param_texts.append(f"{mlabel}: {fmt(val_to_use)}%" if is_pct else f"{mlabel}: {fmt(mval)}")
 
-        # 3. パラメータの2列描画
+        # 3. パラメータの2列描画 (装備名省略に伴いy座標を上にシフト)
         start_x = sep_x + 30
-        start_y = self.y + 80 + detail_y_offset + 35
+        start_y = self.y + 80 + detail_y_offset
         cw = self.width // 2 - 60
-        line_h = self.font.get_height() + 4
+        line_h = self.font.get_height() + 2
         
         N = len(param_texts)
         half = (N + 1) // 2
@@ -1132,7 +1348,7 @@ class InventoryDialog(BaseListDialog):
         # 4. 説明文の描画（最下部1列）
         desc = inst.get_stat("describe", "")
         if desc:
-            desc_y = max(max_y + 15, self.y + self.height - 85)
+            desc_y = max_y + 20
             draw_text_wrapped(screen, self.font, desc, start_x, desc_y, cw, color=(170, 170, 170))
 
     def get_title(self): return Text.UI.INVENTORY_TITLE
@@ -1216,8 +1432,8 @@ class InventoryDialog(BaseListDialog):
         lines = []
         from wordings import Text
         S_MAP = {"attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
-                 "dex_bonus": "器用さ", "eva_bonus": "回避率", "crit_bonus": "会心率",
-                 "block_chance": "回避率", "block_chance_close": "近距離回避率",
+                 "dex_bonus": "器用さ", "crit_bonus": "会心率",
+                 "block_chance_close": "近距離回避率",
                  "block_chance_ranged": "遠距離回避率", "aggro_mod": "感知補正",
                  "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON}
         MAGIC_MAP = {
@@ -1228,6 +1444,7 @@ class InventoryDialog(BaseListDialog):
             "magic_invincible_turns":"✨無敵ターン",
             "magic_stave_bonus":     "🔮杖回数",
             "magic_light_stave_bonus": "💡燈杖回",
+            "magic_yrden_turns":     "🌀障壁ターン",
         }
         
         def fmt(val):
@@ -1247,7 +1464,7 @@ class InventoryDialog(BaseListDialog):
                 if inst.enhance > 0:
                     val += inst.get_enhance_bonus(k)
                 if val:
-                    is_pct = k in ("crit_bonus", "block_chance", "eva_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
+                    is_pct = k in ("crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
                     val_to_use = val * 100 if is_pct and isinstance(val, float) else val
                     lines.append(f"{label}: {fmt(val_to_use)}%" if is_pct else f"{label}: {fmt(val)}")
             # 魔法ボーナスの表示
@@ -1506,8 +1723,11 @@ class StatusBar:
         draw_text_shadow(Text.UI.ATK_LABEL.format(atk=atk_val), self.font, COLOR_TEXT, (bar_x, stat_y))
         def_val = player.total_defense
         draw_text_shadow(Text.UI.DEF_LABEL.format(defense=def_val), self.font, COLOR_TEXT, (bar_x + 110, stat_y))
-        eva_val = player.eva_bonus
-        draw_text_shadow(Text.UI.EVA_LABEL.format(eva=eva_val), self.font, COLOR_TEXT, (bar_x + 220, stat_y))
+        # 回避率（近接/射撃）の描画
+        eva_close = int(player.block_chance_close * 100)
+        eva_ranged = int(player.block_chance_ranged * 100)
+        eva_text = f"回避 近:{eva_close}% 遠:{eva_ranged}%"
+        draw_text_shadow(eva_text, self.font, COLOR_TEXT, (bar_x + 220, stat_y))
 
         # --- 階層 (中央上) ---
         floor_str = Text.UI.VILLAGE if floor_level == 0 else Text.UI.FLOOR.format(level=floor_level)
@@ -1662,7 +1882,7 @@ def draw_vision_overlay(screen, player, dungeon):
     screen.blit(fog, (0, 0))
 
 
-def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, menu_dialog=None, player=None, dungeon=None, shop_dialog=None, stave_selection_dialog=None, guild_dialog=None, warehouse_dialog=None, bank_dialog=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, teleport_dialog=None, cutscene_manager=None, **kwargs):
+def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, menu_dialog=None, player=None, dungeon=None, shop_dialog=None, stave_selection_dialog=None, guild_dialog=None, warehouse_dialog=None, bank_dialog=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, teleport_dialog=None, cutscene_manager=None, parameter_selection_dialog=None, **kwargs):
     """全てのUIイベントを一括で処理する"""
     
     if cutscene_manager and cutscene_manager.is_active:
@@ -1723,6 +1943,10 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
 
     if ore_selection_dialog.is_active:
         ore_selection_dialog.handle_events(events)
+        return
+
+    if parameter_selection_dialog and parameter_selection_dialog.is_active:
+        parameter_selection_dialog.handle_events(events)
         return
 
     if equip_dialog and equip_dialog.is_active:
@@ -1977,11 +2201,16 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             return
                                     elif getattr(npc, "role", None) == "teleport":
                                         if teleport_dialog:
+                                            teleport_dialog.setup_destinations(player)
+                                            if not teleport_dialog.items:
+                                                dialog.text = "「まだ転移できる場所がないようじゃな。\n もう少し深く潜ってみなされ。」"
+                                                dialog.is_active = True
+                                                return
                                             # 先に挨拶を表示
                                             dialog.text = "\n".join(npc.get_dialogue())
                                             dialog.is_active = True
                                             # ダイアログが開いた後にテレポートUIを起動
-                                            teleport_dialog.open(player)
+                                            teleport_dialog.is_active = True
                                             return
                                     elif getattr(npc, "role", None) == "priest":
                                         from constants import CURSE_RECOVERY_COST_GP_PER_LEVEL
@@ -2714,22 +2943,20 @@ class StatusDialog:
                 if def_reduction % 1 == 0:
                     def_reduction = int(def_reduction)
 
-            # 4. 回避率
-            eva_reduction = 0
+            # 4. 回避率の呪い低下算出
+            eva_close_reduction = 0
+            eva_ranged_reduction = 0
             if "evasion" in getattr(player, "cursed_stats", []):
-                from constants import PLAYER_EVASION
-                eva_base = PLAYER_EVASION
-                eva_bonus = 0
+                # 装備による本来の回避率を計算
+                orig_close = 0.0
+                orig_ranged = 0.0
                 for inv, eid in [(player.weapon_inventory, player.equipped_weapon), (player.armor_inventory, player.equipped_armor), (player.shield_inventory, player.equipped_shield)]:
                     inst = player._find_equip_inst(inv, eid)
                     if inst:
-                        val = inst.get_stat("eva_bonus", inst.get_stat("block_chance", 0))
-                        if isinstance(val, float) and val < 1.0:
-                            eva_bonus += val * 100
-                        else:
-                            eva_bonus += val
-                raw_evasion = int(eva_base + eva_bonus)
-                eva_reduction = raw_evasion - player.eva_bonus
+                        orig_close += inst.get_stat("block_chance_close", 0.0) + inst.get_enhance_bonus("block_chance_close")
+                        orig_ranged += inst.get_stat("block_chance_ranged", 0.0) + inst.get_enhance_bonus("block_chance_ranged")
+                eva_close_reduction = int(round((orig_close - player.block_chance_close) * 100))
+                eva_ranged_reduction = int(round((orig_ranged - player.block_chance_ranged) * 100))
 
             # カッコ書き表示テキストの作成
             hp_str = f"HP  ：{player.hp} / {player.max_hp}"
@@ -2744,9 +2971,16 @@ class StatusDialog:
             if def_reduction > 0:
                 def_str += f" (-{def_reduction})"
 
-            eva_str = f"回避率：{player.eva_bonus}%"
-            if eva_reduction > 0:
-                eva_str += f" (-{eva_reduction}%)"
+            eva_close_pct = int(round(player.block_chance_close * 100))
+            eva_ranged_pct = int(round(player.block_chance_ranged * 100))
+            
+            eva_close_str = f"近接回避：{eva_close_pct}%"
+            if eva_close_reduction > 0:
+                eva_close_str += f" (-{eva_close_reduction}%)"
+                
+            eva_ranged_str = f"射撃回避：{eva_ranged_pct}%"
+            if eva_ranged_reduction > 0:
+                eva_ranged_str += f" (-{eva_ranged_reduction}%)"
 
             lines = [
                 f"【基本ステータス】",
@@ -2754,7 +2988,8 @@ class StatusDialog:
                 hp_str,
                 atk_str,
                 def_str,
-                eva_str,
+                eva_close_str,
+                eva_ranged_str,
                 "",
                 f"【装備中】",
                 f"武器：{weapon_inst.get_name() if weapon_inst else 'なし'}",
@@ -2781,7 +3016,6 @@ class StatusDialog:
             total_atk = get_total_bonus("attack_bonus")
             total_def = get_total_bonus("defense_bonus")
             total_hp = get_total_bonus("hp_bonus")
-            total_eva = get_total_bonus("eva_bonus")
             total_acc_close = get_total_bonus("accuracy_bonus_close")
             # total_acc_ranged は将来実装予定のため非表示
             total_crit = get_total_bonus("crit_rate")
@@ -2798,6 +3032,7 @@ class StatusDialog:
             total_heal_ratio = get_total_bonus("magic_heal_ratio")
             total_knockback = get_total_bonus("magic_knockback_damage")
             total_invincible = get_total_bonus("magic_invincible_turns")
+            total_yrden = get_total_bonus("magic_yrden_turns")
 
             def format_val(val):
                 if val % 1 == 0:
@@ -2819,12 +3054,9 @@ class StatusDialog:
             if total_def != 0:
                 left_lines.append(f"防御力    {format_val(total_def)}")
                 has_any_bonus = True
-            if total_eva != 0:
-                val = total_eva * 100 if isinstance(total_eva, float) and total_eva < 1.0 else total_eva
-                left_lines.append(f"回避率    {format_val(val)}%")
-                has_any_bonus = True
             if total_acc_close != 0:
-                left_lines.append(f"近接命中  {format_val(total_acc_close)}")
+                val = total_acc_close * 100 if isinstance(total_acc_close, float) and total_acc_close < 1.0 else total_acc_close
+                left_lines.append(f"命中率    {format_val(val)}%")
                 has_any_bonus = True
             if total_crit != 0:
                 val = total_crit * 100 if isinstance(total_crit, float) and total_crit < 1.0 else total_crit
@@ -2832,11 +3064,11 @@ class StatusDialog:
                 has_any_bonus = True
             if total_block_close != 0:
                 val = total_block_close * 100 if isinstance(total_block_close, float) and total_block_close < 1.0 else total_block_close
-                left_lines.append(f"近接ガード {format_val(val)}%")
+                left_lines.append(f"近距離回避 {format_val(val)}%")
                 has_any_bonus = True
             if total_block_ranged != 0:
                 val = total_block_ranged * 100 if isinstance(total_block_ranged, float) and total_block_ranged < 1.0 else total_block_ranged
-                left_lines.append(f"遠隔ガード {format_val(val)}%")
+                left_lines.append(f"遠距離回避 {format_val(val)}%")
                 has_any_bonus = True
             if total_stave != 0:
                 pass # stave_bonus は魔法加護（右列）に移動
@@ -2880,6 +3112,9 @@ class StatusDialog:
                 has_magic_bonus = True
             if total_invincible != 0:
                 right_lines.append(f"無敵効果  {format_val(total_invincible)}ターン")
+                has_magic_bonus = True
+            if total_yrden != 0:
+                right_lines.append(f"障壁ターン {format_val(total_yrden)}ターン")
                 has_magic_bonus = True
 
             if not has_magic_bonus:
@@ -2960,6 +3195,8 @@ class EnhanceDialog(InventoryDialog):
         super().__init__(screen_width, screen_height)
         self.selection_dialog = None # OreSelectionDialog への参照
 
+    def get_title(self): return Text.UI.WHICH_TO_ENHANCE
+
     def setup(self, player, dialog, ore_selection_dialog):
         """鍛冶屋のコールバックと関連ダイアログを設定する"""
         from systems.item_handler import make_enhance_callback
@@ -2986,8 +3223,6 @@ class EnhanceDialog(InventoryDialog):
     def draw(self, screen, player=None):
         if not self.is_active: return
         super().draw(screen, player)
-        title = self.font.render(Text.UI.WHICH_TO_ENHANCE, True, (255, 200, 100))
-        screen.blit(title, (self.x + 40, self.y + 10))
 
 class ShopDialog(BaseListDialog):
     """NPC商店での売買を行うダイアログ"""
@@ -3177,9 +3412,7 @@ class ShopDialog(BaseListDialog):
             if itype == "shield":
                 if info.get("block_chance_close", 0) != 0: lines.append(f"近距離回避率: {int(info['block_chance_close']*100)}%")
                 if info.get("block_chance_ranged", 0) != 0: lines.append(f"遠距離回避率: {int(info['block_chance_ranged']*100)}%")
-                # 特定の回避率がない場合は基礎回避率を表示
-                if info.get("block_chance_close", 0) == 0 and info.get("block_chance_ranged", 0) == 0:
-                    if info.get("block_chance", 0) != 0: lines.append(f"回避率: {int(info['block_chance']*100)}%")
+                # 特定の回避率がない場合は何も表示しない
                 if info.get("hp_bonus", 0) != 0: lines.append(f"最大HP: +{info['hp_bonus']}")
             elif itype == "weapon":
                 if info.get("attack_bonus", 0) != 0: lines.append(f"攻撃力: +{info['attack_bonus']}")
@@ -3505,6 +3738,15 @@ class TeleportDialog(BaseListDialog):
         self.cost_money = 0
         self.required_item = ""
 
+    def open(self, player):
+        from systems.game_state import game_state
+        game_state["player_ref"] = player
+        self.setup_destinations(player)
+        if not self.items:
+            return False
+        self.is_active = True
+        return True
+
     def get_title(self):
         return "テレポート屋（転移）"
 
@@ -3569,13 +3811,7 @@ class TeleportDialog(BaseListDialog):
             lines.append("冒険者の拠点となる村へ帰還します。")
             lines.append("一度休息をとり、装備を整えましょう。")
         return lines
-
-    def open(self, player):
-        # player参照を保持し、リストを構築してからアクティブにする
-        self.setup_destinations(player)
-        if not self.items: return False
-        self.is_active = True
-        return True
+    # (Inherit open() from BaseListDialog to correctly set game_state[self.STATE_KEY] = True)
 
     def handle_input(self, events, player):
         if not self.is_active: return None
@@ -3590,6 +3826,8 @@ class TeleportDialog(BaseListDialog):
         if res == "cancel":
             play_sfx(SOUND_CANCEL)
             self.is_active = False
+            from systems.game_state import game_state
+            game_state[self.STATE_KEY] = False
             self.mode = "SELECT"
             return None
         elif res == "confirm":
@@ -3597,6 +3835,8 @@ class TeleportDialog(BaseListDialog):
             if selected["type"] == "cancel":
                 play_sfx(SOUND_CANCEL)
                 self.is_active = False
+                from systems.game_state import game_state
+                game_state[self.STATE_KEY] = False
                 return None
                 
             self.target_floor = selected["floor"]
@@ -3657,6 +3897,7 @@ class TeleportDialog(BaseListDialog):
         # 演出付き転移の開始
         warp_with_pitfall(self.target_floor, player, spawn_reason=reason)
         self.is_active = False
+        game_state[self.STATE_KEY] = False
 
     def draw(self, screen, player):
         if not self.is_active: return
@@ -3739,7 +3980,7 @@ def draw_minimap(screen, dungeon, player):
     # 描画
     screen.blit(map_surf, (off_x, off_y))
 
-def draw_all_ui(screen, player, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, shop_dialog, stave_selection_dialog, guild_dialog=None, warehouse_dialog=None, bank_dialog=None, menu_dialog=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, teleport_dialog=None, dungeon=None, events=None, **kwargs):
+def draw_all_ui(screen, player, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, shop_dialog, stave_selection_dialog, guild_dialog=None, warehouse_dialog=None, bank_dialog=None, menu_dialog=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, teleport_dialog=None, dungeon=None, events=None, parameter_selection_dialog=None, **kwargs):
     """全てのUIダイアログなどをまとめて更新・描画する"""
     inventory_dialog.draw(screen, player)
     if equip_dialog: equip_dialog.draw(screen, player)
@@ -3763,6 +4004,8 @@ def draw_all_ui(screen, player, dialog, confirm_dialog, inventory_dialog, status
     # アクション系ダイアログは最前面（メッセージウィンドウの手前）に描画
     item_action_dialog.draw(screen)
     ore_selection_dialog.draw(screen)
+    if parameter_selection_dialog:
+        parameter_selection_dialog.draw(screen, player)
     stave_selection_dialog.draw(screen)
     if teleport_dialog:
         teleport_dialog.draw(screen, player)

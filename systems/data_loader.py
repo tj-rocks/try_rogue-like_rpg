@@ -162,12 +162,10 @@ def get_normalized_equipment_data(floor_map):
     armor = raw_armors.get("ARMOR_DATA", {})
     shields = raw_shields.get("SHIELD_DATA", {})
     
-    # bonus.common のキーを既存のフラットキーに変換するマッピング
     COMMON_KEY_MAP = {
         "attack":             "attack_bonus",
         "defense":            "defense_bonus",
         "hp":                 "hp_bonus",
-        "eva":                "eva_bonus",
         "accuracy_close":     "accuracy_bonus_close",
         "accuracy_range":     "accuracy_bonus_ranged",
         "accuracy":           "accuracy_bonus",
@@ -175,7 +173,6 @@ def get_normalized_equipment_data(floor_map):
         "regen":              "regen_bonus",
         "block_chance_close": "block_chance_close",
         "block_chance_ranged":"block_chance_ranged",
-        "block_chance":       "block_chance",
         "lantern_bonus":      "lantern_bonus",
         "aggro_mod":          "aggro_mod",
         "stupidity":          "stupidity",

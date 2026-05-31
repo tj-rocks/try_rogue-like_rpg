@@ -4,6 +4,7 @@ from systems.dungeon import warp_to_floor
 from systems.ui import (
     Dialog, ConfirmDialog, InventoryDialog, StatusBar, StatusDialog, 
     EquipDialog, EnhanceDialog, ItemActionDialog, OreSelectionDialog, ShopDialog,
+    ParameterSelectionDialog,
     StaveSelectionDialog, GuildDialog, WarehouseDialog, BankDialog, MenuDialog,
     StaveInventoryDialog, EventInventoryDialog, TeleportDialog
 )
@@ -20,6 +21,7 @@ def setup_ui_relations(ui_elements, player, dungeon, game_state):
     item_action_dialog = ui_elements["item_action_dialog"]
     enhance_dialog = ui_elements["enhance_dialog"]
     ore_selection_dialog = ui_elements["ore_selection_dialog"]
+    parameter_selection_dialog = ui_elements.get("parameter_selection_dialog")
     menu_dialog = ui_elements["menu_dialog"]
     status_dialog = ui_elements["status_dialog"]
     confirm_dialog = ui_elements["confirm_dialog"]
@@ -35,6 +37,10 @@ def setup_ui_relations(ui_elements, player, dungeon, game_state):
     enhance_dialog.setup(player, dialog, ore_selection_dialog)
     item_action_dialog.setup(player, dialog, inventory_dialog, game_state)
     ore_selection_dialog.setup(enhance_dialog, confirm_dialog=confirm_dialog, player=player, cutscene_manager=ui_elements["cutscene_manager"])
+    if parameter_selection_dialog:
+        parameter_selection_dialog.setup(enhance_dialog, confirm_dialog=confirm_dialog, player=player, cutscene_manager=ui_elements["cutscene_manager"])
+        ore_selection_dialog.parameter_selection_dialog = parameter_selection_dialog
+        parameter_selection_dialog._back_dialog = ore_selection_dialog
     
     equip_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog)
     equip_dialog.menu_dialog = menu_dialog
@@ -134,6 +140,7 @@ def init_ui_elements(screen_width, screen_height):
         "enhance_dialog": EnhanceDialog(screen_width, screen_height),
         "item_action_dialog": ItemActionDialog(screen_width, screen_height),
         "ore_selection_dialog": OreSelectionDialog(screen_width, screen_height),
+        "parameter_selection_dialog": ParameterSelectionDialog(screen_width, screen_height),
         "shop_dialog": ShopDialog(screen_width, screen_height),
         "stave_selection_dialog": StaveSelectionDialog(screen_width, screen_height),
         "guild_dialog": GuildDialog(screen_width, screen_height),

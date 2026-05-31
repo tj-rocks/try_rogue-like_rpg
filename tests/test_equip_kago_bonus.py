@@ -72,9 +72,8 @@ class TestEquipKagoBonus(unittest.TestCase):
         "crit_rate":             0.15,
         "hp_bonus":              25,
         "defense_bonus":          5,
-        "eva_bonus":             0.08,
-        "block_chance_close":    0.0,
-        "block_chance_ranged":   0.0,
+        "block_chance_close":    0.08,
+        "block_chance_ranged":   0.08,
         "magic_stave_bonus":     10,
         "regen_bonus":            1,
         # magic
@@ -93,9 +92,8 @@ class TestEquipKagoBonus(unittest.TestCase):
         "crit_rate":             0.10,
         "hp_bonus":              30,
         "defense_bonus":         15,
-        "eva_bonus":             0.05,
-        "block_chance_close":    0.0,
-        "block_chance_ranged":   0.0,
+        "block_chance_close":    0.05,
+        "block_chance_ranged":   0.05,
         "magic_stave_bonus":      8,
         "regen_bonus":            2,
         "magic_fire_damage":     0.10,
@@ -113,9 +111,8 @@ class TestEquipKagoBonus(unittest.TestCase):
         "crit_rate":             0.05,
         "hp_bonus":              10,
         "defense_bonus":          5,
-        "eva_bonus":             0.03,
-        "block_chance_close":    0.18,
-        "block_chance_ranged":   0.18,
+        "block_chance_close":    0.21,
+        "block_chance_ranged":   0.21,
         "magic_stave_bonus":      5,
         "regen_bonus":            1,
         "magic_fire_damage":     0.05,
@@ -131,7 +128,6 @@ class TestEquipKagoBonus(unittest.TestCase):
         "attack_bonus",
         "defense_bonus",
         "hp_bonus",
-        "eva_bonus",
         "accuracy_bonus_close",
         "accuracy_bonus_ranged",
         "crit_rate",
@@ -243,17 +239,13 @@ class TestEquipKagoBonus(unittest.TestCase):
         """会心率合計: 0.15 + 0.10 + 0.05 = 0.30"""
         self.assertAlmostEqual(get_total_bonus(self.equips, "crit_rate"), 0.30, places=9)
 
-    def test_total_eva_bonus(self):
-        """回避率合計: 0.08 + 0.05 + 0.03 = 0.16"""
-        self.assertAlmostEqual(get_total_bonus(self.equips, "eva_bonus"), 0.16, places=9)
-
     def test_total_block_chance_close(self):
-        """近接ガード率合計: 0.0 + 0.0 + 0.18 = 0.18"""
-        self.assertAlmostEqual(get_total_bonus(self.equips, "block_chance_close"), 0.18, places=9)
+        """近接ガード率合計: 0.08 + 0.05 + 0.21 = 0.34"""
+        self.assertAlmostEqual(get_total_bonus(self.equips, "block_chance_close"), 0.34, places=9)
 
     def test_total_block_chance_ranged(self):
-        """遠隔ガード率合計: 0.0 + 0.0 + 0.18 = 0.18"""
-        self.assertAlmostEqual(get_total_bonus(self.equips, "block_chance_ranged"), 0.18, places=9)
+        """遠隔ガード率合計: 0.08 + 0.05 + 0.21 = 0.34"""
+        self.assertAlmostEqual(get_total_bonus(self.equips, "block_chance_ranged"), 0.34, places=9)
 
     def test_total_stave_bonus(self):
         """杖強化合計: 10 + 8 + 5 = 23"""

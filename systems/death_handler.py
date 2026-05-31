@@ -72,7 +72,6 @@ def handle_death_sequence(player, dungeon, dialog, game_state):
             player.stave_inventory = []
             
             player.defense = PLAYER_DEFENSE
-            player.block_chance = 0.0
             
             # 死の呪いを進行させる
             player.apply_curse()

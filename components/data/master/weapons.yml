@@ -86,20 +86,18 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 0
-        attack: 2
+        attack: 4
         accuracy_close: 15
         accuracy_range: 0
         crit_rate: 0.05
         hp: 0
         defense: 0
-        eva: 0
-        block_chance: 0
         block_chance_close: 0
         block_chance_ranged: 0
         lantern_bonus: 0
         regen: 2
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -130,22 +128,20 @@ WEAPON_DATA:
         attack: 11
         accuracy_close: 5
         accuracy_range: 0
-        crit_rate: 0.05
+        crit_rate: 0.08
         hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -155,7 +151,7 @@ WEAPON_DATA:
     category: onehanded_sword
     min_rank: F
     max_rank: D
-    rarity: 8
+    rarity: 9
     price: 150
     image_path: components/pictures/weapon/old_sword.png
     sound: components/sounds/sfx/sword_swing.wav
@@ -168,25 +164,23 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 0
-        attack: 6
-        accuracy_close: 5
+        attack: 8
+        accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.05
+        crit_rate: 0
         hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -209,25 +203,23 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 0
-        attack: 6
+        attack: 8
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.08
         hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -250,25 +242,23 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 0
-        attack: 15
+        attack: 14
         accuracy_close: 5
         accuracy_range: 0
         crit_rate: 0.05
         hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -297,8 +287,6 @@ WEAPON_DATA:
         crit_rate: 0.05
         hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -331,21 +319,19 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -1
+        aggro_mod: -3
         attack: 12
         accuracy_close: 20
         accuracy_range: 10
         crit_rate: 0.2
         hp: 0
         defense: 0
-        eva: 0
-        block_chance: 0
         block_chance_close: 0
         block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 1.0
+        armor_penetration: 0.2
       magic:
         fire_damage: 0
         fire_range: 0
@@ -359,7 +345,7 @@ WEAPON_DATA:
     name: 戦士の剣
     category: onehanded_sword
     min_rank: D
-    max_rank: A
+    max_rank: B
     rarity: 3
     price: 2800
     image_path: components/pictures/weapon/fighters_sword.png
@@ -373,25 +359,23 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 0
-        attack: 28
+        attack: 17
         accuracy_close: 5
         accuracy_range: 0
         crit_rate: 0.05
         hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.01
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -400,7 +384,7 @@ WEAPON_DATA:
     name: 狩人のレイピア
     category: onehanded_sword
     min_rank: D
-    max_rank: A
+    max_rank: B
     rarity: 3
     price: 1500
     image_path: components/pictures/weapon/hunters_rapier.png
@@ -414,25 +398,23 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: -2
-        attack: 15
+        attack: 11
         accuracy_close: 20
         accuracy_range: 20
-        crit_rate: 0.15
+        crit_rate: 0.2
         hp: 0
         defense: 0
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 1.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -441,7 +423,7 @@ WEAPON_DATA:
     name: 騎士の重斧
     category: axe
     min_rank: D
-    max_rank: A
+    max_rank: B
     rarity: 4
     price: 4800
     image_path: components/pictures/weapon/knight_heavy_axe.png
@@ -454,26 +436,24 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: 4
-        attack: 52
-        accuracy_close: -10
+        aggro_mod: 3
+        attack: 20
+        accuracy_close: -4
         accuracy_range: -10
-        crit_rate: 0.05
-        hp: 0
+        crit_rate: -0.05
+        hp: 5
         defense: 0
-        eva: -0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: -0.1
+        block_chance_ranged: -0.1
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -482,7 +462,7 @@ WEAPON_DATA:
     name: 魔術師のスタッフ
     category: onehanded_sword
     min_rank: D
-    max_rank: A
+    max_rank: B
     rarity: 4
     price: 3500
     image_path: components/pictures/weapon/mages_staff.png
@@ -495,15 +475,13 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: 0
+        aggro_mod: -2
         attack: 10
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.0
         hp: 0
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -511,19 +489,19 @@ WEAPON_DATA:
         stupidity: 0
         armor_penetration: 0.0
       magic:
-        fire_damage: 0.20
+        fire_damage: 0.15
         fire_range: 1
-        heal_ratio: 0.0
-        knockback_damage: 0.20
-        invincible_turns: 1
-        stave_bonus: 20
+        heal_ratio: 0.1
+        knockback_damage: 0.1
+        invincible_turns: 2
+        stave_bonus: 0
         light_stave_bonus: 0
 
   pilgrims_sword:
     name: 巡礼者の剣
     category: onehanded_sword
     min_rank: D
-    max_rank: A
+    max_rank: B
     rarity: 4
     price: 3600
     image_path: components/pictures/weapon/pilgrims_sword.png
@@ -537,34 +515,32 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 0
-        attack: 22
+        attack: 15
         accuracy_close: 5
         accuracy_range: 0
-        crit_rate: 0.05
-        hp: 20
+        crit_rate: 0.1
+        hp: 10
         defense: 0
-        eva: 0.0
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
-        regen: 1
+        regen: 10
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0.1
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.10
-        knockback_damage: 0.0
+        heal_ratio: 0.1
+        knockback_damage: 0
         invincible_turns: 0
-        stave_bonus: 10
+        stave_bonus: 0
         light_stave_bonus: 0
 
   scount_small_knife:
-    name: スカウトのスモールナイフ
+    name: スカウトの小刀
     category: dagger
     min_rank: D
-    max_rank: A
+    max_rank: B
     rarity: 3
     price: 3000
     image_path: components/pictures/weapon/scount_smallKnife.png
@@ -578,25 +554,23 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: -2
-        attack: 16
+        attack: 9
         accuracy_close: 15
         accuracy_range: 10
-        crit_rate: 0.20
+        crit_rate: 0.1
         hp: 0
         defense: 0
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.2
+        block_chance_ranged: 0.1
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 1.0
+        armor_penetration: 0.3
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -623,10 +597,8 @@ WEAPON_DATA:
         crit_rate: 0.15
         hp: 25
         defense: 5
-        eva: 0.08
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.08
+        block_chance_ranged: 0.08
         lantern_bonus: 0
         regen: 1
         aggro_mod: -2

@@ -50,8 +50,6 @@ ARMOR_DATA:
         crit_rate: 0.0
         hp: 0
         defense: 1
-        eva: 0.0
-        block_chance: 0.0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -84,22 +82,20 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 0
         defense: 7.5
-        eva: 0.0
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -121,22 +117,20 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 0
         defense: 10
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.1
+        block_chance_ranged: 0.1
         lantern_bonus: 0
-        regen: 0
+        regen: 1
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -158,22 +152,20 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 0
         defense: 11
-        eva: 0.0
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -195,22 +187,20 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 0
-        defense: 15
-        eva: 0.0
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        defense: 14
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -233,22 +223,20 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 0
         defense: 14
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0.1
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -257,7 +245,7 @@ ARMOR_DATA:
     name: 巡礼者のローブ
     category: robe
     min_rank: D
-    max_rank: E
+    max_rank: B
     rarity: 6
     price: 2000
     image_dir: components/pictures/armor/leather_armor
@@ -272,14 +260,12 @@ ARMOR_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.0
-        hp: 0
+        hp: 5
         defense: 15
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 0
-        regen: 0
+        regen: 15
         stupidity: 0
         armor_penetration: 0.0
       magic:
@@ -294,7 +280,8 @@ ARMOR_DATA:
   hunters_armor:
     name: 狩人の鎧
     category: light
-    min_rank: E
+    min_rank: D
+    max_rank: B
     rarity: 3
     price: 1200
     image_dir: components/pictures/armor/hunters_armor
@@ -306,15 +293,13 @@ ARMOR_DATA:
       common:
         aggro_mod: -2
         attack: 0
-        accuracy_close: 15
+        accuracy_close: 20
         accuracy_range: 25
-        crit_rate: 0.10
+        crit_rate: 0.15
         hp: 0
-        defense: 6
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        defense: 17
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 1
         regen: 0
         stupidity: 0
@@ -331,7 +316,8 @@ ARMOR_DATA:
   fighters_armor:
     name: 戦士の鎧
     category: medium
-    min_rank: C
+    min_rank: D
+    max_rank: B
     rarity: 3
     price: 2500
     image_dir: components/pictures/armor/fighters_armor
@@ -345,22 +331,20 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 0
-        defense: 20
-        eva: 0.0
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        defense: 18
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -368,7 +352,8 @@ ARMOR_DATA:
   knight_heavy_armor:
     name: 騎士の重鎧
     category: heavy
-    min_rank: B
+    min_rank: D
+    max_rank: B
     rarity: 4
     price: 4500
     image_dir: components/pictures/armor/knight_heavy_armor
@@ -378,26 +363,24 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: 4
-        attack: 0
-        accuracy_close: -10
+        aggro_mod: 3
+        attack: 2
+        accuracy_close: -5
         accuracy_range: -10
-        crit_rate: 0.0
-        hp: 0
-        defense: 35
-        eva: -0.10
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        crit_rate: 0
+        hp: 5
+        defense: 20
+        block_chance_close: -0.11
+        block_chance_ranged: -0.11
         lantern_bonus: -1
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -405,7 +388,8 @@ ARMOR_DATA:
   pilgrims_armor:
     name: 巡礼者の装衣
     category: robe
-    min_rank: C
+    min_rank: D
+    max_rank: B
     rarity: 4
     price: 3200
     image_dir: components/pictures/armor/pilgrims_armor 
@@ -419,30 +403,29 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 30
         defense: 12
-        eva: 0.0
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 1
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0.1
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.10
-        knockback_damage: 0.0
+        heal_ratio: 0.1
+        knockback_damage: 0
         invincible_turns: 0
-        stave_bonus: 10
+        stave_bonus: 0
         light_stave_bonus: 0
 
   scount_armor:
     name: スカウトの鎧
     category: light
-    min_rank: C
+    min_rank: D
+    max_rank: B
     rarity: 3
     price: 2800
     image_dir: components/pictures/armor/scount_armor
@@ -455,23 +438,21 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.10
+        crit_rate: 0.1
         hp: 0
-        defense: 14
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        defense: 10
+        block_chance_close: 0.1
+        block_chance_ranged: 0.1
         lantern_bonus: 0
         regen: 0
-        aggro_mod: -2
+        aggro_mod: -3
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0.1
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -479,7 +460,8 @@ ARMOR_DATA:
   mages_robe:
     name: 魔術師の魔導衣
     category: robe
-    min_rank: C
+    min_rank: D
+    max_rank: B
     rarity: 4
     price: 3200
     image_dir: components/pictures/armor/mages_robe
@@ -495,9 +477,7 @@ ARMOR_DATA:
         accuracy_range: 0
         crit_rate: 0.0
         hp: 0
-        defense: 8
-        eva: 0.0
-        block_chance: 0.0
+        defense: 10
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 0
@@ -510,7 +490,7 @@ ARMOR_DATA:
         heal_ratio: 0.0
         knockback_damage: 0.20
         invincible_turns: 1
-        stave_bonus: 20
+        stave_bonus: 0
         light_stave_bonus: 0
 
   test_all_bonus_armor:
@@ -532,10 +512,8 @@ ARMOR_DATA:
         crit_rate: 0.10
         hp: 30
         defense: 15
-        eva: 0.05
-        block_chance: 0.0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 1
         regen: 2
         aggro_mod: -5
