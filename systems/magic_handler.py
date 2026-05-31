@@ -502,13 +502,14 @@ def _effect_yrden(player, settings, dungeon, dialog, stave=None):
         if stave: stave.charges += 1
         return "そこには 配置できない！"
         
-    # 4. 既存エネミーや障害物との重複チェック
+    # 4. 既存エネミーや障害物との重複チェック (動く敵は重ねて配置して閉じ込められるようにする。静止障害物は不可)
     for e in dungeon.enemies:
         if not getattr(e, "is_dead", False):
             e_grids = e.get_occupied_grids(tile_size)
             if (target_gx, target_gy) in e_grids:
-                if stave: stave.charges += 1
-                return "そこには 配置できない！"
+                if getattr(e, "is_static", False):
+                    if stave: stave.charges += 1
+                    return "そこには 配置できない！"
                 
     # 5. 防壁（障害物）の生成・追加
     from components.sprites.enemy import Enemy

@@ -48,6 +48,17 @@ class Entity:
 
     def can_move_grid(self, tx, ty, dungeon):
         """指定したピクセル座標 (tx, ty) へ、自分のサイズを維持したまま移動可能か判定する"""
+        # 移動する敵が魔法の防壁（magic_barrier）と現在重なっている場合、別グリッドへの移動を禁止する（閉じ込め）
+        if self.__class__.__name__ == "Enemy" and not getattr(self, "is_static", False):
+            curr_grids = self.get_occupied_grids_at(self.x, self.y, dungeon.tile_size)
+            tgt_grids = self.get_occupied_grids_at(tx, ty, dungeon.tile_size)
+            if set(curr_grids) != set(tgt_grids):
+                for e in dungeon.enemies:
+                    if e != self and not getattr(e, "is_dead", False) and getattr(e, "is_static", False) and getattr(e, "type", "") == "magic_barrier":
+                        e_grids = e.get_occupied_grids(dungeon.tile_size)
+                        if any(g in e_grids for g in curr_grids):
+                            return False
+
         occupied_grids = self.get_occupied_grids_at(tx, ty, dungeon.tile_size)
         for gx, gy in occupied_grids:
             if not (0 <= gx < dungeon.map_width and 0 <= gy < dungeon.map_height):

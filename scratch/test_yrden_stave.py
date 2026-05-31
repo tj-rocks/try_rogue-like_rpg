@@ -65,10 +65,17 @@ dungeon.enemies.append(enemy)
 # Player is at (2, 1), facing right -> front is (3, 1) (occupied by enemy)
 msg = execute_stave(player, stave, dungeon, MockDialog())
 print(msg)
-print(f"Remaining charges (Expected 4): {stave.charges}")
-print(f"Number of entities (Expected 2): {len(dungeon.enemies)}")
-assert stave.charges == 4  # Should not decrease
-assert len(dungeon.enemies) == 2
+print(f"Remaining charges (Expected 3): {stave.charges}")
+print(f"Number of entities (Expected 3): {len(dungeon.enemies)}")
+assert stave.charges == 3  # Should decrease by 1
+assert len(dungeon.enemies) == 3
+
+# Verify that the enemy is trapped and cannot move
+# Current position: (3, 1) -> x=192, y=64. Target: (4, 1) -> x=256, y=64
+can_move_away = enemy.can_move_grid(256, 64, dungeon)
+print(f"Trapped enemy can move to (4, 1): {can_move_away} (Expected False)")
+assert can_move_away is False
+
 
 print("\n--- Test 4: Verify lifetime turns decrease and auto-destruct ---")
 # Let's clear enemies and create a fresh barrier
