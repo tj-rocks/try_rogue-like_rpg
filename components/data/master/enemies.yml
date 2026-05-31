@@ -213,9 +213,9 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 6
+    hp: 20
     attack: 16
-    defense: 100
+    defense: 38
     evasion: 10
     exp: 15
     reward_gold: 30
@@ -237,7 +237,7 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 10
+    hp: 17
     attack: 13
     defense: 25
     evasion: 10
@@ -261,7 +261,7 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 20
+    hp: 21
     attack: 18
     defense: 25
     evasion: 10
