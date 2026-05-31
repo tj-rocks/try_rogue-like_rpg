@@ -52,6 +52,7 @@ SHIELD_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.0
+        hp: 0
         defense: 0
         block_chance_close: 0.01
         block_chance_ranged: 0.01
@@ -87,19 +88,20 @@ SHIELD_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
+        hp: 0
         defense: 0
         block_chance_close: 0.05
         block_chance_ranged: 0.05
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -119,18 +121,19 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -0.5
+        aggro_mod: 0
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.1
+        hp: 0
         defense: 0
         block_chance_close: 0.08
         block_chance_ranged: 0.12
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.05
+        armor_penetration: 0.1
       magic:
         fire_damage: 0
         fire_range: 0
@@ -159,7 +162,7 @@ SHIELD_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 0
         defense: 1
         block_chance_close: 0.12
@@ -167,12 +170,12 @@ SHIELD_DATA:
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -196,7 +199,7 @@ SHIELD_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 0
         defense: 0
         block_chance_close: 0.12
@@ -204,12 +207,12 @@ SHIELD_DATA:
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -241,12 +244,12 @@ SHIELD_DATA:
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -307,7 +310,7 @@ SHIELD_DATA:
         attack: 2
         accuracy_close: -5
         accuracy_range: -10
-        crit_rate: 0.0
+        crit_rate: 0
         hp: -10
         defense: 2
         block_chance_close: 0.05
@@ -315,12 +318,12 @@ SHIELD_DATA:
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -381,7 +384,7 @@ SHIELD_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 20
         defense: 0
         block_chance_close: 0.1
@@ -389,12 +392,12 @@ SHIELD_DATA:
         lantern_bonus: 0
         regen: 1
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0.1
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.10
-        knockback_damage: 0.0
+        heal_ratio: 0.1
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -414,7 +417,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -1
+        aggro_mod: -2
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -428,10 +431,10 @@ SHIELD_DATA:
         stupidity: 0
         armor_penetration: 0.1
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0

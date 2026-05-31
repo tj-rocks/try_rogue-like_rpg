@@ -90,6 +90,7 @@ WEAPON_DATA:
         accuracy_close: 15
         accuracy_range: 0
         crit_rate: 0.05
+        hp: 0
         defense: 0
         block_chance_close: 0
         block_chance_ranged: 0
@@ -106,7 +107,6 @@ WEAPON_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
-    hp: 0
   iron_sword:
     name: 鉄の剣
     category: onehanded_sword
@@ -128,45 +128,8 @@ WEAPON_DATA:
         attack: 11
         accuracy_close: 5
         accuracy_range: 0
-        crit_rate: 0.05
-        defense: 0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
-        lantern_bonus: 0
-        regen: 0
-        stupidity: 0
-        armor_penetration: 0.0
-      magic:
-        fire_damage: 0.0
-        fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
-        invincible_turns: 0
-        stave_bonus: 0
-        light_stave_bonus: 0
-
-  old_sword:
-    name: 古びた剣
-    category: onehanded_sword
-    min_rank: F
-    max_rank: D
-    rarity: 8
-    price: 150
-    image_path: components/pictures/weapon/old_sword.png
-    sound: components/sounds/sfx/sword_swing.wav
-    image_scale: 1.2
-    shop_buyable: false
-    describe: 長年放置され、刃がこぼれた古い剣。戦うには心もとない。
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    type: onehanded_sword
-    floor_spawnable: false
-    bonus:
-      common:
-        aggro_mod: 0
-        attack: 10
-        accuracy_close: 5
-        accuracy_range: 0
-        crit_rate: 0.05
+        crit_rate: 0.08
+        hp: 0
         defense: 0
         block_chance_close: 0
         block_chance_ranged: 0
@@ -183,7 +146,45 @@ WEAPON_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
-    hp: 0
+  old_sword:
+    name: 古びた剣
+    category: onehanded_sword
+    min_rank: F
+    max_rank: D
+    rarity: 9
+    price: 150
+    image_path: components/pictures/weapon/old_sword.png
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.2
+    shop_buyable: false
+    describe: 長年放置され、刃がこぼれた古い剣。戦うには心もとない。
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    type: onehanded_sword
+    floor_spawnable: false
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 8
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0
+        hp: 0
+        defense: 0
+        block_chance_close: 0
+        block_chance_ranged: 0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
   wooden_stick:
     name: 木の棍棒
     category: axe
@@ -202,22 +203,23 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 0
-        attack: 6
+        attack: 8
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.08
+        hp: 0
         defense: 0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -240,22 +242,23 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 0
-        attack: 15
+        attack: 14
         accuracy_close: 5
         accuracy_range: 0
         crit_rate: 0.05
+        hp: 0
         defense: 0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -282,6 +285,7 @@ WEAPON_DATA:
         accuracy_close: 5
         accuracy_range: 0
         crit_rate: 0.05
+        hp: 0
         defense: 0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
@@ -315,18 +319,19 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -1
+        aggro_mod: -3
         attack: 12
         accuracy_close: 20
         accuracy_range: 10
         crit_rate: 0.2
+        hp: 0
         defense: 0
         block_chance_close: 0
         block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.3
+        armor_penetration: 0.2
       magic:
         fire_damage: 0
         fire_range: 0
@@ -360,17 +365,17 @@ WEAPON_DATA:
         crit_rate: 0.05
         hp: 0
         defense: 0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0.01
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -396,7 +401,7 @@ WEAPON_DATA:
         attack: 11
         accuracy_close: 20
         accuracy_range: 20
-        crit_rate: 0.15
+        crit_rate: 0.2
         hp: 0
         defense: 0
         block_chance_close: 0.05
@@ -404,12 +409,12 @@ WEAPON_DATA:
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 1.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -433,22 +438,22 @@ WEAPON_DATA:
       common:
         aggro_mod: 3
         attack: 20
-        accuracy_close: -5
+        accuracy_close: -4
         accuracy_range: -10
         crit_rate: -0.05
         hp: 5
         defense: 0
-        block_chance_close: -0.05
-        block_chance_ranged: -0.05
+        block_chance_close: -0.1
+        block_chance_ranged: -0.1
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -513,20 +518,20 @@ WEAPON_DATA:
         attack: 15
         accuracy_close: 5
         accuracy_range: 0
-        crit_rate: 0.05
+        crit_rate: 0.1
         hp: 10
         defense: 0
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 10
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0.1
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
         heal_ratio: 0.1
-        knockback_damage: 0.0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -548,8 +553,8 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -1
-        attack: 13
+        aggro_mod: -2
+        attack: 9
         accuracy_close: 15
         accuracy_range: 10
         crit_rate: 0.1
@@ -560,12 +565,12 @@ WEAPON_DATA:
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.25
+        armor_penetration: 0.3
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0

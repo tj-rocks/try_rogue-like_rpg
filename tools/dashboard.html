@@ -787,13 +787,17 @@
                 const totalAccuracyClose = baseAccuracyClose + finalWAccuracyClose + finalAAccuracyClose + finalSAccuracyClose;
 
                 // 会心率合計
-                const baseCrit = weapon.crit_rate !== undefined ? weapon.crit_rate : (masterData.balance.PLAYER.crit_rate || 0.01);
+                const baseCrit = weaponId === 'none' ? (masterData.balance.PLAYER.crit_rate || 0.01) : 0;
                 const totalCritRate = Math.min(70, Math.round((baseCrit + finalWCrit + finalACrit + finalSCrit) * 100));
                 
                 summary.innerHTML = `<span>Base: ${baseAtk}</span><span>Equipment Atk: +${finalWAtk + finalAAtk + finalSAtk}</span><span class="stat-val val-atk">Total: ${totalAtk}</span><span style="color:var(--text-dim)">Accuracy: ${totalAccuracyClose}</span><span style="color:var(--secondary)">会心率: ${totalCritRate}%</span><span style="color:yellow; margin-left: 10px;">無視率: ${Math.round(totalPen * 100)}%</span>`;
 
                 tableHead.innerHTML = `<tr><th>Enemy ID</th><th>Name</th><th>HP</th><th>DEF</th><th>Enemy EVA</th><th>命中率</th><th>会心率</th><th>Hits to Kill</th></tr>`;
                 const rankEnemies = Object.entries(masterData.enemies).filter(([id, e]) => (e.min_rank || e.rank) === rank && !e.is_static);
+
+                // クリティカル期待値 (1 + 会心率) × 乱数平均 0.85
+                const critFraction = baseCrit + finalWCrit + finalACrit + finalSCrit;
+                const totalAtkAvg = totalAtk * (1.0 + critFraction) * 0.85;
 
                 // 会心スコアの算出
                 const critScore = Math.round(totalCritRate);
@@ -805,18 +809,23 @@
 
                     // 防御力貫通の適用
                     const effectiveDef = Math.max(0, def * (1 - totalPen));
-                    const baseDmg = totalAtk * (50 / (50 + effectiveDef));
-                    const dmg = Math.max(1, Math.round(baseDmg));
+                    const dmg = Math.max(1, Math.round(totalAtkAvg * (50 / (50 + effectiveDef))));
 
-                    const hits = Math.ceil(hp / dmg);
-                    const cls = hits <= 1 ? 'hit-1' : (hits === 2 ? 'hit-2' : (hits === 3 ? 'hit-3' : 'hit-danger'));
-                    const penBadge = totalPen > 0 ? `<span class="badge" style="background: rgba(255,255,0,0.1); color: yellow; border: 1px solid yellow; margin-left: 4px;">無視 ${Math.round(totalPen * 100)}%</span>` : "";
+                    // 理論値（攻撃と防御のみ考慮：会心・乱数・命中回避・防御力無視なし）
+                    const rawBaseDmg = totalAtk * (50 / (50 + def));
+                    const rawDmg = Math.max(1, Math.round(rawBaseDmg));
+                    const rawHits = Math.ceil(hp / rawDmg);
+                    const rawCls = rawHits <= 1 ? 'hit-1' : (rawHits === 2 ? 'hit-2' : (rawHits === 3 ? 'hit-3' : 'hit-danger'));
 
-                    // 命中率計算: (プレイヤー精度 - 敵回避) → 5%〜99%にクランプ
+                    // 実戦値
                     const enemyEva = liveEnemyOverrides[id]?.evasion ?? (e.evasion || 0);
                     const rawHitPctC = Math.min(99, Math.max(5, totalAccuracyClose - enemyEva));
                     const hitScoreC = Math.round(rawHitPctC);
                     const hitColorC = hitScoreC >= 90 ? 'var(--accent)' : (hitScoreC >= 60 ? 'var(--primary)' : (hitScoreC >= 40 ? 'orange' : 'var(--danger)'));
+
+                    const expectedTurns = Math.ceil(hp / (dmg * (hitScoreC / 100)));
+                    const expectedCls = expectedTurns <= 1 ? 'hit-1' : (expectedTurns === 2 ? 'hit-2' : (expectedTurns === 3 ? 'hit-3' : 'hit-danger'));
+                    const penBadge = totalPen > 0 ? `<span class="badge" style="background: rgba(255,255,0,0.1); color: yellow; border: 1px solid yellow; margin-left: 4px;">無視 ${Math.round(totalPen * 100)}%</span>` : "";
 
                     return `
                         <tr>
@@ -826,7 +835,12 @@
                             <td><input class="edit-input" type="number" value="${enemyEva}" oninput="onEnemyInput('${id}', 'evasion', this.value)"></td>
                             <td><span style="font-family:'JetBrains Mono'; font-weight:700; color:${hitColorC}">${hitScoreC}/100</span></td>
                             <td><span style="font-family:'JetBrains Mono'; font-weight:700; color:${critColor}">${critScore}/100</span></td>
-                            <td><span class="badge ${cls}">${hits}撃</span></td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
+                                    <span class="badge ${rawCls}" style="width: 100%; text-align: center; font-size: 11px;">理論: ${rawHits}撃</span>
+                                    <span class="badge ${expectedCls}" style="width: 100%; text-align: center; font-size: 11px;">実戦: ${expectedTurns}撃</span>
+                                </div>
+                            </td>
                         </tr>`;
                 }).join('');
 
@@ -849,17 +863,27 @@
                 const rankEnemies = Object.entries(masterData.enemies).filter(([id, e]) => (e.min_rank || e.rank) === rank && !e.is_static);
                 tableBody.innerHTML = rankEnemies.map(([id, e]) => {
                     const atk = liveEnemyOverrides[id]?.attack ?? e.attack;
-                    const baseDmg = atk * (50 / (50 + Math.max(0, totalDef)));
+                    // 敵のクリティカル期待値 (通常1% = 0.01) × 乱数平均 0.85
+                    const enemyCrit = e.crit_rate ?? 0.01;
+                    const enemyAtkAvg = atk * (1.0 + enemyCrit) * 0.85;
+                    const baseDmg = enemyAtkAvg * (50 / (50 + Math.max(0, totalDef)));
                     const dmg = Math.max(1, Math.round(baseDmg));
-                    const hits = Math.floor(totalHp / dmg);
-                    const cls = hits >= 10 ? 'hit-1' : (hits >= 5 ? 'hit-2' : (hits >= 3 ? 'hit-3' : 'hit-danger'));
 
-                    // 敵命中率計算: (敵精度 - プレイヤー回避) → 5%〜99%にクランプ
+                    // 理論値（被ダメージ：攻撃と防御のみ考慮、会心・乱数・命中回避なし）
+                    const rawBaseEnemyDmg = atk * (50 / (50 + Math.max(0, totalDef)));
+                    const rawEnemyDmg = Math.max(1, Math.round(rawBaseEnemyDmg));
+                    const rawSurvivalHits = Math.floor(totalHp / rawEnemyDmg);
+                    const rawCls = rawSurvivalHits >= 10 ? 'hit-1' : (rawSurvivalHits >= 5 ? 'hit-2' : (rawSurvivalHits >= 3 ? 'hit-3' : 'hit-danger'));
+
+                    // 敵命中率計算
                     const enemyAccuracyC = liveEnemyOverrides[id]?.accuracy_close ?? (e.accuracy_close || 100);
-
                     const rawEnemyHitPctC = Math.min(99, Math.max(5, enemyAccuracyC - playerEvasionClose));
                     const enemyHitScoreC = Math.round(rawEnemyHitPctC);
                     const hitColorC = enemyHitScoreC >= 90 ? 'var(--danger)' : (enemyHitScoreC >= 60 ? 'orange' : (enemyHitScoreC >= 40 ? 'var(--primary)' : 'var(--accent)'));
+
+                    // 実戦値
+                    const expectedSurvivalTurns = Math.floor(totalHp / (dmg * (enemyHitScoreC / 100)));
+                    const expectedCls = expectedSurvivalTurns >= 10 ? 'hit-1' : (expectedSurvivalTurns >= 5 ? 'hit-2' : (expectedSurvivalTurns >= 3 ? 'hit-3' : 'hit-danger'));
 
                     return `
                         <tr>
@@ -869,7 +893,12 @@
                                 <input class="edit-input" type="number" value="${enemyAccuracyC}" oninput="onEnemyInput('${id}', 'accuracy_close', this.value)">
                             </td>
                             <td><span style="font-family:'JetBrains Mono'; font-weight:700; color:${hitColorC}">${enemyHitScoreC}/100</span></td>
-                            <td><span class="badge ${cls}">${hits}発耐える</span></td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
+                                    <span class="badge ${rawCls}" style="width: 100%; text-align: center; font-size: 11px;">理論: ${rawSurvivalHits}発</span>
+                                    <span class="badge ${expectedCls}" style="width: 100%; text-align: center; font-size: 11px;">実戦: ${expectedSurvivalTurns}発</span>
+                                </div>
+                            </td>
                         </tr>`;
                 }).join('');
             }

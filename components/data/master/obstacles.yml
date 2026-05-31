@@ -252,3 +252,20 @@ table:
   max_floor: 999
   image_path: components/pictures/obstacles/table.png
   image_scale: 1.0
+
+magic_barrier:
+  name: 魔法の防壁
+  min_rank: "F"
+  rarity: 1
+  hp: 5
+  defense: 0
+  evasion: 0
+  crit_rate: 0.0
+  reward_gold: 0
+  min_floor: 999
+  max_floor: 999
+  max_concurrent: 0
+  max_spawns: 0
+  image_path: components/pictures/obstacles/magic_barrier.png
+  image_scale: 1.0
+

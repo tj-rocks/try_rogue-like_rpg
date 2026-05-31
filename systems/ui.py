@@ -1148,6 +1148,7 @@ class ParameterSelectionDialog(BaseListDialog):
             "magic_heal_ratio": "[癒]回復量", "magic_knockback_damage": "[風]吹飛ダメ",
             "magic_invincible_turns": "[聖]無敵ターン",
             "magic_stave_bonus": "[魔]杖回数", "magic_light_stave_bonus": "[光]燈杖回",
+            "magic_yrden_turns": "[印]障壁ターン",
             "accuracy_bonus_close": "命中率",
             "accuracy_bonus": "命中率",
         }
@@ -1299,6 +1300,7 @@ class InventoryDialog(BaseListDialog):
             "magic_invincible_turns":"[聖]無敵ターン",
             "magic_stave_bonus":     "[魔]杖回数",
             "magic_light_stave_bonus": "[光]燈杖回",
+            "magic_yrden_turns":     "[印]障壁ターン",
         }
         
         def fmt(val):
@@ -1442,6 +1444,7 @@ class InventoryDialog(BaseListDialog):
             "magic_invincible_turns":"✨無敵ターン",
             "magic_stave_bonus":     "🔮杖回数",
             "magic_light_stave_bonus": "💡燈杖回",
+            "magic_yrden_turns":     "🌀障壁ターン",
         }
         
         def fmt(val):
@@ -3029,6 +3032,7 @@ class StatusDialog:
             total_heal_ratio = get_total_bonus("magic_heal_ratio")
             total_knockback = get_total_bonus("magic_knockback_damage")
             total_invincible = get_total_bonus("magic_invincible_turns")
+            total_yrden = get_total_bonus("magic_yrden_turns")
 
             def format_val(val):
                 if val % 1 == 0:
@@ -3108,6 +3112,9 @@ class StatusDialog:
                 has_magic_bonus = True
             if total_invincible != 0:
                 right_lines.append(f"無敵効果  {format_val(total_invincible)}ターン")
+                has_magic_bonus = True
+            if total_yrden != 0:
+                right_lines.append(f"障壁ターン {format_val(total_yrden)}ターン")
                 has_magic_bonus = True
 
             if not has_magic_bonus:

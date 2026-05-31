@@ -239,6 +239,10 @@ def execute_stave(player, stave, dungeon, dialog):
         msg += _effect_invincible(player, settings, dungeon, dialog)
     elif effect_type == "light_all":
         msg += _effect_light_all(player, settings, dungeon, dialog, stave)
+    elif effect_type == "yrden":
+        msg += _effect_yrden(player, settings, dungeon, dialog, stave)
+    elif effect_type == "attack_buff":
+        msg += _effect_attack_buff(player, settings, dungeon, dialog)
     else:
         msg += "しかし 何もおきなかった！"
 
@@ -466,3 +470,76 @@ def _effect_light_all(player, settings, dungeon, dialog, stave=None):
                 
         return msg
     return "しかし 何も 起こらなかった。"
+
+def _effect_yrden(player, settings, dungeon, dialog, stave=None):
+    """正面1マスに敵の侵入を防ぐ魔法の防壁（障害物）を配置する"""
+    gx = int((player.x + player.width / 2) // dungeon.tile_size)
+    gy = int((player.y + player.height / 2) // dungeon.tile_size)
+    
+    dx, dy = 0, 0
+    if player.facing == "up": dy = -1
+    elif player.facing == "down": dy = 1
+    elif player.facing == "left": dx = -1
+    elif player.facing == "right": dx = 1
+    
+    target_gx, target_gy = gx + dx, gy + dy
+    tile_size = dungeon.tile_size
+    
+    # 1. マップ範囲内チェック
+    if not (0 <= target_gx < dungeon.map_width and 0 <= target_gy < dungeon.map_height):
+        if stave: stave.charges += 1
+        return "そこには 配置できない！"
+        
+    # 2. 壁判定チェック (map_data が 1 以外のマスは床ではない＝配置不可)
+    if dungeon.map_data[target_gy][target_gx] != 1:
+        if stave: stave.charges += 1
+        return "そこには 配置できない！"
+        
+    # 3. プレイヤー自身との重複チェック
+    p_grids = player.get_occupied_grids(tile_size)
+    if (target_gx, target_gy) in p_grids:
+        if stave: stave.charges += 1
+        return "そこには 配置できない！"
+        
+    # 4. 既存エネミーや障害物との重複チェック
+    for e in dungeon.enemies:
+        if not getattr(e, "is_dead", False):
+            e_grids = e.get_occupied_grids(tile_size)
+            if (target_gx, target_gy) in e_grids:
+                if stave: stave.charges += 1
+                return "そこには 配置できない！"
+                
+    # 5. 防壁（障害物）の生成・追加
+    from components.sprites.enemy import Enemy
+    barrier = Enemy(target_gx * tile_size, target_gy * tile_size, "magic_barrier", player=player)
+    # タイル中央に寄せるオフセットを計算して設定
+    barrier.x += (tile_size - barrier.width) // 2
+    barrier.y += (tile_size - barrier.height) // 2
+    barrier.target_x, barrier.target_y = barrier.x, barrier.y
+    
+    # 5ターン（ベース値）と装備ボーナスの加算
+    base_turns = settings.get("duration_turns", 5)
+    bonus_turns = int(getattr(player, "get_magic_bonus", lambda k: 0)("yrden_turns"))
+    barrier.lifetime_turns = base_turns + bonus_turns
+    
+    dungeon.enemies.append(barrier)
+    
+    # 6. 召喚エフェクトの追加 (紫色の DirectionalFlashEffect)
+    tx = target_gx * tile_size
+    ty = target_gy * tile_size
+    dungeon.magic_effects.append(DirectionalFlashEffect(tx, ty, size=tile_size, color=(200, 100, 255)))
+    
+    return f"正面の床に 魔法の防壁 が出現した！（持続: {barrier.lifetime_turns}ターン）"
+
+def _effect_attack_buff(player, settings, dungeon, dialog):
+    """攻撃力上昇バフ付与"""
+    turns = settings.get("duration_turns", 10)
+    buff_val = settings.get("attack_buff_val", 5)
+    
+    player.attack_buff_turns = turns
+    player.attack_buff_val = buff_val
+    
+    # 青白くフラッシュ
+    dungeon.magic_effects.append(FlashEffect(color=settings.get("effect_color", [100, 200, 255])))
+    
+    return f"武器に魔力が 宿った！\n{turns}ターンの間 攻撃力が {buff_val} 上昇した！"

@@ -26,6 +26,11 @@ def apply_surgical_update(file_type, target_id, updates):
         "regen_bonus": "regen",
         "armor_penetration": "armor_penetration",
     }
+    EQUIPMENT_ROOT_KEYS = {
+        "name", "category", "min_rank", "max_rank", "rarity", "price",
+        "image_path", "image_dir", "sound", "image_scale", "describe",
+        "growth", "type", "floor_spawnable", "shop_buyable"
+    }
     
     if file_type == "equipment":
         weapons_raw = load_master_data("weapons.yml")
@@ -103,7 +108,12 @@ def apply_surgical_update(file_type, target_id, updates):
                 if stripped != f"{target_id}:":
                     for k, found in param_found.items():
                         if not found:
-                            new_lines.append(f"    {k}: {mapped_updates[k]}\n")
+                            val = mapped_updates[k]
+                            if val in (0, 0.0, "", None, False):
+                                continue
+                            if file_type == "equipment" and k not in EQUIPMENT_ROOT_KEYS:
+                                return False
+                            new_lines.append(f"    {k}: {val}\n")
                             updated = True
                     in_target_block = False
             
@@ -125,7 +135,12 @@ def apply_surgical_update(file_type, target_id, updates):
         if in_target_block:
             for k, found in param_found.items():
                 if not found:
-                    new_lines.append(f"    {k}: {mapped_updates[k]}\n")
+                    val = mapped_updates[k]
+                    if val in (0, 0.0, "", None, False):
+                        continue
+                    if file_type == "equipment" and k not in EQUIPMENT_ROOT_KEYS:
+                        return False
+                    new_lines.append(f"    {k}: {val}\n")
                     updated = True
         
         if updated:

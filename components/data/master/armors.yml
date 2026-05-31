@@ -48,6 +48,7 @@ ARMOR_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.0
+        hp: 0
         defense: 1
         block_chance_close: 0.0
         block_chance_ranged: 0.0
@@ -81,19 +82,20 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
+        hp: 0
         defense: 7.5
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -115,20 +117,20 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 0
         defense: 10
-        block_chance_close: 0.05
-        block_chance_ranged: 0.05
+        block_chance_close: 0.1
+        block_chance_ranged: 0.1
         lantern_bonus: 0
         regen: 1
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -150,20 +152,20 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 0
         defense: 11
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -185,20 +187,20 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 0
-        defense: 15
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        defense: 14
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -329,20 +331,20 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 0
         defense: 18
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -365,7 +367,7 @@ ARMOR_DATA:
         attack: 2
         accuracy_close: -5
         accuracy_range: -10
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 5
         defense: 20
         block_chance_close: -0.11
@@ -373,12 +375,12 @@ ARMOR_DATA:
         lantern_bonus: -1
         regen: 0
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
@@ -401,22 +403,22 @@ ARMOR_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0.0
+        crit_rate: 0
         hp: 30
         defense: 12
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
         regen: 1
         stupidity: 0
-        armor_penetration: 0.0
+        armor_penetration: 0.1
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.10
-        knockback_damage: 0.0
+        heal_ratio: 0.1
+        knockback_damage: 0
         invincible_turns: 0
-        stave_bonus: 10
+        stave_bonus: 0
         light_stave_bonus: 0
 
   scount_armor:
@@ -438,19 +440,19 @@ ARMOR_DATA:
         accuracy_range: 0
         crit_rate: 0.1
         hp: 0
-        defense: 14
-        block_chance_close: 0.05
-        block_chance_ranged: 0.05
+        defense: 10
+        block_chance_close: 0.1
+        block_chance_ranged: 0.1
         lantern_bonus: 0
         regen: 0
-        aggro_mod: -1
+        aggro_mod: -3
         stupidity: 0
         armor_penetration: 0.1
       magic:
-        fire_damage: 0.0
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0

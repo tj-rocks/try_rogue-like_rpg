@@ -345,7 +345,22 @@ class Enemy(Entity):
         return False
 
     def take_turn(self, player, dungeon, all_entities, dialog=None, occupied_cells=None):
-        if getattr(self, "is_dead", False) or self.is_static: return
+        if getattr(self, "is_dead", False): return
+        if self.is_static:
+            if hasattr(self, "lifetime_turns") and self.lifetime_turns is not None:
+                self.lifetime_turns -= 1
+                if self.lifetime_turns <= 0:
+                    self.is_dead = True
+                    if dialog:
+                        from constants import COMBAT_LOG_WAIT_FRAMES
+                        msg = f"{self.name} は 消滅した！"
+                        if dialog.is_active:
+                            dialog.text += "\n" + msg
+                        else:
+                            dialog.text = msg
+                            dialog.is_active = True
+                        dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+            return
         mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
         px, py = int((player.target_x+player.width/2)//dungeon.tile_size), int((player.target_y+player.height/2)//dungeon.tile_size)
         
