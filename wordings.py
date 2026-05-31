@@ -122,8 +122,8 @@ class Text:
         STAT_CONFUSION_LABEL = "困惑"
 
     class System:
-        GAME_OVER = "死んでしまった\nアイテムや装備も全て失ってしまった"
-        DOCTOR_REVIVE = "大手術だったよ\nアイテムは失ったけど命があっただけでも儲け物だよ\n棍棒をあげるから諦めるんじゃないよ。"
+        GAME_OVER = "死んでしまった\n所持金が半分になり、死の呪いが進行した"
+        DOCTOR_REVIVE = "大手術だったよ\n命があっただけでも儲け物だよ。\nお気をつけて。"
         STAIRS_CONFIRM = "次の階層へ進みますか？"
         OVERFLOW_SENSE = "モンスター氾濫の 予感がする……"
         OVERFLOW_START = "モンスター氾濫が 発生した"

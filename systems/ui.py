@@ -2213,8 +2213,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             teleport_dialog.is_active = True
                                             return
                                     elif getattr(npc, "role", None) == "priest":
-                                        from constants import CURSE_RECOVERY_COST_GP_PER_LEVEL
-                                        cost = CURSE_RECOVERY_COST_GP_PER_LEVEL
+                                        cost = max(1, player.guild_point // 10)
                                         if getattr(player, "curse_level", 0) > 0:
                                             dialog.text = Text.NPC.PRIEST_WELCOME
                                             dialog.is_active = True

@@ -46,32 +46,6 @@ def handle_death_sequence(player, dungeon, dialog, game_state):
         game_state["death_timer"] -= 1
         if game_state["death_timer"] <= 0:
             # Step 4: 復活処理（ペナルティ適用とワープ）
-            # 装備品は残し、それ以外のインベントリ(未装備装備、消耗品、杖)をロスト
-            if player.equipped_weapon is not None:
-                player.weapon_inventory = [eq for eq in player.weapon_inventory if eq.iid == player.equipped_weapon]
-            else:
-                player.weapon_inventory = []
-                player.weapon = None
-
-            if player.equipped_armor is not None:
-                player.armor_inventory = [eq for eq in player.armor_inventory if eq.iid == player.equipped_armor]
-            else:
-                player.armor_inventory = []
-
-            if player.equipped_shield is not None:
-                player.shield_inventory = [eq for eq in player.shield_inventory if eq.iid == player.equipped_shield]
-            else:
-                player.shield_inventory = []
-
-            if player.equipped_lantern is not None:
-                player.lantern_inventory = [eq for eq in player.lantern_inventory if eq.iid == player.equipped_lantern]
-            else:
-                player.lantern_inventory = []
-
-            player.items = []
-            player.stave_inventory = []
-            
-            player.defense = PLAYER_DEFENSE
             
             # 死の呪いを進行させる
             player.apply_curse()

@@ -51,12 +51,12 @@ def test_death_penalty():
     print(f"所持金検証: 期待値 {expected_coin}, 実際 {player.coin}")
     assert player.coin == expected_coin
     
-    # 検証: 装備保存 (装備していた物は残り、未装備は失われる)
+    # 検証: 装備保存 (アイテムロストなしのため装備も全て維持される)
     print(f"装備検証: weapon_inventory={len(player.weapon_inventory)}, equipped_weapon={player.equipped_weapon}")
-    assert len(player.weapon_inventory) == 1
-    assert player.weapon_inventory[0].key == "iron_sword"
-    assert len(player.armor_inventory) == 1
-    assert player.armor_inventory[0].key == "leather_breastplate"
+    assert len(player.weapon_inventory) == 2
+    assert any(w.key == "iron_sword" for w in player.weapon_inventory)
+    assert len(player.armor_inventory) == 2
+    assert any(a.key == "leather_breastplate" for a in player.armor_inventory)
     
     # 検証: 呪い進行
     print(f"呪い検証: curse_level={player.curse_level}, cursed_stats={player.cursed_stats}")
@@ -208,15 +208,18 @@ def test_comprehensive_curse_system():
         with patch("components.sprites.player.Player.save_to_file"):
             handle_death_sequence(player, dungeon, dialog, game_state)
             
-    # 検証: 装備品以外は全ロストしているか？
-    print("死亡ロスト検証...")
-    assert len(player.weapon_inventory) == 1
-    assert player.weapon_inventory[0].iid == w_equipped.iid # 装備中のみ残る
-    assert len(player.armor_inventory) == 1
-    assert player.armor_inventory[0].iid == a_equipped.iid # 装備中のみ残る
-    assert len(player.stave_inventory) == 0 # 杖はロスト
-    assert len(player.items) == 0 # 消耗品はロスト
-    print("[OK] 装備保存＆その他ロスト検証成功！")
+    # 検証: アイテムがロストしていないか？
+    print("死亡ロストなし検証...")
+    weapon_keys = [w.key for w in player.weapon_inventory]
+    assert "iron_sword" in weapon_keys
+    assert "wooden_stick" in weapon_keys
+    
+    armor_keys = [a.key for a in player.armor_inventory]
+    assert "leather_breastplate" in armor_keys
+    
+    assert len(player.stave_inventory) == 1   # 杖も残る
+    assert len(player.items) == 1             # 消耗品も残る
+    print("[OK] 装備保存＆その他ロストなし検証成功！")
     
     # 呪い進行の検証 (1段階目)
     assert player.curse_level == 1
