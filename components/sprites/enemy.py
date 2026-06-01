@@ -361,6 +361,16 @@ class Enemy(Entity):
                             dialog.is_active = True
                         dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
             return
+
+        # 魔法の防壁（magic_barrier）に囚われているかチェック
+        my_grids = self.get_occupied_grids_at(self.x, self.y, dungeon.tile_size)
+        for e in dungeon.enemies:
+            if e != self and not getattr(e, "is_dead", False) and getattr(e, "is_static", False) and getattr(e, "type", "") == "magic_barrier":
+                e_grids = e.get_occupied_grids(dungeon.tile_size)
+                if any(g in e_grids for g in my_grids):
+                    # 閉じ込められているため、ターンをスキップ（攻撃も移動も行わない）
+                    return
+
         mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
         px, py = int((player.target_x+player.width/2)//dungeon.tile_size), int((player.target_y+player.height/2)//dungeon.tile_size)
         
@@ -475,6 +485,15 @@ class Enemy(Entity):
         # その階層がボスの出現開始階層(min_floor)であれば、最優先で1体配置する
         boss_types = [t for t in mt if ENEMY_DATA[t].get("is_boss") and ENEMY_DATA[t].get("min_floor") == floor]
         for b_type in boss_types:
+            has_quest = False
+            if player and hasattr(player, "active_quests"):
+                has_quest = any(q.get("target_key") == b_type for q in player.active_quests)
+            
+            if not has_quest and player is not None:
+                if random.random() >= 0.05:
+                    print(f"[Dungeon] Boss {b_type} skipped: no quest and did not roll 5% chance.")
+                    continue
+
             spawned = False
             # 全部屋（スタート部屋以外優先）を巡回して場所を探す
             shuffled_rooms = list(enumerate(dungeon.rooms))

@@ -1925,6 +1925,15 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
             return new_dungeon
         return
     
+    guild_guide_dialog = kwargs.get("guild_guide_dialog")
+    if guild_guide_dialog and guild_guide_dialog.is_active:
+        guild_guide_dialog.handle_input(events, player)
+        if dialog.is_active and dialog.just_opened_timer <= 0:
+            for event in events:
+                if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
+                    dialog.is_active = False
+        return
+    
     if menu_dialog and menu_dialog.is_active:
         # サブダイアログが開いている場合はそちらを優先
         sub_active = (
@@ -2211,10 +2220,16 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             dialog.is_active = True
                                             # ダイアログが開いた後にテレポートUIを起動
                                             teleport_dialog.is_active = True
+                                    elif getattr(npc, "role", None) == "guild_guide":
+                                        guild_guide_dialog = kwargs.get("guild_guide_dialog")
+                                        if guild_guide_dialog:
+                                            guild_guide_dialog.setup_options(player)
+                                            dialog.text = "\n".join(npc.get_dialogue())
+                                            dialog.is_active = True
+                                            guild_guide_dialog.is_active = True
                                             return
                                     elif getattr(npc, "role", None) == "priest":
-                                        from constants import CURSE_RECOVERY_COST_GP_PER_LEVEL
-                                        cost = CURSE_RECOVERY_COST_GP_PER_LEVEL
+                                        cost = max(1, player.guild_point // 10)
                                         if getattr(player, "curse_level", 0) > 0:
                                             dialog.text = Text.NPC.PRIEST_WELCOME
                                             dialog.is_active = True
@@ -2224,13 +2239,8 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                     if player.guild_point >= cost:
                                                         player.guild_point -= cost
                                                         player.curse_level -= 1
-                                                        import random
-                                                        if player.cursed_stats:
-                                                            removed = random.choice(player.cursed_stats)
-                                                            player.cursed_stats.remove(removed)
-                                                            dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat=player.get_cursed_stats_japanese_single(removed))
-                                                        else:
-                                                            dialog.text = Text.NPC.PRIEST_CURE_DONE_SIMPLE
+                                                        player.cursed_stats = ["hp"] if player.curse_level > 0 else []
+                                                        dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat="最大HP")
                                                         dialog.is_active = True
                                                         from systems.sound_handler import sound_manager
                                                         from constants import SOUND_SELECT
@@ -2323,6 +2333,17 @@ class GuildDialog:
                 if not already_active:
                     self.items.append(("mode", "ACCEPT_RANKUP", "昇級試験を受ける", f"{next_rank_data['rank']}ランクへの昇格試験に挑戦します。"))
             
+            # 次のランクまでのギルドポイントを説明する案内項目をメニューに追加
+            if next_rank_data:
+                needed_gp = next_rank_data["required_gp"] - player.guild_point
+                if needed_gp > 0:
+                    info_desc = f"次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です。\n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
+                else:
+                    info_desc = f"次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(昇級試験を受けられます)"
+            else:
+                info_desc = "これ以上は昇格できません。あなたは最高ランクに達しています！"
+            self.items.append(("info_rank", None, "🏆 ランク情報を確認", info_desc))
+            
             self.items.append(("mode", "ACCEPT_FIXED", "特別な依頼を見る", "特定の条件で発生する特別な依頼を確認します。"))
             self.items.append(("mode", "ABANDON", "依頼破棄", "現在受けている依頼をキャンセルします。"))
             self.items.append(("mode", "SAVE", "💾 記録する", "現在の進行状況をセーブします。"))
@@ -2367,6 +2388,8 @@ class GuildDialog:
     def _create_rank_up_quest(self, next_rank_data):
         from constants import CONSUMABLE_DATA
         cert_data = CONSUMABLE_DATA.get(next_rank_data["rank_up_item"], {})
+        target_floor = cert_data.get("min_floor", 1)
+        description = f"次のランクへ昇級するための試験です。\n対象フロアの最奥に配置される『{cert_data.get('name', '冒険者の証')}』を回収してきてください。(対象階層: {target_floor}F)"
         return {
             "id": f"rank_up_{next_rank_data['rank']}",
             "type": "delivery", "is_rank_up": True,
@@ -2374,7 +2397,8 @@ class GuildDialog:
             "target_name": cert_data.get("name", "冒険者の証"),
             "amount": 1, "reward_gold": next_rank_data.get("rank_up_reward_gold", 0), "reward_gp": 0,
             "next_rank": next_rank_data["rank"],
-            "title": "冒険者の証の回収" if next_rank_data['rank'] == "F" else Text.Guild.QUEST_RANK_UP_TITLE.format(rank=next_rank_data['rank'])
+            "title": "冒険者の証の回収" if next_rank_data['rank'] == "F" else Text.Guild.QUEST_RANK_UP_TITLE.format(rank=next_rank_data['rank']),
+            "description": description
         }
 
     def handle_events(self, events, player, dialog, confirm_dialog):
@@ -2470,6 +2494,10 @@ class GuildDialog:
             self.mode = "MENU"
             self.cursor_idx = 0
             self.setup(player, self.dungeon_ref)
+            return
+        if status == "info_rank":
+            dialog.text = item[3]
+            dialog.is_active = True
             return
         if status == "mode":
             self.mode = item[1]
@@ -2701,7 +2729,7 @@ class GuildDialog:
                     screen.blit(cursor, (self.x + 35, y_pos))
                 
                 # 表示テキストの構築
-                if status == "mode":
+                if status in ("mode", "info_rank"):
                     display_name = item[2]
                 elif status in ("cancel", "back"):
                     display_name = Text.UI.QUIT
@@ -2751,6 +2779,8 @@ class GuildDialog:
                     "ABANDON": "現在受けている依頼を中止します。\n※違約金とGPの減少が発生します。"
                 }
                 desc_text = menu_descs.get(mode_id, Text.UI.STATUS_MENU_HINT)
+            elif status == "info_rank":
+                desc_text = selected_item[3]
             elif status in ("cancel", "back"):
                 desc_text = "前の画面に戻ります。"
             else:
@@ -3155,6 +3185,13 @@ class StatusDialog:
                     if prog:
                         lines.append(f"  進捗: {prog} {q.get('target_name', '')}")
                     lines.append(f"  報酬: {reward} G")
+                    
+                    desc = q.get("description")
+                    if desc:
+                        lines.append("  詳細:")
+                        desc_lines = desc.split("\n")
+                        for dl in desc_lines:
+                            lines.append(f"    {dl}")
             
             draw_text_wrapped(screen, self.font, "\n".join(lines), content_x, content_y, cw)
         
@@ -3916,6 +3953,79 @@ class TeleportDialog(BaseListDialog):
             screen.blit(self.font.render(f"{item['cost']} G", True, color), (sep_x - 110, y_pos))
 
 
+class GuildGuideDialog(BaseListDialog):
+    """ギルド職員（案内）によるギルドシステム説明用ダイアログ"""
+    STATE_KEY = "guild_guide_active"
+
+    def __init__(self, screen_width, screen_height):
+        super().__init__(screen_width, screen_height)
+        self.row_height = 36
+
+    def setup_options(self, player):
+        from systems.guild import GuildSystem
+        guild = GuildSystem()
+        
+        next_rank_data = guild.get_next_rank_data(player.guild_rank)
+        if next_rank_data:
+            needed_gp = next_rank_data["required_gp"] - player.guild_point
+            if needed_gp > 0:
+                rank_info_desc = f"現在のランクは {player.guild_rank} です。\n次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です。\n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
+            else:
+                rank_info_desc = f"現在のランクは {player.guild_rank} です。\n次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(ギルドの受付で昇級試験を受けられます)"
+        else:
+            rank_info_desc = f"現在のランクは {player.guild_rank} です。あなたは最高ランクに達しています！"
+
+        self.items = [
+            {"key": "your_rank", "name": "あなたのランク", "desc": rank_info_desc},
+            {"key": "guild_point", "name": "ギルドポイント", "desc": "【ギルドポイント(GP)とは】\nクエストを達成すると貰えるポイントよ。\nランクを上げる条件になるほか、神官様に死の呪いを解いてもらう際にも必要になるわ。"},
+            {"key": "adventure_rank", "name": "冒険者ランク", "desc": "【冒険者ランク】\nランクは -（未加入）から始まり、F, E, D, C, B, A, S, SS までの9段階あるわ。\nランクが上がると、より難易度と報酬の高い依頼を受けられるようになるのよ。"},
+            {"key": "floor_limit", "name": "到達可能階層", "desc": "【ランク制限】\nランクに応じて進める限界階層が決まっているわ。\n- : B0F(村のみ)\nF : B11F まで\nE : B21F まで\nD : B30F まで\nC : B35F まで\nB : B55F まで\nそれ以上のランクになれば、さらに深くまで進めるようになるわ！"},
+            {"key": "promotion_exam", "name": "昇級試験", "desc": "【昇級試験】\nランクごとに必要なGPが溜まると、ギルドで試験を受けられるわ。\n試験クエストを受けて、そのランクのボスが落とす『冒険者の証』を回収して報告すればランクアップよ！"},
+            {"key": "quit", "name": "閉じる", "desc": "説明を終わります。"}
+        ]
+
+    def get_title(self):
+        return "ギルド案内"
+
+    def get_item_label(self, item, idx):
+        return item["name"]
+
+    def get_detail_lines(self, player):
+        if not self.items or self.cursor_idx >= len(self.items): return []
+        item = self.items[self.cursor_idx]
+        return item["desc"].split("\n")
+
+    def handle_input(self, events, player):
+        if not self.is_active: return None
+        from systems.audio_manager import play_sfx
+        from constants import SOUND_SELECT, SOUND_CANCEL
+        
+        res = self._navigate(events)
+        if res == "cancel":
+            play_sfx(SOUND_CANCEL)
+            self.is_active = False
+            from systems.game_state import game_state
+            game_state[self.STATE_KEY] = False
+            return None
+        elif res == "confirm":
+            selected = self.items[self.cursor_idx]
+            if selected["key"] == "quit":
+                play_sfx(SOUND_CANCEL)
+                self.is_active = False
+                from systems.game_state import game_state
+                game_state[self.STATE_KEY] = False
+                return None
+            else:
+                # 項目を選択したら、ダイアログに解説を大きく表示する
+                play_sfx(SOUND_SELECT)
+                from systems.game_state import game_state
+                dialog = game_state.get("ui_elements", {}).get("dialog")
+                if dialog:
+                    dialog.text = selected["desc"]
+                    dialog.is_active = True
+                self.is_active = False
+                game_state[self.STATE_KEY] = False
+                return None
 
 
 def draw_minimap(screen, dungeon, player):
@@ -4009,6 +4119,10 @@ def draw_all_ui(screen, player, dialog, confirm_dialog, inventory_dialog, status
     stave_selection_dialog.draw(screen)
     if teleport_dialog:
         teleport_dialog.draw(screen, player)
+    
+    guild_guide_dialog = kwargs.get("guild_guide_dialog")
+    if guild_guide_dialog:
+        guild_guide_dialog.draw(screen, player)
     
     dialog.update()
     dialog.draw(screen)

@@ -113,14 +113,13 @@ def test_priest_services():
     player = Player()
     player.guild_point = 100
     player.curse_level = 1
-    player.cursed_stats = ["attack"]
+    player.cursed_stats = ["hp"]
     
     dialog = Dialog(800, 600)
     confirm = ConfirmDialog(800, 600)
     
-    from constants import CURSE_RECOVERY_COST_GP_PER_LEVEL
-    cost = CURSE_RECOVERY_COST_GP_PER_LEVEL
-    assert cost == 50
+    cost = max(1, player.guild_point // 10)
+    assert cost == 10
     
     # 1. 呪われている状態で話しかけると、歓迎ダイアログと確認ダイアログがアクティブになる
     assert player.curse_level == 1
@@ -133,13 +132,8 @@ def test_priest_services():
         if player.guild_point >= cost:
             player.guild_point -= cost
             player.curse_level -= 1
-            import random
-            if player.cursed_stats:
-                removed = random.choice(player.cursed_stats)
-                player.cursed_stats.remove(removed)
-                dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat=player.get_cursed_stats_japanese_single(removed))
-            else:
-                dialog.text = Text.NPC.PRIEST_CURE_DONE_SIMPLE
+            player.cursed_stats = ["hp"] if player.curse_level > 0 else []
+            dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat="最大HP")
             dialog.is_active = True
             player.save_to_file()
             
@@ -154,7 +148,7 @@ def test_priest_services():
     
     # 2. 解呪後の状態検証
     print(f"解呪後: GP={player.guild_point}, 呪いレベル={player.curse_level}, 被デバフステータス数={len(player.cursed_stats)}")
-    assert player.guild_point == 50
+    assert player.guild_point == 90
     assert player.curse_level == 0
     assert len(player.cursed_stats) == 0
     

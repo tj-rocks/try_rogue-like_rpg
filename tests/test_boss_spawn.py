@@ -31,6 +31,7 @@ def run_test():
         # 2. 各ボスの確定出現テスト
         for boss_info in boss_list:
             test_boss_guaranteed_spawn(boss_info)
+            test_boss_no_quest_spawn_rate(boss_info)
         
         # 3. 壁内スポーン防止テスト (全ボス階層対象)
         test_all_bosses_wall_prevention(boss_list)
@@ -55,6 +56,8 @@ def test_boss_guaranteed_spawn(boss_info):
     
     print(f"\n--- {b_name} ({b_floor}F) 確定出現テスト開始 ---")
     player = Player()
+    # 依頼受託状態にする（確定出現）
+    player.active_quests.append({"target_key": b_key, "type": "hunt"})
     
     for i in range(5):
         dungeon = warp_to_floor(b_floor, player, spawn_reason="warped")
@@ -72,7 +75,11 @@ def test_all_bosses_wall_prevention(boss_list):
     for boss_info in boss_list:
         b_floor = boss_info["floor"]
         b_name = boss_info["name"]
+        b_key = boss_info["key"]
         print(f"Checking Floor {b_floor} ({b_name})...")
+        
+        # 討伐依頼を受託した状態にして確実に出現させる
+        player.active_quests = [{"target_key": b_key, "type": "hunt"}]
         
         for i in range(3):
             dungeon = warp_to_floor(b_floor, player, spawn_reason="warped")
@@ -82,6 +89,29 @@ def test_all_bosses_wall_prevention(boss_list):
                     if dungeon.map_data[gy][gx] == 0:
                         raise AssertionError(f"Entity {e.type} (size {e.width}x{e.height}) is overlapping with a wall at ({gx}, {gy}) on floor {b_floor}")
         print(f"[OK] Floor {b_floor} boss/enemy safety check passed.")
+
+def test_boss_no_quest_spawn_rate(boss_info):
+    """依頼を受託していない状態でのボス出現確率が約5%であることを検証する"""
+    b_key = boss_info["key"]
+    b_floor = boss_info["floor"]
+    b_name = boss_info["name"]
+    
+    print(f"\n--- {b_name} ({b_floor}F) 依頼なし出現確率検証テスト開始 ---")
+    player = Player()
+    player.active_quests = [] # 依頼なし
+    
+    spawn_count = 0
+    attempts = 40
+    for i in range(attempts):
+        dungeon = warp_to_floor(b_floor, player, spawn_reason="warped")
+        bosses = [e for e in dungeon.enemies if e.type == b_key]
+        if len(bosses) > 0:
+            spawn_count += 1
+            
+    spawn_rate = spawn_count / attempts
+    print(f"[INFO] {b_name} spawned {spawn_count} times out of {attempts} attempts ({spawn_rate * 100}%).")
+    # 5%確率なので40回試行で0〜8回程度に収まるはず
+    assert 0 <= spawn_count <= 8, f"Expected low spawn rate around 5%, but got {spawn_count}/{attempts}"
 
 def test_all_entities_on_floor_tiles(floors):
     """出現したすべての敵・アイテム・罠が、壁(0)ではなく床タイルの上に配置されているかを検証する"""

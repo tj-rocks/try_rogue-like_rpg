@@ -476,10 +476,10 @@ STAVE_DATA:
     describe: フロア全体を一瞬で明るく照らす魔法の杖。隠れた罠や敵を暴き出す。
     floor_spawnable: true
   yrden_stave:
-    name: イヤーデンの杖
+    name: 障壁の杖
     effect_type: yrden
     min_rank: F
-    rarity: 1
+    rarity: 2
     price: 1500
     selling_price: 150
     charges: 5
@@ -489,7 +489,7 @@ STAVE_DATA:
     - 200
     - 100
     - 255
-    duration_turns: 5
+    duration_turns: 40
     shop_buyable: true
     describe: 正面の地面に、敵の侵入を防ぐ魔法の防壁（魔法陣）を配置する魔法の杖。
     floor_spawnable: true

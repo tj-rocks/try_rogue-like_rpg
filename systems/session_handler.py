@@ -6,7 +6,7 @@ from systems.ui import (
     EquipDialog, EnhanceDialog, ItemActionDialog, OreSelectionDialog, ShopDialog,
     ParameterSelectionDialog,
     StaveSelectionDialog, GuildDialog, WarehouseDialog, BankDialog, MenuDialog,
-    StaveInventoryDialog, EventInventoryDialog, TeleportDialog
+    StaveInventoryDialog, EventInventoryDialog, TeleportDialog, GuildGuideDialog
 )
 from wordings import Text
 
@@ -151,5 +151,6 @@ def init_ui_elements(screen_width, screen_height):
         "stave_inventory_dialog": StaveInventoryDialog(screen_width, screen_height),
         "event_inventory_dialog": EventInventoryDialog(screen_width, screen_height),
         "teleport_dialog": TeleportDialog(screen_width, screen_height),
+        "guild_guide_dialog": GuildGuideDialog(screen_width, screen_height),
         "cutscene_manager": CutsceneManager(screen_width, screen_height),
     }

@@ -25,6 +25,7 @@ from constants import (
 
 def test_actual_combat_interaction():
     print("--- 敵との実戦交戦シミュレーションテスト開始 ---")
+    random.seed(0)
     
     try:
         # 1. 初期化

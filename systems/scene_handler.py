@@ -170,6 +170,7 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
                      event_inv_dialog=ui_elements.get("event_inventory_dialog"),
                      bank_dialog=ui_elements.get("bank_dialog"),
                      teleport_dialog=ui_elements.get("teleport_dialog"),
+                     guild_guide_dialog=ui_elements.get("guild_guide_dialog"),
                      cutscene_manager=ui_elements.get("cutscene_manager"),
                      parameter_selection_active=game_state.get("parameter_selection_active"),
                      parameter_selection_dialog=ui_elements.get("parameter_selection_dialog"))
@@ -242,6 +243,7 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
                 stave_inv_dialog=ui_elements.get("stave_inventory_dialog"),
                 event_inv_dialog=ui_elements.get("event_inventory_dialog"),
                 teleport_dialog=ui_elements.get("teleport_dialog"),
+                guild_guide_dialog=ui_elements.get("guild_guide_dialog"),
                 dungeon=new_dungeon, events=events,
                 cutscene_manager=ui_elements.get("cutscene_manager"),
                 parameter_selection_dialog=ui_elements.get("parameter_selection_dialog"))

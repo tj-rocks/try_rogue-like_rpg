@@ -147,7 +147,7 @@ DUNGEON_IMAGES:
   '11':
     image: standard
     sound: just_move.mp3
-    brightness: 2
+    brightness: 5
     # map: first_rest_point.txt
     wall_decoration_ratio: 0.3
 
@@ -205,6 +205,7 @@ DUNGEON_IMAGES:
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
+    map: first_rest_point.txt
 # ==========================================
 # Dランク 到達可能階層 (22F 〜 30F)
 # ==========================================
