@@ -3185,6 +3185,13 @@ class StatusDialog:
                     if prog:
                         lines.append(f"  進捗: {prog} {q.get('target_name', '')}")
                     lines.append(f"  報酬: {reward} G")
+                    
+                    desc = q.get("description")
+                    if desc:
+                        lines.append("  詳細:")
+                        desc_lines = desc.split("\n")
+                        for dl in desc_lines:
+                            lines.append(f"    {dl}")
             
             draw_text_wrapped(screen, self.font, "\n".join(lines), content_x, content_y, cw)
         

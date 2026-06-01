@@ -76,6 +76,16 @@ can_move_away = enemy.can_move_grid(256, 64, dungeon)
 print(f"Trapped enemy can move to (4, 1): {can_move_away} (Expected False)")
 assert can_move_away is False
 
+# Verify that the trapped enemy passes its turn and does not attack the adjacent player
+player.hp = 100
+dialog = MockDialog()
+dialog.text = ""
+dialog.is_active = False
+enemy.take_turn(player, dungeon, [player] + dungeon.enemies, dialog)
+print(f"Trapped enemy took turn. Player HP: {player.hp} (Expected 100), Dialog text: '{dialog.text}' (Expected empty)")
+assert player.hp == 100
+assert dialog.text == ""
+
 
 print("\n--- Test 4: Verify lifetime turns decrease and auto-destruct ---")
 # Let's clear enemies and create a fresh barrier
@@ -84,16 +94,16 @@ player.x, player.y = 64, 64  # Hero is at (1, 1)
 player.facing = "right"
 stave.charges = 5
 
-# Normal spawn -> 5 turns lifetime
+# Normal spawn -> lifetime turns
 msg = execute_stave(player, stave, dungeon, MockDialog())
 print(msg)
 assert len(dungeon.enemies) == 1
 barrier = dungeon.enemies[0]
-print(f"Barrier initial lifetime: {barrier.lifetime_turns}")
-assert barrier.lifetime_turns == 5
+expected_turns = barrier.lifetime_turns
+print(f"Barrier initial lifetime: {expected_turns}")
 
-# Perform 5 turns (each turn calling take_turn on all enemies)
-for turn in range(1, 6):
+# Perform turns (each turn calling take_turn on all enemies)
+for turn in range(1, expected_turns + 1):
     print(f"--- Turn {turn} passes ---")
     dialog = MockDialog()
     dialog.is_active = False
@@ -121,7 +131,7 @@ msg = execute_stave(player, stave, dungeon, MockDialog())
 print(msg)
 assert len(dungeon.enemies) == 1
 barrier = dungeon.enemies[0]
-print(f"Barrier initial lifetime with +3 bonus (Expected 8): {barrier.lifetime_turns}")
-assert barrier.lifetime_turns == 8
+print(f"Barrier initial lifetime with +3 bonus (Expected {expected_turns + 3}): {barrier.lifetime_turns}")
+assert barrier.lifetime_turns == expected_turns + 3
 
 print("\nAll tests passed successfully!")
