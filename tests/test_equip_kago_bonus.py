@@ -144,24 +144,66 @@ class TestEquipKagoBonus(unittest.TestCase):
     ]
 
     def setUp(self):
-        # テスト用装備がデータに存在することを確認
-        self.assertIn(
-            self.TEST_WEAPON_KEY, WEAPON_DATA,
-            f"テスト装備 '{self.TEST_WEAPON_KEY}' が weapons.yml に存在しません"
-        )
-        self.assertIn(
-            self.TEST_ARMOR_KEY, ARMOR_DATA,
-            f"テスト装備 '{self.TEST_ARMOR_KEY}' が armors.yml に存在しません"
-        )
-        self.assertIn(
-            self.TEST_SHIELD_KEY, SHIELD_DATA,
-            f"テスト装備 '{self.TEST_SHIELD_KEY}' が shields.yml に存在しません"
-        )
+        # YAMLでのコメントアウトに対応するため、動的に辞書へテストデータを注入する
+        WEAPON_DATA[self.TEST_WEAPON_KEY] = {
+            "name": "[TEST]全加護の剣",
+            "category": "onehanded_sword",
+            "min_rank": "F",
+            "rarity": 1,
+            "price": 1,
+            "image_path": "components/pictures/weapon/iron_sword.png",
+            "sound": "components/sounds/sfx/sword_swing.wav",
+            "image_scale": 1.2,
+            "shop_buyable": False,
+            "floor_spawnable": False,
+            "describe": "テスト用。全ボーナスが乗っている装備。",
+            "growth": {"bonus_limit": 2, "times_limit": 50, "over_limit_growth_rate": 0.003},
+            "type": "onehanded_sword",
+            **self.WEAPON_EXPECTED
+        }
+        ARMOR_DATA[self.TEST_ARMOR_KEY] = {
+            "name": "[TEST]全加護の鎧",
+            "category": "heavy_armor",
+            "min_rank": "F",
+            "rarity": 1,
+            "price": 1,
+            "image_path": "components/pictures/armor/iron_armor.png",
+            "sound": "components/sounds/sfx/equip.wav",
+            "image_scale": 1.2,
+            "shop_buyable": False,
+            "floor_spawnable": False,
+            "describe": "テスト用。全ボーナスが乗っている装備。",
+            "growth": {"bonus_limit": 2, "times_limit": 50, "over_limit_growth_rate": 0.003},
+            "type": "heavy_armor",
+            **self.ARMOR_EXPECTED
+        }
+        SHIELD_DATA[self.TEST_SHIELD_KEY] = {
+            "name": "[TEST]全加護の盾",
+            "category": "large_shield",
+            "min_rank": "F",
+            "rarity": 1,
+            "price": 1,
+            "image_path": "components/pictures/shield/iron_shield.png",
+            "sound": "components/sounds/sfx/equip.wav",
+            "image_scale": 1.2,
+            "shop_buyable": False,
+            "floor_spawnable": False,
+            "describe": "テスト用。全ボーナスが乗っている装備。",
+            "growth": {"bonus_limit": 2, "times_limit": 50, "over_limit_growth_rate": 0.003},
+            "type": "large_shield",
+            **self.SHIELD_EXPECTED
+        }
 
         self.weapon_inst = EquipInstance("weapon", self.TEST_WEAPON_KEY)
         self.armor_inst  = EquipInstance("armor",  self.TEST_ARMOR_KEY)
         self.shield_inst = EquipInstance("shield", self.TEST_SHIELD_KEY)
         self.equips = [self.weapon_inst, self.armor_inst, self.shield_inst]
+
+    def tearDown(self):
+        # テスト終了後に注入したデータを削除してクリーンにする
+        WEAPON_DATA.pop(self.TEST_WEAPON_KEY, None)
+        ARMOR_DATA.pop(self.TEST_ARMOR_KEY, None)
+        SHIELD_DATA.pop(self.TEST_SHIELD_KEY, None)
 
     # -------------------------------------------------------------------
     # 1. 各装備単体でのフラット化確認

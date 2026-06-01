@@ -493,3 +493,35 @@ ENEMY_DATA:
     ranged_attack_effect: dark_bolt
     attack_priority: close
     damaged_detect_range: 100
+  deka_komori:
+    name: デカコウモリ
+    min_rank: C
+    min_floor: 35
+    max_floor: 35
+    max_concurrent: 1
+    is_boss: true
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/deka_komori
+    detect_range: 15
+    status: poison
+    status_chance: 50
+    drops:
+      normal: [hp_potion]
+      rare: [fullmetal_sword, fullmetal_round_shield, fullmetal_breastplate]
+    normal_drop_rate: 0.25
+    rare_drop_rate: 0.20
+    hp: 120
+    attack: 26
+    defense: 60
+    evasion: 25
+    exp: 80
+    reward_gold: 1500
+    accuracy_close: 95
+    accuracy_ranged: 95
+    attack_range: 4
+    stupidity: 0
+    image_scale: 2.0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: sonic_wave
+    attack_priority: close
+    damaged_detect_range: 100
