@@ -575,40 +575,40 @@ WEAPON_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
-  test_all_bonus_weapon:
-    name: "[TEST]全加護の剣"
-    category: onehanded_sword
-    min_rank: F
-    rarity: 1
-    price: 1
-    image_path: components/pictures/weapon/iron_sword.png
-    sound: components/sounds/sfx/sword_swing.wav
-    image_scale: 1.2
-    shop_buyable: false
-    floor_spawnable: false
-    describe: テスト用。全ボーナスが乗っている装備。
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    type: onehanded_sword
-    bonus:
-      common:
-        attack: 15
-        accuracy_close: 20
-        accuracy_range: 10
-        crit_rate: 0.15
-        hp: 25
-        defense: 5
-        block_chance_close: 0.08
-        block_chance_ranged: 0.08
-        lantern_bonus: 0
-        regen: 1
-        aggro_mod: -2
-        stupidity: 1.5
-        armor_penetration: 0.2
-      magic:
-        fire_damage: 0.20
-        fire_range: 1
-        heal_ratio: 0.10
-        knockback_damage: 0.15
-        invincible_turns: 1
-        stave_bonus: 10
-        light_stave_bonus: 0
+  # test_all_bonus_weapon:
+  #   name: "[TEST]全加護の剣"
+  #   category: onehanded_sword
+  #   min_rank: F
+  #   rarity: 1
+  #   price: 1
+  #   image_path: components/pictures/weapon/iron_sword.png
+  #   sound: components/sounds/sfx/sword_swing.wav
+  #   image_scale: 1.2
+  #   shop_buyable: false
+  #   floor_spawnable: false
+  #   describe: テスト用。全ボーナスが乗っている装備。
+  #   growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+  #   type: onehanded_sword
+  #   bonus:
+  #     common:
+  #       attack: 15
+  #       accuracy_close: 20
+  #       accuracy_range: 10
+  #       crit_rate: 0.15
+  #       hp: 25
+  #       defense: 5
+  #       block_chance_close: 0.08
+  #       block_chance_ranged: 0.08
+  #       lantern_bonus: 0
+  #       regen: 1
+  #       aggro_mod: -2
+  #       stupidity: 1.5
+  #       armor_penetration: 0.2
+  #     magic:
+  #       fire_damage: 0.20
+  #       fire_range: 1
+  #       heal_ratio: 0.10
+  #       knockback_damage: 0.15
+  #       invincible_turns: 1
+  #       stave_bonus: 10
+  #       light_stave_bonus: 0

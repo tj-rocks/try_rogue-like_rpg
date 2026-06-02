@@ -231,11 +231,6 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
             else:
                 # 帰還の道標（warp_home）の特殊処理
                 if item_data.get("effect") == "warp_home":
-                    if player.is_any_quest_ready():
-                        dialog.text = Text.Items.WARP_HOME_QUEST_READY
-                        dialog.is_active = True
-                        return
-                    
                     # ワープ実行
                     from systems.dungeon import warp_to_floor
                     dialog.text = use_consumable(item_key_or_iid, player, current_dungeon)

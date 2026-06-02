@@ -101,13 +101,14 @@ TILE_MAPPINGS:
     fg_color: '#333'}
   wall_none_3: {char: w, category: wall_none, tile_id: 3, desc: 背景虚無3, bg_color: '#08080c',
     fg_color: '#333'}
-  wood_barrel: {category: obstacle, id: wood_barrel, positions: []}
-  crate: {category: obstacle, id: crate, positions: []}
+  wood_barrel: {category: obstacle, id: wood_barrel, positions: [{x: 8, y: 5, 
+            flip: false}]}
+  crate: {category: obstacle, id: crate}
   pot: {category: obstacle, id: pot}
   rubble: {category: obstacle, id: rubble}
   statue: {category: obstacle, id: statue}
   broken_pillar: {category: obstacle, id: broken_pillar}
-  anvil: {category: obstacle, id: anvil, positions: []}
+  anvil: {category: obstacle, id: anvil, positions: [{x: 11, y: 13, flip: false}]}
   well: {category: obstacle, id: well}
   skeleton: {category: obstacle, id: skeleton}
   crystal: {category: obstacle, id: crystal, positions: [{x: 28, y: 12, flip: 
@@ -133,15 +134,20 @@ TILE_MAPPINGS:
   guide_doctor: {category: npc, id: guide_doctor}
   guild_guide: {category: npc, id: guild_guide}
   wizard: {category: npc, id: wizard, positions: [{x: 28, y: 13, flip: true}]}
-  teleport_wizard: {category: npc, id: teleport_wizard}
-  guild_staff: {category: npc, id: guild_staff, positions: []}
-  crank_adventurer: {category: npc, id: crank_adventurer, positions: []}
-  crank_adventurer2: {category: npc, id: crank_adventurer2, positions: []}
-  crank_adventurer3: {category: npc, id: crank_adventurer3}
-  apprentice: {category: npc, id: apprentice, positions: []}
-  pub_master: {category: npc, id: pub_master, positions: []}
-  guide_bank: {category: npc, id: guide_bank}
-  villager: {category: npc, id: villager}
+  teleport_wizard: {category: npc, id: teleport_wizard, positions: [{x: 1, y: 12,
+          flip: true}]}
+  guild_staff: {category: npc, id: guild_staff}
+  crank_adventurer: {category: npc, id: crank_adventurer}
+  crank_adventurer2: {category: npc, id: crank_adventurer2, positions: [{x: 20, 
+            y: 6, flip: false}]}
+  crank_adventurer3: {category: npc, id: crank_adventurer3, positions: [{x: 16, 
+            y: 6, flip: false}]}
+  apprentice: {category: npc, id: apprentice}
+  pub_master: {category: npc, id: pub_master, positions: [{x: 8, y: 4, flip: 
+            true}]}
+  guide_bank: {category: npc, id: guide_bank, positions: [{x: 12, y: 6, flip: 
+            false}]}
+  villager: {category: npc, id: villager, positions: [{x: 15, y: 5, flip: false}]}
   wall_deco_ivy: {category: wall_decoration, desc: 壁のツタ, id: wall_decoration_0, 
       image_path: components/pictures/dungeon/shallow/wall_decoration_0.png, 
       positions: [{x: 9, y: 1, flip: false}, {x: 17, y: 1, flip: false}, {x: 20, 
@@ -161,8 +167,8 @@ TILE_MAPPINGS:
       components/pictures/dungeon/home/wall_decoration_tapestry.png, positions: [
        {x: 9, y: 4, flip: false}, {x: 9, y: 5, flip: false}, {x: 2, y: 7, flip: 
             false}, {x: 2, y: 8, flip: false}, {x: 2, y: 9, flip: false}, {x: 27,
-          y: 10, flip: true}, {x: 27, y: 11, flip: true}, {x: 27, y: 12, flip: 
-            true}, {x: 27, y: 13, flip: true}]}
+          y: 10, flip: true}, {x: 27, y: 11, flip: true}, {x: 2, y: 12, flip: 
+            false}, {x: 27, y: 12, flip: true}, {x: 27, y: 13, flip: true}]}
   wall_deco_window: {category: wall_decoration, desc: 窓, id: 
       wall_decoration_window, image_path: 
       components/pictures/dungeon/home/wall_decoration_window.png}
@@ -186,7 +192,8 @@ TILE_MAPPINGS:
       components/pictures/dungeon/home/wall_decoration_wooden_roof.png, 
       positions: [{x: 11, y: 3, flip: false}, {x: 12, y: 3, flip: false}, {x: 13,
           y: 3, flip: false}, {x: 14, y: 3, flip: false}]}
-  table: {category: obstacle, id: table, positions: []}
+  table: {category: obstacle, id: table, positions: [{x: 11, y: 6, flip: false}, {
+          x: 15, y: 6, flip: false}, {x: 19, y: 6, flip: false}]}
   special_P: {char: P, category: special, desc: プレイヤー開始地点, image_path: 
       components/pictures/player/walk/down_idel.png, bg_image_path: 
       components/pictures/dungeon/home/floor_lawn.png, bg_color: '#2244cc', 
