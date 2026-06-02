@@ -44,7 +44,7 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
         from systems.ui import show_loading_screen
         show_loading_screen(screen)
             
-    player.current_floor = floor_level
+    player.set_current_floor(floor_level)
     new_dungeon = Dungeon(level=floor_level, player=player, debug_overflow=debug_overflow)
     
     # 専用メソッドでスポーン位置を決定
