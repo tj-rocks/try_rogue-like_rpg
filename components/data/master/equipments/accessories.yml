@@ -53,7 +53,7 @@ ACCESSORY_DATA:
     min_rank: F
     rarity: 2
     price: 80
-    # image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/item.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
     shop_buyable: true
@@ -91,7 +91,7 @@ ACCESSORY_DATA:
     min_rank: D
     rarity: 4
     price: 600
-    # image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/item.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
     shop_buyable: true
@@ -129,7 +129,7 @@ ACCESSORY_DATA:
     min_rank: E
     rarity: 3
     price: 400
-    # image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/item.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
     shop_buyable: true
