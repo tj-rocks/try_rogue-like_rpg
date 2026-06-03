@@ -147,7 +147,7 @@ ENEMY_DATA:
     accuracy_close: 80
     accuracy_ranged: 100
     attack_range: 3
-    stupidity: 5
+    stupidity: 2
     image_scale: 1.0
     close_attack_effect: explosion
     ranged_attack_effect: explosion
