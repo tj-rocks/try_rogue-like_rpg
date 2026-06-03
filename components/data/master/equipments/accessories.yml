@@ -63,9 +63,27 @@ ACCESSORY_DATA:
     type: accessory
     bonus:
       common:
-        lantern_bonus: 1
-        defense: 1
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 5
+        defense: 1
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 1
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
 
   luminous_ring:
     name: "大輝光の指輪"
@@ -83,8 +101,27 @@ ACCESSORY_DATA:
     type: accessory
     bonus:
       common:
-        lantern_bonus: 3
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
         hp: 15
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
 
   ring_of_protection:
     name: "守護の指輪"
@@ -102,5 +139,24 @@ ACCESSORY_DATA:
     type: accessory
     bonus:
       common:
-        lantern_bonus: 1
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
         defense: 4
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 1
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
