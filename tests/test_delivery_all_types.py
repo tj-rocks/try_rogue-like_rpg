@@ -25,7 +25,7 @@ class TestDeliveryAllTypes(unittest.TestCase):
         self.player.weapon_inventory = []
         self.player.armor_inventory = []
         self.player.shield_inventory = []
-        self.player.lantern_inventory = []
+        self.player.accessory_inventory = []
 
     def test_delivery_consumable(self):
         """消耗品での納品達成・削除テスト"""
@@ -87,17 +87,17 @@ class TestDeliveryAllTypes(unittest.TestCase):
         self.assertTrue(self.player.remove_item_by_key(target_key, 1))
         self.assertEqual(len(self.player.shield_inventory), 0)
 
-    def test_delivery_lantern(self):
-        """カンテラでの納品達成・削除テスト"""
-        target_key = "old_lantern"
-        self.player.active_quests = [{"type": "delivery", "target_key": target_key, "amount": 1, "title": "カンテラ納品"}]
-        self.player.lantern_inventory.append(EquipInstance("lantern", target_key))
+    def test_delivery_accessory(self):
+        """アクセサリでの納品達成・削除テスト"""
+        target_key = "glowing_ring"
+        self.player.active_quests = [{"type": "delivery", "target_key": target_key, "amount": 1, "title": "アクセサリ納品"}]
+        self.player.accessory_inventory.append(EquipInstance("accessory", target_key))
         
         # 判定チェック
         self.assertTrue(self.player.is_quest_reportable(self.player.active_quests[0]))
         # 削除チェック
         self.assertTrue(self.player.remove_item_by_key(target_key, 1))
-        self.assertEqual(len(self.player.lantern_inventory), 0)
+        self.assertEqual(len(self.player.accessory_inventory), 0)
 
     def test_delivery_equipped_removal(self):
         """装備中のアイテムを削除した際に装備が解除されるかのテスト"""

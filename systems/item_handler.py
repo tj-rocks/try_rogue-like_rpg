@@ -33,14 +33,7 @@ def use_consumable(item_key, player, dungeon=None):
     elif effect == "material":
         msg = Text.Items.MATERIAL_DESC
         return msg
-    elif effect == "lantern":
-        # カンテラをインベントリに加えるだけにする（自動装備を廃止）
-        lantern_key = data.get("lantern_key", "basic")
-        inst = player.equip_lantern_by_key(lantern_key)
-        if inst:
-            msg = Text.Items.GET.format(name=inst.get_name())
-        else:
-            msg = Text.Items.USE_NOTHING.format(item=data['name'])
+    # effect == "lantern" was deprecated
     elif effect == "warp_home":
         msg = f"{data['name']}を使用した 身体が光に包まれる..."
     elif effect == "remove_trap":
@@ -99,7 +92,7 @@ def discard_item(player, item_type, iid_or_key):
     if item_type == "weapon" and player.equipped_weapon == iid_or_key: is_equipped = True
     if item_type == "armor" and player.equipped_armor == iid_or_key: is_equipped = True
     if item_type == "shield" and player.equipped_shield == iid_or_key: is_equipped = True
-    if item_type == "lantern" and getattr(player, "equipped_lantern", None) == iid_or_key: is_equipped = True
+    if item_type == "accessory" and getattr(player, "equipped_accessory", None) == iid_or_key: is_equipped = True
     
     if is_equipped:
         return Text.Items.EQUIPPED_CANT_DISCARD, False
@@ -121,11 +114,11 @@ def discard_item(player, item_type, iid_or_key):
         if inst:
             name = inst.get_name()
             player.shield_inventory.remove(inst)
-    elif item_type == "lantern":
-        inst = player._find_equip_inst(player.lantern_inventory, iid_or_key)
+    elif item_type == "accessory":
+        inst = player._find_equip_inst(player.accessory_inventory, iid_or_key)
         if inst:
             name = inst.get_name()
-            player.lantern_inventory.remove(inst)
+            player.accessory_inventory.remove(inst)
     elif item_type == "stave":
         inst = player._find_stave_inst(iid_or_key)
         if inst:
@@ -148,7 +141,7 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
         if item_type == "weapon" and player.equipped_weapon == item_key_or_iid: return
         if item_type == "armor" and player.equipped_armor == item_key_or_iid: return
         if item_type == "shield" and player.equipped_shield == item_key_or_iid: return
-        if item_type == "lantern" and getattr(player, "equipped_lantern", None) == item_key_or_iid: return
+        if item_type == "accessory" and getattr(player, "equipped_accessory", None) == item_key_or_iid: return
 
         inventory_dialog.is_active = False
         # 「使う・捨てる」の選択ダイアログも閉じる
@@ -165,13 +158,13 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
         current_dungeon = getattr(inventory_dialog, "dungeon", dungeon)
 
         # ---- ランクチェック ----
-        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, LANTERN_DATA
-        catalog = {"weapon": WEAPON_DATA, "armor": ARMOR_DATA, "shield": SHIELD_DATA, "stave": STAVE_DATA, "consumable": CONSUMABLE_DATA}
+        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, ACCESSORY_DATA
+        catalog = {"weapon": WEAPON_DATA, "armor": ARMOR_DATA, "shield": SHIELD_DATA, "stave": STAVE_DATA, "consumable": CONSUMABLE_DATA, "accessory": ACCESSORY_DATA}
         
         # 装備品の場合は iid からキーを取得してマスタデータを参照
         item_key = None
-        if item_type in ["weapon", "armor", "shield"]:
-            inv_map = {"weapon": player.weapon_inventory, "armor": player.armor_inventory, "shield": player.shield_inventory}
+        if item_type in ["weapon", "armor", "shield", "accessory"]:
+            inv_map = {"weapon": player.weapon_inventory, "armor": player.armor_inventory, "shield": player.shield_inventory, "accessory": player.accessory_inventory}
             inst = player._find_equip_inst(inv_map[item_type], item_key_or_iid)
             if inst: item_key = inst.key
         else:
@@ -197,10 +190,10 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
             player.change_shield(item_key_or_iid)
             inst = player._find_equip_inst(player.shield_inventory, item_key_or_iid)
             dialog.text = Text.Items.EQUIPPED.format(name=inst.get_name() if inst else "盾")
-        elif item_type == "lantern":
-            player.change_lantern(item_key_or_iid)
-            inst = player._find_equip_inst(player.lantern_inventory, item_key_or_iid)
-            dialog.text = Text.Items.HELD.format(name=inst.get_name() if inst else "カンテラ")
+        elif item_type == "accessory":
+            player.change_accessory(item_key_or_iid)
+            inst = player._find_equip_inst(player.accessory_inventory, item_key_or_iid)
+            dialog.text = Text.Items.EQUIPPED.format(name=inst.get_name() if inst else "アクセサリ")
         elif item_type == "stave":
             inst = player._find_stave_inst(item_key_or_iid)
             if inst:
@@ -288,7 +281,8 @@ def make_enhance_callback(player, dialog, enhance_dialog):
             
         if item_type == "weapon": inventory = player.weapon_inventory
         elif item_type == "armor": inventory = player.armor_inventory
-        else: inventory = getattr(player, "shield_inventory", [])
+        elif item_type == "shield": inventory = player.shield_inventory
+        else: inventory = getattr(player, "accessory_inventory", [])
         inst = player._find_equip_inst(inventory, iid)
         
         if inst:
@@ -341,11 +335,11 @@ def unequip_item(player, item_type, iid):
         if inst:
             name = inst.get_name()
             player.unequip_shield()
-    elif item_type == "lantern":
-        inst = player._find_equip_inst(player.lantern_inventory, iid)
+    elif item_type == "accessory":
+        inst = player._find_equip_inst(player.accessory_inventory, iid)
         if inst:
             name = inst.get_name()
-            player.unequip_lantern()
+            player.unequip_accessory()
             
     return Text.Items.UNEQUIPPED.format(name=name)
 

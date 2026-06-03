@@ -229,28 +229,7 @@ CONSUMABLE_DATA:
     shop_buyable: false
     describe: "加護が宿る石。鍛冶屋で杖関連のパラメータを1つ選択して強化できる。"
     floor_spawnable: true
-  basic_lantern:
-    name: カンテラ
-    effect: lantern
-    lantern_key: basic
-    price: 300
-    min_rank: F
-    rarity: 3
-    image_path: components/pictures/icon/basic_lantern.png
-    shop_buyable: false
-    describe: 周囲の闇を照らし出し、視界を確保する。
-    floor_spawnable: true
-  luxury_lantern:
-    name: 上等なカンテラ
-    effect: lantern
-    lantern_key: luxury
-    price: 2000
-    min_rank: B
-    rarity: 4
-    image_path: components/pictures/icon/luxury_lantern.png
-    shop_buyable: false
-    describe: 精巧な細工が施された高級なカンテラ。広範囲を明るく照らし続けることができる。
-    floor_spawnable: true
+
   guild_cert_e:
     name: E級ギルド証
     effect: none
@@ -512,17 +491,3 @@ STAVE_DATA:
     shop_buyable: true
     describe: 魔力で武器を強化する付与の杖。10ターンの間、プレイヤーの攻撃力が5上昇する。
     floor_spawnable: true
-#以下は弄らない
-LANTERN_DATA:
-  none:
-    name: なし
-    radius: 1
-    fade_radius: 2
-  basic:
-    name: カンテラ
-    radius: 2
-    fade_radius: 5
-  luxury:
-    name: 上等なカンテラ
-    radius: 5
-    fade_radius: 8

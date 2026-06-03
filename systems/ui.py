@@ -616,7 +616,7 @@ class ItemActionDialog:
                     if itype == "weapon" and self.player.equipped_weapon == iid_or_key: is_equipped = True
                     elif itype == "armor" and self.player.equipped_armor == iid_or_key: is_equipped = True
                     elif itype == "shield" and getattr(self.player, "equipped_shield", None) == iid_or_key: is_equipped = True
-                    elif itype == "lantern" and getattr(self.player, "equipped_lantern", None) == iid_or_key: is_equipped = True
+                    elif itype == "accessory" and getattr(self.player, "equipped_accessory", None) == iid_or_key: is_equipped = True
 
                     if self.cursor_idx == 0:
                         if itype == "consumable":
@@ -649,7 +649,7 @@ class ItemActionDialog:
         if itype == "weapon" and self.player.equipped_weapon == iid_or_key: is_equipped = True
         elif itype == "armor" and self.player.equipped_armor == iid_or_key: is_equipped = True
         elif itype == "shield" and getattr(self.player, "equipped_shield", None) == iid_or_key: is_equipped = True
-        elif itype == "lantern" and getattr(self.player, "equipped_lantern", None) == iid_or_key: is_equipped = True
+        elif itype == "accessory" and getattr(self.player, "equipped_accessory", None) == iid_or_key: is_equipped = True
 
         # 選択肢を中央に配置
         is_unusable = False
@@ -1269,7 +1269,7 @@ class InventoryDialog(BaseListDialog):
         if not data or data[0] == "cancel": return
         
         itype, key = data
-        if itype not in ("weapon", "armor", "shield", "lantern", "stave"):
+        if itype not in ("weapon", "armor", "shield", "accessory", "stave"):
             # 消耗品は従来通り1列で描画
             lines = self.get_detail_lines(player)
             if lines:
@@ -1377,10 +1377,10 @@ class InventoryDialog(BaseListDialog):
         itype, key_or_iid = self.item_data[idx]
         if itype == "cancel": return None
         
-        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, LANTERN_DATA, STAVE_DATA, CONSUMABLE_DATA
-        catalog = {"weapon": WEAPON_DATA, "armor": ARMOR_DATA, "shield": SHIELD_DATA, "lantern": LANTERN_DATA, "stave": STAVE_DATA}
+        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, ACCESSORY_DATA, STAVE_DATA, CONSUMABLE_DATA
+        catalog = {"weapon": WEAPON_DATA, "armor": ARMOR_DATA, "shield": SHIELD_DATA, "accessory": ACCESSORY_DATA, "stave": STAVE_DATA}
         
-        if itype in ("weapon", "armor", "shield", "lantern", "stave"):
+        if itype in ("weapon", "armor", "shield", "accessory", "stave"):
             inv = getattr(player, itype + "_inventory", [])
             inst = player._find_equip_inst(inv, key_or_iid)
             if not inst: return None
@@ -1454,7 +1454,7 @@ class InventoryDialog(BaseListDialog):
                 val_str = str(round(val, 2))
             return f"+{val_str}" if val > 0 else val_str
 
-        if itype in ("weapon", "armor", "shield", "lantern", "stave"):
+        if itype in ("weapon", "armor", "shield", "accessory", "stave"):
             inv = getattr(player, itype + "_inventory", [])
             inst = player._find_equip_inst(inv, key)
             if not inst: return []
@@ -1530,9 +1530,9 @@ class EquipDialog(InventoryDialog):
         for inst in getattr(player, "shield_inventory", []):
             prefix = "E:" if inst.iid == player.equipped_shield else ""
             labels.append(prefix + inst.get_name()); data.append(("shield", inst.iid))
-        for inst in getattr(player, "lantern_inventory", []):
-            prefix = "E:" if inst.iid == player.equipped_lantern else ""
-            labels.append(prefix + inst.get_name()); data.append(("lantern", inst.iid))
+        for inst in getattr(player, "accessory_inventory", []):
+            prefix = "E:" if inst.iid == player.equipped_accessory else ""
+            labels.append(prefix + inst.get_name()); data.append(("accessory", inst.iid))
         labels.append(Text.UI.QUIT); data.append(("cancel", None))
         self.items, self.item_data = labels, data
 
@@ -1833,22 +1833,11 @@ def draw_vision_overlay(screen, player, dungeon):
     if getattr(dungeon, "is_lighted", False):
         return
 
-    from constants import LANTERN_DATA
     import pygame
 
-    # 1. 装備中のカンテラから半径を取得
-    lantern_key = "none" 
-    if getattr(player, "equipped_lantern", None):
-        inst = player._find_equip_inst(player.lantern_inventory, player.equipped_lantern)
-        if inst:
-            lantern_key = inst.key
-    
-    l_data = LANTERN_DATA.get(lantern_key, LANTERN_DATA["basic"])
-    r_tiles = l_data["radius"]
-    # [NEW] 装備ボーナスを加算
-    r_tiles += getattr(player, "lantern_bonus", 0)
-    
-    f_tiles = l_data["fade_radius"]
+    # 1. 視界半径の計算（ベース視界：半径1、フェード2 ＋ 装備品の合計 lantern_bonus）
+    r_tiles = 1 + getattr(player, "lantern_bonus", 0)
+    f_tiles = 2
     
     # 2. ピクセル単位に変換
     tile_size = getattr(dungeon, "tile_size", 32)
@@ -3306,13 +3295,10 @@ class ShopDialog(BaseListDialog):
         for st in player.stave_inventory:
             data = STAVE_DATA.get(st.key, {})
             self.items.append((st.iid, "stave_inst", st.get_name_with_charges(), get_sell_price(data), 1, st.key))
-        for eq in getattr(player, "lantern_inventory", []):
-            sell_data = {}
-            for k, v in CONSUMABLE_DATA.items():
-                if v.get("effect") == "lantern" and v.get("lantern_key", "basic") == eq.key:
-                    sell_data = v
-                    break
-            self.items.append((eq.iid, "lantern_inst", eq.get_name(), get_sell_price(sell_data), 1, eq.key))
+        from constants import ACCESSORY_DATA
+        for eq in getattr(player, "accessory_inventory", []):
+            data = ACCESSORY_DATA.get(eq.key, {})
+            self.items.append((eq.iid, "accessory_inst", eq.get_name(), get_sell_price(data), 1, eq.key))
         self.items.append(("cancel", "cancel", Text.UI.SHOP_CANCEL, 0, 1))
 
 
@@ -3371,6 +3357,7 @@ class ShopDialog(BaseListDialog):
                     if itype == "weapon": player.equip_weapon_by_key(key_or_iid)
                     elif itype == "armor": player.equip_armor_by_key(key_or_iid)
                     elif itype == "shield": player.equip_shield_by_key(key_or_iid)
+                    elif itype == "accessory": player.equip_accessory_by_key(key_or_iid)
                     elif itype == "stave": from components.sprites.player import StaveInstance; player.stave_inventory.append(StaveInstance(key_or_iid))
                     elif itype == "consumable": player.add_item_to_inventory(key_or_iid)
                     self.stock_ref[self.cursor_idx]["count"] -= 1
@@ -3378,7 +3365,7 @@ class ShopDialog(BaseListDialog):
                     play_sfx(SOUND_PURCHASE); self.refresh_items_from_stock(); self.cursor_idx = min(self.cursor_idx, len(self.items)-1); dialog.text = Text.Items.BOUGHT.format(name=name); dialog.is_active = True
                 confirm_dialog.on_yes = do_buy; confirm_dialog.is_active = True
         else: # SELL
-            if (itype == "weapon_inst" and key_or_iid == player.equipped_weapon) or (itype == "armor_inst" and key_or_iid == player.equipped_armor) or (itype == "shield_inst" and key_or_iid == player.equipped_shield) or (itype == "lantern_inst" and key_or_iid == getattr(player, "equipped_lantern", None)):
+            if (itype == "weapon_inst" and key_or_iid == player.equipped_weapon) or (itype == "armor_inst" and key_or_iid == player.equipped_armor) or (itype == "shield_inst" and key_or_iid == player.equipped_shield) or (itype == "accessory_inst" and key_or_iid == getattr(player, "equipped_accessory", None)):
                 dialog.text = Text.Items.CANT_SELL_EQUIPPED; dialog.is_active = True; return
             if confirm_dialog:
                 confirm_dialog.text = Text.UI.SHOP_SELL_CONFIRM.format(name=name, price=price)
@@ -3389,7 +3376,7 @@ class ShopDialog(BaseListDialog):
                     elif itype == "shield_inst": player.remove_shield_by_iid(key_or_iid); ok = True
                     elif itype == "consumable": player.remove_item_by_key(key_or_iid); ok = True
                     elif itype == "stave_inst": player.remove_stave_by_iid(key_or_iid); ok = True
-                    elif itype == "lantern_inst": player.remove_lantern_by_iid(key_or_iid); ok = True
+                    elif itype == "accessory_inst": player.remove_accessory_by_iid(key_or_iid); ok = True
                     if ok: player.coin += price; play_sfx(SOUND_PURCHASE); dialog.text = Text.Items.SOLD.format(name=name, price=price); dialog.auto_close_timer = 60
                     self.setup_sell_mode(player); self.cursor_idx = min(self.cursor_idx, len(self.items)-1); dialog.is_active = True
                 confirm_dialog.on_yes = do_sell; confirm_dialog.is_active = True
@@ -3414,7 +3401,7 @@ class ShopDialog(BaseListDialog):
                 if itype == "weapon_inst" and player.equipped_weapon == iid: is_eq = True
                 elif itype == "armor_inst" and player.equipped_armor == iid: is_eq = True
                 elif itype == "shield_inst" and player.equipped_shield == iid: is_eq = True
-                elif itype == "lantern_inst" and player.equipped_lantern == iid: is_eq = True
+                elif itype == "accessory_inst" and player.equipped_accessory == iid: is_eq = True
                 
                 if is_eq: color = (150, 150, 150)
                 
@@ -3503,9 +3490,9 @@ class WarehouseDialog(BaseListDialog):
             self.items.append((eq.iid, "shield_inst", eq.get_name(), eq, is_eq))
         for st in player.stave_inventory:
             self.items.append((st.iid, "stave_inst", st.get_name_with_charges(), st, False))
-        for eq in player.lantern_inventory:
-            is_eq = (eq.iid == player.equipped_lantern)
-            self.items.append((eq.iid, "lantern_inst", eq.get_name(), eq, is_eq))
+        for eq in player.accessory_inventory:
+            is_eq = (eq.iid == player.equipped_accessory)
+            self.items.append((eq.iid, "accessory_inst", eq.get_name(), eq, is_eq))
         
         self.items.append((-1, "back", Text.UI.QUIT, None, False))
 
@@ -3584,7 +3571,7 @@ class WarehouseDialog(BaseListDialog):
                     elif itype == "armor_inst": player.remove_armor_by_iid(_id)
                     elif itype == "shield_inst": player.remove_shield_by_iid(_id)
                     elif itype == "stave_inst": player.remove_stave_by_iid(_id)
-                    elif itype == "lantern_inst": player.remove_lantern_by_iid(_id)
+                    elif itype == "accessory_inst": player.remove_accessory_by_iid(_id)
                 self.setup_deposit_mode(player)
             confirm_dialog.on_yes = do_dep; confirm_dialog.is_active = True
 
@@ -3597,7 +3584,7 @@ class WarehouseDialog(BaseListDialog):
             
         from constants import MAX_ITEM_SLOTS, MAX_EQUIP_SLOTS, MAX_STAVE_SLOTS
         bag_full = False
-        if itype in ("weapon_inst", "armor_inst", "shield_inst", "lantern_inst"):
+        if itype in ("weapon_inst", "armor_inst", "shield_inst", "accessory_inst"):
             if player.get_equipment_count() >= MAX_EQUIP_SLOTS: bag_full = True
         elif itype == "stave_inst":
             if player.get_stave_count() >= MAX_STAVE_SLOTS: bag_full = True
@@ -3622,7 +3609,7 @@ class WarehouseDialog(BaseListDialog):
                     if itype == "weapon_inst": player.weapon_inventory.append(inst)
                     elif itype == "armor_inst": player.armor_inventory.append(inst)
                     elif itype == "shield_inst": player.shield_inventory.append(inst)
-                    elif itype == "lantern_inst": player.lantern_inventory.append(inst)
+                    elif itype == "accessory_inst": player.accessory_inventory.append(inst)
                     elif itype == "stave_inst": player.stave_inventory.append(inst)
                 self.setup_withdraw_mode(player)
             confirm_dialog.on_yes = do_with; confirm_dialog.is_active = True
