@@ -5,7 +5,7 @@ import math
 from constants import *
 from components.sprites.npc import NPC
 from components.sprites.enemy import Enemy
-from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave
+from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave, DroppedAccessory
 from systems.ui import Dialog, ConfirmDialog, InventoryDialog, StatusBar, StatusDialog, EnhanceDialog, ItemActionDialog, OreSelectionDialog, ShopDialog, StaveSelectionDialog, GuildDialog, WarehouseDialog
 from systems.guild import GuildSystem
 # from systems.dungeon_settings import dungeon_settings
@@ -1024,9 +1024,9 @@ class Dungeon:
                 play_bgm(bgm_folder + "/" + sound_file)
 
     def spawn_floor_items(self, player):
-        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, ITEM_DROP_RATES
+        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, ACCESSORY_DATA, ITEM_DROP_RATES
         from constants import FLOOR_ITEM_SPAWN_MIN, FLOOR_ITEM_SPAWN_MAX, FLOOR_ITEM_ROOM_RATIO, FLOOR_ITEM_SCALE_EVERY, FLOOR_ITEM_SCALE_ADD
-        from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave
+        from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave, DroppedAccessory
         
         floor = self.current_floor
         rooms = len(self.rooms)
@@ -1077,6 +1077,10 @@ class Dungeon:
             if data.get("category") != "event" and data.get("floor_spawnable", True):
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "stave", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
+        for key, data in ACCESSORY_DATA.items():
+            if data.get("category") != "event" and data.get("floor_spawnable", True):
+                if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
+                    candidates.append((key, "accessory", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         if not candidates:
             print(f"[Dungeon] WARNING: No item candidates for Floor {floor}!")
             return
@@ -1102,6 +1106,7 @@ class Dungeon:
                 elif chosen_type == "armor": item = DroppedArmor(px, py, chosen_key, chosen_data)
                 elif chosen_type == "shield": item = DroppedShield(px, py, chosen_key, chosen_data)
                 elif chosen_type == "stave": item = DroppedStave(px, py, chosen_key, chosen_data)
+                elif chosen_type == "accessory": item = DroppedAccessory(px, py, chosen_key, chosen_data)
                 else: continue
                 
                 self.dropped_items.append(item)
