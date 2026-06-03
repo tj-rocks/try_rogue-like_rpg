@@ -1365,7 +1365,9 @@ class InventoryDialog(BaseListDialog):
     def update_items_from_player(self, player):
         labels, data = [], []
         from constants import CONSUMABLE_DATA
-        for item in player.items:
+        items_to_sort = list(player.items)
+        items_to_sort.sort(key=lambda item: CONSUMABLE_DATA.get(item["key"], {}).get("name", item["key"]).lower())
+        for item in items_to_sort:
             k, c = item["key"], item.get("count", 1)
             n = CONSUMABLE_DATA.get(k, {}).get("name", k)
             labels.append(f"{n} x{c}" if c > 1 else n); data.append(("consumable", k))
@@ -1521,16 +1523,26 @@ class EquipDialog(InventoryDialog):
 
     def update_items_from_player(self, player):
         labels, data = [], []
-        for inst in player.weapon_inventory:
+        weapons = list(player.weapon_inventory)
+        armors = list(player.armor_inventory)
+        shields = list(getattr(player, "shield_inventory", []))
+        accessories = list(getattr(player, "accessory_inventory", []))
+        
+        weapons.sort(key=lambda x: x.get_name().lower())
+        armors.sort(key=lambda x: x.get_name().lower())
+        shields.sort(key=lambda x: x.get_name().lower())
+        accessories.sort(key=lambda x: x.get_name().lower())
+            
+        for inst in weapons:
             prefix = "E:" if inst.iid == player.equipped_weapon else ""
             labels.append(prefix + inst.get_name()); data.append(("weapon", inst.iid))
-        for inst in player.armor_inventory:
+        for inst in armors:
             prefix = "E:" if inst.iid == player.equipped_armor else ""
             labels.append(prefix + inst.get_name()); data.append(("armor", inst.iid))
-        for inst in getattr(player, "shield_inventory", []):
+        for inst in shields:
             prefix = "E:" if inst.iid == player.equipped_shield else ""
             labels.append(prefix + inst.get_name()); data.append(("shield", inst.iid))
-        for inst in getattr(player, "accessory_inventory", []):
+        for inst in accessories:
             prefix = "E:" if inst.iid == player.equipped_accessory else ""
             labels.append(prefix + inst.get_name()); data.append(("accessory", inst.iid))
         labels.append(Text.UI.QUIT); data.append(("cancel", None))
@@ -1544,7 +1556,9 @@ class StaveInventoryDialog(InventoryDialog):
 
     def update_items_from_player(self, player):
         labels, data = [], []
-        for inst in player.stave_inventory:
+        staves = list(player.stave_inventory)
+        staves.sort(key=lambda x: x.get_name().lower())
+        for inst in staves:
             labels.append(inst.get_name_with_charges()); data.append(("stave", inst.iid))
         labels.append(Text.UI.QUIT); data.append(("cancel", None))
         self.items, self.item_data = labels, data
@@ -1558,7 +1572,9 @@ class EventInventoryDialog(InventoryDialog):
     def update_items_from_player(self, player):
         labels, data = [], []
         from constants import CONSUMABLE_DATA
-        for item in player.event_items:
+        items_to_sort = list(player.event_items)
+        items_to_sort.sort(key=lambda item: CONSUMABLE_DATA.get(item["key"], {}).get("name", item["key"]).lower())
+        for item in items_to_sort:
             k, c = item["key"], item.get("count", 1)
             n = CONSUMABLE_DATA.get(k, {}).get("name", k)
             labels.append(f"{n} x{c}" if c > 1 else n); data.append(("consumable", k))
@@ -3231,13 +3247,21 @@ class EnhanceDialog(InventoryDialog):
 
     def update_items_from_player(self, player):
         new_items, new_data = [], []
-        for inst in player.weapon_inventory:
+        weapons = list(player.weapon_inventory)
+        armors = list(player.armor_inventory)
+        shields = list(getattr(player, "shield_inventory", []))
+        
+        weapons.sort(key=lambda x: x.get_name().lower())
+        armors.sort(key=lambda x: x.get_name().lower())
+        shields.sort(key=lambda x: x.get_name().lower())
+            
+        for inst in weapons:
             new_items.append(inst.get_name())
             new_data.append(("weapon", inst.iid))
-        for inst in player.armor_inventory:
+        for inst in armors:
             new_items.append(Text.UI.ENHANCE_ARMOR_LABEL.format(name=inst.get_name()))
             new_data.append(("armor", inst.iid))
-        for inst in getattr(player, "shield_inventory", []):
+        for inst in shields:
             new_items.append(Text.UI.ENHANCE_SHIELD_LABEL.format(name=inst.get_name()))
             new_data.append(("shield", inst.iid))
         
@@ -3268,6 +3292,7 @@ class ShopDialog(BaseListDialog):
     def refresh_items_from_stock(self):
         self.items = []
         for s in self.stock_ref: self.items.append((s["key"], s["type"], s["name"], s["price"], s["count"]))
+        self.items.sort(key=lambda x: x[2].lower())
         self.items.append(("cancel", "cancel", Text.UI.SHOP_CANCEL, 0, 1))
 
     def setup_sell_mode(self, player):
@@ -3299,6 +3324,7 @@ class ShopDialog(BaseListDialog):
         for eq in getattr(player, "accessory_inventory", []):
             data = ACCESSORY_DATA.get(eq.key, {})
             self.items.append((eq.iid, "accessory_inst", eq.get_name(), get_sell_price(data), 1, eq.key))
+        self.items.sort(key=lambda x: x[2].lower())
         self.items.append(("cancel", "cancel", Text.UI.SHOP_CANCEL, 0, 1))
 
 
@@ -3494,6 +3520,7 @@ class WarehouseDialog(BaseListDialog):
             is_eq = (eq.iid == player.equipped_accessory)
             self.items.append((eq.iid, "accessory_inst", eq.get_name(), eq, is_eq))
         
+        self.items.sort(key=lambda x: x[2].lower())
         self.items.append((-1, "back", Text.UI.QUIT, None, False))
 
     def setup_withdraw_mode(self, player):
@@ -3505,6 +3532,7 @@ class WarehouseDialog(BaseListDialog):
             name = temp.get_name_with_charges() if itype == "stave_inst" else temp.get_name() if temp else ""
             if not temp: from constants import CONSUMABLE_DATA; name = CONSUMABLE_DATA.get(data, {}).get("name", data)
             self.items.append((idx, itype, name, data, False))
+        self.items.sort(key=lambda x: x[2].lower())
         self.items.append((-1, "back", Text.UI.QUIT, None, False))
 
     def handle_events(self, events, player, confirm_dialog, dialog):
