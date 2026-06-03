@@ -120,13 +120,16 @@ def setup_gungeon_mode(dungeon, player):
             tx, ty = floor_tiles[i]
             ctype, ckey = cand
             try:
+                it = None
                 if ctype == "weapon": it = DroppedWeapon(tx * ts, ty * ts, ckey, WEAPON_DATA[ckey])
                 elif ctype == "armor": it = DroppedArmor(tx * ts, ty * ts, ckey, ARMOR_DATA[ckey])
                 elif ctype == "shield": it = DroppedShield(tx * ts, ty * ts, ckey, SHIELD_DATA[ckey])
                 elif ctype == "item": it = DroppedConsumable(tx * ts, ty * ts, ckey, CONSUMABLE_DATA[ckey])
                 elif ctype == "stave": it = DroppedStave(tx * ts, ty * ts, ckey, STAVE_DATA[ckey])
                 elif ctype == "accessory": it = DroppedAccessory(tx * ts, ty * ts, ckey, ACCESSORY_DATA[ckey])
-                dungeon.dropped_items.append(it)
+                if it:
+                    dungeon.dropped_items.append(it)
+                    print(f"  [Debug Spawn] Item {i+1}: {it.name} ({ckey}) at ({tx}, {ty})")
             except Exception as e:
                 print(f"[Debug Error] Failed to spawn {ckey}: {e}")
         

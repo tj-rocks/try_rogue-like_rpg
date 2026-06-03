@@ -251,9 +251,13 @@ class DroppedAccessory(Item):
         super().__init__(x, y, accessory_data.get("name", accessory_key), "accessory")
         self.accessory_key = accessory_key
         self.accessory_data = accessory_data
-        # 共通画像を使用
-        from constants import COMMON_ITEM_IMAGES
-        self._image = self._load_item_image({"image_path": COMMON_ITEM_IMAGES.get("shield")}) # 盾と共通の仮画像
+        
+        # 個別画像の設定があればそれをロード、なければ共通アイコンを使用
+        if accessory_data.get("image_path") or accessory_data.get("image_dir"):
+            self._image = self._load_item_image(accessory_data)
+        else:
+            from constants import COMMON_ITEM_IMAGES
+            self._image = self._load_item_image({"image_path": COMMON_ITEM_IMAGES.get("consumable")})
 
     def draw(self, screen, camera_x, camera_y):
         if self.is_collected:
