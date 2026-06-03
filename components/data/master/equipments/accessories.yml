@@ -1,0 +1,77 @@
+ACCESSORY_CATEGORIES:
+  accessory:
+    position:
+      hand_offsets:
+        down: [[0, 0], [0, 0]]
+        left: [[0, 0], [0, 0]]
+        right: [[0, 0], [0, 0]]
+        up: [[0, 0], [0, 0]]
+      weapon_angles:
+        down: [0, 0]
+        left: [0, 0]
+        right: [0, 0]
+        up: [0, 0]
+      draw_over_player:
+        down: false
+        left: false
+        right: false
+        up: false
+
+ACCESSORY_DATA:
+  glowing_ring:
+    name: "光る指輪"
+    category: accessory
+    min_rank: F
+    rarity: 2
+    price: 150
+    image_path: components/pictures/icon/item.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 周囲を微かに照らす不思議な指輪。防御力も少し上がる。
+    growth: {bonus_limit: 1, times_limit: 10, over_limit_growth_rate: 0.001}
+    type: accessory
+    bonus:
+      common:
+        lantern_bonus: 1
+        defense: 1
+        hp: 5
+
+  luminous_ring:
+    name: "大輝光の指輪"
+    category: accessory
+    min_rank: D
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/item.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 強い光で周囲を照らし出す指輪。
+    growth: {bonus_limit: 2, times_limit: 20, over_limit_growth_rate: 0.002}
+    type: accessory
+    bonus:
+      common:
+        lantern_bonus: 3
+        hp: 15
+
+  ring_of_protection:
+    name: "守護の指輪"
+    category: accessory
+    min_rank: E
+    rarity: 3
+    price: 400
+    image_path: components/pictures/icon/item.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 装備者の身を守る魔力が込められた指輪。
+    growth: {bonus_limit: 2, times_limit: 20, over_limit_growth_rate: 0.002}
+    type: accessory
+    bonus:
+      common:
+        lantern_bonus: 1
+        defense: 4

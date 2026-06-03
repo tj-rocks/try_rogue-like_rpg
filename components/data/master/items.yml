@@ -50,7 +50,7 @@ CONSUMABLE_DATA:
     heal_amount: 1
     price: 80
     min_rank: F
-    rarity: 4
+    rarity: 2
     image_path: components/pictures/icon/potion2.png
     sound: components/sounds/sfx/recharge.wav
     shop_buyable: false
@@ -237,7 +237,7 @@ CONSUMABLE_DATA:
     min_rank: F
     rarity: 3
     image_path: components/pictures/icon/basic_lantern.png
-    shop_buyable: true
+    shop_buyable: false
     describe: 周囲の闇を照らし出し、視界を確保する。
     floor_spawnable: true
   luxury_lantern:
@@ -248,7 +248,7 @@ CONSUMABLE_DATA:
     min_rank: B
     rarity: 4
     image_path: components/pictures/icon/luxury_lantern.png
-    shop_buyable: true
+    shop_buyable: false
     describe: 精巧な細工が施された高級なカンテラ。広範囲を明るく照らし続けることができる。
     floor_spawnable: true
   guild_cert_e:
