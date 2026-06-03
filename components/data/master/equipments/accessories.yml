@@ -1,3 +1,33 @@
+# ==========================================
+# アクセサリマスタデータ (accessories.yml)
+#
+# 【指定可能なボーナス一覧】
+# bonus.common の下に定義できるパラメータ：
+#   - attack (攻撃力上昇値)
+#   - defense (防御力上昇値)
+#   - hp (最大HP上昇値)
+#   - accuracy_close (近接命中率ボーナス)
+#   - accuracy_range (遠隔命中率ボーナス)
+#   - accuracy (共通命中率ボーナス)
+#   - crit_rate (クリティカル率ボーナス)
+#   - regen (自然回復ボーナス値)
+#   - block_chance_close (近接ブロック率)
+#   - block_chance_ranged (遠隔ブロック率)
+#   - lantern_bonus (視界/光源半径ボーナス)
+#   - aggro_mod (ヘイト/アグロ値の加減)
+#   - stupidity (愚かさ値/デメリット等)
+#   - armor_penetration (防御貫通率)
+#
+# bonus.magic の下に定義できる魔法パラメータ：
+#   - stave_bonus (杖の効果強化)
+#   - light_stave_bonus (光の杖の効果強化)
+#   - heal_ratio (回復魔法の倍率)
+#   - fire_damage (ファイアの追加ダメージ)
+#   - fire_range (ファイアの射程)
+#   - knockback_damage (ノックバック時のダメージ)
+#   - invincible_turns (無敵ターン数の追加)
+# ==========================================
+
 ACCESSORY_CATEGORIES:
   accessory:
     position:
@@ -24,7 +54,7 @@ ACCESSORY_DATA:
     min_rank: F
     rarity: 2
     price: 150
-    image_path: components/pictures/icon/item.png
+    # image_path: components/pictures/icon/item.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
     shop_buyable: true
@@ -44,7 +74,7 @@ ACCESSORY_DATA:
     min_rank: D
     rarity: 4
     price: 600
-    image_path: components/pictures/icon/item.png
+    # image_path: components/pictures/icon/item.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
     shop_buyable: true
@@ -63,7 +93,7 @@ ACCESSORY_DATA:
     min_rank: E
     rarity: 3
     price: 400
-    image_path: components/pictures/icon/item.png
+    # image_path: components/pictures/icon/item.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
     shop_buyable: true
