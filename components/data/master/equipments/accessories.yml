@@ -47,18 +47,18 @@ ACCESSORY_CATEGORIES:
         up: false
 
 ACCESSORY_DATA:
-  glowing_ring:
-    name: "光る指輪"
+  adventurers_lantern:
+    name: "冒険者のカンテラ"
     category: accessory
     min_rank: F
     rarity: 2
-    price: 150
+    price: 80
     # image_path: components/pictures/icon/item.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
-    describe: 周囲を微かに照らす不思議な指輪。防御力も少し上がる。
+    describe: 周囲を微かに照らすカンテラ
     growth: {bonus_limit: 1, times_limit: 10, over_limit_growth_rate: 0.001}
     type: accessory
     bonus:
@@ -68,11 +68,11 @@ ACCESSORY_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.0
-        hp: 5
-        defense: 1
+        hp: 0
+        defense: 0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        lantern_bonus: 1
+        lantern_bonus: 3
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
@@ -85,8 +85,8 @@ ACCESSORY_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
-  luminous_ring:
-    name: "大輝光の指輪"
+  luminous_gem:
+    name: "光る宝石"
     category: accessory
     min_rank: D
     rarity: 4
@@ -96,7 +96,7 @@ ACCESSORY_DATA:
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
-    describe: 強い光で周囲を照らし出す指輪。
+    describe: 強い光で周囲を照らし出す宝石 防御力も少し上がる
     growth: {bonus_limit: 2, times_limit: 20, over_limit_growth_rate: 0.002}
     type: accessory
     bonus:
@@ -106,8 +106,8 @@ ACCESSORY_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.0
-        hp: 15
-        defense: 0
+        hp: 0
+        defense: 1
         block_chance_close: 0.0
         block_chance_ranged: 0.0
         lantern_bonus: 3
@@ -134,8 +134,8 @@ ACCESSORY_DATA:
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
-    describe: 装備者の身を守る魔力が込められた指輪。
-    growth: {bonus_limit: 2, times_limit: 20, over_limit_growth_rate: 0.002}
+    describe: 装備者の身を守る魔力が込められた指輪
+    growth: {bonus_limit: 4, times_limit: 20, over_limit_growth_rate: 0.002}
     type: accessory
     bonus:
       common:
@@ -145,10 +145,10 @@ ACCESSORY_DATA:
         accuracy_range: 0
         crit_rate: 0.0
         hp: 0
-        defense: 4
+        defense: 2
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        lantern_bonus: 1
+        lantern_bonus: 3
         regen: 0
         stupidity: 0
         armor_penetration: 0.0

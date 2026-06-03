@@ -38,7 +38,7 @@ ARMOR_DATA:
     price: 100
     image_dir: components/pictures/armor/adventurers_clothes
     shop_buyable: false
-    describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない。
+    describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: false
     bonus:
@@ -250,7 +250,7 @@ ARMOR_DATA:
     price: 2000
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
-    describe: 巡礼者が旅の安全を祈って着る聖なるローブ。魔法の効果を高める力がある。
+    describe: 巡礼者が旅の安全を祈って着る聖なるローブ 魔法の効果を高める力がある
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -286,7 +286,7 @@ ARMOR_DATA:
     price: 1200
     image_dir: components/pictures/armor/hunters_armor
     shop_buyable: true
-    describe: 隠密性に特化した深紺の軽装。防御力は極めて低いが、攻撃の命中率と会心率（10/100）が大きく向上する。
+    describe: 隠密性に特化した深紺の軽装 防御力は極めて低いが、攻撃の命中率と会心率（10/100）が大きく向上する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -322,7 +322,7 @@ ARMOR_DATA:
     price: 2500
     image_dir: components/pictures/armor/fighters_armor
     shop_buyable: true
-    describe: 標準的な戦士の鎧。特にバフやデバフはなく、扱いやすい。
+    describe: 標準的な戦士の鎧 特にバフやデバフはなく、扱いやすい
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -358,7 +358,7 @@ ARMOR_DATA:
     price: 4500
     image_dir: components/pictures/armor/knight_heavy_armor
     shop_buyable: true
-    describe: 鉄板を重ねた非常に強固な鎧。重さゆえに敵に気づかれやすく、回避や命中、視野が低下する。
+    describe: 鉄板を重ねた非常に強固な鎧 重さゆえに敵に気づかれやすく、回避や命中、視野が低下する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -394,7 +394,7 @@ ARMOR_DATA:
     price: 3200
     image_dir: components/pictures/armor/pilgrims_armor 
     shop_buyable: true
-    describe: 聖なる加護を受けた巡礼者の軽防具。最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する。
+    describe: 聖なる加護を受けた巡礼者の軽防具 最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -430,7 +430,7 @@ ARMOR_DATA:
     price: 2800
     image_dir: components/pictures/armor/scount_armor
     shop_buyable: true
-    describe: 隠密性に特化した偵察用の軽装鎧。敵に見つかりにくくなり、回避率と会心率が高まる。
+    describe: 隠密性に特化した偵察用の軽装鎧 敵に見つかりにくくなり、回避率と会心率が高まる
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -466,7 +466,7 @@ ARMOR_DATA:
     price: 3200
     image_dir: components/pictures/armor/mages_robe
     shop_buyable: true
-    describe: 魔力の流れを操る高貴な紫の魔導衣。軽装で動きやすく、火炎・吹飛などの攻撃魔法の威力・射程を極限まで引き出す。
+    describe: 魔力の流れを操る高貴な紫の魔導衣 軽装で動きやすく、火炎・吹飛などの攻撃魔法の威力・射程を極限まで引き出す
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:

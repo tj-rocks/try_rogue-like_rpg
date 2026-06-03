@@ -908,7 +908,7 @@ class BaseListDialog:
     def on_activated(self): pass  # open 時フック（サブクラスでオーバーライド）
 
     def _close_back(self):
-        """「もどる」: 親ダイアログがあればそれを再表示、なければ普通に閉じる。"""
+        """「もどる」: 親ダイアログがあればそれを再表示、なければ普通に閉じる"""
         self.is_active = False
         if self._back_dialog:
             self._back_dialog.is_active = True
@@ -927,7 +927,7 @@ class BaseListDialog:
 
     # --- 共通ナビゲーション ---
     def _navigate(self, events):
-        """カーソル移動を処理し、'cancel'|'confirm'|None を返す。"""
+        """カーソル移動を処理し、'cancel'|'confirm'|None を返す"""
         from systems.audio_manager import play_sfx
         from constants import SOUND_CURSOR_MOVE, KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_CANCEL, KEY_CONFIRM
         for event in events:
@@ -1437,14 +1437,14 @@ class InventoryDialog(BaseListDialog):
                  "block_chance_ranged": "遠距離回避率", "aggro_mod": "感知補正",
                  "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON}
         MAGIC_MAP = {
-            "magic_fire_damage":    "🔥炎ダメージ",
-            "magic_fire_range":     "🔥炎射程",
-            "magic_heal_ratio":     "💚回復量",
-            "magic_knockback_damage":"💨吹飛ダメージ",
-            "magic_invincible_turns":"✨無敵ターン",
-            "magic_stave_bonus":     "🔮杖回数",
-            "magic_light_stave_bonus": "💡燈杖回",
-            "magic_yrden_turns":     "🌀障壁ターン",
+            "magic_fire_damage":    "炎ダメージ",
+            "magic_fire_range":     "炎射程",
+            "magic_heal_ratio":     "回復量",
+            "magic_knockback_damage":"吹飛ダメージ",
+            "magic_invincible_turns":"無敵ターン",
+            "magic_stave_bonus":     "杖回数",
+            "magic_light_stave_bonus": "燈杖回",
+            "magic_yrden_turns":     "障壁ターン",
         }
         
         def fmt(val):
@@ -1591,15 +1591,15 @@ class MenuDialog(BaseListDialog):
         self.callbacks = []
         self._dungeon = None
         self.items = [
-            (Text.UI.MENU_ITEMS,      "所持アイテム（薬・巻物など）の一覧を表示します。"),
-            (Text.UI.MENU_EQUIP,      "武器・鎧・盾・カンテラの管理画面を開きます。"),
-            (Text.UI.MENU_STAVES,     "所持している杖の管理画面を開きます。"),
-            (Text.UI.MENU_EVENT_ITEMS, "冒険者の証などの貴重品を確認します。"),
-            (Text.UI.MENU_STATUS,     "プレイヤーのステータスを表示します。"),
-            (Text.UI.MENU_QUESTS,     "現在のクエスト進捗を確認します。"),
-            (Text.UI.MENU_QUIT,       "タイトル画面に戻ります。"),
-            (Text.UI.MENU_MAP_TOGGLE, "ミニマップの表示・非表示を切り替えます。"),
-            (Text.UI.MENU_BACK,       "メニューを閉じます。"),
+            (Text.UI.MENU_ITEMS,      "所持アイテム（薬・巻物など）の一覧を表示します"),
+            (Text.UI.MENU_EQUIP,      "武器・鎧・盾・カンテラの管理画面を開きます"),
+            (Text.UI.MENU_STAVES,     "所持している杖の管理画面を開きます"),
+            (Text.UI.MENU_EVENT_ITEMS, "冒険者の証などの貴重品を確認します"),
+            (Text.UI.MENU_STATUS,     "プレイヤーのステータスを表示します"),
+            (Text.UI.MENU_QUESTS,     "現在のクエスト進捗を確認します"),
+            (Text.UI.MENU_QUIT,       "タイトル画面に戻ります"),
+            (Text.UI.MENU_MAP_TOGGLE, "ミニマップの表示・非表示を切り替えます"),
+            (Text.UI.MENU_BACK,       "メニューを閉じます"),
         ]
 
     def setup(self, on_items, on_equip, on_staves, on_event, on_status, on_quests, on_quit):
@@ -1641,7 +1641,7 @@ class MenuDialog(BaseListDialog):
                 self.is_active = False  # メニューを閉じる
 
     def setup2(self, inventory_dialog, equip_dialog, status_dialog, stave_inv_dialog=None, event_inv_dialog=None):
-        """サブダイアログに「もどる」先として自分を登録する。"""
+        """サブダイアログに「もどる」先として自分を登録する"""
         if inventory_dialog: inventory_dialog._back_dialog = self
         if equip_dialog:     equip_dialog._back_dialog = self
         if status_dialog:    status_dialog._back_dialog = self
@@ -2093,7 +2093,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             return
                                     elif getattr(npc, "role", None) == "magic_shop":
                                         if shop_dialog and dungeon:
-                                            dialog.text = "フォッフォッフォ、杖のことならわしに任せるがよいぞ。"
+                                            dialog.text = "フォッフォッフォ、杖のことならわしに任せるがよいぞ"
                                             dialog.is_active = True
                                             shop_dialog.open_shop("魔法屋", dungeon.magic_shop_stock)
                                             return
@@ -2201,7 +2201,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                         if teleport_dialog:
                                             teleport_dialog.setup_destinations(player)
                                             if not teleport_dialog.items:
-                                                dialog.text = "「まだ転移できる場所がないようじゃな。\n もう少し深く潜ってみなされ。」"
+                                                dialog.text = "「まだ転移できる場所がないようじゃな \n もう少し深く潜ってみなされ」"
                                                 dialog.is_active = True
                                                 return
                                             # 先に挨拶を表示
@@ -2313,30 +2313,30 @@ class GuildDialog:
 
             # 通常メニュー (モードに関わらずMENUなら常に構築する)
             self.items = [
-                ("mode", "ACCEPT_DAILY", "日常依頼を受注", "ランダムに生成された日常的な依頼を受けます。"),
+                ("mode", "ACCEPT_DAILY", "日常依頼を受注", "ランダムに生成された日常的な依頼を受けます"),
             ]
             # 昇格試験の判定
             next_rank_data = dungeon.guild_system.get_next_rank_data(player.guild_rank)
             if next_rank_data and player.guild_point >= next_rank_data["required_gp"]:
                 already_active = any(q.get("is_rank_up") for q in player.active_quests)
                 if not already_active:
-                    self.items.append(("mode", "ACCEPT_RANKUP", "昇級試験を受ける", f"{next_rank_data['rank']}ランクへの昇格試験に挑戦します。"))
+                    self.items.append(("mode", "ACCEPT_RANKUP", "昇級試験を受ける", f"{next_rank_data['rank']}ランクへの昇格試験に挑戦します"))
             
             # 次のランクまでのギルドポイントを説明する案内項目をメニューに追加
             if next_rank_data:
                 needed_gp = next_rank_data["required_gp"] - player.guild_point
                 if needed_gp > 0:
-                    info_desc = f"次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です。\n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
+                    info_desc = f"次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です \n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
                 else:
                     info_desc = f"次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(昇級試験を受けられます)"
             else:
-                info_desc = "これ以上は昇格できません。あなたは最高ランクに達しています！"
-            self.items.append(("info_rank", None, "🏆 ランク情報を確認", info_desc))
+                info_desc = "これ以上は昇格できません あなたは最高ランクに達しています！"
+            self.items.append(("info_rank", None, "ランク情報を確認", info_desc))
             
-            self.items.append(("mode", "ACCEPT_FIXED", "特別な依頼を見る", "特定の条件で発生する特別な依頼を確認します。"))
-            self.items.append(("mode", "ABANDON", "依頼破棄", "現在受けている依頼をキャンセルします。"))
-            self.items.append(("mode", "SAVE", "💾 記録する", "現在の進行状況をセーブします。"))
-            self.items.append(("cancel", None, "🚪 ギルドを出る", "ギルドメニューを終了します。"))
+            self.items.append(("mode", "ACCEPT_FIXED", "特別な依頼を見る", "特定の条件で発生する特別な依頼を確認します"))
+            self.items.append(("mode", "ABANDON", "依頼破棄", "現在受けている依頼をキャンセルします"))
+            self.items.append(("mode", "SAVE", "記録する", "現在の進行状況をセーブします"))
+            self.items.append(("cancel", None, "ギルドを出る", "ギルドメニューを終了します"))
             
         elif self.mode == "REPORT":
             # 条件を満たしているもののみ
@@ -2378,7 +2378,7 @@ class GuildDialog:
         from constants import CONSUMABLE_DATA
         cert_data = CONSUMABLE_DATA.get(next_rank_data["rank_up_item"], {})
         target_floor = cert_data.get("min_floor", 1)
-        description = f"次のランクへ昇級するための試験です。\n対象フロアの最奥に配置される『{cert_data.get('name', '冒険者の証')}』を回収してきてください。(対象階層: {target_floor}F)"
+        description = f"次のランクへ昇級するための試験です \n対象フロアの最奥に配置される『{cert_data.get('name', '冒険者の証')}』を回収してきてください (対象階層: {target_floor}F)"
         return {
             "id": f"rank_up_{next_rank_data['rank']}",
             "type": "delivery", "is_rank_up": True,
@@ -2520,7 +2520,7 @@ class GuildDialog:
                 elif q in self.dungeon_ref.guild_system.fixed_quests:
                     self.dungeon_ref.guild_system.fixed_quests.remove(q)
                 
-                # 🎵 効果音再生
+                # 効果音再生
                 from systems.sound_handler import sound_manager
                 from constants import SOUND_SELECT
                 sound_manager.play_sfx(SOUND_SELECT)
@@ -2561,14 +2561,14 @@ class GuildDialog:
                 success = True
         
         if success:
-            # 🎵 簡易ファンファーレを生成して再生
+            # 簡易ファンファーレを生成して再生
             self._play_placeholder_complete_sound()
 
             if q.get("is_rank_up"):
                 player.guild_rank = q["next_rank"]
                 
                 def on_done():
-                    dialog.text = f"依頼達成ですね。\n{player.guild_rank}ランクに昇格です！おめでとうございます！"
+                    dialog.text = f"依頼達成ですね \n{player.guild_rank}ランクに昇格です！おめでとうございます！"
                     dialog.is_active = True
                     
                 if hasattr(self, "cutscene_manager") and self.cutscene_manager:
@@ -2761,17 +2761,17 @@ class GuildDialog:
             if status == "mode":
                 mode_id = selected_item[1]
                 menu_descs = {
-                    "REPORT": "完了した依頼の報告を行い、\n報酬を受け取ります。",
-                    "ACCEPT_DAILY": "階層に応じた日常依頼を受注します。\n(お小遣い稼ぎに適したランダムな内容です)",
-                    "ACCEPT_RANKUP": "次のランクへ昇格するための試験を受けます。\n(ストーリーが進行する重要な依頼です)",
-                    "ACCEPT_FIXED": "特定の条件で発生する依頼を確認します。\n(ボス戦や重要なイベントが発生します)",
-                    "ABANDON": "現在受けている依頼を中止します。\n※違約金とGPの減少が発生します。"
+                    "REPORT": "完了した依頼の報告を行い、\n報酬を受け取ります",
+                    "ACCEPT_DAILY": "階層に応じた日常依頼を受注します \n(お小遣い稼ぎに適したランダムな内容です)",
+                    "ACCEPT_RANKUP": "次のランクへ昇格するための試験を受けます \n(ストーリーが進行する重要な依頼です)",
+                    "ACCEPT_FIXED": "特定の条件で発生する依頼を確認します \n(ボス戦や重要なイベントが発生します)",
+                    "ABANDON": "現在受けている依頼を中止します \n※違約金とGPの減少が発生します"
                 }
                 desc_text = menu_descs.get(mode_id, Text.UI.STATUS_MENU_HINT)
             elif status == "info_rank":
                 desc_text = selected_item[3]
             elif status in ("cancel", "back"):
-                desc_text = "前の画面に戻ります。"
+                desc_text = "前の画面に戻ります"
             else:
                 # 依頼詳細 (データ不備に備えて .get() で安全にアクセス)
                 q = selected_item[1]
@@ -2811,9 +2811,9 @@ class GuildDialog:
                     is_static = ENEMY_DATA.get(key, {}).get("is_static", False)
                     unit = "個" if is_static else "体"
                     verb = "破壊" if is_static else "討伐"
-                    desc_text += f"【内容】\n{target} を {amount} {unit}{verb}する。"
+                    desc_text += f"【内容】\n{target} を {amount} {unit}{verb}する"
                 elif t == "delivery":
-                    desc_text += f"【内容】\n{target} を {amount} 個納品する。"
+                    desc_text += f"【内容】\n{target} を {amount} 個納品する"
                 
                 reward_gold = q.get("reward_gold", 0)
                 reward_gp = q.get("reward_gp", 0)
@@ -3140,7 +3140,7 @@ class StatusDialog:
                 right_lines.append("なし")
 
             if not has_any_bonus and not has_magic_bonus:
-                screen.blit(self.font.render("適用中の装備の加護はありません。", True, (200, 200, 200)), (content_x, content_y))
+                screen.blit(self.font.render("適用中の装備の加護はありません", True, (200, 200, 200)), (content_x, content_y))
             else:
                 line_h = self.font.get_height() + 5
                 col_w = cw // 2
@@ -3155,7 +3155,7 @@ class StatusDialog:
         elif self.mode == "QUESTS":
             lines = [f"【受注中のクエスト】"]
             if not player.active_quests:
-                lines.append("現在受注している依頼はありません。")
+                lines.append("現在受注している依頼はありません")
             else:
                 for q in player.active_quests:
                     prog = ""
@@ -3448,7 +3448,7 @@ class ShopDialog(BaseListDialog):
                 if info.get("attack_bonus", 0) != 0: lines.append(f"攻撃力: +{info['attack_bonus']}")
                 if info.get("defense_bonus", 0) != 0: lines.append(f"防御力: +{info['defense_bonus']}")
                 if info.get("hp_bonus", 0) != 0: lines.append(f"最大HP: +{info['hp_bonus']}")
-            lines.append(""); lines.append(info.get("describe", "詳細情報はありません。") if selected[1] != "cancel" else "店を出ます。")
+            lines.append(""); lines.append(info.get("describe", "詳細情報はありません") if selected[1] != "cancel" else "店を出ます")
             draw_text_wrapped(screen, self.font, "\n".join(lines), sep_x + 30, self.y + 80, self.width // 2 - 60, color=(220, 230, 240))
 
 class WarehouseDialog(BaseListDialog):
@@ -3466,9 +3466,9 @@ class WarehouseDialog(BaseListDialog):
     def setup_main_menu(self):
         self.mode = "MAIN"; self.cursor_idx = 0
         self.items = [
-            ("mode_deposit", "action", Text.UI.WAREHOUSE_DEPOSIT, "アイテムを預けます。", False),
-            ("mode_withdraw", "action", Text.UI.WAREHOUSE_WITHDRAW, "アイテムを引き出します。", False),
-            ("cancel", "cancel", Text.UI.QUIT, "店を出ます。", False)
+            ("mode_deposit", "action", Text.UI.WAREHOUSE_DEPOSIT, "アイテムを預けます", False),
+            ("mode_withdraw", "action", Text.UI.WAREHOUSE_WITHDRAW, "アイテムを引き出します", False),
+            ("cancel", "cancel", Text.UI.QUIT, "店を出ます", False)
         ]
 
     def setup_deposit_mode(self, player):
@@ -3547,7 +3547,7 @@ class WarehouseDialog(BaseListDialog):
         _id, itype, name, obj, is_equipped = selected
         if is_equipped:
             if dialog:
-                dialog.text = "装備中のアイテムは預けられません。\n装備を外してから再度お試しください。"
+                dialog.text = "装備中のアイテムは預けられません \n装備を外してから再度お試しください"
                 dialog.is_active = True
             return
 
@@ -3669,9 +3669,9 @@ class WarehouseDialog(BaseListDialog):
             else:
                 info_lines.append(f"品名: {sel[2]}")
                 if is_equipped:
-                    info_lines.append("※装備中のため預けられません。")
+                    info_lines.append("※装備中のため預けられません")
                 else:
-                    info_lines.append("倉庫に預けます。" if self.mode == "DEPOSIT" else "倉庫から引き出します。")
+                    info_lines.append("倉庫に預けます" if self.mode == "DEPOSIT" else "倉庫から引き出します")
                 
                 desc = ""
                 if "inst" in status:
@@ -3691,13 +3691,13 @@ class BankDialog(BaseListDialog):
         super().__init__(screen_width, screen_height)
         self.row_height = 40
         self.items = [
-            ("DEPOSIT",  100,  Text.UI.BANK_DEPOSIT_100,   "100 G を銀行に預けます。"),
-            ("DEPOSIT",  1000, Text.UI.BANK_DEPOSIT_1000,  "1000 G を銀行に預けます。"),
-            ("DEPOSIT",  -1,   Text.UI.BANK_DEPOSIT_ALL,   "所持金を全額銀行に預けます。"),
-            ("WITHDRAW", 100,  Text.UI.BANK_WITHDRAW_100,  "100 G を引き出します。"),
-            ("WITHDRAW", 1000, Text.UI.BANK_WITHDRAW_1000, "1000 G を引き出します。"),
-            ("WITHDRAW", -1,   Text.UI.BANK_WITHDRAW_ALL,  "銀行残高を全額引き出します。"),
-            ("CANCEL",   0,    Text.UI.QUIT,               "銀行を出ます。"),
+            ("DEPOSIT",  100,  Text.UI.BANK_DEPOSIT_100,   "100 G を銀行に預けます"),
+            ("DEPOSIT",  1000, Text.UI.BANK_DEPOSIT_1000,  "1000 G を銀行に預けます"),
+            ("DEPOSIT",  -1,   Text.UI.BANK_DEPOSIT_ALL,   "所持金を全額銀行に預けます"),
+            ("WITHDRAW", 100,  Text.UI.BANK_WITHDRAW_100,  "100 G を引き出します"),
+            ("WITHDRAW", 1000, Text.UI.BANK_WITHDRAW_1000, "1000 G を引き出します"),
+            ("WITHDRAW", -1,   Text.UI.BANK_WITHDRAW_ALL,  "銀行残高を全額引き出します"),
+            ("CANCEL",   0,    Text.UI.QUIT,               "銀行を出ます"),
         ]
 
     def get_title(self): return Text.UI.BANK_TITLE
@@ -3749,7 +3749,7 @@ class BankDialog(BaseListDialog):
     def draw(self, screen, player): super().draw(screen, player)
 
 
-# 🌀 TELEPORT_DIALOG
+# TELEPORT_DIALOG
 class TeleportDialog(BaseListDialog):
     """テレポート屋（転移）での目的地選択を行うダイアログ"""
     STATE_KEY = "teleport_active"
@@ -3815,7 +3815,7 @@ class TeleportDialog(BaseListDialog):
     def get_detail_lines(self, player):
         if not self.items or self.cursor_idx >= len(self.items): return []
         item = self.items[self.cursor_idx]
-        if item["type"] == "cancel": return ["店を出ます。"]
+        if item["type"] == "cancel": return ["店を出ます"]
         
         from systems.guild import GuildSystem
         guild = GuildSystem()
@@ -3828,12 +3828,12 @@ class TeleportDialog(BaseListDialog):
         if f_lv > 0:
             lines.append(f"到達可能ランク: {req_rank}")
             lines.append("")
-            lines.append(f"地下 {f_lv} 階にある休憩所へ転移します。")
-            lines.append("※強力な魔物の気配が漂っています。")
+            lines.append(f"地下 {f_lv} 階にある休憩所へ転移します")
+            lines.append("※強力な魔物の気配が漂っています")
         else:
             lines.append("")
-            lines.append("冒険者の拠点となる村へ帰還します。")
-            lines.append("一度休息をとり、装備を整えましょう。")
+            lines.append("冒険者の拠点となる村へ帰還します")
+            lines.append("一度休息をとり、装備を整えましょう")
         return lines
     # (Inherit open() from BaseListDialog to correctly set game_state[self.STATE_KEY] = True)
 
@@ -3880,7 +3880,7 @@ class TeleportDialog(BaseListDialog):
             elif not self._has_required_item(player):
                 self.mode = "NO_ITEM"
                 if dialog:
-                    dialog.text = "テレポートには『転移の石』が必要です。"
+                    dialog.text = "テレポートには『転移の石』が必要です"
                     dialog.is_active = True
                 play_sfx(SOUND_CANCEL)
                 return None
@@ -3956,19 +3956,19 @@ class GuildGuideDialog(BaseListDialog):
         if next_rank_data:
             needed_gp = next_rank_data["required_gp"] - player.guild_point
             if needed_gp > 0:
-                rank_info_desc = f"現在のランクは {player.guild_rank} です。\n次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です。\n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
+                rank_info_desc = f"現在のランクは {player.guild_rank} です \n次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です \n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
             else:
-                rank_info_desc = f"現在のランクは {player.guild_rank} です。\n次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(ギルドの受付で昇級試験を受けられます)"
+                rank_info_desc = f"現在のランクは {player.guild_rank} です \n次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(ギルドの受付で昇級試験を受けられます)"
         else:
-            rank_info_desc = f"現在のランクは {player.guild_rank} です。あなたは最高ランクに達しています！"
+            rank_info_desc = f"現在のランクは {player.guild_rank} です あなたは最高ランクに達しています！"
 
         self.items = [
             {"key": "your_rank", "name": "あなたのランク", "desc": rank_info_desc},
-            {"key": "guild_point", "name": "ギルドポイント", "desc": "【ギルドポイント(GP)とは】\nクエストを達成すると貰えるポイントよ。\nランクを上げる条件になるほか、神官様に死の呪いを解いてもらう際にも必要になるわ。"},
-            {"key": "adventure_rank", "name": "冒険者ランク", "desc": "【冒険者ランク】\nランクは -（未加入）から始まり、F, E, D, C, B, A, S, SS までの9段階あるわ。\nランクが上がると、より難易度と報酬の高い依頼を受けられるようになるのよ。"},
-            {"key": "floor_limit", "name": "到達可能階層", "desc": "【ランク制限】\nランクに応じて進める限界階層が決まっているわ。\n- : B0F(村のみ)\nF : B11F まで\nE : B21F まで\nD : B30F まで\nC : B35F まで\nB : B55F まで\nそれ以上のランクになれば、さらに深くまで進めるようになるわ！"},
-            {"key": "promotion_exam", "name": "昇級試験", "desc": "【昇級試験】\nランクごとに必要なGPが溜まると、ギルドで試験を受けられるわ。\n試験クエストを受けて、そのランクのボスが落とす『冒険者の証』を回収して報告すればランクアップよ！"},
-            {"key": "quit", "name": "閉じる", "desc": "説明を終わります。"}
+            {"key": "guild_point", "name": "ギルドポイント", "desc": "【ギルドポイント(GP)とは】\nクエストを達成すると貰えるポイントよ \nランクを上げる条件になるほか、神官様に死の呪いを解いてもらう際にも必要になるわ"},
+            {"key": "adventure_rank", "name": "冒険者ランク", "desc": "【冒険者ランク】\nランクは -（未加入）から始まり、F, E, D, C, B, A, S, SS までの9段階あるわ \nランクが上がると、より難易度と報酬の高い依頼を受けられるようになるのよ"},
+            {"key": "floor_limit", "name": "到達可能階層", "desc": "【ランク制限】\nランクに応じて進める限界階層が決まっているわ \n- : B0F(村のみ)\nF : B11F まで\nE : B21F まで\nD : B30F まで\nC : B35F まで\nB : B55F まで\nそれ以上のランクになれば、さらに深くまで進めるようになるわ！"},
+            {"key": "promotion_exam", "name": "昇級試験", "desc": "【昇級試験】\nランクごとに必要なGPが溜まると、ギルドで試験を受けられるわ \n試験クエストを受けて、そのランクのボスが落とす『冒険者の証』を回収して報告すればランクアップよ！"},
+            {"key": "quit", "name": "閉じる", "desc": "説明を終わります"}
         ]
 
     def get_title(self):

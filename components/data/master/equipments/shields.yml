@@ -226,7 +226,7 @@ SHIELD_DATA:
     price: 2000
     image_dir: components/pictures/shield
     shop_buyable: true
-    describe: 標準的な戦士の盾。特別な補正はなく、扱いやすい。
+    describe: 標準的な戦士の盾 特別な補正はなく、扱いやすい
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     floor_spawnable: true
@@ -263,7 +263,7 @@ SHIELD_DATA:
     price: 1200
     image_dir: components/pictures/shield
     shop_buyable: true
-    describe: 隠密性と回避力を高めるため、極限まで軽量化された木製の盾。
+    describe: 隠密性と回避力を高めるため、極限まで軽量化された木製の盾
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     floor_spawnable: true
@@ -300,7 +300,7 @@ SHIELD_DATA:
     price: 4000
     image_dir: components/pictures/shield
     shop_buyable: true
-    describe: 圧倒的なガード率を誇る重厚な盾。その大きさゆえに身動きが鈍くなり、敵に狙われやすい。
+    describe: 圧倒的なガード率を誇る重厚な盾 その大きさゆえに身動きが鈍くなり、敵に狙われやすい
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     floor_spawnable: true
@@ -337,7 +337,7 @@ SHIELD_DATA:
     price: 3000
     image_dir: components/pictures/shield
     shop_buyable: true
-    describe: 魔力を帯びた盾。ガード率は控えめだが、攻撃魔法の威力・射程・回数を強化する。
+    describe: 魔力を帯びた盾 ガード率は控えめだが、攻撃魔法の威力・射程・回数を強化する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     floor_spawnable: true
@@ -374,7 +374,7 @@ SHIELD_DATA:
     price: 3200
     image_dir: components/pictures/shield
     shop_buyable: true
-    describe: 聖なる加護を受けた巡礼者の盾。所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する。
+    describe: 聖なる加護を受けた巡礼者の盾 所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     floor_spawnable: true
@@ -411,7 +411,7 @@ SHIELD_DATA:
     price: 2600
     image_dir: components/pictures/shield
     shop_buyable: true
-    describe: 黒く染められた軽量の革盾。敵に見つかりにくくなり、高い回避率と会心率を誇る。
+    describe: 黒く染められた軽量の革盾 敵に見つかりにくくなり、高い回避率と会心率を誇る
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     floor_spawnable: true

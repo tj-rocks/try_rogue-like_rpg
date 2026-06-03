@@ -79,7 +79,7 @@ WEAPON_DATA:
     image_path: components/pictures/weapon/broken_sword.png
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.2
-    describe: 刃がボロボロで、今にも折れそうな剣。
+    describe: 刃がボロボロで、今にも折れそうな剣
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: false
@@ -118,7 +118,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.2
     shop_buyable: true
-    describe: 鉄製の標準的な剣。丈夫で扱いやすい。
+    describe: 鉄製の標準的な剣 丈夫で扱いやすい
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
@@ -157,7 +157,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.2
     shop_buyable: false
-    describe: 長年放置され、刃がこぼれた古い剣。戦うには心もとない。
+    describe: 長年放置され、刃がこぼれた古い剣 戦うには心もとない
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: false
@@ -196,7 +196,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/wood_swing.wav
     image_scale: 1.3
     shop_buyable: true
-    describe: その辺の木を削って作った鈍器。不恰好だが威力はそれなり？
+    describe: その辺の木を削って作った鈍器 不恰好だが威力はそれなり？
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: axe
     floor_spawnable: true
@@ -235,7 +235,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.2
     shop_buyable: false
-    describe: 鉄を鍛え上げて打った剣。鉄より鋭く重い。
+    describe: 鉄を鍛え上げて打った剣 鉄より鋭く重い
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
@@ -313,7 +313,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
     shop_buyable: true
-    describe: 音もなく獲物を屠るための特殊な刀。装備するとモンスターに気づかれにくくなる。
+    describe: 音もなく獲物を屠るための特殊な刀 装備するとモンスターに気づかれにくくなる
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: dagger
     floor_spawnable: true
@@ -352,7 +352,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.2
     shop_buyable: true
-    describe: 標準的な戦士の片手剣。特別な補正はなく、扱いやすい。
+    describe: 標準的な戦士の片手剣 特別な補正はなく、扱いやすい
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
@@ -391,7 +391,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.2
     shop_buyable: true
-    describe: 急所を突くことに特化した細身の刺突剣。攻撃力は低いが、高い命中率と会心率（15/100）を誇り、鎧を貫通する。
+    describe: 急所を突くことに特化した細身の刺突剣 攻撃力は低いが、高い命中率と会心率（15/100）を誇り、鎧を貫通する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
@@ -430,7 +430,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.3
     shop_buyable: true
-    describe: 強大な破壊力を持つ騎士の巨大な斧。攻撃力は凄まじいが、重量ゆえに回避率や命中率が低下し、敵に感知されやすくなる。
+    describe: 強大な破壊力を持つ騎士の巨大な斧 攻撃力は凄まじいが、重量ゆえに回避率や命中率が低下し、敵に感知されやすくなる
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: axe
     floor_spawnable: true
@@ -469,7 +469,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.2
     shop_buyable: true
-    describe: 魔力を宿すスタッフ。物理攻撃力は低いが、攻撃魔法の威力・射程・回数を強化する。
+    describe: 魔力を宿すスタッフ 物理攻撃力は低いが、攻撃魔法の威力・射程・回数を強化する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
@@ -508,7 +508,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.2
     shop_buyable: true
-    describe: 聖なる加護を受けた剣。所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する。
+    describe: 聖なる加護を受けた剣 所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
@@ -547,7 +547,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
     shop_buyable: true
-    describe: 隠密偵察用の小型ナイフ。攻撃力は控えめだが、非常に高い会心率（20/100）と回避率を持つ。
+    describe: 隠密偵察用の小型ナイフ 攻撃力は控えめだが、非常に高い会心率（20/100）と回避率を持つ
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: dagger
     floor_spawnable: true
