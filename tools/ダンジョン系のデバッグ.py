@@ -343,10 +343,10 @@ def main():
                     elif event.key == pygame.K_o:
                         dungeon.debug_overflow = True
                         print(f"[DEBUG] Outbreak Reserved for Next Floor. Go to the stairs!")
+                    elif event.key == pygame.K_l:
+                        dungeon.is_lighted = not dungeon.is_lighted
+                        print(f"[DEBUG] Light Mode: {'ON' if dungeon.is_lighted else 'OFF'}")
 
-            # 常に全表示
-            dungeon.is_lighted = True
-            
             scene = game_state.get("current_scene", "game")
             
             if scene == "game":
