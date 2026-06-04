@@ -160,8 +160,8 @@ class EquipInstance:
         ekey = data["key"]
         if etype == "lantern":
             etype = "accessory"
-            if ekey in ("basic", "luxury", "none", "basic_lantern", "luxury_lantern"):
-                ekey = "glowing_ring"
+            if ekey in ("basic", "luxury", "none", "basic_lantern", "luxury_lantern", "glowing_ring"):
+                ekey = "luminous_gem"
         inst = cls(etype, ekey, randomize=False)
         inst.iid = data.get("iid", inst.iid)
         inst.enhance = data.get("enhance", 0)
