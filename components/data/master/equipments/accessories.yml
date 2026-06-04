@@ -48,10 +48,11 @@ ACCESSORY_CATEGORIES:
 
 ACCESSORY_DATA:
   adventurers_lantern:
+    quest_targetable: true
     name: "冒険者のカンテラ"
     category: accessory
     min_rank: F
-    rarity: 2
+    rarity: 4
     price: 80
     image_path: components/pictures/icon/basic_lantern.png
     sound: components/sounds/sfx/equip.wav
@@ -371,7 +372,7 @@ ACCESSORY_DATA:
     category: accessory
     min_rank: E
     max_rank: C
-    rarity: 3
+    rarity: 4
     price: 400
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
