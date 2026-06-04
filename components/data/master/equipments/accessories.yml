@@ -48,13 +48,12 @@ ACCESSORY_CATEGORIES:
 
 ACCESSORY_DATA:
   adventurers_lantern:
-    quest_targetable: true
     name: "冒険者のカンテラ"
     category: accessory
     min_rank: F
     rarity: 2
     price: 80
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/basic_lantern.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
     shop_buyable: true
@@ -88,18 +87,19 @@ ACCESSORY_DATA:
 
   luminous_gem:
     quest_targetable: true
-    name: "光る宝石"
+    name: "光る指輪"
     category: accessory
     min_rank: D
+    max_rank: B
     rarity: 4
     price: 600
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
-    describe: 強い光で周囲を照らし出す宝石 防御力も少し上がる
-    growth: {bonus_limit: 2, times_limit: 20, over_limit_growth_rate: 0.002}
+    describe: 強い光で周囲を照らし出す指輪 防御力も少し上がる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
     type: accessory
     bonus:
       common:
@@ -125,20 +125,181 @@ ACCESSORY_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
+  ring_of_might:
+    quest_targetable: true
+    name: "力闘の指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 装備者の腕力を高める指輪 攻撃力が少し上がる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 1
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_vitality:
+    quest_targetable: true
+    name: "活力の指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 装備者の生命力を活性化させる指輪 最大HPが少し上がる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 5
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_crit:
+    quest_targetable: true
+    name: "致命の指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 装備者の集中力を高める指輪 会心率が少し上がる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.02
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_healing:
+    quest_targetable: true
+    name: "治癒の指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 聖なる癒やしの力を宿す指輪 回復効果が少し上がる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.05
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
   ring_of_protection:
     quest_targetable: true
     name: "守護の指輪"
     category: accessory
     min_rank: E
+    max_rank: C
     rarity: 3
     price: 400
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
     describe: 装備者の身を守る魔力が込められた指輪
-    growth: {bonus_limit: 4, times_limit: 20, over_limit_growth_rate: 0.002}
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
     type: accessory
     bonus:
       common:
