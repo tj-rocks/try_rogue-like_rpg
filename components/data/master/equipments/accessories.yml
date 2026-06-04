@@ -205,9 +205,9 @@ ACCESSORY_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
-  ring_of_crit:
+  ring_of_surekill:
     quest_targetable: true
-    name: "致命の指輪"
+    name: "必殺の指輪"
     category: accessory
     min_rank: D
     max_rank: B
@@ -218,7 +218,7 @@ ACCESSORY_DATA:
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
-    describe: 装備者の集中力を高める指輪 会心率が少し上がる
+    describe: 装備者の致命の感覚を鋭くする指輪 会心率が少し上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
     type: accessory
     bonus:
@@ -228,6 +228,86 @@ ACCESSORY_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.02
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_stealth:
+    quest_targetable: true
+    name: "隠密の指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 装備者の気配を絶つ魔力が込められた指輪 敵に見つかりにくくなる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: -1
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_accuracy:
+    quest_targetable: true
+    name: "必中の指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 装備者の狙いを正確にする指輪 命中率が少し上がる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 2
+        accuracy_range: 2
+        crit_rate: 0.0
         hp: 0
         defense: 0
         block_chance_close: 0.0
