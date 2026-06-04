@@ -1,0 +1,1477 @@
+
+--- /Users/tj/Desktop/2DGame/wordings.py (modified)
+--- /Users/tj/Desktop/2DGame/wordings.py
++++ /Users/tj/Desktop/2DGame/wordings.py.new
+@@ -64,7 +64,7 @@
+         VILLAGE = "ダンジョンの街"
+         FLOOR = "B{level}F"
+         MENU_TITLE = "--- MENU ---"
+-        QUIT_CONFIRM_MSG = "セーブせずにタイトルへ戻りますか？\nギルドか宿屋でセーブをお勧めします。"
++        QUIT_CONFIRM_MSG = "セーブせずにタイトルへ戻りますか？\nギルドか宿屋でセーブをお勧めします"
+         MENU_ITEMS = "1. アイテム"
+         MENU_EQUIP = "2. 装備"
+         MENU_STAVES = "3. 杖"
+@@ -112,7 +112,7 @@
+         GUILD_REPORT_REWARD = "報酬: {gold} G / {gp} GP"
+         GUILD_REPORT_RANK_UP = "報酬: ギルドランク {rank} への昇格"
+         GUILD_REPORT_GUIDE = "--- [決定キー] を押して報酬を受け取る ---"
+-        GUILD_REPORT_CONFIRM = "{name} をすでにお持ちですね。納品しますか？"
++        GUILD_REPORT_CONFIRM = "{name} をすでにお持ちですね 納品しますか？"
+         GUILD_REPORT_CONFIRM_GENERIC = "クエストを報告しますか？"
+         NOW_LOADING = "Now Loading..."
+         SAVING = "Saving..."
+@@ -123,7 +123,7 @@
+ 
+     class System:
+         GAME_OVER = "死んでしまった\n所持金が半分になり、死の呪いが進行した"
+-        DOCTOR_REVIVE = "大手術だったよ\n命があっただけでも儲け物だよ。\nお気をつけて。"
++        DOCTOR_REVIVE = "大手術だったよ\n命があっただけでも儲け物だよ \nお気をつけて"
+         STAIRS_CONFIRM = "次の階層へ進みますか？"
+         OVERFLOW_SENSE = "モンスター氾濫の 予感がする……"
+         OVERFLOW_START = "モンスター氾濫が 発生した"
+@@ -164,10 +164,10 @@
+         RANK_REQUIRED = "この商品を買うにはギルドランク {rank} 以上が必要です"
+ 
+     class NPC:
+-        INN_WELCOME = "今日もご苦労様。ゆっくり休んでいくかい？"
++        INN_WELCOME = "今日もご苦労様 ゆっくり休んでいくかい？"
+         INN_FEE_INFO = "宿泊代は {fee} G だよお金が足りないみたいだね"
+-        INN_RECOVERED = "今日もご苦労様でした。\nこれまでの冒険を 確実に 記録しましたよ。"
+-        INN_DEBT = "お金が足りないだって。しょうがない、今回はツケにしておいてあげるよ。"
++        INN_RECOVERED = "今日もご苦労様でした \nこれまでの冒険を 確実に 記録しましたよ"
++        INN_DEBT = "お金が足りないだって しょうがない、今回はツケにしておいてあげるよ"
+         INN_NO = "無理するんじゃないよー"
+         WEAPON_SHOP_WELCOME = "いらっしゃい 武器と防具のことならお任せな"
+         ITEM_SHOP_WELCOME = "いらっしゃいませ薬や巻物など、冒険の必需品を取り揃えております"
+@@ -202,13 +202,13 @@
+         WAREHOUSE_CONFIRM_DEPOSIT = "手数料 {fee} G で {name} を預けますか？"
+         WAREHOUSE_CONFIRM_WITHDRAW = "手数料 {fee} G で {name} を引き出しますか？"
+         GENERIC_FALLBACK = "私は {name} です"
+-        PRIEST_WELCOME = "ようこそ。…おや、あなたには死の呪いがかかっているようですね。"
+-        PRIEST_HEALTHY = "あなたは呪われていません。\n神の加護があらんことを。"
+-        PRIEST_NO_GP = "ギルドポイント(GP)が足りないようです。\n呪いの解除には {cost} GP必要です。"
+-        PRIEST_CURE_CONFIRM = "ギルドポイント(GP)を {cost} GP捧げることで、\n死の呪いを1段階解除できます。儀式を行いますか？"
+-        PRIEST_CURE_DONE = "死の呪いが一段階解除されました！\n【{stat}】の低下ペナルティが消失しました。"
++        PRIEST_WELCOME = "ようこそ …おや、あなたには死の呪いがかかっているようですね"
++        PRIEST_HEALTHY = "あなたは呪われていません \n神の加護があらんことを"
++        PRIEST_NO_GP = "ギルドポイント(GP)が足りないようです \n呪いの解除には {cost} GP必要です"
++        PRIEST_CURE_CONFIRM = "ギルドポイント(GP)を {cost} GP捧げることで、\n死の呪いを1段階解除できます 儀式を行いますか？"
++        PRIEST_CURE_DONE = "死の呪いが一段階解除されました！\n【{stat}】の低下ペナルティが消失しました"
+         PRIEST_CURE_DONE_SIMPLE = "死の呪いが一段階解除されました！"
+-        PRIEST_DECLINE = "神の加護があらんことを。"
++        PRIEST_DECLINE = "神の加護があらんことを"
+ 
+     class Guild:
+         QUEST_HUNT_TITLE = "[{rank}] {name}を{amount}匹討伐"
+@@ -218,25 +218,25 @@
+         
+         # フレーバーテキスト用テンプレート
+         QUEST_HUNT_FLAVORS = [
+-            "最近、ダンジョンの浅層で{name}が増えすぎて困っています。少し数を減らしてください。",
+-            "探索中の商人が{name}に襲われました。安全確保のため討伐をお願いします。",
+-            "生態系の調査のため、特定の階層における{name}の個体数調整が必要です。",
+-            "深層へ向かうルートに{name}が群生しています。早急な対応を！",
++            "最近、ダンジョンの浅層で{name}が増えすぎて困っています 少し数を減らしてください",
++            "探索中の商人が{name}に襲われました 安全確保のため討伐をお願いします",
++            "生態系の調査のため、特定の階層における{name}の個体数調整が必要です",
++            "深層へ向かうルートに{name}が群生しています 早急な対応を！",
+             "探索のついでに、{name}を片付けてきてくれませんか？"
+         ]
+         QUEST_DESTROY_FLAVORS = [
+-            "探索路に{name}が放置されていて邪魔です。撤去をお願いします。",
+-            "古びた{name}が通路を塞いでいます。破壊して進路を確保してください。",
+-            "放置された{name}が探索の妨げになっています。片付けてください。",
+-            "{name}の中に魔物が潜んでいるとの報告がありました。今のうちに破壊を！",
+-            "探索路の整備のため、邪魔な{name}の撤去を依頼します。"
++            "探索路に{name}が放置されていて邪魔です 撤去をお願いします",
++            "古びた{name}が通路を塞いでいます 破壊して進路を確保してください",
++            "放置された{name}が探索の妨げになっています 片付けてください",
++            "{name}の中に魔物が潜んでいるとの報告がありました 今のうちに破壊を！",
++            "探索路の整備のため、邪魔な{name}の撤去を依頼します"
+         ]
+         QUEST_DELIVERY_FLAVORS = [
+-            "魔法の研究のために{name}が必要です。分けていただけませんか？",
+-            "娘の誕生日に{name}を贈りたいのですが、自分では手に入らなくて…。",
+-            "お客さんから{name}の注文が入りました。至急納品をお願いします！",
+-            "備蓄用の{name}が底を突いてしまいました。協力をお願いします。",
+-            "珍しい{name}に興味があります。見つけたら持ってきてください。"
++            "魔法の研究のために{name}が必要です 分けていただけませんか？",
++            "娘の誕生日に{name}を贈りたいのですが、自分では手に入らなくて…",
++            "お客さんから{name}の注文が入りました 至急納品をお願いします！",
++            "備蓄用の{name}が底を突いてしまいました 協力をお願いします",
++            "珍しい{name}に興味があります 見つけたら持ってきてください"
+         ]
+         QUEST_REQUESTER_NPCS = [
+             "ギルドマスター", "ギルドの受付嬢", "鍛冶屋の親方", "道具屋の店主", 
+
+--- /Users/tj/Desktop/2DGame/components/data/master/npcs.yml (modified)
+--- /Users/tj/Desktop/2DGame/components/data/master/npcs.yml
++++ /Users/tj/Desktop/2DGame/components/data/master/npcs.yml.new
+@@ -37,64 +37,64 @@
+   name: 宿屋
+   image_path: components/pictures/npc/woman_maid_h
+   dialogue:
+-  - 宿屋「ゆっくり休んでいってね。」
++  - 宿屋「ゆっくり休んでいってね」
+   role: inn
+ 
+ blacksmith:
+   name: 鍛冶屋
+   image_path: components/pictures/npc/man_artisan_v
+   dialogue:
+-  - 鍛冶屋「俺ぁ鍛冶屋だ。鉱石を持ってこれば装備を叩き直してやるぜ。」
++  - 鍛冶屋「俺ぁ鍛冶屋だ 鉱石を持ってこれば装備を叩き直してやるぜ」
+   role: blacksmith
+ 
+ villager:
+   name: 村人
+   image_path: components/pictures/npc/girl_town_v
+   dialogue:
+-  - 村人「この先は危険だよ。1Fへ行くするには右の階段を使ってね。」
++  - 村人「この先は危険だよ 1Fへ行くするには右の階段を使ってね」
+ 
+ guild_receptionist:
+   name: ギルド受付
+   image_path: components/pictures/npc/girl_town_v
+   dialogue:
+-  - ギルド受付「ようこそ冒険者ギルドへ。」
++  - ギルド受付「ようこそ冒険者ギルドへ」
+   role: guild_receptionist
+ 
+ guild_master:
+   name: ギルドマスター
+   image_path: components/pictures/npc/man_middleage_h
+   dialogue:
+-  - ギルドマスター「よくぞ来た、若き冒険者よ。ギルドへ歓迎する！」
++  - ギルドマスター「よくぞ来た、若き冒険者よ ギルドへ歓迎する！」
+   role: guild_receptionist
+ 
+ doctor:
+   name: 医者
+   image_path: components/pictures/npc/man_doctor_h
+   dialogue:
+-  - 医者「……気がついたかい？無茶はしちゃいけないよ。」
++  - 医者「……気がついたかい？無茶はしちゃいけないよ」
+   role: doctor
+ 
+ bank:
+   name: 銀行員
+   image_path: components/pictures/npc/woman_old_v
+   dialogue:
+-  - 銀行員「大切なお金をお預かりします。」
++  - 銀行員「大切なお金をお預かりします」
+   role: bank
+ 
+ wizard:
+   name: 魔法屋
+   image_path: components/pictures/npc/woman_witch_h
+   dialogue:
+-  - 魔導士「ほっほっほ、若き冒険者よ。魔法の真髄を知りたいか？」
+-  - 魔導士「このダンジョンには、時として魔力の残滓が渦巻く場所があるのじゃ。」
+-  - 魔導士「杖を振る時は、その残数をよく確認するのじゃぞ。空の杖を振っても、何も起きぬからの。」
++  - 魔導士「ほっほっほ、若き冒険者よ 魔法の真髄を知りたいか？」
++  - 魔導士「このダンジョンには、時として魔力の残滓が渦巻く場所があるのじゃ」
++  - 魔導士「杖を振る時は、その残数をよく確認するのじゃぞ 空の杖を振っても、何も起きぬからの」
+   role: magic_shop
+ 
+ teleport_wizard:
+   name: テレポート屋
+   image_path: components/pictures/npc/man_wizard_h
+   dialogue:
+-  - テレポート屋「フフフ……。世界の理を超えて、お望みの場所へ飛ばしてやろう。」
++  - テレポート屋「フフフ…… 世界の理を超えて、お望みの場所へ飛ばしてやろう」
+   - テレポート屋「ただし……それなりの『対価』はもらうぞ？」
+   role: teleport
+ 
+@@ -103,93 +103,93 @@
+   name: 中堅冒険者
+   image_path: components/pictures/npc/man_fighter_v
+   dialogue:
+-  - 中堅冒険者「よぉ新人！ 冒険の準備は進んでるか？ まずはギルドに所属しないとダンジョンに入ることすらできないぞ。」
+-  - 中堅冒険者「それと、装備はケチるなよ。身の丈に合った武器と防具を武器屋できちんと揃えるんだ。裸同然で潜るのは自殺志願者だけだ。」
+-  - 中堅冒険者「あと、一番大事なのは『引き際』だ。欲張って深くに行きすぎるなよ。自分の限界を感じたら、早めに引き返すのがプロの冒険者ってやつだ！」
++  - 中堅冒険者「よぉ新人！ 冒険の準備は進んでるか？ まずはギルドに所属しないとダンジョンに入ることすらできないぞ」
++  - 中堅冒険者「それと、装備はケチるなよ 身の丈に合った武器と防具を武器屋できちんと揃えるんだ 裸同然で潜るのは自殺志願者だけだ」
++  - 中堅冒険者「あと、一番大事なのは『引き際』だ 欲張って深くに行きすぎるなよ 自分の限界を感じたら、早めに引き返すのがプロの冒険者ってやつだ！」
+ 
+ crank_adventurer2:
+   name: 先輩冒険者
+   image_path: components/pictures/npc/woman_fighter_v
+   dialogue:
+-  - 先輩冒険者「あら、新人君？ 冒険者らしくなってきたじゃない。先輩から一つ、身に染みるアドバイスをあげるね。」
+-  - 先輩冒険者「手に入れたコインは、持ち歩かずにすぐ銀行へ預けること！ ダンジョンで力尽きると、手持ちのコインは半分になっちゃうの。……私、これで何度泣いたか分からないわ。」
+-  - 先輩冒険者「あと、HPが減ったら絶対に無理しないで、すぐに街へ戻るか回復すること。回復薬をケチって全滅するなんて、一番ダサいんだからね？」
++  - 先輩冒険者「あら、新人君？ 冒険者らしくなってきたじゃない 先輩から一つ、身に染みるアドバイスをあげるね」
++  - 先輩冒険者「手に入れたコインは、持ち歩かずにすぐ銀行へ預けること！ ダンジョンで力尽きると、手持ちのコインは半分になっちゃうの ……私、これで何度泣いたか分からないわ」
++  - 先輩冒険者「あと、HPが減ったら絶対に無理しないで、すぐに街へ戻るか回復すること 回復薬をケチって全滅するなんて、一番ダサいんだからね？」
+ 
+ crank_adventurer3:
+   name: 先輩冒険者
+   image_path: components/pictures/npc/woman_fighter_v
+   dialogue:
+-  - 先輩冒険者「ふふっ。冒険者って意外に安全な職業なのよ。」
+-  - 先輩冒険者「だって、ダンジョンの中で死んでも、死んだらそこで終わり…じゃないわよ？ちゃんと街まで戻ってこられるんだから。」
+-  - 先輩冒険者「もちろん、ちょっとだけ呪われるけどね。……まあ、ギルドで治療もできるし、大したことないわ。」
++  - 先輩冒険者「ふふっ 冒険者って意外に安全な職業なのよ」
++  - 先輩冒険者「だって、ダンジョンの中で死んでも、死んだらそこで終わり…じゃないわよ？ちゃんと街まで戻ってこられるんだから」
++  - 先輩冒険者「もちろん、ちょっとだけ呪われるけどね ……まあ、ギルドで治療もできるし、大したことないわ」
+ 
+ guide_inn:
+   name: 宿屋の看板娘
+   image_path: components/pictures/npc/woman_maid_h
+   dialogue:
+-  - 案内人「宿屋で休むと、HPが全回復して記録も行われるわ。」
+-  - 案内人「貴重な装備品を手に入れたり、大切なアイテムを手に入れたら、泊まっていくといいわ。」
++  - 案内人「宿屋で休むと、HPが全回復して記録も行われるわ」
++  - 案内人「貴重な装備品を手に入れたり、大切なアイテムを手に入れたら、泊まっていくといいわ」
+ 
+ guide_guild:
+   name: ギルド職員
+   image_path: components/pictures/npc/woman_ordinary_h
+   dialogue:
+-  - 案内人「まずはギルドで『クエスト』を受けて、冒険の目的を決めましょう。」
+-  - 案内人「クエストを達成してポイントを貯めれば、より深い階層への通行許可が下りるわよ。」
++  - 案内人「まずはギルドで『クエスト』を受けて、冒険の目的を決めましょう」
++  - 案内人「クエストを達成してポイントを貯めれば、より深い階層への通行許可が下りるわよ」
+ 
+ guide_doctor:
+   name: 医療助手
+   image_path: components/pictures/npc/woman_ordinary_h
+   dialogue:
+-  - 案内人「もしダンジョンでHPが0になっても、お医者様がここまで運んでくれるわ。」
+-  - 案内人「ただし、持っていたコインや一部のアイテムを失うこともあるから注意してね。」
++  - 案内人「もしダンジョンでHPが0になっても、お医者様がここまで運んでくれるわ」
++  - 案内人「ただし、持っていたコインや一部のアイテムを失うこともあるから注意してね」
+ 
+ guide_bank:
+   name: 村人
+   image_path: components/pictures/npc/man_young_h
+   dialogue:
+-  - 案内人「手持ちのコインを銀行に預けておけば、倒れた時でも没収されずに済むよ。」
+-  - 案内人「まとまったお金が手に入ったら、こまめに預けに来るのが冒険者の知恵だね。」
++  - 案内人「手持ちのコインを銀行に預けておけば、倒れた時でも没収されずに済むよ」
++  - 案内人「まとまったお金が手に入ったら、こまめに預けに来るのが冒険者の知恵だね」
+ 
+ apprentice:
+   name: 見習い冒険者
+   image_path: components/pictures/npc/boy_young_v
+   dialogue:
+   - 見習い「ぼくもいつか、あなたみたいな強い冒険者になりたいな！」
+-  - 見習い「まずは基本の『移動』と『攻撃』をマスターしなきゃ。」
++  - 見習い「まずは基本の『移動』と『攻撃』をマスターしなきゃ」
+   - 見習い「矢印キーで移動して、敵の隣に行けば自動で攻撃できるんだよね？」
+ 
+ guild_guide:
+   name: ギルド職員
+   image_path: components/pictures/npc/woman_ordinary_h
+   dialogue:
+-  - 案内人「冒険者ギルドへようこそ。」
++  - 案内人「冒険者ギルドへようこそ」
+   - 案内人 "新たな冒険者さんを歓迎するわ"
+   - 案内人「クエストを達成してランクを上げれば、より深い階層へ進めるようになるわ！」
+-  - 案内人「受付でクエストを受注できますよランクアップ目指して頑張ってくださいね。」
++  - 案内人「受付でクエストを受注できますよランクアップ目指して頑張ってくださいね」
+   role: guild_guide
+ 
+ pub_master:
+   name: パブのマスター
+   image_path: components/pictures/npc/woman_ordinary2_h
+   dialogue:
+-  - マスター「ようこそいらっしゃい、冒険者さん。ここは冒険者の疲れを癒すパブさ。」
+-  - マスター「冒険者は危険も少なく稼ぎもでかい。いい仕事だね」
++  - マスター「ようこそいらっしゃい、冒険者さん ここは冒険者の疲れを癒すパブさ」
++  - マスター「冒険者は危険も少なく稼ぎもでかい いい仕事だね」
+   - マスター「嫌なことがあったらここにきて、うまい酒を飲んで忘れちまいな」
+ 
+ guild_staff:
+   name: ギルド職員
+   image_path: components/pictures/npc/woman_scientist_v
+   dialogue:
+-  - 看護師「ダンジョンで死んでも諦めないでください。ダンジョンの呪いはかかりますが生きて帰れます。」
+-  - 看護師「もし呪いにかかってしまったら、ギルドにいる神官様に解いてもらいましょう。」
+-  - 看護師「とはいえ迷宮から帰ってこない冒険者もいます。お気をつけて」
++  - 看護師「ダンジョンで死んでも諦めないでください ダンジョンの呪いはかかりますが生きて帰れます」
++  - 看護師「もし呪いにかかってしまったら、ギルドにいる神官様に解いてもらいましょう」
++  - 看護師「とはいえ迷宮から帰ってこない冒険者もいます お気をつけて」
+ 
+ priest:
+   name: 神官
+   image_path: components/pictures/npc/man_sage_v
+   dialogue:
+-  - 神官「私は神の奇跡によって、あなたの死の呪いを祓うことができます。」
++  - 神官「私は神の奇跡によって、あなたの死の呪いを祓うことができます」
+   role: priest
+ 
+ # --- レガシーNPC（殿堂入り） ---
+@@ -198,7 +198,7 @@
+   image_path: components/pictures/enemies/bat
+   dialogue:
+   - コウモリ先輩「キィキィ...（昔はオレたちも、お前と一緒にバグと戦ったもんだぜ...）」
+-  - コウモリ先輩「キィ...（入院中もよくデバッグしたよな。懐かしいぜ...）」
++  - コウモリ先輩「キィ...（入院中もよくデバッグしたよな 懐かしいぜ...）」
+ 
+ legacy_dragon:
+   name: ドラゴン先輩
+
+--- /Users/tj/Desktop/2DGame/components/data/master/story.yml (modified)
+--- /Users/tj/Desktop/2DGame/components/data/master/story.yml
++++ /Users/tj/Desktop/2DGame/components/data/master/story.yml.new
+@@ -12,34 +12,34 @@
+ 
+ opening:
+   1:
+-    text: "古より、この世界には「ダンジョン」が存在した。\n人々は富と名声を求め、その深淵へと足を踏み入れた。"
++    text: "古より、この世界には「ダンジョン」が存在した \n人々は富と名声を求め、その深淵へと足を踏み入れた"
+     bgm: "components/sounds/bgm/winding_adventure.mp3"
+   2:
+-    text: "ダンジョンからもたらされる神秘のアイテムは人々に恩恵を与え、\n独自の文化を築き上げていった。"
++    text: "ダンジョンからもたらされる神秘のアイテムは人々に恩恵を与え、\n独自の文化を築き上げていった"
+     bgm: "components/sounds/bgm/winding_adventure.mp3"
+   3:
+-    text: "潜るたびに姿を変え、未知の秘宝を生み出す不思議な空間。\nそこを往く者たちはいつしか「冒険者」と呼ばれた。"
++    text: "潜るたびに姿を変え、未知の秘宝を生み出す不思議な空間 \nそこを往く者たちはいつしか「冒険者」と呼ばれた"
+     bgm: "components/sounds/bgm/winding_adventure.mp3"
+   4:
+-    text: "時は流れ、探索を管理する「冒険者ギルド」が設立されると、\nダンジョン探索は国家規模で体系化されていった。"
++    text: "時は流れ、探索を管理する「冒険者ギルド」が設立されると、\nダンジョン探索は国家規模で体系化されていった"
+     bgm: "components/sounds/bgm/winding_adventure.mp3"
+   5:
+-    text: "だが、栄光を掴む者の陰で、数多の冒険者たちが帰らぬ人となった。"
++    text: "だが、栄光を掴む者の陰で、数多の冒険者たちが帰らぬ人となった"
+     bgm: "components/sounds/bgm/winding_adventure.mp3"
+   6:
+-    text: "これは、行方不明となった父の背中を追い、\n冒険者の道を志した一人の若者の物語……。"
++    text: "これは、行方不明となった父の背中を追い、\n冒険者の道を志した一人の若者の物語……"
+     bgm: "components/sounds/bgm/winding_adventure.mp3"
+   7:
+-    text: "深淵を目指すための第一歩。\nまずは「冒険者ギルド」の入会テストを突破しなければならない。"
++    text: "深淵を目指すための第一歩 \nまずは「冒険者ギルド」の入会テストを突破しなければならない"
+     bgm: "components/sounds/bgm/winding_adventure.mp3"
+ 
+ ending:
+   1:
+-    text: "ついに、君は最深部に到達し\n失われた秘宝を手に入れた。"
++    text: "ついに、君は最深部に到達し\n失われた秘宝を手に入れた"
+     bgm: "components/sounds/bgm/winding_adventure.mp3"
+   2:
+-    text: "世界に再び光が戻り、\n君の名は伝説として語り継がれるだろう。"
++    text: "世界に再び光が戻り、\n君の名は伝説として語り継がれるだろう"
+     bgm: "components/sounds/bgm/winding_adventure.mp3"
+   3:
+-    text: "冒険は終わった。\nしかし、新たな物語がまたどこかで始まる……。"
++    text: "冒険は終わった \nしかし、新たな物語がまたどこかで始まる……"
+     bgm: "components/sounds/bgm/winding_adventure.mp3"
+
+--- /Users/tj/Desktop/2DGame/components/data/master/balance.yml (modified)
+--- /Users/tj/Desktop/2DGame/components/data/master/balance.yml
++++ /Users/tj/Desktop/2DGame/components/data/master/balance.yml.new
+@@ -1,8 +1,8 @@
+ # ==============================================================================
+-# ⚖️ balance.yml - ゲーム全体のバランス調整窓口
++# balance.yml - ゲーム全体のバランス調整窓口
+ # ==============================================================================
+ 
+-# 👤 PLAYER (プレイヤーの初期能力と成長)
++# PLAYER (プレイヤーの初期能力と成長)
+ # ------------------------------------------------------------------------------
+ PLAYER:
+   # 基本ステータス
+@@ -35,7 +35,7 @@
+     atk_per_level: 2  # レベルアップ時の攻撃力上昇量
+     def_per_level: 1  # レベルアップ時の防御力上昇量
+ 
+-# 🏰 DUNGEON (ダンジョン生成)
++# DUNGEON (ダンジョン生成)
+ # ------------------------------------------------------------------------------
+ DUNGEON:
+   DUNGEON_MIN_ROOMS: 4              # 1階層あたりの初期最小部屋数
+@@ -62,7 +62,7 @@
+   DUNGEON_ROOM_MIN_SIZE_CAP: 3      # 最小サイズの成長上限
+   DUNGEON_ROOM_MAX_SIZE_CAP: 20     # 最大サイズの成長上限
+ 
+-# 👹 ENEMY_AI (敵の行動・スポーン・難易度)
++# ENEMY_AI (敵の行動・スポーン・難易度)
+ # ------------------------------------------------------------------------------
+ ENEMY_AI:
+   # 基本AI挙動
+@@ -93,12 +93,12 @@
+   ENEMY_SPAWN_NEAR_CHANCE: 1        # 近くに湧く確率 (n/10)
+   ENEMY_SPAWN_NEAR_FLOOR: 50        # この階以降は、空きがあれば必ずプレイヤーの近くに湧く
+ 
+-  # 🔒 逃げ道封鎖AI (true=有効 / false=無効)
++  # 逃げ道封鎖AI (true=有効 / false=無効)
+   # 複数の低困惑度（低stupidity）敵がいる場合、最接近以外の敵がプレイヤーの退路を塞ぐ動きをする。
+   # 削除したい場合は enemy.py の [ESCAPE_BLOCK] ブロックと _get_escape_block_target メソッドも消すこと。
+   ENEMY_ESCAPE_BLOCK_ENABLED: true
+ 
+-  # 🧠 困惑度 (stupidity) ごとのぼーっと確率テーブル
++  # 困惑度 (stupidity) ごとのぼーっと確率テーブル
+   # 敵が行動するとき、この確率でランダム移動（ぼーっとする）してしまいます。
+   # 値は 0.0〜1.0 (0.0 = 絶対ぼーっとしない, 1.0 = 必ずぼーっとする)
+   STUPIDITY_WANDER_RATES:
+@@ -114,7 +114,7 @@
+     9:  0.40   # 9 = 40%  
+     10: 0.50   # 10 = 50%
+ 
+-# ⚔️ COMBAT (戦闘システム設定)
++# COMBAT (戦闘システム設定)
+ # ------------------------------------------------------------------------------
+ COMBAT:
+   CRITICAL_RATE_MAX: 0.7            # 会心率（痛恨率）の最終的な上限値 (0.7 = 70%)
+@@ -129,7 +129,7 @@
+   COMBAT_LOG_WAIT_FRAMES: 60        # ログが表示されてから消えるまでの待機時間
+   INTER_ACTION_BREATHER: 1          # 連続行動の間のわずかな静止時間
+ 
+-  # 💎 ITEMS (ドロップアイテム)
++  # ITEMS (ドロップアイテム)
+ # ------------------------------------------------------------------------------
+ ITEMS:
+   FLOOR_ITEM_SPAWN_MIN: 1           # 1フロアに落ちているアイテムの最小数
+@@ -142,7 +142,7 @@
+   # ドロップ率の調整（ここを変えると敵や障害物からのドロップが一括で変わります！）
+   DROP_RATE_MULTIPLIER: 1.0         # 全体のドロップ率倍率 (0.5 = 半分, 1.0 = 標準)
+ 
+-# 🧱 OBSTACLES (障害物 - 壊せる壁や樽など)
++# OBSTACLES (障害物 - 壊せる壁や樽など)
+ # ------------------------------------------------------------------------------
+ OBSTACLES:
+   OBSTACLE_SPAWN_MIN: 1             # 1部屋に配置される障害物の最小数
+@@ -156,7 +156,7 @@
+   OBSTACLE_TOTAL_SCALE_EVERY: 10    # 何階ごとにフロア全体の合計上限を +2 するか
+   OBSTACLE_TOTAL_SCALE_ADD: 1
+ 
+-# 🕸️ TRAPS (罠)
++# TRAPS (罠)
+ # ------------------------------------------------------------------------------
+ TRAPS:
+   TRAP_SPAWN_MIN: 0                 # 1部屋に配置される罠の最小数
+@@ -165,7 +165,7 @@
+   TRAP_SPAWN_SCALE_EVERY: 5        # 何階ごとに罠を増やすか
+   TRAP_SPAWN_SCALE_ADD: 1           # 増やす数
+ 
+-# 💜 STATUS_EFFECTS (状態異常)
++# STATUS_EFFECTS (状態異常)
+ # ------------------------------------------------------------------------------
+ STATUS_EFFECTS:
+   poison:
+@@ -174,7 +174,7 @@
+     min_damage: 1                   # 毒による最低ダメージ（0にならないように）
+     cure_fee: 100                   # 医者での解毒費用
+ 
+-# 🏠 VILLAGE_SERVICES (村の施設・サービス料金)
++# VILLAGE_SERVICES (村の施設・サービス料金)
+ # ------------------------------------------------------------------------------
+ VILLAGE_SERVICES:
+   INN_FEE: 60            # 宿屋の宿泊費
+@@ -182,7 +182,7 @@
+   WAREHOUSE_FEE: 10      # 預かり屋の利用料
+   BANK_INTEREST: 0.0     # 銀行の利息（将来用）
+ 
+-# 🤝 GUILD_QUEST (ギルド依頼)
++# GUILD_QUEST (ギルド依頼)
+ # ------------------------------------------------------------------------------
+ GUILD_QUEST:
+   BOARD_QUEST_COUNT: [5, 10]        # 掲示板に出現するランダムクエストの数 (最小, 最大)
+@@ -198,13 +198,13 @@
+   DELIVERY_REWARD_BONUS: 1.2    # 納品報酬のボーナス倍率 (基準価格 * この値)
+   
+ 
+-# 📈 GLOBAL_SCALING (ランクによる自動スケーリング倍率)
++# GLOBAL_SCALING (ランクによる自動スケーリング倍率)
+ # ------------------------------------------------------------------------------
+ GLOBAL_SCALING:
+   ENEMY: 1.05             # 敵のランクごとの強化倍率 (1ランクにつき 1.05倍: インフレ抑制)
+   EQUIPMENT: 1.05         # 装備のランクごとの強化倍率 (1ランクにつき 1.05倍: シブい成長)
+ 
+-# 🚨 OUTBREAK_CONFIG (魔物の氾濫イベント設定)
++# OUTBREAK_CONFIG (魔物の氾濫イベント設定)
+ # ------------------------------------------------------------------------------
+ OUTBREAK_CONFIG:
+   min_floor: 2                  # 発生開始階層 (1階はチュートリアル的に除外)
+@@ -216,7 +216,7 @@
+   bgm: "components/sounds/bgm/outbreak.mp3" # 専用BGM (既存パス)
+   flash_color: [255, 0, 0]      # 発生時のフラッシュ色 (R, G, B)
+ 
+-# 🌀 TELEPORT_CONFIG (テレポート屋設定)
++# TELEPORT_CONFIG (テレポート屋設定)
+ # ------------------------------------------------------------------------------
+ TELEPORT_CONFIG:
+   money_per_floor: 100         # 1階層あたりの料金
+@@ -224,7 +224,7 @@
+   return_village_money: 2000   # 休憩所から村への帰還料金 (超高額)
+ 
+ 
+-# 💀 CURSE_SYSTEM (呪いシステム設定)
++# CURSE_SYSTEM (呪いシステム設定)
+ # ------------------------------------------------------------------------------
+ CURSE_SYSTEM:
+   reduction_rate: 0.10             # 1つ呪われるごとの能力下降率 (0.10 = 10%)
+
+--- /Users/tj/Desktop/2DGame/components/data/master/items.yml (modified)
+--- /Users/tj/Desktop/2DGame/components/data/master/items.yml
++++ /Users/tj/Desktop/2DGame/components/data/master/items.yml.new
+@@ -33,7 +33,7 @@
+     sound: components/sounds/sfx/stairs.wav
+     shop_buyable: true
+     max_stack: 1
+-    describe: 使うと一瞬で村に帰還できる魔法の羽。非常に高価だが、命を救う最後の手段になる。
++    describe: 使うと一瞬で村に帰還できる魔法の羽 非常に高価だが、命を救う最後の手段になる
+     floor_spawnable: true
+   revive_amulet:
+     name: 復活のお守り
+@@ -55,7 +55,7 @@
+     sound: components/sounds/sfx/recharge.wav
+     shop_buyable: false
+     max_stack: 5
+-    describe: ラベルが剥がれかけ、嫌な沈殿物が見えるポーション。飲んでもほとんど効果がないようだ。
++    describe: ラベルが剥がれかけ、嫌な沈殿物が見えるポーション 飲んでもほとんど効果がないようだ
+     floor_spawnable: true
+   rotten_potion:
+     name: 腐ったポーション
+@@ -67,7 +67,7 @@
+     sound: components/sounds/sfx/recharge.wav
+     shop_buyable: false
+     max_stack: 1
+-    describe: どろりと変色し、異臭を放つポーション。絶対に飲んではいけない。
++    describe: どろりと変色し、異臭を放つポーション 絶対に飲んではいけない
+     floor_spawnable: true
+   trap_remover:
+     name: 罠解除ツール
+@@ -79,7 +79,7 @@
+     sound: components/sounds/sfx/select_new.wav
+     shop_buyable: true
+     max_stack: 3
+-    describe: 足元の罠を安全に解除するための道具。罠に向かって使うと、その罠を消去できる。
++    describe: 足元の罠を安全に解除するための道具 罠に向かって使うと、その罠を消去できる
+     floor_spawnable: true
+   teleport_stone:
+     name: 転移の石
+@@ -90,7 +90,7 @@
+     sound: components/sounds/sfx/recharge.wav
+     shop_buyable: false
+     max_stack: 5
+-    describe: テレポート屋のサービスを利用するために必要な不思議な石。
++    describe: テレポート屋のサービスを利用するために必要な不思議な石
+     floor_spawnable: true
+   hp_potion:
+     name: ヒールポーション
+@@ -104,7 +104,7 @@
+     shop_buyable: true
+     category: common
+     max_stack: 10
+-    describe: 傷を癒やす一般的な薬草の煎じ薬。
++    describe: 傷を癒やす一般的な薬草の煎じ薬
+     floor_spawnable: true
+   antidote_potion:
+     name: 毒消薬
+@@ -116,7 +116,7 @@
+     sound: components/sounds/sfx/drink.wav
+     shop_buyable: true
+     max_stack: 10
+-    describe: 解毒作用を持つ薬。毒状態を回復する。
++    describe: 解毒作用を持つ薬 毒状態を回復する
+     floor_spawnable: true
+   hi_potion:
+     name: ハイポーション
+@@ -130,7 +130,7 @@
+     shop_buyable: true
+     category: common
+     max_stack: 3
+-    describe: 高度な精製技術で作られた強力な回復薬。
++    describe: 高度な精製技術で作られた強力な回復薬
+     floor_spawnable: true
+   magic_crystal:
+     name: 魔力の水晶
+@@ -143,7 +143,7 @@
+     sound: components/sounds/sfx/recharge.wav
+     max_stack: 5
+     shop_buyable: true
+-    describe: 神秘的な光を放つ水晶。使い古した杖の魔力を回復させることができる。
++    describe: 神秘的な光を放つ水晶 使い古した杖の魔力を回復させることができる
+     floor_spawnable: true
+   # copper_ore:
+   #   name: 銅の鉱石
+@@ -191,7 +191,7 @@
+     image_path: components/pictures/icon/red_stone.png
+     max_stack: 3
+     shop_buyable: false
+-    describe: "加護が宿る石。鍛冶屋で攻撃関連のパラメータを1つ選択して強化できる。"
++    describe: "加護が宿る石 鍛冶屋で攻撃関連のパラメータを1つ選択して強化できる"
+     floor_spawnable: true
+   blue_stone:
+     name: "青い鉱石"
+@@ -203,7 +203,7 @@
+     image_path: components/pictures/icon/blue_stone.png
+     max_stack: 3
+     shop_buyable: false
+-    describe: "加護が宿る石。鍛冶屋で防御・HP関連のパラメータを1つ選択して強化できる。"
++    describe: "加護が宿る石 鍛冶屋で防御・HP関連のパラメータを1つ選択して強化できる"
+     floor_spawnable: true
+   green_stone:
+     name: "緑の鉱石"
+@@ -215,7 +215,7 @@
+     image_path: components/pictures/icon/green_stone.png
+     max_stack: 3
+     shop_buyable: false
+-    describe: "加護が宿る石。鍛冶屋で回避や回復、特殊効果などのパラメータを1つ選択して強化できる。"
++    describe: "加護が宿る石 鍛冶屋で回避や回復、特殊効果などのパラメータを1つ選択して強化できる"
+     floor_spawnable: true
+   purple_stone:
+     name: "紫の鉱石"
+@@ -227,7 +227,7 @@
+     image_path: components/pictures/icon/purple_stone.png
+     max_stack: 3
+     shop_buyable: false
+-    describe: "加護が宿る石。鍛冶屋で杖関連のパラメータを1つ選択して強化できる。"
++    describe: "加護が宿る石 鍛冶屋で杖関連のパラメータを1つ選択して強化できる"
+     floor_spawnable: true
+ 
+   guild_cert_e:
+@@ -241,7 +241,7 @@
+     shop_buyable: false
+     min_floor: 11
+     max_floor: 11
+-    describe: E級冒険者の証。ギルドに認められた駆け出し冒険者の象徴。
++    describe: E級冒険者の証 ギルドに認められた駆け出し冒険者の象徴
+     floor_spawnable: true
+   guild_cert_d:
+     name: D級ギルド証
+@@ -254,7 +254,7 @@
+     shop_buyable: false
+     min_floor: 21
+     max_floor: 21
+-    describe: D級冒険者の証。一通りの経験を積んだ冒険者として認められた証。
++    describe: D級冒険者の証 一通りの経験を積んだ冒険者として認められた証
+     floor_spawnable: true
+   guild_cert_c:
+     name: C級ギルド証
+@@ -267,7 +267,7 @@
+     shop_buyable: false
+     min_floor: 30
+     max_floor: 30
+-    describe: C級冒険者の証。中堅冒険者として、より危険な依頼への参加が許される。
++    describe: C級冒険者の証 中堅冒険者として、より危険な依頼への参加が許される
+     floor_spawnable: true
+   guild_cert_b:
+     name: B級ギルド証
+@@ -280,7 +280,7 @@
+     shop_buyable: false
+     min_floor: 35
+     max_floor: 35
+-    describe: B級冒険者の証。熟練の冒険者のみが手にできる栄誉ある証。
++    describe: B級冒険者の証 熟練の冒険者のみが手にできる栄誉ある証
+     floor_spawnable: true
+   guild_cert_a:
+     name: A級ギルド証
+@@ -293,7 +293,7 @@
+     shop_buyable: false
+     min_floor: 55
+     max_floor: 55
+-    describe: 'A級冒険者の証。一流の証であり、多くの冒険者の憧れの的。'
++    describe: 'A級冒険者の証 一流の証であり、多くの冒険者の憧れの的'
+     floor_spawnable: true
+   guild_cert_s:
+     name: S級ギルド証
+@@ -306,7 +306,7 @@
+     shop_buyable: false
+     min_floor: 70
+     max_floor: 70
+-    describe: S級冒険者の証。英雄に等しい実力を持つ者だけに授与される。
++    describe: S級冒険者の証 英雄に等しい実力を持つ者だけに授与される
+     floor_spawnable: true
+   guild_cert_ss:
+     name: SS級ギルド証
+@@ -319,7 +319,7 @@
+     shop_buyable: false
+     min_floor: 80
+     max_floor: 80
+-    describe: SS級冒険者の証。伝説に名を刻む、至高の冒険者の証。
++    describe: SS級冒険者の証 伝説に名を刻む、至高の冒険者の証
+     floor_spawnable: true
+   adventurer_proof:
+     name: 冒険者の証
+@@ -332,7 +332,7 @@
+     shop_buyable: false
+     min_floor: 5
+     max_floor: 5
+-    describe: ギルドへの正式加入を認められるための証。これを持ち帰れば一人前の冒険者だ。
++    describe: ギルドへの正式加入を認められるための証 これを持ち帰れば一人前の冒険者だ
+     floor_spawnable: true
+   fathers_keepsake:
+     name: 父の遺品
+@@ -345,7 +345,7 @@
+     shop_buyable: false
+     min_floor: 99
+     max_floor: 99
+-    describe: 父が遺した大切な品。かつての名冒険者だった父の記憶が刻まれている。
++    describe: 父が遺した大切な品 かつての名冒険者だった父の記憶が刻まれている
+     floor_spawnable: true
+ STAVE_DATA:
+   knockback_stave:
+@@ -364,7 +364,7 @@
+     damage_mult: 0.5
+     max_distance: 10
+     shop_buyable: true
+-    describe: 前方の敵を激しく弾き飛ばす魔法の杖。囲まれた時の脱出に役立つ。
++    describe: 前方の敵を激しく弾き飛ばす魔法の杖 囲まれた時の脱出に役立つ
+     floor_spawnable: true
+   broken_stave:
+     name: 壊れた杖
+@@ -377,7 +377,7 @@
+     charges: 0
+     image_path: components/pictures/icon/stave.png
+     shop_buyable: false
+-    describe: 完全に魔力が枯渇し、折れ曲がった杖。何の役にも立たない。
++    describe: 完全に魔力が枯渇し、折れ曲がった杖 何の役にも立たない
+     floor_spawnable: true
+   fire_stave:
+     name: 火炎の杖
+@@ -399,7 +399,7 @@
+       left: [[-1, -1], [-1, 0], [-1, 1], [-2, -1], [-2, 0], [-2, 1]]
+       right: [[1, -1], [1, 0], [1, 1], [2, -1], [2, 0], [2, 1]]
+     shop_buyable: true
+-    describe: 燃え盛る fire を放つ魔法の杖。自分前方の広範囲（2x3）を焼き尽くし、敵に大ダメージを与える。
++    describe: 燃え盛る fire を放つ魔法の杖 自分前方の広範囲（2x3）を焼き尽くし、敵に大ダメージを与える
+     floor_spawnable: true
+   heal_stave:
+     name: 回復の杖
+@@ -417,7 +417,7 @@
+     - 100
+     heal_ratio: 0.8
+     shop_buyable: true
+-    describe: 癒やしの光を放つ魔法の杖。自分や仲間の傷を癒やすことができる。
++    describe: 癒やしの光を放つ魔法の杖 自分や仲間の傷を癒やすことができる
+     floor_spawnable: true
+   invincible_stave:
+     name: 無敵の杖
+@@ -435,7 +435,7 @@
+     - 150
+     duration_turns: 10
+     shop_buyable: false
+-    describe: 一時的にあらゆる攻撃を無効化する聖なる杖。ここぞという時の切り札。
++    describe: 一時的にあらゆる攻撃を無効化する聖なる杖 ここぞという時の切り札
+     floor_spawnable: true
+   light_stave:
+     name: 燈の杖
+@@ -452,7 +452,7 @@
+     - 255
+     - 200
+     shop_buyable: true
+-    describe: フロア全体を一瞬で明るく照らす魔法の杖。隠れた罠や敵を暴き出す。
++    describe: フロア全体を一瞬で明るく照らす魔法の杖 隠れた罠や敵を暴き出す
+     floor_spawnable: true
+   yrden_stave:
+     name: 障壁の杖
+@@ -470,7 +470,7 @@
+     - 255
+     duration_turns: 40
+     shop_buyable: true
+-    describe: 正面の地面に、敵の侵入を防ぐ魔法の防壁（魔法陣）を配置する魔法の杖。
++    describe: 正面の地面に、敵の侵入を防ぐ魔法の防壁（魔法陣）を配置する魔法の杖
+     floor_spawnable: true
+   enchant_stave:
+     name: 付与の杖
+@@ -489,5 +489,5 @@
+     attack_buff_val: 5
+     duration_turns: 10
+     shop_buyable: true
+-    describe: 魔力で武器を強化する付与の杖。10ターンの間、プレイヤーの攻撃力が5上昇する。
+-    floor_spawnable: true
++    describe: 魔力で武器を強化する付与の杖 10ターンの間、プレイヤーの攻撃力が5上昇する
++    floor_spawnable: true
+
+--- /Users/tj/Desktop/2DGame/components/data/master/quests.yml (modified)
+--- /Users/tj/Desktop/2DGame/components/data/master/quests.yml
++++ /Users/tj/Desktop/2DGame/components/data/master/quests.yml.new
+@@ -49,7 +49,7 @@
+     reward_gp: 50
+     title: スイスイスライムの討伐
+     requester: ギルドマスター
+-    description: "ダンジョン深層に現れるという、驚異的な回避能力を持つスライムを討伐してください。(想定階層: 10F)"
++    description: "ダンジョン深層に現れるという、驚異的な回避能力を持つスライムを討伐してください (想定階層: 10F)"
+     repeatable: true
+     chance: 1.0
+     ending: false
+@@ -64,7 +64,7 @@
+     reward_gp: 150
+     title: スケスケスケルトンの討伐
+     requester: ギルドマスター
+-    description: "ダンジョンに現れる姿の薄いスケルトンを討伐し、その脅威を排除してください。(想定階層: 20F)"
++    description: "ダンジョンに現れる姿の薄いスケルトンを討伐し、その脅威を排除してください (想定階層: 20F)"
+     repeatable: true
+     chance: 1.0
+     ending: false
+@@ -79,7 +79,7 @@
+     reward_gp: 250
+     title: デカコウモリの討伐
+     requester: ギルドマスター
+-    description: "ダンジョン中層に現れるという、猛毒を持つ巨大なコウモリを討伐してください。(想定階層: 35F)"
++    description: "ダンジョン中層に現れるという、猛毒を持つ巨大なコウモリを討伐してください (想定階層: 35F)"
+     repeatable: true
+     chance: 1.0
+     ending: false
+
+--- /Users/tj/Desktop/2DGame/components/data/master/equipments/accessories.yml (modified)
+--- /Users/tj/Desktop/2DGame/components/data/master/equipments/accessories.yml
++++ /Users/tj/Desktop/2DGame/components/data/master/equipments/accessories.yml.new
+@@ -58,7 +58,7 @@
+     image_scale: 1.0
+     shop_buyable: true
+     floor_spawnable: true
+-    describe: 周囲を微かに照らすカンテラ。
++    describe: 周囲を微かに照らすカンテラ
+     growth: {bonus_limit: 1, times_limit: 10, over_limit_growth_rate: 0.001}
+     type: accessory
+     bonus:
+@@ -134,7 +134,7 @@
+     image_scale: 1.0
+     shop_buyable: true
+     floor_spawnable: true
+-    describe: 装備者の身を守る魔力が込められた指輪。
++    describe: 装備者の身を守る魔力が込められた指輪
+     growth: {bonus_limit: 4, times_limit: 20, over_limit_growth_rate: 0.002}
+     type: accessory
+     bonus:
+
+--- /Users/tj/Desktop/2DGame/components/data/master/equipments/shields.yml (modified)
+--- /Users/tj/Desktop/2DGame/components/data/master/equipments/shields.yml
++++ /Users/tj/Desktop/2DGame/components/data/master/equipments/shields.yml.new
+@@ -226,7 +226,7 @@
+     price: 2000
+     image_dir: components/pictures/shield
+     shop_buyable: true
+-    describe: 標準的な戦士の盾。特別な補正はなく、扱いやすい。
++    describe: 標準的な戦士の盾 特別な補正はなく、扱いやすい
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     image_scale: 1.0
+     floor_spawnable: true
+@@ -263,7 +263,7 @@
+     price: 1200
+     image_dir: components/pictures/shield
+     shop_buyable: true
+-    describe: 隠密性と回避力を高めるため、極限まで軽量化された木製の盾。
++    describe: 隠密性と回避力を高めるため、極限まで軽量化された木製の盾
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     image_scale: 1.0
+     floor_spawnable: true
+@@ -300,7 +300,7 @@
+     price: 4000
+     image_dir: components/pictures/shield
+     shop_buyable: true
+-    describe: 圧倒的なガード率を誇る重厚な盾。その大きさゆえに身動きが鈍くなり、敵に狙われやすい。
++    describe: 圧倒的なガード率を誇る重厚な盾 その大きさゆえに身動きが鈍くなり、敵に狙われやすい
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     image_scale: 1.0
+     floor_spawnable: true
+@@ -337,7 +337,7 @@
+     price: 3000
+     image_dir: components/pictures/shield
+     shop_buyable: true
+-    describe: 魔力を帯びた盾。ガード率は控えめだが、攻撃魔法の威力・射程・回数を強化する。
++    describe: 魔力を帯びた盾 ガード率は控えめだが、攻撃魔法の威力・射程・回数を強化する
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     image_scale: 1.0
+     floor_spawnable: true
+@@ -374,7 +374,7 @@
+     price: 3200
+     image_dir: components/pictures/shield
+     shop_buyable: true
+-    describe: 聖なる加護を受けた巡礼者の盾。所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する。
++    describe: 聖なる加護を受けた巡礼者の盾 所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     image_scale: 1.0
+     floor_spawnable: true
+@@ -411,7 +411,7 @@
+     price: 2600
+     image_dir: components/pictures/shield
+     shop_buyable: true
+-    describe: 黒く染められた軽量の革盾。敵に見つかりにくくなり、高い回避率と会心率を誇る。
++    describe: 黒く染められた軽量の革盾 敵に見つかりにくくなり、高い回避率と会心率を誇る
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     image_scale: 1.0
+     floor_spawnable: true
+
+--- /Users/tj/Desktop/2DGame/components/data/master/equipments/weapons.yml (modified)
+--- /Users/tj/Desktop/2DGame/components/data/master/equipments/weapons.yml
++++ /Users/tj/Desktop/2DGame/components/data/master/equipments/weapons.yml.new
+@@ -79,7 +79,7 @@
+     image_path: components/pictures/weapon/broken_sword.png
+     sound: components/sounds/sfx/sword_swing.wav
+     image_scale: 1.2
+-    describe: 刃がボロボロで、今にも折れそうな剣。
++    describe: 刃がボロボロで、今にも折れそうな剣
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     type: onehanded_sword
+     floor_spawnable: false
+@@ -118,7 +118,7 @@
+     sound: components/sounds/sfx/sword_swing.wav
+     image_scale: 1.2
+     shop_buyable: true
+-    describe: 鉄製の標準的な剣。丈夫で扱いやすい。
++    describe: 鉄製の標準的な剣 丈夫で扱いやすい
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     type: onehanded_sword
+     floor_spawnable: true
+@@ -157,7 +157,7 @@
+     sound: components/sounds/sfx/sword_swing.wav
+     image_scale: 1.2
+     shop_buyable: false
+-    describe: 長年放置され、刃がこぼれた古い剣。戦うには心もとない。
++    describe: 長年放置され、刃がこぼれた古い剣 戦うには心もとない
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     type: onehanded_sword
+     floor_spawnable: false
+@@ -196,7 +196,7 @@
+     sound: components/sounds/sfx/wood_swing.wav
+     image_scale: 1.3
+     shop_buyable: true
+-    describe: その辺の木を削って作った鈍器。不恰好だが威力はそれなり？
++    describe: その辺の木を削って作った鈍器 不恰好だが威力はそれなり？
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     type: axe
+     floor_spawnable: true
+@@ -235,7 +235,7 @@
+     sound: components/sounds/sfx/sword_swing.wav
+     image_scale: 1.2
+     shop_buyable: false
+-    describe: 鉄を鍛え上げて打った剣。鉄より鋭く重い。
++    describe: 鉄を鍛え上げて打った剣 鉄より鋭く重い
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     type: onehanded_sword
+     floor_spawnable: true
+@@ -313,7 +313,7 @@
+     sound: components/sounds/sfx/sword_swing.wav
+     image_scale: 1.0
+     shop_buyable: true
+-    describe: 音もなく獲物を屠るための特殊な刀。装備するとモンスターに気づかれにくくなる。
++    describe: 音もなく獲物を屠るための特殊な刀 装備するとモンスターに気づかれにくくなる
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     type: dagger
+     floor_spawnable: true
+@@ -352,7 +352,7 @@
+     sound: components/sounds/sfx/sword_swing.wav
+     image_scale: 1.2
+     shop_buyable: true
+-    describe: 標準的な戦士の片手剣。特別な補正はなく、扱いやすい。
++    describe: 標準的な戦士の片手剣 特別な補正はなく、扱いやすい
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     type: onehanded_sword
+     floor_spawnable: true
+@@ -391,7 +391,7 @@
+     sound: components/sounds/sfx/sword_swing.wav
+     image_scale: 1.2
+     shop_buyable: true
+-    describe: 急所を突くことに特化した細身の刺突剣。攻撃力は低いが、高い命中率と会心率（15/100）を誇り、鎧を貫通する。
++    describe: 急所を突くことに特化した細身の刺突剣 攻撃力は低いが、高い命中率と会心率（15/100）を誇り、鎧を貫通する
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     type: onehanded_sword
+     floor_spawnable: true
+@@ -430,7 +430,7 @@
+     sound: components/sounds/sfx/sword_swing.wav
+     image_scale: 1.3
+     shop_buyable: true
+-    describe: 強大な破壊力を持つ騎士の巨大な斧。攻撃力は凄まじいが、重量ゆえに回避率や命中率が低下し、敵に感知されやすくなる。
++    describe: 強大な破壊力を持つ騎士の巨大な斧 攻撃力は凄まじいが、重量ゆえに回避率や命中率が低下し、敵に感知されやすくなる
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     type: axe
+     floor_spawnable: true
+@@ -469,7 +469,7 @@
+     sound: components/sounds/sfx/sword_swing.wav
+     image_scale: 1.2
+     shop_buyable: true
+-    describe: 魔力を宿すスタッフ。物理攻撃力は低いが、攻撃魔法の威力・射程・回数を強化する。
++    describe: 魔力を宿すスタッフ 物理攻撃力は低いが、攻撃魔法の威力・射程・回数を強化する
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     type: onehanded_sword
+     floor_spawnable: true
+@@ -508,7 +508,7 @@
+     sound: components/sounds/sfx/sword_swing.wav
+     image_scale: 1.2
+     shop_buyable: true
+-    describe: 聖なる加護を受けた剣。所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する。
++    describe: 聖なる加護を受けた剣 所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     type: onehanded_sword
+     floor_spawnable: true
+@@ -547,7 +547,7 @@
+     sound: components/sounds/sfx/sword_swing.wav
+     image_scale: 1.0
+     shop_buyable: true
+-    describe: 隠密偵察用の小型ナイフ。攻撃力は控えめだが、非常に高い会心率（20/100）と回避率を持つ。
++    describe: 隠密偵察用の小型ナイフ 攻撃力は控えめだが、非常に高い会心率（20/100）と回避率を持つ
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     type: dagger
+     floor_spawnable: true
+
+--- /Users/tj/Desktop/2DGame/components/data/master/equipments/armors.yml (modified)
+--- /Users/tj/Desktop/2DGame/components/data/master/equipments/armors.yml
++++ /Users/tj/Desktop/2DGame/components/data/master/equipments/armors.yml.new
+@@ -38,7 +38,7 @@
+     price: 100
+     image_dir: components/pictures/armor/adventurers_clothes
+     shop_buyable: false
+-    describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない。
++    describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     floor_spawnable: false
+     bonus:
+@@ -250,7 +250,7 @@
+     price: 2000
+     image_dir: components/pictures/armor/leather_armor
+     shop_buyable: true
+-    describe: 巡礼者が旅の安全を祈って着る聖なるローブ。魔法の効果を高める力がある。
++    describe: 巡礼者が旅の安全を祈って着る聖なるローブ 魔法の効果を高める力がある
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     floor_spawnable: true
+     bonus:
+@@ -286,7 +286,7 @@
+     price: 1200
+     image_dir: components/pictures/armor/hunters_armor
+     shop_buyable: true
+-    describe: 隠密性に特化した深紺の軽装。防御力は極めて低いが、攻撃の命中率と会心率（10/100）が大きく向上する。
++    describe: 隠密性に特化した深紺の軽装 防御力は極めて低いが、攻撃の命中率と会心率（10/100）が大きく向上する
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     floor_spawnable: true
+     bonus:
+@@ -322,7 +322,7 @@
+     price: 2500
+     image_dir: components/pictures/armor/fighters_armor
+     shop_buyable: true
+-    describe: 標準的な戦士の鎧。特にバフやデバフはなく、扱いやすい。
++    describe: 標準的な戦士の鎧 特にバフやデバフはなく、扱いやすい
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     floor_spawnable: true
+     bonus:
+@@ -358,7 +358,7 @@
+     price: 4500
+     image_dir: components/pictures/armor/knight_heavy_armor
+     shop_buyable: true
+-    describe: 鉄板を重ねた非常に強固な鎧。重さゆえに敵に気づかれやすく、回避や命中、視野が低下する。
++    describe: 鉄板を重ねた非常に強固な鎧 重さゆえに敵に気づかれやすく、回避や命中、視野が低下する
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     floor_spawnable: true
+     bonus:
+@@ -394,7 +394,7 @@
+     price: 3200
+     image_dir: components/pictures/armor/pilgrims_armor 
+     shop_buyable: true
+-    describe: 聖なる加護を受けた巡礼者の軽防具。最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する。
++    describe: 聖なる加護を受けた巡礼者の軽防具 最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     floor_spawnable: true
+     bonus:
+@@ -430,7 +430,7 @@
+     price: 2800
+     image_dir: components/pictures/armor/scount_armor
+     shop_buyable: true
+-    describe: 隠密性に特化した偵察用の軽装鎧。敵に見つかりにくくなり、回避率と会心率が高まる。
++    describe: 隠密性に特化した偵察用の軽装鎧 敵に見つかりにくくなり、回避率と会心率が高まる
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     floor_spawnable: true
+     bonus:
+@@ -466,7 +466,7 @@
+     price: 3200
+     image_dir: components/pictures/armor/mages_robe
+     shop_buyable: true
+-    describe: 魔力の流れを操る高貴な紫の魔導衣。軽装で動きやすく、火炎・吹飛などの攻撃魔法の威力・射程を極限まで引き出す。
++    describe: 魔力の流れを操る高貴な紫の魔導衣 軽装で動きやすく、火炎・吹飛などの攻撃魔法の威力・射程を極限まで引き出す
+     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+     floor_spawnable: true
+     bonus:
+
+--- /Users/tj/Desktop/2DGame/systems/ui.py (modified)
+--- /Users/tj/Desktop/2DGame/systems/ui.py
++++ /Users/tj/Desktop/2DGame/systems/ui.py.new
+@@ -908,7 +908,7 @@
+     def on_activated(self): pass  # open 時フック（サブクラスでオーバーライド）
+ 
+     def _close_back(self):
+-        """「もどる」: 親ダイアログがあればそれを再表示、なければ普通に閉じる。"""
++        """「もどる」: 親ダイアログがあればそれを再表示、なければ普通に閉じる"""
+         self.is_active = False
+         if self._back_dialog:
+             self._back_dialog.is_active = True
+@@ -927,7 +927,7 @@
+ 
+     # --- 共通ナビゲーション ---
+     def _navigate(self, events):
+-        """カーソル移動を処理し、'cancel'|'confirm'|None を返す。"""
++        """カーソル移動を処理し、'cancel'|'confirm'|None を返す"""
+         from systems.audio_manager import play_sfx
+         from constants import SOUND_CURSOR_MOVE, KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_CANCEL, KEY_CONFIRM
+         for event in events:
+@@ -1437,14 +1437,14 @@
+                  "block_chance_ranged": "遠距離回避率", "aggro_mod": "感知補正",
+                  "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON}
+         MAGIC_MAP = {
+-            "magic_fire_damage":    "🔥炎ダメージ",
+-            "magic_fire_range":     "🔥炎射程",
+-            "magic_heal_ratio":     "💚回復量",
+-            "magic_knockback_damage":"💨吹飛ダメージ",
+-            "magic_invincible_turns":"✨無敵ターン",
+-            "magic_stave_bonus":     "🔮杖回数",
+-            "magic_light_stave_bonus": "💡燈杖回",
+-            "magic_yrden_turns":     "🌀障壁ターン",
++            "magic_fire_damage":    "炎ダメージ",
++            "magic_fire_range":     "炎射程",
++            "magic_heal_ratio":     "回復量",
++            "magic_knockback_damage":"吹飛ダメージ",
++            "magic_invincible_turns":"無敵ターン",
++            "magic_stave_bonus":     "杖回数",
++            "magic_light_stave_bonus": "燈杖回",
++            "magic_yrden_turns":     "障壁ターン",
+         }
+         
+         def fmt(val):
+@@ -1591,15 +1591,15 @@
+         self.callbacks = []
+         self._dungeon = None
+         self.items = [
+-            (Text.UI.MENU_ITEMS,      "所持アイテム（薬・巻物など）の一覧を表示します。"),
+-            (Text.UI.MENU_EQUIP,      "武器・鎧・盾・カンテラの管理画面を開きます。"),
+-            (Text.UI.MENU_STAVES,     "所持している杖の管理画面を開きます。"),
+-            (Text.UI.MENU_EVENT_ITEMS, "冒険者の証などの貴重品を確認します。"),
+-            (Text.UI.MENU_STATUS,     "プレイヤーのステータスを表示します。"),
+-            (Text.UI.MENU_QUESTS,     "現在のクエスト進捗を確認します。"),
+-            (Text.UI.MENU_QUIT,       "タイトル画面に戻ります。"),
+-            (Text.UI.MENU_MAP_TOGGLE, "ミニマップの表示・非表示を切り替えます。"),
+-            (Text.UI.MENU_BACK,       "メニューを閉じます。"),
++            (Text.UI.MENU_ITEMS,      "所持アイテム（薬・巻物など）の一覧を表示します"),
++            (Text.UI.MENU_EQUIP,      "武器・鎧・盾・カンテラの管理画面を開きます"),
++            (Text.UI.MENU_STAVES,     "所持している杖の管理画面を開きます"),
++            (Text.UI.MENU_EVENT_ITEMS, "冒険者の証などの貴重品を確認します"),
++            (Text.UI.MENU_STATUS,     "プレイヤーのステータスを表示します"),
++            (Text.UI.MENU_QUESTS,     "現在のクエスト進捗を確認します"),
++            (Text.UI.MENU_QUIT,       "タイトル画面に戻ります"),
++            (Text.UI.MENU_MAP_TOGGLE, "ミニマップの表示・非表示を切り替えます"),
++            (Text.UI.MENU_BACK,       "メニューを閉じます"),
+         ]
+ 
+     def setup(self, on_items, on_equip, on_staves, on_event, on_status, on_quests, on_quit):
+@@ -1641,7 +1641,7 @@
+                 self.is_active = False  # メニューを閉じる
+ 
+     def setup2(self, inventory_dialog, equip_dialog, status_dialog, stave_inv_dialog=None, event_inv_dialog=None):
+-        """サブダイアログに「もどる」先として自分を登録する。"""
++        """サブダイアログに「もどる」先として自分を登録する"""
+         if inventory_dialog: inventory_dialog._back_dialog = self
+         if equip_dialog:     equip_dialog._back_dialog = self
+         if status_dialog:    status_dialog._back_dialog = self
+@@ -2093,7 +2093,7 @@
+                                             return
+                                     elif getattr(npc, "role", None) == "magic_shop":
+                                         if shop_dialog and dungeon:
+-                                            dialog.text = "フォッフォッフォ、杖のことならわしに任せるがよいぞ。"
++                                            dialog.text = "フォッフォッフォ、杖のことならわしに任せるがよいぞ"
+                                             dialog.is_active = True
+                                             shop_dialog.open_shop("魔法屋", dungeon.magic_shop_stock)
+                                             return
+@@ -2201,7 +2201,7 @@
+                                         if teleport_dialog:
+                                             teleport_dialog.setup_destinations(player)
+                                             if not teleport_dialog.items:
+-                                                dialog.text = "「まだ転移できる場所がないようじゃな。\n もう少し深く潜ってみなされ。」"
++                                                dialog.text = "「まだ転移できる場所がないようじゃな \n もう少し深く潜ってみなされ」"
+                                                 dialog.is_active = True
+                                                 return
+                                             # 先に挨拶を表示
+@@ -2313,30 +2313,30 @@
+ 
+             # 通常メニュー (モードに関わらずMENUなら常に構築する)
+             self.items = [
+-                ("mode", "ACCEPT_DAILY", "日常依頼を受注", "ランダムに生成された日常的な依頼を受けます。"),
++                ("mode", "ACCEPT_DAILY", "日常依頼を受注", "ランダムに生成された日常的な依頼を受けます"),
+             ]
+             # 昇格試験の判定
+             next_rank_data = dungeon.guild_system.get_next_rank_data(player.guild_rank)
+             if next_rank_data and player.guild_point >= next_rank_data["required_gp"]:
+                 already_active = any(q.get("is_rank_up") for q in player.active_quests)
+                 if not already_active:
+-                    self.items.append(("mode", "ACCEPT_RANKUP", "昇級試験を受ける", f"{next_rank_data['rank']}ランクへの昇格試験に挑戦します。"))
++                    self.items.append(("mode", "ACCEPT_RANKUP", "昇級試験を受ける", f"{next_rank_data['rank']}ランクへの昇格試験に挑戦します"))
+             
+             # 次のランクまでのギルドポイントを説明する案内項目をメニューに追加
+             if next_rank_data:
+                 needed_gp = next_rank_data["required_gp"] - player.guild_point
+                 if needed_gp > 0:
+-                    info_desc = f"次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です。\n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
++                    info_desc = f"次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です \n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
+                 else:
+                     info_desc = f"次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(昇級試験を受けられます)"
+             else:
+-                info_desc = "これ以上は昇格できません。あなたは最高ランクに達しています！"
+-            self.items.append(("info_rank", None, "🏆 ランク情報を確認", info_desc))
+-            
+-            self.items.append(("mode", "ACCEPT_FIXED", "特別な依頼を見る", "特定の条件で発生する特別な依頼を確認します。"))
+-            self.items.append(("mode", "ABANDON", "依頼破棄", "現在受けている依頼をキャンセルします。"))
+-            self.items.append(("mode", "SAVE", "💾 記録する", "現在の進行状況をセーブします。"))
+-            self.items.append(("cancel", None, "🚪 ギルドを出る", "ギルドメニューを終了します。"))
++                info_desc = "これ以上は昇格できません あなたは最高ランクに達しています！"
++            self.items.append(("info_rank", None, "ランク情報を確認", info_desc))
++            
++            self.items.append(("mode", "ACCEPT_FIXED", "特別な依頼を見る", "特定の条件で発生する特別な依頼を確認します"))
++            self.items.append(("mode", "ABANDON", "依頼破棄", "現在受けている依頼をキャンセルします"))
++            self.items.append(("mode", "SAVE", "記録する", "現在の進行状況をセーブします"))
++            self.items.append(("cancel", None, "ギルドを出る", "ギルドメニューを終了します"))
+             
+         elif self.mode == "REPORT":
+             # 条件を満たしているもののみ
+@@ -2378,7 +2378,7 @@
+         from constants import CONSUMABLE_DATA
+         cert_data = CONSUMABLE_DATA.get(next_rank_data["rank_up_item"], {})
+         target_floor = cert_data.get("min_floor", 1)
+-        description = f"次のランクへ昇級するための試験です。\n対象フロアの最奥に配置される『{cert_data.get('name', '冒険者の証')}』を回収してきてください。(対象階層: {target_floor}F)"
++        description = f"次のランクへ昇級するための試験です \n対象フロアの最奥に配置される『{cert_data.get('name', '冒険者の証')}』を回収してきてください (対象階層: {target_floor}F)"
+         return {
+             "id": f"rank_up_{next_rank_data['rank']}",
+             "type": "delivery", "is_rank_up": True,
+@@ -2520,7 +2520,7 @@
+                 elif q in self.dungeon_ref.guild_system.fixed_quests:
+                     self.dungeon_ref.guild_system.fixed_quests.remove(q)
+                 
+-                # 🎵 効果音再生
++                # 効果音再生
+                 from systems.sound_handler import sound_manager
+                 from constants import SOUND_SELECT
+                 sound_manager.play_sfx(SOUND_SELECT)
+@@ -2561,14 +2561,14 @@
+                 success = True
+         
+         if success:
+-            # 🎵 簡易ファンファーレを生成して再生
++            # 簡易ファンファーレを生成して再生
+             self._play_placeholder_complete_sound()
+ 
+             if q.get("is_rank_up"):
+                 player.guild_rank = q["next_rank"]
+                 
+                 def on_done():
+-                    dialog.text = f"依頼達成ですね。\n{player.guild_rank}ランクに昇格です！おめでとうございます！"
++                    dialog.text = f"依頼達成ですね \n{player.guild_rank}ランクに昇格です！おめでとうございます！"
+                     dialog.is_active = True
+                     
+                 if hasattr(self, "cutscene_manager") and self.cutscene_manager:
+@@ -2761,17 +2761,17 @@
+             if status == "mode":
+                 mode_id = selected_item[1]
+                 menu_descs = {
+-                    "REPORT": "完了した依頼の報告を行い、\n報酬を受け取ります。",
+-                    "ACCEPT_DAILY": "階層に応じた日常依頼を受注します。\n(お小遣い稼ぎに適したランダムな内容です)",
+-                    "ACCEPT_RANKUP": "次のランクへ昇格するための試験を受けます。\n(ストーリーが進行する重要な依頼です)",
+-                    "ACCEPT_FIXED": "特定の条件で発生する依頼を確認します。\n(ボス戦や重要なイベントが発生します)",
+-                    "ABANDON": "現在受けている依頼を中止します。\n※違約金とGPの減少が発生します。"
++                    "REPORT": "完了した依頼の報告を行い、\n報酬を受け取ります",
++                    "ACCEPT_DAILY": "階層に応じた日常依頼を受注します \n(お小遣い稼ぎに適したランダムな内容です)",
++                    "ACCEPT_RANKUP": "次のランクへ昇格するための試験を受けます \n(ストーリーが進行する重要な依頼です)",
++                    "ACCEPT_FIXED": "特定の条件で発生する依頼を確認します \n(ボス戦や重要なイベントが発生します)",
++                    "ABANDON": "現在受けている依頼を中止します \n※違約金とGPの減少が発生します"
+                 }
+                 desc_text = menu_descs.get(mode_id, Text.UI.STATUS_MENU_HINT)
+             elif status == "info_rank":
+                 desc_text = selected_item[3]
+             elif status in ("cancel", "back"):
+-                desc_text = "前の画面に戻ります。"
++                desc_text = "前の画面に戻ります"
+             else:
+                 # 依頼詳細 (データ不備に備えて .get() で安全にアクセス)
+                 q = selected_item[1]
+@@ -2811,9 +2811,9 @@
+                     is_static = ENEMY_DATA.get(key, {}).get("is_static", False)
+                     unit = "個" if is_static else "体"
+                     verb = "破壊" if is_static else "討伐"
+-                    desc_text += f"【内容】\n{target} を {amount} {unit}{verb}する。"
++                    desc_text += f"【内容】\n{target} を {amount} {unit}{verb}する"
+                 elif t == "delivery":
+-                    desc_text += f"【内容】\n{target} を {amount} 個納品する。"
++                    desc_text += f"【内容】\n{target} を {amount} 個納品する"
+                 
+                 reward_gold = q.get("reward_gold", 0)
+                 reward_gp = q.get("reward_gp", 0)
+@@ -3140,7 +3140,7 @@
+                 right_lines.append("なし")
+ 
+             if not has_any_bonus and not has_magic_bonus:
+-                screen.blit(self.font.render("適用中の装備の加護はありません。", True, (200, 200, 200)), (content_x, content_y))
++                screen.blit(self.font.render("適用中の装備の加護はありません", True, (200, 200, 200)), (content_x, content_y))
+             else:
+                 line_h = self.font.get_height() + 5
+                 col_w = cw // 2
+@@ -3155,7 +3155,7 @@
+         elif self.mode == "QUESTS":
+             lines = [f"【受注中のクエスト】"]
+             if not player.active_quests:
+-                lines.append("現在受注している依頼はありません。")
++                lines.append("現在受注している依頼はありません")
+             else:
+                 for q in player.active_quests:
+                     prog = ""
+@@ -3448,7 +3448,7 @@
+                 if info.get("attack_bonus", 0) != 0: lines.append(f"攻撃力: +{info['attack_bonus']}")
+                 if info.get("defense_bonus", 0) != 0: lines.append(f"防御力: +{info['defense_bonus']}")
+                 if info.get("hp_bonus", 0) != 0: lines.append(f"最大HP: +{info['hp_bonus']}")
+-            lines.append(""); lines.append(info.get("describe", "詳細情報はありません。") if selected[1] != "cancel" else "店を出ます。")
++            lines.append(""); lines.append(info.get("describe", "詳細情報はありません") if selected[1] != "cancel" else "店を出ます")
+             draw_text_wrapped(screen, self.font, "\n".join(lines), sep_x + 30, self.y + 80, self.width // 2 - 60, color=(220, 230, 240))
+ 
+ class WarehouseDialog(BaseListDialog):
+@@ -3466,9 +3466,9 @@
+     def setup_main_menu(self):
+         self.mode = "MAIN"; self.cursor_idx = 0
+         self.items = [
+-            ("mode_deposit", "action", Text.UI.WAREHOUSE_DEPOSIT, "アイテムを預けます。", False),
+-            ("mode_withdraw", "action", Text.UI.WAREHOUSE_WITHDRAW, "アイテムを引き出します。", False),
+-            ("cancel", "cancel", Text.UI.QUIT, "店を出ます。", False)
++            ("mode_deposit", "action", Text.UI.WAREHOUSE_DEPOSIT, "アイテムを預けます", False),
++            ("mode_withdraw", "action", Text.UI.WAREHOUSE_WITHDRAW, "アイテムを引き出します", False),
++            ("cancel", "cancel", Text.UI.QUIT, "店を出ます", False)
+         ]
+ 
+     def setup_deposit_mode(self, player):
+@@ -3547,7 +3547,7 @@
+         _id, itype, name, obj, is_equipped = selected
+         if is_equipped:
+             if dialog:
+-                dialog.text = "装備中のアイテムは預けられません。\n装備を外してから再度お試しください。"
++                dialog.text = "装備中のアイテムは預けられません \n装備を外してから再度お試しください"
+                 dialog.is_active = True
+             return
+ 
+@@ -3669,9 +3669,9 @@
+             else:
+                 info_lines.append(f"品名: {sel[2]}")
+                 if is_equipped:
+-                    info_lines.append("※装備中のため預けられません。")
++                    info_lines.append("※装備中のため預けられません")
+                 else:
+-                    info_lines.append("倉庫に預けます。" if self.mode == "DEPOSIT" else "倉庫から引き出します。")
++                    info_lines.append("倉庫に預けます" if self.mode == "DEPOSIT" else "倉庫から引き出します")
+                 
+                 desc = ""
+                 if "inst" in status:
+@@ -3691,13 +3691,13 @@
+         super().__init__(screen_width, screen_height)
+         self.row_height = 40
+         self.items = [
+-            ("DEPOSIT",  100,  Text.UI.BANK_DEPOSIT_100,   "100 G を銀行に預けます。"),
+-            ("DEPOSIT",  1000, Text.UI.BANK_DEPOSIT_1000,  "1000 G を銀行に預けます。"),
+-            ("DEPOSIT",  -1,   Text.UI.BANK_DEPOSIT_ALL,   "所持金を全額銀行に預けます。"),
+-            ("WITHDRAW", 100,  Text.UI.BANK_WITHDRAW_100,  "100 G を引き出します。"),
+-            ("WITHDRAW", 1000, Text.UI.BANK_WITHDRAW_1000, "1000 G を引き出します。"),
+-            ("WITHDRAW", -1,   Text.UI.BANK_WITHDRAW_ALL,  "銀行残高を全額引き出します。"),
+-            ("CANCEL",   0,    Text.UI.QUIT,               "銀行を出ます。"),
++            ("DEPOSIT",  100,  Text.UI.BANK_DEPOSIT_100,   "100 G を銀行に預けます"),
++            ("DEPOSIT",  1000, Text.UI.BANK_DEPOSIT_1000,  "1000 G を銀行に預けます"),
++            ("DEPOSIT",  -1,   Text.UI.BANK_DEPOSIT_ALL,   "所持金を全額銀行に預けます"),
++            ("WITHDRAW", 100,  Text.UI.BANK_WITHDRAW_100,  "100 G を引き出します"),
++            ("WITHDRAW", 1000, Text.UI.BANK_WITHDRAW_1000, "1000 G を引き出します"),
++            ("WITHDRAW", -1,   Text.UI.BANK_WITHDRAW_ALL,  "銀行残高を全額引き出します"),
++            ("CANCEL",   0,    Text.UI.QUIT,               "銀行を出ます"),
+         ]
+ 
+     def get_title(self): return Text.UI.BANK_TITLE
+@@ -3749,7 +3749,7 @@
+     def draw(self, screen, player): super().draw(screen, player)
+ 
+ 
+-# 🌀 TELEPORT_DIALOG
++# TELEPORT_DIALOG
+ class TeleportDialog(BaseListDialog):
+     """テレポート屋（転移）での目的地選択を行うダイアログ"""
+     STATE_KEY = "teleport_active"
+@@ -3815,7 +3815,7 @@
+     def get_detail_lines(self, player):
+         if not self.items or self.cursor_idx >= len(self.items): return []
+         item = self.items[self.cursor_idx]
+-        if item["type"] == "cancel": return ["店を出ます。"]
++        if item["type"] == "cancel": return ["店を出ます"]
+         
+         from systems.guild import GuildSystem
+         guild = GuildSystem()
+@@ -3828,12 +3828,12 @@
+         if f_lv > 0:
+             lines.append(f"到達可能ランク: {req_rank}")
+             lines.append("")
+-            lines.append(f"地下 {f_lv} 階にある休憩所へ転移します。")
+-            lines.append("※強力な魔物の気配が漂っています。")
++            lines.append(f"地下 {f_lv} 階にある休憩所へ転移します")
++            lines.append("※強力な魔物の気配が漂っています")
+         else:
+             lines.append("")
+-            lines.append("冒険者の拠点となる村へ帰還します。")
+-            lines.append("一度休息をとり、装備を整えましょう。")
++            lines.append("冒険者の拠点となる村へ帰還します")
++            lines.append("一度休息をとり、装備を整えましょう")
+         return lines
+     # (Inherit open() from BaseListDialog to correctly set game_state[self.STATE_KEY] = True)
+ 
+@@ -3880,7 +3880,7 @@
+             elif not self._has_required_item(player):
+                 self.mode = "NO_ITEM"
+                 if dialog:
+-                    dialog.text = "テレポートには『転移の石』が必要です。"
++                    dialog.text = "テレポートには『転移の石』が必要です"
+                     dialog.is_active = True
+                 play_sfx(SOUND_CANCEL)
+                 return None
+@@ -3956,19 +3956,19 @@
+         if next_rank_data:
+             needed_gp = next_rank_data["required_gp"] - player.guild_point
+             if needed_gp > 0:
+-                rank_info_desc = f"現在のランクは {player.guild_rank} です。\n次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です。\n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
++                rank_info_desc = f"現在のランクは {player.guild_rank} です \n次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です \n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
+             else:
+-                rank_info_desc = f"現在のランクは {player.guild_rank} です。\n次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(ギルドの受付で昇級試験を受けられます)"
++                rank_info_desc = f"現在のランクは {player.guild_rank} です \n次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(ギルドの受付で昇級試験を受けられます)"
+         else:
+-            rank_info_desc = f"現在のランクは {player.guild_rank} です。あなたは最高ランクに達しています！"
++            rank_info_desc = f"現在のランクは {player.guild_rank} です あなたは最高ランクに達しています！"
+ 
+         self.items = [
+             {"key": "your_rank", "name": "あなたのランク", "desc": rank_info_desc},
+-            {"key": "guild_point", "name": "ギルドポイント", "desc": "【ギルドポイント(GP)とは】\nクエストを達成すると貰えるポイントよ。\nランクを上げる条件になるほか、神官様に死の呪いを解いてもらう際にも必要になるわ。"},
+-            {"key": "adventure_rank", "name": "冒険者ランク", "desc": "【冒険者ランク】\nランクは -（未加入）から始まり、F, E, D, C, B, A, S, SS までの9段階あるわ。\nランクが上がると、より難易度と報酬の高い依頼を受けられるようになるのよ。"},
+-            {"key": "floor_limit", "name": "到達可能階層", "desc": "【ランク制限】\nランクに応じて進める限界階層が決まっているわ。\n- : B0F(村のみ)\nF : B11F まで\nE : B21F まで\nD : B30F まで\nC : B35F まで\nB : B55F まで\nそれ以上のランクになれば、さらに深くまで進めるようになるわ！"},
+-            {"key": "promotion_exam", "name": "昇級試験", "desc": "【昇級試験】\nランクごとに必要なGPが溜まると、ギルドで試験を受けられるわ。\n試験クエストを受けて、そのランクのボスが落とす『冒険者の証』を回収して報告すればランクアップよ！"},
+-            {"key": "quit", "name": "閉じる", "desc": "説明を終わります。"}
++            {"key": "guild_point", "name": "ギルドポイント", "desc": "【ギルドポイント(GP)とは】\nクエストを達成すると貰えるポイントよ \nランクを上げる条件になるほか、神官様に死の呪いを解いてもらう際にも必要になるわ"},
++            {"key": "adventure_rank", "name": "冒険者ランク", "desc": "【冒険者ランク】\nランクは -（未加入）から始まり、F, E, D, C, B, A, S, SS までの9段階あるわ \nランクが上がると、より難易度と報酬の高い依頼を受けられるようになるのよ"},
++            {"key": "floor_limit", "name": "到達可能階層", "desc": "【ランク制限】\nランクに応じて進める限界階層が決まっているわ \n- : B0F(村のみ)\nF : B11F まで\nE : B21F まで\nD : B30F まで\nC : B35F まで\nB : B55F まで\nそれ以上のランクになれば、さらに深くまで進めるようになるわ！"},
++            {"key": "promotion_exam", "name": "昇級試験", "desc": "【昇級試験】\nランクごとに必要なGPが溜まると、ギルドで試験を受けられるわ \n試験クエストを受けて、そのランクのボスが落とす『冒険者の証』を回収して報告すればランクアップよ！"},
++            {"key": "quit", "name": "閉じる", "desc": "説明を終わります"}
+         ]
+ 
+     def get_title(self):
+
+--- /Users/tj/Desktop/2DGame/systems/magic_handler.py (modified)
+--- /Users/tj/Desktop/2DGame/systems/magic_handler.py
++++ /Users/tj/Desktop/2DGame/systems/magic_handler.py.new
+@@ -9,7 +9,7 @@
+ MAGIC_SETTINGS = load_master_data("magic_settings.yml")
+ 
+ # ============================================================
+-# ✨ 演出用エフェクトクラス
++# 演出用エフェクトクラス
+ # ============================================================
+ class MagicEffect:
+     def __init__(self, x, y, duration=30):
+@@ -221,7 +221,7 @@
+     effect_type = settings.get("effect_type")
+     print(f"[MAGIC] Execute Stave: {stave.name} (Key: {stave.key}, Effect: {effect_type})")
+ 
+-    # 🎵 効果音再生
++    # 効果音再生
+     sound_path = settings.get("sound")
+     if sound_path:
+         from systems.sound_handler import sound_manager
+@@ -469,7 +469,7 @@
+                 msg += f"\n強烈な光で {affected}体の敵の 感知能力が 低下した！"
+                 
+         return msg
+-    return "しかし 何も 起こらなかった。"
++    return "しかし 何も 起こらなかった"
+ 
+ def _effect_yrden(player, settings, dungeon, dialog, stave=None):
+     """正面1マスに敵の侵入を防ぐ魔法の防壁（障害物）を配置する"""
+
+Scan finished. Total modified files: 12
+Note: Running in DRY-RUN mode. Pass '--execute' to actually apply changes.

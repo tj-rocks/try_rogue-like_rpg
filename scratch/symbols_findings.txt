@@ -1,0 +1,83 @@
+=== NON-STANDARD SYMBOLS FOUND ===
+wordings.py:L180: BLACKSMITH_ENHANCE_PREVIEW = "{name}\n{label}: {before:.2f}{unit} → {after:.2f}{unit}\n強化回数: +{enhance}回目 (+{ore_bonus})" | Symbols: ['→']
+components/data/master/balance.yml:L2: # ⚖️ balance.yml - ゲーム全体のバランス調整窓口 | Symbols: ['⚖', '️']
+components/data/master/balance.yml:L5: # 👤 PLAYER (プレイヤーの初期能力と成長) | Symbols: ['👤']
+components/data/master/balance.yml:L38: # 🏰 DUNGEON (ダンジョン生成) | Symbols: ['🏰']
+components/data/master/balance.yml:L52: # 進捗率: (現在の階層 - 1) / (成長止まり階層 - 1)  ※5階ごとのステップ処理あり | Symbols: ['※']
+components/data/master/balance.yml:L65: # 👹 ENEMY_AI (敵の行動・スポーン・難易度) | Symbols: ['👹']
+components/data/master/balance.yml:L96: # 🔒 逃げ道封鎖AI (true=有効 / false=無効) | Symbols: ['🔒']
+components/data/master/balance.yml:L101: # 🧠 困惑度 (stupidity) ごとのぼーっと確率テーブル | Symbols: ['🧠']
+components/data/master/balance.yml:L117: # ⚔️ COMBAT (戦闘システム設定) | Symbols: ['️', '⚔']
+components/data/master/balance.yml:L132: # 💎 ITEMS (ドロップアイテム) | Symbols: ['💎']
+components/data/master/balance.yml:L145: # 🧱 OBSTACLES (障害物 - 壊せる壁や樽など) | Symbols: ['🧱']
+components/data/master/balance.yml:L159: # 🕸️ TRAPS (罠) | Symbols: ['️', '🕸']
+components/data/master/balance.yml:L168: # 💜 STATUS_EFFECTS (状態異常) | Symbols: ['💜']
+components/data/master/balance.yml:L177: # 🏠 VILLAGE_SERVICES (村の施設・サービス料金) | Symbols: ['🏠']
+components/data/master/balance.yml:L185: # 🤝 GUILD_QUEST (ギルド依頼) | Symbols: ['🤝']
+components/data/master/balance.yml:L201: # 📈 GLOBAL_SCALING (ランクによる自動スケーリング倍率) | Symbols: ['📈']
+components/data/master/balance.yml:L207: # 🚨 OUTBREAK_CONFIG (魔物の氾濫イベント設定) | Symbols: ['🚨']
+components/data/master/balance.yml:L219: # 🌀 TELEPORT_CONFIG (テレポート屋設定) | Symbols: ['🌀']
+components/data/master/balance.yml:L227: # 💀 CURSE_SYSTEM (呪いシステム設定) | Symbols: ['💀']
+components/data/master/quests.yml:L19: #   - 特定のボス討伐などに使用します。（※enemies.ymlで max_concurrent: 1 に設定された敵を対象にするなど） | Symbols: ['※']
+systems/ui.py:L353: # 4. スクロールインジケーター（▲▼） | Symbols: ['▲', '▼']
+systems/ui.py:L355: up_arrow = font_small.render("▲", True, (255, 255, 100)) | Symbols: ['▲']
+systems/ui.py:L358: down_arrow = font_small.render("▼", True, (255, 255, 100)) | Symbols: ['▼']
+systems/ui.py:L363: # 右下に点滅する ▼ を表示 | Symbols: ['▼']
+systems/ui.py:L367: next_indicator = font_small.render("▼", True, (200, 255, 200)) | Symbols: ['▼']
+systems/ui.py:L1031: 右: 選択中パラメータの before → after プレビュー | Symbols: ['→']
+systems/ui.py:L1068: """右パネル: 選択中パラメータの before → after プレビュー""" | Symbols: ['→']
+systems/ui.py:L1091: lines.append(f"  {fmt(before_val)}{unit}  →  {fmt(after_val)}{unit}") | Symbols: ['→']
+systems/ui.py:L1234: f"{label}: {fmt(bv)}{unit} → {fmt(av)}{unit}", | Symbols: ['→']
+systems/ui.py:L1440: "magic_fire_damage":    "🔥炎ダメージ", | Symbols: ['🔥']
+systems/ui.py:L1441: "magic_fire_range":     "🔥炎射程", | Symbols: ['🔥']
+systems/ui.py:L1442: "magic_heal_ratio":     "💚回復量", | Symbols: ['💚']
+systems/ui.py:L1443: "magic_knockback_damage":"💨吹飛ダメージ", | Symbols: ['💨']
+systems/ui.py:L1444: "magic_invincible_turns":"✨無敵ターン", | Symbols: ['✨']
+systems/ui.py:L1445: "magic_stave_bonus":     "🔮杖回数", | Symbols: ['🔮']
+systems/ui.py:L1446: "magic_light_stave_bonus": "💡燈杖回", | Symbols: ['💡']
+systems/ui.py:L1447: "magic_yrden_turns":     "🌀障壁ターン", | Symbols: ['🌀']
+systems/ui.py:L1752: # 呪い表示 (Rankの下・Hollow表示とジェム◆◆◆◆◆の描画) | Symbols: ['◆']
+systems/ui.py:L2334: self.items.append(("info_rank", None, "🏆 ランク情報を確認", info_desc)) | Symbols: ['🏆']
+systems/ui.py:L2338: self.items.append(("mode", "SAVE", "💾 記録する", "現在の進行状況をセーブします。")) | Symbols: ['💾']
+systems/ui.py:L2339: self.items.append(("cancel", None, "🚪 ギルドを出る", "ギルドメニューを終了します。")) | Symbols: ['🚪']
+systems/ui.py:L2523: # 🎵 効果音再生 | Symbols: ['🎵']
+systems/ui.py:L2564: # 🎵 簡易ファンファーレを生成して再生 | Symbols: ['🎵']
+systems/ui.py:L2768: "ABANDON": "現在受けている依頼を中止します。\n※違約金とGPの減少が発生します。" | Symbols: ['※']
+systems/ui.py:L3672: info_lines.append("※装備中のため預けられません。") | Symbols: ['※']
+systems/ui.py:L3752: # 🌀 TELEPORT_DIALOG | Symbols: ['🌀']
+systems/ui.py:L3832: lines.append("※強力な魔物の気配が漂っています。") | Symbols: ['※']
+
+=== SUMMARY OF SYMBOLS ===
+Char: → | Unicode: U+2192 | Count: 5 | Name: RIGHTWARDS ARROW
+Char: ※ | Unicode: U+203B | Count: 5 | Name: REFERENCE MARK
+Char: ◆ | Unicode: U+25C6 | Count: 5 | Name: BLACK DIAMOND
+Char: ▼ | Unicode: U+25BC | Count: 4 | Name: BLACK DOWN-POINTING TRIANGLE
+Char: ️ | Unicode: U+FE0F | Count: 3 | Name: VARIATION SELECTOR-16
+Char: 🌀 | Unicode: U+1F300 | Count: 3 | Name: CYCLONE
+Char: ▲ | Unicode: U+25B2 | Count: 2 | Name: BLACK UP-POINTING TRIANGLE
+Char: 🔥 | Unicode: U+1F525 | Count: 2 | Name: FIRE
+Char: 🎵 | Unicode: U+1F3B5 | Count: 2 | Name: MUSICAL NOTE
+Char: ⚖ | Unicode: U+2696 | Count: 1 | Name: SCALES
+Char: 👤 | Unicode: U+1F464 | Count: 1 | Name: BUST IN SILHOUETTE
+Char: 🏰 | Unicode: U+1F3F0 | Count: 1 | Name: EUROPEAN CASTLE
+Char: 👹 | Unicode: U+1F479 | Count: 1 | Name: JAPANESE OGRE
+Char: 🔒 | Unicode: U+1F512 | Count: 1 | Name: LOCK
+Char: 🧠 | Unicode: U+1F9E0 | Count: 1 | Name: BRAIN
+Char: ⚔ | Unicode: U+2694 | Count: 1 | Name: CROSSED SWORDS
+Char: 💎 | Unicode: U+1F48E | Count: 1 | Name: GEM STONE
+Char: 🧱 | Unicode: U+1F9F1 | Count: 1 | Name: BRICK
+Char: 🕸 | Unicode: U+1F578 | Count: 1 | Name: SPIDER WEB
+Char: 💜 | Unicode: U+1F49C | Count: 1 | Name: PURPLE HEART
+Char: 🏠 | Unicode: U+1F3E0 | Count: 1 | Name: HOUSE BUILDING
+Char: 🤝 | Unicode: U+1F91D | Count: 1 | Name: HANDSHAKE
+Char: 📈 | Unicode: U+1F4C8 | Count: 1 | Name: CHART WITH UPWARDS TREND
+Char: 🚨 | Unicode: U+1F6A8 | Count: 1 | Name: POLICE CARS REVOLVING LIGHT
+Char: 💀 | Unicode: U+1F480 | Count: 1 | Name: SKULL
+Char: 💚 | Unicode: U+1F49A | Count: 1 | Name: GREEN HEART
+Char: 💨 | Unicode: U+1F4A8 | Count: 1 | Name: DASH SYMBOL
+Char: ✨ | Unicode: U+2728 | Count: 1 | Name: SPARKLES
+Char: 🔮 | Unicode: U+1F52E | Count: 1 | Name: CRYSTAL BALL
+Char: 💡 | Unicode: U+1F4A1 | Count: 1 | Name: ELECTRIC LIGHT BULB
+Char: 🏆 | Unicode: U+1F3C6 | Count: 1 | Name: TROPHY
+Char: 💾 | Unicode: U+1F4BE | Count: 1 | Name: FLOPPY DISK
+Char: 🚪 | Unicode: U+1F6AA | Count: 1 | Name: DOOR

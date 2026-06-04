@@ -1,0 +1,283 @@
+=== TARGET FILES ===
+/Users/tj/Desktop/2DGame/wordings.py
+/Users/tj/Desktop/2DGame/components/data/master/guild.yml
+/Users/tj/Desktop/2DGame/components/data/master/village.yml
+/Users/tj/Desktop/2DGame/components/data/master/ui.yml
+/Users/tj/Desktop/2DGame/components/data/master/npcs.yml
+/Users/tj/Desktop/2DGame/components/data/master/dungeon.yml
+/Users/tj/Desktop/2DGame/components/data/master/story.yml
+/Users/tj/Desktop/2DGame/components/data/master/obstacles.yml
+/Users/tj/Desktop/2DGame/components/data/master/balance.yml
+/Users/tj/Desktop/2DGame/components/data/master/magic_settings.yml
+/Users/tj/Desktop/2DGame/components/data/master/enemies.yml
+/Users/tj/Desktop/2DGame/components/data/master/items.yml
+/Users/tj/Desktop/2DGame/components/data/master/enemy_attack_effects.yml
+/Users/tj/Desktop/2DGame/components/data/master/quests.yml
+/Users/tj/Desktop/2DGame/components/data/master/restpoint/first_rest_point.yml
+/Users/tj/Desktop/2DGame/components/data/master/equipments/accessories.yml
+/Users/tj/Desktop/2DGame/components/data/master/equipments/shields.yml
+/Users/tj/Desktop/2DGame/components/data/master/equipments/weapons.yml
+/Users/tj/Desktop/2DGame/components/data/master/equipments/armors.yml
+/Users/tj/Desktop/2DGame/systems/ui.py
+
+=== EMOJIS FOUND IN TARGET FILES ===
+balance.yml:L2: # ⚖️ balance.yml - ゲーム全体のバランス調整窓口 (emojis: ['⚖', '️'])
+balance.yml:L117: # ⚔️ COMBAT (戦闘システム設定) (emojis: ['⚔', '️'])
+balance.yml:L159: # 🕸️ TRAPS (罠) (emojis: ['🕸', '️'])
+ui.py:L1444: "magic_invincible_turns":"✨無敵ターン", (emojis: ['✨'])
+
+=== PERIODS FOUND IN TARGET FILES ===
+wordings.py:L67: QUIT_CONFIRM_MSG = "セーブせずにタイトルへ戻りますか？\nギルドか宿屋でセーブをお勧めします。"
+wordings.py:L115: GUILD_REPORT_CONFIRM = "{name} をすでにお持ちですね。納品しますか？"
+wordings.py:L126: DOCTOR_REVIVE = "大手術だったよ\n命があっただけでも儲け物だよ。\nお気をつけて。"
+wordings.py:L167: INN_WELCOME = "今日もご苦労様。ゆっくり休んでいくかい？"
+wordings.py:L169: INN_RECOVERED = "今日もご苦労様でした。\nこれまでの冒険を 確実に 記録しましたよ。"
+wordings.py:L170: INN_DEBT = "お金が足りないだって。しょうがない、今回はツケにしておいてあげるよ。"
+wordings.py:L205: PRIEST_WELCOME = "ようこそ。…おや、あなたには死の呪いがかかっているようですね。"
+wordings.py:L206: PRIEST_HEALTHY = "あなたは呪われていません。\n神の加護があらんことを。"
+wordings.py:L207: PRIEST_NO_GP = "ギルドポイント(GP)が足りないようです。\n呪いの解除には {cost} GP必要です。"
+wordings.py:L208: PRIEST_CURE_CONFIRM = "ギルドポイント(GP)を {cost} GP捧げることで、\n死の呪いを1段階解除できます。儀式を行いますか？"
+wordings.py:L209: PRIEST_CURE_DONE = "死の呪いが一段階解除されました！\n【{stat}】の低下ペナルティが消失しました。"
+wordings.py:L211: PRIEST_DECLINE = "神の加護があらんことを。"
+wordings.py:L221: "最近、ダンジョンの浅層で{name}が増えすぎて困っています。少し数を減らしてください。",
+wordings.py:L222: "探索中の商人が{name}に襲われました。安全確保のため討伐をお願いします。",
+wordings.py:L223: "生態系の調査のため、特定の階層における{name}の個体数調整が必要です。",
+wordings.py:L224: "深層へ向かうルートに{name}が群生しています。早急な対応を！",
+wordings.py:L228: "探索路に{name}が放置されていて邪魔です。撤去をお願いします。",
+wordings.py:L229: "古びた{name}が通路を塞いでいます。破壊して進路を確保してください。",
+wordings.py:L230: "放置された{name}が探索の妨げになっています。片付けてください。",
+wordings.py:L231: "{name}の中に魔物が潜んでいるとの報告がありました。今のうちに破壊を！",
+wordings.py:L232: "探索路の整備のため、邪魔な{name}の撤去を依頼します。"
+wordings.py:L235: "魔法の研究のために{name}が必要です。分けていただけませんか？",
+wordings.py:L236: "娘の誕生日に{name}を贈りたいのですが、自分では手に入らなくて…。",
+wordings.py:L237: "お客さんから{name}の注文が入りました。至急納品をお願いします！",
+wordings.py:L238: "備蓄用の{name}が底を突いてしまいました。協力をお願いします。",
+wordings.py:L239: "珍しい{name}に興味があります。見つけたら持ってきてください。"
+guild.yml:L4: # 各ランクのステータス、クエスト受注制限、および「到達可能階層」を定義します。
+guild.yml:L7: # この値に基づき、constants.py がエネミーの出現範囲を自動計算します。
+ui.yml:L4: # - corner_radius: 0 にすると四角く、12 程度にすると今風の丸い角になります。
+ui.yml:L5: # - font.size: dialog, menu, hud などの数値を大きくすると文字が大きくなります。
+ui.yml:L6: # - bg_color: [R, G, B, A] の形式で、4つ目の数字が透明度（0〜255）です。
+npcs.yml:L4: # 町やダンジョンに登場するNPCの定義です。
+npcs.yml:L40: - 宿屋「ゆっくり休んでいってね。」
+npcs.yml:L47: - 鍛冶屋「俺ぁ鍛冶屋だ。鉱石を持ってこれば装備を叩き直してやるぜ。」
+npcs.yml:L54: - 村人「この先は危険だよ。1Fへ行くするには右の階段を使ってね。」
+npcs.yml:L60: - ギルド受付「ようこそ冒険者ギルドへ。」
+npcs.yml:L67: - ギルドマスター「よくぞ来た、若き冒険者よ。ギルドへ歓迎する！」
+npcs.yml:L74: - 医者「……気がついたかい？無茶はしちゃいけないよ。」
+npcs.yml:L81: - 銀行員「大切なお金をお預かりします。」
+npcs.yml:L88: - 魔導士「ほっほっほ、若き冒険者よ。魔法の真髄を知りたいか？」
+npcs.yml:L89: - 魔導士「このダンジョンには、時として魔力の残滓が渦巻く場所があるのじゃ。」
+npcs.yml:L90: - 魔導士「杖を振る時は、その残数をよく確認するのじゃぞ。空の杖を振っても、何も起きぬからの。」
+npcs.yml:L97: - テレポート屋「フフフ……。世界の理を超えて、お望みの場所へ飛ばしてやろう。」
+npcs.yml:L106: - 中堅冒険者「よぉ新人！ 冒険の準備は進んでるか？ まずはギルドに所属しないとダンジョンに入ることすらできないぞ。」
+npcs.yml:L107: - 中堅冒険者「それと、装備はケチるなよ。身の丈に合った武器と防具を武器屋できちんと揃えるんだ。裸同然で潜るのは自殺志願者だけだ。」
+npcs.yml:L108: - 中堅冒険者「あと、一番大事なのは『引き際』だ。欲張って深くに行きすぎるなよ。自分の限界を感じたら、早めに引き返すのがプロの冒険者ってやつだ！」
+npcs.yml:L114: - 先輩冒険者「あら、新人君？ 冒険者らしくなってきたじゃない。先輩から一つ、身に染みるアドバイスをあげるね。」
+npcs.yml:L115: - 先輩冒険者「手に入れたコインは、持ち歩かずにすぐ銀行へ預けること！ ダンジョンで力尽きると、手持ちのコインは半分になっちゃうの。……私、これで何度泣いたか分からないわ。」
+npcs.yml:L116: - 先輩冒険者「あと、HPが減ったら絶対に無理しないで、すぐに街へ戻るか回復すること。回復薬をケチって全滅するなんて、一番ダサいんだからね？」
+npcs.yml:L122: - 先輩冒険者「ふふっ。冒険者って意外に安全な職業なのよ。」
+npcs.yml:L123: - 先輩冒険者「だって、ダンジョンの中で死んでも、死んだらそこで終わり…じゃないわよ？ちゃんと街まで戻ってこられるんだから。」
+npcs.yml:L124: - 先輩冒険者「もちろん、ちょっとだけ呪われるけどね。……まあ、ギルドで治療もできるし、大したことないわ。」
+npcs.yml:L130: - 案内人「宿屋で休むと、HPが全回復して記録も行われるわ。」
+npcs.yml:L131: - 案内人「貴重な装備品を手に入れたり、大切なアイテムを手に入れたら、泊まっていくといいわ。」
+npcs.yml:L137: - 案内人「まずはギルドで『クエスト』を受けて、冒険の目的を決めましょう。」
+npcs.yml:L138: - 案内人「クエストを達成してポイントを貯めれば、より深い階層への通行許可が下りるわよ。」
+npcs.yml:L144: - 案内人「もしダンジョンでHPが0になっても、お医者様がここまで運んでくれるわ。」
+npcs.yml:L145: - 案内人「ただし、持っていたコインや一部のアイテムを失うこともあるから注意してね。」
+npcs.yml:L151: - 案内人「手持ちのコインを銀行に預けておけば、倒れた時でも没収されずに済むよ。」
+npcs.yml:L152: - 案内人「まとまったお金が手に入ったら、こまめに預けに来るのが冒険者の知恵だね。」
+npcs.yml:L159: - 見習い「まずは基本の『移動』と『攻撃』をマスターしなきゃ。」
+npcs.yml:L166: - 案内人「冒険者ギルドへようこそ。」
+npcs.yml:L169: - 案内人「受付でクエストを受注できますよランクアップ目指して頑張ってくださいね。」
+npcs.yml:L176: - マスター「ようこそいらっしゃい、冒険者さん。ここは冒険者の疲れを癒すパブさ。」
+npcs.yml:L177: - マスター「冒険者は危険も少なく稼ぎもでかい。いい仕事だね」
+npcs.yml:L184: - 看護師「ダンジョンで死んでも諦めないでください。ダンジョンの呪いはかかりますが生きて帰れます。」
+npcs.yml:L185: - 看護師「もし呪いにかかってしまったら、ギルドにいる神官様に解いてもらいましょう。」
+npcs.yml:L186: - 看護師「とはいえ迷宮から帰ってこない冒険者もいます。お気をつけて」
+npcs.yml:L192: - 神官「私は神の奇跡によって、あなたの死の呪いを祓うことができます。」
+npcs.yml:L201: - コウモリ先輩「キィ...（入院中もよくデバッグしたよな。懐かしいぜ...）」
+story.yml:L4: # オープニング(opening)とエンディング(ending)の各シーンのテキストとBGMを定義します。
+story.yml:L15: text: "古より、この世界には「ダンジョン」が存在した。\n人々は富と名声を求め、その深淵へと足を踏み入れた。"
+story.yml:L18: text: "ダンジョンからもたらされる神秘のアイテムは人々に恩恵を与え、\n独自の文化を築き上げていった。"
+story.yml:L21: text: "潜るたびに姿を変え、未知の秘宝を生み出す不思議な空間。\nそこを往く者たちはいつしか「冒険者」と呼ばれた。"
+story.yml:L24: text: "時は流れ、探索を管理する「冒険者ギルド」が設立されると、\nダンジョン探索は国家規模で体系化されていった。"
+story.yml:L27: text: "だが、栄光を掴む者の陰で、数多の冒険者たちが帰らぬ人となった。"
+story.yml:L30: text: "これは、行方不明となった父の背中を追い、\n冒険者の道を志した一人の若者の物語……。"
+story.yml:L33: text: "深淵を目指すための第一歩。\nまずは「冒険者ギルド」の入会テストを突破しなければならない。"
+story.yml:L38: text: "ついに、君は最深部に到達し\n失われた秘宝を手に入れた。"
+story.yml:L41: text: "世界に再び光が戻り、\n君の名は伝説として語り継がれるだろう。"
+story.yml:L44: text: "冒険は終わった。\nしかし、新たな物語がまたどこかで始まる……。"
+obstacles.yml:L5: # - name          : ゲーム内に表示される名前。
+obstacles.yml:L6: # - rank          : 強さランク (F〜SS)。出現階層の自動計算に使用されます。
+obstacles.yml:L7: # - hp            : 耐久力。0になると破壊されます。playerの攻撃力の倍数を設定します。
+obstacles.yml:L8: # - defense       : 防御力。ダメージからこの値が引かれます。
+obstacles.yml:L9: # - evasion       : 回避率。攻撃を避ける確率。通常は 0。
+obstacles.yml:L10: # - crit_rate     : 会心率（0.0 〜 1.0）。障害物の場合は通常 0.0。
+obstacles.yml:L11: # - reward_gold   : 破壊（クエスト対象時）の基本報酬額。
+obstacles.yml:L12: # - exp           : 破壊時に得られる経験値。
+obstacles.yml:L13: # - min_floor     : 出現開始階。nullの場合はrankから自動計算。
+obstacles.yml:L14: # - max_floor     : 出現終了階。nullの場合はrankから自動計算。
+obstacles.yml:L15: # - max_concurrent: その階に同時に存在できる最大数。
+obstacles.yml:L16: # - max_spawns    : その階で合計で出現する最大数。
+obstacles.yml:L17: # - drops         : 破壊時に落とすアイテムのリスト (itemとrateを指定)。
+obstacles.yml:L18: # - image_path    : 画像ファイルへのパス。
+obstacles.yml:L19: # - image_scale   : 表示サイズのスケーリング (1.0 = 標準)。
+balance.yml:L53: # 特徴: 指数関数（掛け算）で増えるため、最初はゆっくり、後半で一気に広くなります。
+balance.yml:L97: # 複数の低困惑度（低stupidity）敵がいる場合、最接近以外の敵がプレイヤーの退路を塞ぐ動きをする。
+balance.yml:L98: # 削除したい場合は enemy.py の [ESCAPE_BLOCK] ブロックと _get_escape_block_target メソッドも消すこと。
+balance.yml:L102: # 敵が行動するとき、この確率でランダム移動（ぼーっとする）してしまいます。
+items.yml:L4: # CONSUMABLE_DATA, STAVE_DATA, LANTERN_DATA の各種アイテムを定義します。
+items.yml:L36: describe: 使うと一瞬で村に帰還できる魔法の羽。非常に高価だが、命を救う最後の手段になる。
+items.yml:L58: describe: ラベルが剥がれかけ、嫌な沈殿物が見えるポーション。飲んでもほとんど効果がないようだ。
+items.yml:L70: describe: どろりと変色し、異臭を放つポーション。絶対に飲んではいけない。
+items.yml:L82: describe: 足元の罠を安全に解除するための道具。罠に向かって使うと、その罠を消去できる。
+items.yml:L93: describe: テレポート屋のサービスを利用するために必要な不思議な石。
+items.yml:L107: describe: 傷を癒やす一般的な薬草の煎じ薬。
+items.yml:L119: describe: 解毒作用を持つ薬。毒状態を回復する。
+items.yml:L133: describe: 高度な精製技術で作られた強力な回復薬。
+items.yml:L146: describe: 神秘的な光を放つ水晶。使い古した杖の魔力を回復させることができる。
+items.yml:L158: #   describe: どこにでもある一般的な銅の鉱石。鍛冶屋で装備の強化に利用できる。
+items.yml:L170: #   describe: 硬度の高い鉄の鉱石。装備をより強力に叩き直すための必需品。
+items.yml:L182: #   describe: まばゆい輝きを放つ金の鉱石。非常に価値が高く、武具の性能を大幅に引き出す。
+items.yml:L194: describe: "加護が宿る石。鍛冶屋で攻撃関連のパラメータを1つ選択して強化できる。"
+items.yml:L206: describe: "加護が宿る石。鍛冶屋で防御・HP関連のパラメータを1つ選択して強化できる。"
+items.yml:L218: describe: "加護が宿る石。鍛冶屋で回避や回復、特殊効果などのパラメータを1つ選択して強化できる。"
+items.yml:L230: describe: "加護が宿る石。鍛冶屋で杖関連のパラメータを1つ選択して強化できる。"
+items.yml:L244: describe: E級冒険者の証。ギルドに認められた駆け出し冒険者の象徴。
+items.yml:L257: describe: D級冒険者の証。一通りの経験を積んだ冒険者として認められた証。
+items.yml:L270: describe: C級冒険者の証。中堅冒険者として、より危険な依頼への参加が許される。
+items.yml:L283: describe: B級冒険者の証。熟練の冒険者のみが手にできる栄誉ある証。
+items.yml:L296: describe: 'A級冒険者の証。一流の証であり、多くの冒険者の憧れの的。'
+items.yml:L309: describe: S級冒険者の証。英雄に等しい実力を持つ者だけに授与される。
+items.yml:L322: describe: SS級冒険者の証。伝説に名を刻む、至高の冒険者の証。
+items.yml:L335: describe: ギルドへの正式加入を認められるための証。これを持ち帰れば一人前の冒険者だ。
+items.yml:L348: describe: 父が遺した大切な品。かつての名冒険者だった父の記憶が刻まれている。
+items.yml:L367: describe: 前方の敵を激しく弾き飛ばす魔法の杖。囲まれた時の脱出に役立つ。
+items.yml:L380: describe: 完全に魔力が枯渇し、折れ曲がった杖。何の役にも立たない。
+items.yml:L402: describe: 燃え盛る fire を放つ魔法の杖。自分前方の広範囲（2x3）を焼き尽くし、敵に大ダメージを与える。
+items.yml:L420: describe: 癒やしの光を放つ魔法の杖。自分や仲間の傷を癒やすことができる。
+items.yml:L438: describe: 一時的にあらゆる攻撃を無効化する聖なる杖。ここぞという時の切り札。
+items.yml:L455: describe: フロア全体を一瞬で明るく照らす魔法の杖。隠れた罠や敵を暴き出す。
+items.yml:L473: describe: 正面の地面に、敵の侵入を防ぐ魔法の防壁（魔法陣）を配置する魔法の杖。
+items.yml:L492: describe: 魔力で武器を強化する付与の杖。10ターンの間、プレイヤーの攻撃力が5上昇する。
+enemy_attack_effects.yml:L4: # 敵の攻撃ごとの演出・効果音を定義します。
+quests.yml:L4: # 当ゲームのクエストは大きく分けて3種類存在し、それぞれ管理場所が異なります。
+quests.yml:L7: #   - ギルドボードを開くたびに自動生成される、日常的なクエストです。
+quests.yml:L8: #   - 生成ルールは `guild.yml` の各ランク設定 (`allowed_ranks`, `amount_range` 等) に依存します。
+quests.yml:L9: #   - 討伐(hunt) : 許可されたランクの敵からランダムに選ばれ、報酬は敵の強さから自動計算されます。
+quests.yml:L10: #   - 納品(delivery) : 許可されたランクのアイテムから選ばれ、報酬はアイテムの価格から自動計算されます。
+quests.yml:L13: #   - GPが規定値に達した際、ギルドマスターから受ける特別なクエストです。
+quests.yml:L14: #   - 昇格に必要な「証明書」などのアイテムは、`guild.yml` の `rank_up_item` で指定されています。
+quests.yml:L18: #   - 下記で定義する、条件を満たせば常に受注可能な静的クエストです。
+quests.yml:L19: #   - 特定のボス討伐などに使用します。（※enemies.ymlで max_concurrent: 1 に設定された敵を対象にするなど）
+quests.yml:L34: # 実は enemies.yml（モンスターの設定）で、max_concurrent （同時に存在できる数）を 1 に設定したモンスターは、システム側で自動的に「ボス級モンスター」として扱われるようになっています。
+quests.yml:L35: # ボス級として判定されると、フロアを生成した際に**「その階層で一番面積が広い部屋」の中心に確定でスポーンする（配置される）**というロジックが enemy.py で動いています。（現在は dragon_boss などがこの設定になっています）
+quests.yml:L37: # enemies.yml でボスの max_concurrent: 1 を設定し、特定の階層（min_floor〜max_floor）に出現するようにする。
+quests.yml:L38: # quests.yml の FIXED_QUESTS に、そのボスのIDを target_key とした討伐（hunt）クエストを追加する。
+quests.yml:L52: description: "ダンジョン深層に現れるという、驚異的な回避能力を持つスライムを討伐してください。(想定階層: 10F)"
+quests.yml:L67: description: "ダンジョンに現れる姿の薄いスケルトンを討伐し、その脅威を排除してください。(想定階層: 20F)"
+quests.yml:L82: description: "ダンジョン中層に現れるという、猛毒を持つ巨大なコウモリを討伐してください。(想定階層: 35F)"
+quests.yml:L97: #   description: 50階に彷徨う強力な亡霊を討伐し、安らかな眠りを与えてください。
+accessories.yml:L61: describe: 周囲を微かに照らすカンテラ。
+accessories.yml:L137: describe: 装備者の身を守る魔力が込められた指輪。
+shields.yml:L229: describe: 標準的な戦士の盾。特別な補正はなく、扱いやすい。
+shields.yml:L266: describe: 隠密性と回避力を高めるため、極限まで軽量化された木製の盾。
+shields.yml:L303: describe: 圧倒的なガード率を誇る重厚な盾。その大きさゆえに身動きが鈍くなり、敵に狙われやすい。
+shields.yml:L340: describe: 魔力を帯びた盾。ガード率は控えめだが、攻撃魔法の威力・射程・回数を強化する。
+shields.yml:L377: describe: 聖なる加護を受けた巡礼者の盾。所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する。
+shields.yml:L414: describe: 黒く染められた軽量の革盾。敵に見つかりにくくなり、高い回避率と会心率を誇る。
+shields.yml:L452: #   describe: テスト用。全ボーナスが乗っている盾。
+weapons.yml:L82: describe: 刃がボロボロで、今にも折れそうな剣。
+weapons.yml:L121: describe: 鉄製の標準的な剣。丈夫で扱いやすい。
+weapons.yml:L160: describe: 長年放置され、刃がこぼれた古い剣。戦うには心もとない。
+weapons.yml:L199: describe: その辺の木を削って作った鈍器。不恰好だが威力はそれなり？
+weapons.yml:L238: describe: 鉄を鍛え上げて打った剣。鉄より鋭く重い。
+weapons.yml:L277: #   describe: 職人が鉄を何層にも重ねて打った剣。波打つような文様が特徴。
+weapons.yml:L316: describe: 音もなく獲物を屠るための特殊な刀。装備するとモンスターに気づかれにくくなる。
+weapons.yml:L355: describe: 標準的な戦士の片手剣。特別な補正はなく、扱いやすい。
+weapons.yml:L394: describe: 急所を突くことに特化した細身の刺突剣。攻撃力は低いが、高い命中率と会心率（15/100）を誇り、鎧を貫通する。
+weapons.yml:L433: describe: 強大な破壊力を持つ騎士の巨大な斧。攻撃力は凄まじいが、重量ゆえに回避率や命中率が低下し、敵に感知されやすくなる。
+weapons.yml:L472: describe: 魔力を宿すスタッフ。物理攻撃力は低いが、攻撃魔法の威力・射程・回数を強化する。
+weapons.yml:L511: describe: 聖なる加護を受けた剣。所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する。
+weapons.yml:L550: describe: 隠密偵察用の小型ナイフ。攻撃力は控えめだが、非常に高い会心率（20/100）と回避率を持つ。
+weapons.yml:L589: #   describe: テスト用。全ボーナスが乗っている装備。
+armors.yml:L41: describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない。
+armors.yml:L253: describe: 巡礼者が旅の安全を祈って着る聖なるローブ。魔法の効果を高める力がある。
+armors.yml:L289: describe: 隠密性に特化した深紺の軽装。防御力は極めて低いが、攻撃の命中率と会心率（10/100）が大きく向上する。
+armors.yml:L325: describe: 標準的な戦士の鎧。特にバフやデバフはなく、扱いやすい。
+armors.yml:L361: describe: 鉄板を重ねた非常に強固な鎧。重さゆえに敵に気づかれやすく、回避や命中、視野が低下する。
+armors.yml:L397: describe: 聖なる加護を受けた巡礼者の軽防具。最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する。
+armors.yml:L433: describe: 隠密性に特化した偵察用の軽装鎧。敵に見つかりにくくなり、回避率と会心率が高まる。
+armors.yml:L469: describe: 魔力の流れを操る高貴な紫の魔導衣。軽装で動きやすく、火炎・吹飛などの攻撃魔法の威力・射程を極限まで引き出す。
+armors.yml:L505: #   describe: テスト用。全ボーナスが乗っている鎧。
+ui.py:L61: 画面全体を少し暗くし、中央に読み込み中表示を出す。
+ui.py:L180: メッセージウィンドウにテキストを表示する。
+ui.py:L181: 既に表示中の場合は改行して追記する。
+ui.py:L879: """NPCサービスダイアログの共通基底クラス。
+ui.py:L881: カーソルナビゲーションを提供する。
+ui.py:L911: """「もどる」: 親ダイアログがあればそれを再表示、なければ普通に閉じる。"""
+ui.py:L930: """カーソル移動を処理し、'cancel'|'confirm'|None を返す。"""
+ui.py:L1594: (Text.UI.MENU_ITEMS,      "所持アイテム（薬・巻物など）の一覧を表示します。"),
+ui.py:L1595: (Text.UI.MENU_EQUIP,      "武器・鎧・盾・カンテラの管理画面を開きます。"),
+ui.py:L1596: (Text.UI.MENU_STAVES,     "所持している杖の管理画面を開きます。"),
+ui.py:L1597: (Text.UI.MENU_EVENT_ITEMS, "冒険者の証などの貴重品を確認します。"),
+ui.py:L1598: (Text.UI.MENU_STATUS,     "プレイヤーのステータスを表示します。"),
+ui.py:L1599: (Text.UI.MENU_QUESTS,     "現在のクエスト進捗を確認します。"),
+ui.py:L1600: (Text.UI.MENU_QUIT,       "タイトル画面に戻ります。"),
+ui.py:L1601: (Text.UI.MENU_MAP_TOGGLE, "ミニマップの表示・非表示を切り替えます。"),
+ui.py:L1602: (Text.UI.MENU_BACK,       "メニューを閉じます。"),
+ui.py:L1644: """サブダイアログに「もどる」先として自分を登録する。"""
+ui.py:L1830: プレイヤーの周囲以外を暗闇で覆う。
+ui.py:L1831: dungeon.is_lighted が True の場合は何もしない（全域が見える）。
+ui.py:L2096: dialog.text = "フォッフォッフォ、杖のことならわしに任せるがよいぞ。"
+ui.py:L2204: dialog.text = "「まだ転移できる場所がないようじゃな。\n もう少し深く潜ってみなされ。」"
+ui.py:L2316: ("mode", "ACCEPT_DAILY", "日常依頼を受注", "ランダムに生成された日常的な依頼を受けます。"),
+ui.py:L2323: self.items.append(("mode", "ACCEPT_RANKUP", "昇級試験を受ける", f"{next_rank_data['rank']}ランクへの昇格試験に挑戦します。"))
+ui.py:L2329: info_desc = f"次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です。\n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
+ui.py:L2333: info_desc = "これ以上は昇格できません。あなたは最高ランクに達しています！"
+ui.py:L2336: self.items.append(("mode", "ACCEPT_FIXED", "特別な依頼を見る", "特定の条件で発生する特別な依頼を確認します。"))
+ui.py:L2337: self.items.append(("mode", "ABANDON", "依頼破棄", "現在受けている依頼をキャンセルします。"))
+ui.py:L2338: self.items.append(("mode", "SAVE", "💾 記録する", "現在の進行状況をセーブします。"))
+ui.py:L2339: self.items.append(("cancel", None, "🚪 ギルドを出る", "ギルドメニューを終了します。"))
+ui.py:L2381: description = f"次のランクへ昇級するための試験です。\n対象フロアの最奥に配置される『{cert_data.get('name', '冒険者の証')}』を回収してきてください。(対象階層: {target_floor}F)"
+ui.py:L2571: dialog.text = f"依頼達成ですね。\n{player.guild_rank}ランクに昇格です！おめでとうございます！"
+ui.py:L2764: "REPORT": "完了した依頼の報告を行い、\n報酬を受け取ります。",
+ui.py:L2765: "ACCEPT_DAILY": "階層に応じた日常依頼を受注します。\n(お小遣い稼ぎに適したランダムな内容です)",
+ui.py:L2766: "ACCEPT_RANKUP": "次のランクへ昇格するための試験を受けます。\n(ストーリーが進行する重要な依頼です)",
+ui.py:L2767: "ACCEPT_FIXED": "特定の条件で発生する依頼を確認します。\n(ボス戦や重要なイベントが発生します)",
+ui.py:L2768: "ABANDON": "現在受けている依頼を中止します。\n※違約金とGPの減少が発生します。"
+ui.py:L2774: desc_text = "前の画面に戻ります。"
+ui.py:L2814: desc_text += f"【内容】\n{target} を {amount} {unit}{verb}する。"
+ui.py:L2816: desc_text += f"【内容】\n{target} を {amount} 個納品する。"
+ui.py:L3143: screen.blit(self.font.render("適用中の装備の加護はありません。", True, (200, 200, 200)), (content_x, content_y))
+ui.py:L3158: lines.append("現在受注している依頼はありません。")
+ui.py:L3451: lines.append(""); lines.append(info.get("describe", "詳細情報はありません。") if selected[1] != "cancel" else "店を出ます。")
+ui.py:L3469: ("mode_deposit", "action", Text.UI.WAREHOUSE_DEPOSIT, "アイテムを預けます。", False),
+ui.py:L3470: ("mode_withdraw", "action", Text.UI.WAREHOUSE_WITHDRAW, "アイテムを引き出します。", False),
+ui.py:L3471: ("cancel", "cancel", Text.UI.QUIT, "店を出ます。", False)
+ui.py:L3550: dialog.text = "装備中のアイテムは預けられません。\n装備を外してから再度お試しください。"
+ui.py:L3672: info_lines.append("※装備中のため預けられません。")
+ui.py:L3674: info_lines.append("倉庫に預けます。" if self.mode == "DEPOSIT" else "倉庫から引き出します。")
+ui.py:L3694: ("DEPOSIT",  100,  Text.UI.BANK_DEPOSIT_100,   "100 G を銀行に預けます。"),
+ui.py:L3695: ("DEPOSIT",  1000, Text.UI.BANK_DEPOSIT_1000,  "1000 G を銀行に預けます。"),
+ui.py:L3696: ("DEPOSIT",  -1,   Text.UI.BANK_DEPOSIT_ALL,   "所持金を全額銀行に預けます。"),
+ui.py:L3697: ("WITHDRAW", 100,  Text.UI.BANK_WITHDRAW_100,  "100 G を引き出します。"),
+ui.py:L3698: ("WITHDRAW", 1000, Text.UI.BANK_WITHDRAW_1000, "1000 G を引き出します。"),
+ui.py:L3699: ("WITHDRAW", -1,   Text.UI.BANK_WITHDRAW_ALL,  "銀行残高を全額引き出します。"),
+ui.py:L3700: ("CANCEL",   0,    Text.UI.QUIT,               "銀行を出ます。"),
+ui.py:L3818: if item["type"] == "cancel": return ["店を出ます。"]
+ui.py:L3831: lines.append(f"地下 {f_lv} 階にある休憩所へ転移します。")
+ui.py:L3832: lines.append("※強力な魔物の気配が漂っています。")
+ui.py:L3835: lines.append("冒険者の拠点となる村へ帰還します。")
+ui.py:L3836: lines.append("一度休息をとり、装備を整えましょう。")
+ui.py:L3883: dialog.text = "テレポートには『転移の石』が必要です。"
+ui.py:L3959: rank_info_desc = f"現在のランクは {player.guild_rank} です。\n次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です。\n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
+ui.py:L3961: rank_info_desc = f"現在のランクは {player.guild_rank} です。\n次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(ギルドの受付で昇級試験を受けられます)"
+ui.py:L3963: rank_info_desc = f"現在のランクは {player.guild_rank} です。あなたは最高ランクに達しています！"
+ui.py:L3967: {"key": "guild_point", "name": "ギルドポイント", "desc": "【ギルドポイント(GP)とは】\nクエストを達成すると貰えるポイントよ。\nランクを上げる条件になるほか、神官様に死の呪いを解いてもらう際にも必要になるわ。"},
+ui.py:L3968: {"key": "adventure_rank", "name": "冒険者ランク", "desc": "【冒険者ランク】\nランクは -（未加入）から始まり、F, E, D, C, B, A, S, SS までの9段階あるわ。\nランクが上がると、より難易度と報酬の高い依頼を受けられるようになるのよ。"},
+ui.py:L3969: {"key": "floor_limit", "name": "到達可能階層", "desc": "【ランク制限】\nランクに応じて進める限界階層が決まっているわ。\n- : B0F(村のみ)\nF : B11F まで\nE : B21F まで\nD : B30F まで\nC : B35F まで\nB : B55F まで\nそれ以上のランクになれば、さらに深くまで進めるようになるわ！"},
+ui.py:L3970: {"key": "promotion_exam", "name": "昇級試験", "desc": "【昇級試験】\nランクごとに必要なGPが溜まると、ギルドで試験を受けられるわ。\n試験クエストを受けて、そのランクのボスが落とす『冒険者の証』を回収して報告すればランクアップよ！"},
+ui.py:L3971: {"key": "quit", "name": "閉じる", "desc": "説明を終わります。"}
+ui.py:L4020: 探索済みのタイルを表示するミニマップ（透過オーバーレイ）を描画する。
