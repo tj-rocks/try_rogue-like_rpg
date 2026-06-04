@@ -60,14 +60,20 @@ class EquipInstance:
 
     def get_base_upgradeable_stats(self):
         # 装備品が現在持っている（base > 0）かつ、いずれかの系統に属するステータス
+        # ただし aggro_mod は負の値（見つかりにくさ）がメリットなので、-1を掛けた値が正であれば強化可能とする
         all_upgradeable_keys = set()
         for cats in ORE_STAT_CATEGORIES.values():
             all_upgradeable_keys.update(cats)
         
         compatible = []
         for k in all_upgradeable_keys:
-            if self.get_stat(k, 0) > 0:
-                compatible.append(k)
+            val = self.get_stat(k, 0)
+            if k == "aggro_mod":
+                if val * -1 > 0:
+                    compatible.append(k)
+            else:
+                if val > 0:
+                    compatible.append(k)
         return compatible
 
     def is_ore_compatible(self, ore_key):
@@ -97,6 +103,12 @@ class EquipInstance:
     def get_enhance_bonus(self, stat_key):
         # その装備品が元々持っていないステータスは、強化しても増えない（常に0）
         base = self.get_stat(stat_key, 0)
+        
+        # aggro_mod は負の値がメリットなので、-1を掛けて正の値として計算を行う
+        is_aggro_mod = (stat_key == "aggro_mod")
+        if is_aggro_mod:
+            base = base * -1
+            
         if base <= 0:
             return 0
 
@@ -127,6 +139,11 @@ class EquipInstance:
             bonus = stat_enhance * per_step
         else:
             bonus = growth_room + (stat_enhance - times_limit) * over_per_step
+            
+        # aggro_mod の場合は、計算された正のボーナスに -1 を掛けて負のボーナスとして返す
+        if is_aggro_mod:
+            return -1 * round(bonus, 3)
+            
         return round(bonus, 3)
 
     def get_name(self):
