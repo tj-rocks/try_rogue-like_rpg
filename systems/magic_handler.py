@@ -9,7 +9,7 @@ from constants import load_master_data
 MAGIC_SETTINGS = load_master_data("magic_settings.yml")
 
 # ============================================================
-# ✨ 演出用エフェクトクラス
+# 演出用エフェクトクラス
 # ============================================================
 class MagicEffect:
     def __init__(self, x, y, duration=30):
@@ -221,7 +221,7 @@ def execute_stave(player, stave, dungeon, dialog):
     effect_type = settings.get("effect_type")
     print(f"[MAGIC] Execute Stave: {stave.name} (Key: {stave.key}, Effect: {effect_type})")
 
-    # 🎵 効果音再生
+    # 効果音再生
     sound_path = settings.get("sound")
     if sound_path:
         from systems.sound_handler import sound_manager
@@ -469,7 +469,7 @@ def _effect_light_all(player, settings, dungeon, dialog, stave=None):
                 msg += f"\n強烈な光で {affected}体の敵の 感知能力が 低下した！"
                 
         return msg
-    return "しかし 何も 起こらなかった。"
+    return "しかし 何も 起こらなかった"
 
 def _effect_yrden(player, settings, dungeon, dialog, stave=None):
     """正面1マスに敵の侵入を防ぐ魔法の防壁（障害物）を配置する"""

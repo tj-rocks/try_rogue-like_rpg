@@ -64,7 +64,7 @@ class Text:
         VILLAGE = "ダンジョンの街"
         FLOOR = "B{level}F"
         MENU_TITLE = "--- MENU ---"
-        QUIT_CONFIRM_MSG = "セーブせずにタイトルへ戻りますか？\nギルドか宿屋でセーブをお勧めします。"
+        QUIT_CONFIRM_MSG = "セーブせずにタイトルへ戻りますか？\nギルドか宿屋でセーブをお勧めします"
         MENU_ITEMS = "1. アイテム"
         MENU_EQUIP = "2. 装備"
         MENU_STAVES = "3. 杖"
@@ -112,7 +112,7 @@ class Text:
         GUILD_REPORT_REWARD = "報酬: {gold} G / {gp} GP"
         GUILD_REPORT_RANK_UP = "報酬: ギルドランク {rank} への昇格"
         GUILD_REPORT_GUIDE = "--- [決定キー] を押して報酬を受け取る ---"
-        GUILD_REPORT_CONFIRM = "{name} をすでにお持ちですね。納品しますか？"
+        GUILD_REPORT_CONFIRM = "{name} をすでにお持ちですね 納品しますか？"
         GUILD_REPORT_CONFIRM_GENERIC = "クエストを報告しますか？"
         NOW_LOADING = "Now Loading..."
         SAVING = "Saving..."
@@ -123,7 +123,7 @@ class Text:
 
     class System:
         GAME_OVER = "死んでしまった\n所持金が半分になり、死の呪いが進行した"
-        DOCTOR_REVIVE = "大手術だったよ\n命があっただけでも儲け物だよ。\nお気をつけて。"
+        DOCTOR_REVIVE = "大手術だったよ\n命があっただけでも儲け物だよ \nお気をつけて"
         STAIRS_CONFIRM = "次の階層へ進みますか？"
         OVERFLOW_SENSE = "モンスター氾濫の 予感がする……"
         OVERFLOW_START = "モンスター氾濫が 発生した"
@@ -164,10 +164,10 @@ class Text:
         RANK_REQUIRED = "この商品を買うにはギルドランク {rank} 以上が必要です"
 
     class NPC:
-        INN_WELCOME = "今日もご苦労様。ゆっくり休んでいくかい？"
+        INN_WELCOME = "今日もご苦労様 ゆっくり休んでいくかい？"
         INN_FEE_INFO = "宿泊代は {fee} G だよお金が足りないみたいだね"
-        INN_RECOVERED = "今日もご苦労様でした。\nこれまでの冒険を 確実に 記録しましたよ。"
-        INN_DEBT = "お金が足りないだって。しょうがない、今回はツケにしておいてあげるよ。"
+        INN_RECOVERED = "今日もご苦労様でした \nこれまでの冒険を 確実に 記録しましたよ"
+        INN_DEBT = "お金が足りないだって しょうがない、今回はツケにしておいてあげるよ"
         INN_NO = "無理するんじゃないよー"
         WEAPON_SHOP_WELCOME = "いらっしゃい 武器と防具のことならお任せな"
         ITEM_SHOP_WELCOME = "いらっしゃいませ薬や巻物など、冒険の必需品を取り揃えております"
@@ -202,13 +202,13 @@ class Text:
         WAREHOUSE_CONFIRM_DEPOSIT = "手数料 {fee} G で {name} を預けますか？"
         WAREHOUSE_CONFIRM_WITHDRAW = "手数料 {fee} G で {name} を引き出しますか？"
         GENERIC_FALLBACK = "私は {name} です"
-        PRIEST_WELCOME = "ようこそ。…おや、あなたには死の呪いがかかっているようですね。"
-        PRIEST_HEALTHY = "あなたは呪われていません。\n神の加護があらんことを。"
-        PRIEST_NO_GP = "ギルドポイント(GP)が足りないようです。\n呪いの解除には {cost} GP必要です。"
-        PRIEST_CURE_CONFIRM = "ギルドポイント(GP)を {cost} GP捧げることで、\n死の呪いを1段階解除できます。儀式を行いますか？"
-        PRIEST_CURE_DONE = "死の呪いが一段階解除されました！\n【{stat}】の低下ペナルティが消失しました。"
+        PRIEST_WELCOME = "ようこそ …おや、あなたには死の呪いがかかっているようですね"
+        PRIEST_HEALTHY = "あなたは呪われていません \n神の加護があらんことを"
+        PRIEST_NO_GP = "ギルドポイント(GP)が足りないようです \n呪いの解除には {cost} GP必要です"
+        PRIEST_CURE_CONFIRM = "ギルドポイント(GP)を {cost} GP捧げることで、\n死の呪いを1段階解除できます 儀式を行いますか？"
+        PRIEST_CURE_DONE = "死の呪いが一段階解除されました！\n【{stat}】の低下ペナルティが消失しました"
         PRIEST_CURE_DONE_SIMPLE = "死の呪いが一段階解除されました！"
-        PRIEST_DECLINE = "神の加護があらんことを。"
+        PRIEST_DECLINE = "神の加護があらんことを"
 
     class Guild:
         QUEST_HUNT_TITLE = "[{rank}] {name}を{amount}匹討伐"
@@ -218,25 +218,25 @@ class Text:
         
         # フレーバーテキスト用テンプレート
         QUEST_HUNT_FLAVORS = [
-            "最近、ダンジョンの浅層で{name}が増えすぎて困っています。少し数を減らしてください。",
-            "探索中の商人が{name}に襲われました。安全確保のため討伐をお願いします。",
-            "生態系の調査のため、特定の階層における{name}の個体数調整が必要です。",
-            "深層へ向かうルートに{name}が群生しています。早急な対応を！",
+            "最近、ダンジョンの浅層で{name}が増えすぎて困っています 少し数を減らしてください",
+            "探索中の商人が{name}に襲われました 安全確保のため討伐をお願いします",
+            "生態系の調査のため、特定の階層における{name}の個体数調整が必要です",
+            "深層へ向かうルートに{name}が群生しています 早急な対応を！",
             "探索のついでに、{name}を片付けてきてくれませんか？"
         ]
         QUEST_DESTROY_FLAVORS = [
-            "探索路に{name}が放置されていて邪魔です。撤去をお願いします。",
-            "古びた{name}が通路を塞いでいます。破壊して進路を確保してください。",
-            "放置された{name}が探索の妨げになっています。片付けてください。",
-            "{name}の中に魔物が潜んでいるとの報告がありました。今のうちに破壊を！",
-            "探索路の整備のため、邪魔な{name}の撤去を依頼します。"
+            "探索路に{name}が放置されていて邪魔です 撤去をお願いします",
+            "古びた{name}が通路を塞いでいます 破壊して進路を確保してください",
+            "放置された{name}が探索の妨げになっています 片付けてください",
+            "{name}の中に魔物が潜んでいるとの報告がありました 今のうちに破壊を！",
+            "探索路の整備のため、邪魔な{name}の撤去を依頼します"
         ]
         QUEST_DELIVERY_FLAVORS = [
-            "魔法の研究のために{name}が必要です。分けていただけませんか？",
-            "娘の誕生日に{name}を贈りたいのですが、自分では手に入らなくて…。",
-            "お客さんから{name}の注文が入りました。至急納品をお願いします！",
-            "備蓄用の{name}が底を突いてしまいました。協力をお願いします。",
-            "珍しい{name}に興味があります。見つけたら持ってきてください。"
+            "魔法の研究のために{name}が必要です 分けていただけませんか？",
+            "娘の誕生日に{name}を贈りたいのですが、自分では手に入らなくて…",
+            "お客さんから{name}の注文が入りました 至急納品をお願いします！",
+            "備蓄用の{name}が底を突いてしまいました 協力をお願いします",
+            "珍しい{name}に興味があります 見つけたら持ってきてください"
         ]
         QUEST_REQUESTER_NPCS = [
             "ギルドマスター", "ギルドの受付嬢", "鍛冶屋の親方", "道具屋の店主", 

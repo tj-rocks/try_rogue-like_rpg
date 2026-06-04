@@ -12,34 +12,34 @@
 
 opening:
   1:
-    text: "古より、この世界には「ダンジョン」が存在した。\n人々は富と名声を求め、その深淵へと足を踏み入れた。"
+    text: "古より、この世界には「ダンジョン」が存在した \n人々は富と名声を求め、その深淵へと足を踏み入れた"
     bgm: "components/sounds/bgm/winding_adventure.mp3"
   2:
-    text: "ダンジョンからもたらされる神秘のアイテムは人々に恩恵を与え、\n独自の文化を築き上げていった。"
+    text: "ダンジョンからもたらされる神秘のアイテムは人々に恩恵を与え、\n独自の文化を築き上げていった"
     bgm: "components/sounds/bgm/winding_adventure.mp3"
   3:
-    text: "潜るたびに姿を変え、未知の秘宝を生み出す不思議な空間。\nそこを往く者たちはいつしか「冒険者」と呼ばれた。"
+    text: "潜るたびに姿を変え、未知の秘宝を生み出す不思議な空間 \nそこを往く者たちはいつしか「冒険者」と呼ばれた"
     bgm: "components/sounds/bgm/winding_adventure.mp3"
   4:
-    text: "時は流れ、探索を管理する「冒険者ギルド」が設立されると、\nダンジョン探索は国家規模で体系化されていった。"
+    text: "時は流れ、探索を管理する「冒険者ギルド」が設立されると、\nダンジョン探索は国家規模で体系化されていった"
     bgm: "components/sounds/bgm/winding_adventure.mp3"
   5:
-    text: "だが、栄光を掴む者の陰で、数多の冒険者たちが帰らぬ人となった。"
+    text: "だが、栄光を掴む者の陰で、数多の冒険者たちが帰らぬ人となった"
     bgm: "components/sounds/bgm/winding_adventure.mp3"
   6:
-    text: "これは、行方不明となった父の背中を追い、\n冒険者の道を志した一人の若者の物語……。"
+    text: "これは、行方不明となった父の背中を追い、\n冒険者の道を志した一人の若者の物語……"
     bgm: "components/sounds/bgm/winding_adventure.mp3"
   7:
-    text: "深淵を目指すための第一歩。\nまずは「冒険者ギルド」の入会テストを突破しなければならない。"
+    text: "深淵を目指すための第一歩 \nまずは「冒険者ギルド」の入会テストを突破しなければならない"
     bgm: "components/sounds/bgm/winding_adventure.mp3"
 
 ending:
   1:
-    text: "ついに、君は最深部に到達し\n失われた秘宝を手に入れた。"
+    text: "ついに、君は最深部に到達し\n失われた秘宝を手に入れた"
     bgm: "components/sounds/bgm/winding_adventure.mp3"
   2:
-    text: "世界に再び光が戻り、\n君の名は伝説として語り継がれるだろう。"
+    text: "世界に再び光が戻り、\n君の名は伝説として語り継がれるだろう"
     bgm: "components/sounds/bgm/winding_adventure.mp3"
   3:
-    text: "冒険は終わった。\nしかし、新たな物語がまたどこかで始まる……。"
+    text: "冒険は終わった \nしかし、新たな物語がまたどこかで始まる……"
     bgm: "components/sounds/bgm/winding_adventure.mp3"

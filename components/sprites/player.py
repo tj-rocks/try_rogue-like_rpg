@@ -9,7 +9,7 @@ from constants import (
     ATTACK_TAME_DURATION, ATTACK_STRIKE_DURATION, ATTACK_ANIMATION_FRAMES, 
     COMBAT_LOG_WAIT_FRAMES, PLAYER_HP, PLAYER_COIN, PLAYER_ATTACK, 
     PLAYER_WEAPON, WEAPON_DATA, PLAYER_DEFENSE, PLAYER_ARMOR, ARMOR_DATA, ARMOR_COLORS,
-    PLAYER_SHIELD, SHIELD_DATA, SHIELD_COLORS, PLAYER_ORE,
+    PLAYER_SHIELD, SHIELD_DATA, SHIELD_COLORS, PLAYER_ORE, ACCESSORY_DATA,
     MAX_ITEM_SLOTS, MAX_EQUIP_SLOTS, MAX_STAVE_SLOTS, MAX_WAREHOUSE_SLOTS,
     STAVE_DATA, HIT_STUN_DURATION, SOUND_ATTACK_HIT, SOUND_ATTACK_MISS,
     ENABLE_DEBUG_LOGGING, PLAYER_MOVE_SPEED, STATUS_EFFECTS
@@ -55,21 +55,25 @@ class EquipInstance:
         if self.equip_type == "weapon": data = WEAPON_DATA.get(self.key, {})
         elif self.equip_type == "armor": data = ARMOR_DATA.get(self.key, {})
         elif self.equip_type == "shield": data = SHIELD_DATA.get(self.key, {})
-        elif self.equip_type == "lantern":
-            from constants import LANTERN_DATA
-            data = LANTERN_DATA.get(self.key, {})
+        elif self.equip_type == "accessory": data = ACCESSORY_DATA.get(self.key, {})
         return data.get(stat_key, default)
 
     def get_base_upgradeable_stats(self):
         # 装備品が現在持っている（base > 0）かつ、いずれかの系統に属するステータス
+        # ただし aggro_mod は負の値（見つかりにくさ）がメリットなので、-1を掛けた値が正であれば強化可能とする
         all_upgradeable_keys = set()
         for cats in ORE_STAT_CATEGORIES.values():
             all_upgradeable_keys.update(cats)
         
         compatible = []
         for k in all_upgradeable_keys:
-            if self.get_stat(k, 0) > 0:
-                compatible.append(k)
+            val = self.get_stat(k, 0)
+            if k == "aggro_mod":
+                if val * -1 > 0:
+                    compatible.append(k)
+            else:
+                if val > 0:
+                    compatible.append(k)
         return compatible
 
     def is_ore_compatible(self, ore_key):
@@ -99,6 +103,12 @@ class EquipInstance:
     def get_enhance_bonus(self, stat_key):
         # その装備品が元々持っていないステータスは、強化しても増えない（常に0）
         base = self.get_stat(stat_key, 0)
+        
+        # aggro_mod は負の値がメリットなので、-1を掛けて正の値として計算を行う
+        is_aggro_mod = (stat_key == "aggro_mod")
+        if is_aggro_mod:
+            base = base * -1
+            
         if base <= 0:
             return 0
 
@@ -106,6 +116,7 @@ class EquipInstance:
         if self.equip_type == "weapon": data = WEAPON_DATA.get(self.key, {})
         elif self.equip_type == "armor": data = ARMOR_DATA.get(self.key, {})
         elif self.equip_type == "shield": data = SHIELD_DATA.get(self.key, {})
+        elif self.equip_type == "accessory": data = ACCESSORY_DATA.get(self.key, {})
 
         growth = data.get("growth")
         if not growth:
@@ -128,14 +139,15 @@ class EquipInstance:
             bonus = stat_enhance * per_step
         else:
             bonus = growth_room + (stat_enhance - times_limit) * over_per_step
+            
+        # aggro_mod の場合は、計算された正のボーナスに -1 を掛けて負のボーナスとして返す
+        if is_aggro_mod:
+            return -1 * round(bonus, 3)
+            
         return round(bonus, 3)
 
     def get_name(self):
-        if self.equip_type == "lantern":
-            from constants import LANTERN_DATA
-            base = LANTERN_DATA.get(self.key, {}).get("name", self.key)
-        else:
-            base = self.get_stat("name", self.key)
+        base = self.get_stat("name", self.key)
         if self.enhance > 0: return f"{base}+{self.enhance}"
         return base
 
@@ -144,7 +156,13 @@ class EquipInstance:
 
     @classmethod
     def from_dict(cls, data):
-        inst = cls(data["type"], data["key"], randomize=False)
+        etype = data["type"]
+        ekey = data["key"]
+        if etype == "lantern":
+            etype = "accessory"
+            if ekey in ("basic", "luxury", "none", "basic_lantern", "luxury_lantern", "glowing_ring"):
+                ekey = "luminous_gem"
+        inst = cls(etype, ekey, randomize=False)
         inst.iid = data.get("iid", inst.iid)
         inst.enhance = data.get("enhance", 0)
         inst.stats = data.get("stats", {})
@@ -202,6 +220,8 @@ class Player(Entity):
         if armor_inst: bonus += armor_inst.get_stat("attack_bonus", 0)
         shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
         if shield_inst: bonus += shield_inst.get_stat("attack_bonus", 0)
+        accessory_inst = self._find_equip_inst(self.accessory_inventory, self.equipped_accessory)
+        if accessory_inst: bonus += accessory_inst.get_stat("attack_bonus", 0)
         
         # 攻撃力バフの加算
         if getattr(self, "attack_buff_turns", 0) > 0:
@@ -213,7 +233,12 @@ class Player(Entity):
     @property
     def max_hp(self):
         bonus = 0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("hp_bonus", 0)
         val = int(self._base_max_hp + bonus)
@@ -230,7 +255,12 @@ class Player(Entity):
         from constants import PLAYER_ACCURACY_CLOSE
         base = PLAYER_ACCURACY_CLOSE
         bonus = 0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("accuracy_bonus_close", inst.get_stat("accuracy_bonus", 0))
         val = int(base + bonus)
@@ -241,18 +271,26 @@ class Player(Entity):
         from constants import PLAYER_ACCURACY_RANGED
         base = PLAYER_ACCURACY_RANGED
         bonus = 0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("accuracy_bonus_ranged", inst.get_stat("accuracy_bonus", 0))
         val = int(base + bonus)
         return val
 
-
-
     @property
     def crit_bonus(self):
         bonus = 0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst:
                 # crit_bonus または crit_rate を取得
@@ -267,7 +305,12 @@ class Player(Entity):
     @property
     def stave_bonus(self):
         bonus = 0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("magic_stave_bonus", 0)
         return bonus
@@ -275,14 +318,19 @@ class Player(Entity):
     @property
     def total_stupidity(self):
         bonus = 0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("stupidity", 0)
         return bonus
 
     def get_magic_bonus(self, key):
         """装備品の bonus.magic 系ボーナスの合計を返す（例: get_magic_bonus("fire_damage")）
-        武器・防具・盾の全装備から合算する。yml側の bonus.magic で制御する。
+        武器・防具・盾・アクセサリの全装備から合算する。yml側の bonus.magic で制御する。
         """
         total = 0
         flat_key = f"magic_{key}"
@@ -290,17 +338,22 @@ class Player(Entity):
             (self.weapon_inventory, self.equipped_weapon),
             (self.armor_inventory,  self.equipped_armor),
             (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory),
         ]:
             inst = self._find_equip_inst(inv, eid)
             if inst:
                 total += inst.get_stat(flat_key, 0)
         return total
 
-    
     @property
     def lantern_bonus(self):
         bonus = 0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("lantern_bonus", 0)
         return bonus
@@ -308,7 +361,12 @@ class Player(Entity):
     @property
     def regen_bonus(self):
         bonus = 0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("regen_bonus", 0)
         return bonus
@@ -316,7 +374,12 @@ class Player(Entity):
     @property
     def total_armor_penetration(self):
         bonus = 0.0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("armor_penetration", 0.0)
         return bonus
@@ -324,17 +387,26 @@ class Player(Entity):
     @property
     def total_defense(self):
         bonus = 0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("defense_bonus", 0) + inst.get_enhance_bonus("defense_bonus")
         val = round(self.defense + bonus, 1)
         return val
 
-
     @property
     def block_chance_close(self):
         total = 0.0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst:
                 total += inst.get_stat("block_chance_close", 0.0) + inst.get_enhance_bonus("block_chance_close")
@@ -343,7 +415,12 @@ class Player(Entity):
     @property
     def block_chance_ranged(self):
         total = 0.0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
             if inst:
                 total += inst.get_stat("block_chance_ranged", 0.0) + inst.get_enhance_bonus("block_chance_ranged")
@@ -361,8 +438,8 @@ class Player(Entity):
         self.equipped_armor = None
         self.shield_inventory = []
         self.equipped_shield = None
-        self.lantern_inventory = []
-        self.equipped_lantern = None
+        self.accessory_inventory = []
+        self.equipped_accessory = None
         self.stave_inventory = []
         self.invincible_turns = 0
         self.attack_buff_turns = 0
@@ -565,11 +642,11 @@ class Player(Entity):
         self.shield_inventory.append(inst)
         return inst
 
-    def equip_lantern_by_key(self, lk):
-        from constants import LANTERN_DATA
-        if lk not in LANTERN_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
-        inst = EquipInstance("lantern", lk)
-        self.lantern_inventory.append(inst)
+    def equip_accessory_by_key(self, lk):
+        from constants import ACCESSORY_DATA
+        if lk not in ACCESSORY_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
+        inst = EquipInstance("accessory", lk)
+        self.accessory_inventory.append(inst)
         return inst
 
     def _remove_from_inv(self, inv, iid):
@@ -581,7 +658,7 @@ class Player(Entity):
     def remove_armor_by_iid(self, iid): return self._remove_from_inv(self.armor_inventory, iid)
     def remove_shield_by_iid(self, iid): return self._remove_from_inv(self.shield_inventory, iid)
     def remove_stave_by_iid(self, iid): return self._remove_from_inv(self.stave_inventory, iid)
-    def remove_lantern_by_iid(self, iid): return self._remove_from_inv(self.lantern_inventory, iid)
+    def remove_accessory_by_iid(self, iid): return self._remove_from_inv(self.accessory_inventory, iid)
 
     def change_armor(self, iid):
         inst = self._find_equip_inst(self.armor_inventory, iid)
@@ -629,18 +706,23 @@ class Player(Entity):
     def unequip_armor(self): self.equipped_armor = None; self._armor_images = {}
     def unequip_shield(self): self.equipped_shield = None; self._shield_images = {}
 
-    def change_lantern(self, iid):
-        inst = self._find_equip_inst(self.lantern_inventory, iid)
-        if inst: self.equipped_lantern = inst.iid
+    def change_accessory(self, iid):
+        inst = self._find_equip_inst(self.accessory_inventory, iid)
+        if inst: self.equipped_accessory = inst.iid
 
     def get_aggro_modifier(self):
         mod = 0
-        for inv, eid in [(self.weapon_inventory, self.equipped_weapon), (self.armor_inventory, self.equipped_armor), (self.shield_inventory, self.equipped_shield)]:
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
             inst = self._find_equip_inst(inv, eid)
-            if inst: mod += inst.get_stat("aggro_mod", 0)
+            if inst: mod += inst.get_stat("aggro_mod", 0) + inst.get_enhance_bonus("aggro_mod")
         return mod
 
-    def unequip_lantern(self): self.equipped_lantern = None
+    def unequip_accessory(self): self.equipped_accessory = None
 
     def reset_status(self): self.is_moving = self.is_attacking = self.is_falling = False
 
@@ -837,7 +919,7 @@ class Player(Entity):
         game_state["dialog_just_closed"] = False
 
     def get_total_item_count(self): return len(self.items) + self.get_equipment_count() + len(self.stave_inventory)
-    def get_equipment_count(self): return len(self.weapon_inventory) + len(self.armor_inventory) + len(self.shield_inventory) + len(self.lantern_inventory)
+    def get_equipment_count(self): return len(self.weapon_inventory) + len(self.armor_inventory) + len(self.shield_inventory) + len(self.accessory_inventory)
     def get_stave_count(self): return len(self.stave_inventory)
     def get_item_count(self): return len(self.items)
 
@@ -864,7 +946,7 @@ class Player(Entity):
 
     def add_equipment_to_inventory(self, ek, etype):
         if self.get_equipment_count() >= MAX_EQUIP_SLOTS: return False
-        inst = EquipInstance(etype, ek); inv = {"weapon":self.weapon_inventory,"armor":self.armor_inventory,"shield":self.shield_inventory,"lantern":self.lantern_inventory}.get(etype)
+        inst = EquipInstance(etype, ek); inv = {"weapon":self.weapon_inventory,"armor":self.armor_inventory,"shield":self.shield_inventory,"accessory":self.accessory_inventory}.get(etype)
         if inv is not None: inv.append(inst); return True
         return False
 
@@ -889,7 +971,7 @@ class Player(Entity):
             (self.weapon_inventory, "equipped_weapon", self.unequip_weapon),
             (self.armor_inventory, "equipped_armor", self.unequip_armor),
             (self.shield_inventory, "equipped_shield", self.unequip_shield),
-            (self.lantern_inventory, "equipped_lantern", self.unequip_lantern)
+            (self.accessory_inventory, "equipped_accessory", self.unequip_accessory)
         ]
 
         for inv, slot_attr, unequip_method in mapping:
@@ -929,10 +1011,10 @@ class Player(Entity):
             if target_inv is self.weapon_inventory: return "equipped_weapon"
             if target_inv is self.armor_inventory: return "equipped_armor"
             if target_inv is self.shield_inventory: return "equipped_shield"
-            if target_inv is self.lantern_inventory: return "equipped_lantern"
+            if target_inv is self.accessory_inventory: return "equipped_accessory"
             return None
 
-        for inv in [self.stave_inventory, self.weapon_inventory, self.armor_inventory, self.shield_inventory, self.lantern_inventory]:
+        for inv in [self.stave_inventory, self.weapon_inventory, self.armor_inventory, self.shield_inventory, self.accessory_inventory]:
             slot_attr = get_slot_attr(inv)
             cnt += sum(1 for i in inv if i.key == tk and (not slot_attr or getattr(self, slot_attr) != i.iid))
         return cnt
@@ -1032,7 +1114,7 @@ class Player(Entity):
             "x": self.x, "y": self.y, "hp": self.hp, "max_hp": self.max_hp, "coin": self.coin, "bank_coin": getattr(self, "bank_coin", 0), "attack": self.attack, "defense": self.defense,
             "items": [dict(it) for it in self.items], "weapon_inventory": [eq.to_dict() for eq in self.weapon_inventory], "armor_inventory": [eq.to_dict() for eq in self.armor_inventory],
             "shield_inventory": [eq.to_dict() for eq in self.shield_inventory], "equipped_weapon": self.equipped_weapon, "equipped_armor": self.equipped_armor, "equipped_shield": self.equipped_shield,
-            "stave_inventory": [st.to_dict() for st in self.stave_inventory], "lantern_inventory": [eq.to_dict() for eq in self.lantern_inventory], "equipped_lantern": self.equipped_lantern,
+            "stave_inventory": [st.to_dict() for st in self.stave_inventory], "accessory_inventory": [eq.to_dict() for eq in self.accessory_inventory], "equipped_accessory": self.equipped_accessory,
             "invincible_turns": self.invincible_turns,
             "attack_buff_turns": getattr(self, "attack_buff_turns", 0),
             "attack_buff_val": getattr(self, "attack_buff_val", 0),
@@ -1061,8 +1143,18 @@ class Player(Entity):
         ea = data.get("equipped_armor"); self.change_armor(ea) if ea is not None else self.unequip_armor()
         es = data.get("equipped_shield"); self.change_shield(es) if es is not None else self.unequip_shield()
         self.stave_inventory = [StaveInstance.from_dict(st) for st in data.get("stave_inventory", [])]
-        self.lantern_inventory = [EquipInstance.from_dict(eq) for eq in data.get("lantern_inventory", [])]
-        el = data.get("equipped_lantern"); self.change_lantern(el) if el is not None else self.unequip_lantern()
+        self.accessory_inventory = [EquipInstance.from_dict(eq) for eq in data.get("accessory_inventory", [])]
+        ea = data.get("equipped_accessory")
+        # 後方互換性：旧セーブデータのカンテラをアクセサリ枠にインポート
+        old_lanterns = data.get("lantern_inventory", [])
+        old_equipped = data.get("equipped_lantern")
+        if old_lanterns:
+            for l_data in old_lanterns:
+                l_inst = EquipInstance.from_dict(l_data)
+                self.accessory_inventory.append(l_inst)
+                if old_equipped == l_data.get("iid"):
+                    ea = l_inst.iid
+        self.change_accessory(ea) if ea is not None else self.unequip_accessory()
         self.invincible_turns = int(data.get("invincible_turns", 0))
         self.attack_buff_turns = int(data.get("attack_buff_turns", 0))
         self.attack_buff_val = int(data.get("attack_buff_val", 0))

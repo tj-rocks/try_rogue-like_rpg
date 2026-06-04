@@ -1,0 +1,407 @@
+# ==========================================
+# アクセサリマスタデータ (accessories.yml)
+#
+# 【コピー用：ボーナス設定テンプレート】
+#    bonus:
+#      common:
+#        aggro_mod: 0
+#        attack: 0
+#        accuracy_close: 0
+#        accuracy_range: 0
+#        crit_rate: 0.0
+#        hp: 0
+#        defense: 0
+#        block_chance_close: 0.0
+#        block_chance_ranged: 0.0
+#        lantern_bonus: 0
+#        regen: 0
+#        stupidity: 0
+#        armor_penetration: 0.0
+#      magic:
+#        fire_damage: 0.0
+#        fire_range: 0
+#        heal_ratio: 0.0
+#        knockback_damage: 0.0
+#        invincible_turns: 0
+#        stave_bonus: 0
+#        light_stave_bonus: 0
+# ==========================================
+
+ACCESSORY_CATEGORIES:
+  accessory:
+    position:
+      hand_offsets:
+        down: [[0, 0], [0, 0]]
+        left: [[0, 0], [0, 0]]
+        right: [[0, 0], [0, 0]]
+        up: [[0, 0], [0, 0]]
+      weapon_angles:
+        down: [0, 0]
+        left: [0, 0]
+        right: [0, 0]
+        up: [0, 0]
+      draw_over_player:
+        down: false
+        left: false
+        right: false
+        up: false
+
+ACCESSORY_DATA:
+  adventurers_lantern:
+    quest_targetable: true
+    name: "冒険者のカンテラ"
+    category: accessory
+    min_rank: F
+    rarity: 4
+    price: 80
+    image_path: components/pictures/icon/basic_lantern.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 周囲を微かに照らすカンテラ
+    growth: {bonus_limit: 1, times_limit: 10, over_limit_growth_rate: 0.001}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  luminous_gem:
+    quest_targetable: true
+    name: "光る指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 強い光で周囲を照らし出す指輪 防御力も少し上がる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 1
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_might:
+    quest_targetable: true
+    name: "力闘の指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 装備者の腕力を高める指輪 攻撃力が少し上がる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 1
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_vitality:
+    quest_targetable: true
+    name: "活力の指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 装備者の生命力を活性化させる指輪 最大HPが少し上がる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 5
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_surekill:
+    quest_targetable: true
+    name: "必殺の指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 装備者の致命の感覚を鋭くする指輪 会心率が少し上がる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.02
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_stealth:
+    quest_targetable: true
+    name: "隠密の指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 装備者の気配を絶つ魔力が込められた指輪 敵に見つかりにくくなる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 1
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_accuracy:
+    quest_targetable: true
+    name: "必中の指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 装備者の狙いを正確にする指輪 命中率が少し上がる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 2
+        accuracy_range: 2
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_healing:
+    quest_targetable: true
+    name: "治癒の指輪"
+    category: accessory
+    min_rank: D
+    max_rank: B
+    rarity: 4
+    price: 600
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 聖なる癒やしの力を宿す指輪 回復効果が少し上がる
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.05
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_protection:
+    quest_targetable: true
+    name: "守護の指輪"
+    category: accessory
+    min_rank: E
+    max_rank: C
+    rarity: 4
+    price: 400
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop_buyable: true
+    floor_spawnable: true
+    describe: 装備者の身を守る魔力が込められた指輪
+    growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 2
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 3
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0

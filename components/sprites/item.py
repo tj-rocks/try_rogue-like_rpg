@@ -146,17 +146,7 @@ class DroppedConsumable(Item):
             pygame.draw.rect(screen, (20, 100, 20), (draw_x, draw_y, self.width, self.height), 2)
 
     def collect(self, player):
-        # カンテラの場合は即座に装備インベントリへ（消耗品枠をスキップ）
-        if self.item_data.get("effect") == "lantern":
-            lantern_key = self.item_data.get("lantern_key", "basic")
-            if hasattr(player, "equip_lantern_by_key"):
-                inst = player.equip_lantern_by_key(lantern_key)
-                if inst:
-                    self.is_collected = True
-                    from wordings import Text
-                    return Text.Items.GET_LANTERN.format(name=inst.get_name())
-                else:
-                    return "装備がいっぱいで 拾えない！"
+        # effect == "lantern" was deprecated
 
         if hasattr(player, "add_item_to_inventory"):
             success = player.add_item_to_inventory(self.item_key, count=1)
@@ -251,6 +241,44 @@ class DroppedShield(Item):
         self.is_collected = True
         if hasattr(player, "equip_shield_by_key"):
             player.equip_shield_by_key(self.shield_key)
+        from wordings import Text
+        return Text.Items.GET.format(name=self.name)
+
+
+class DroppedAccessory(Item):
+    """地面に落ちたアクセサリ。踏んで拾うとインベントリに入る。"""
+    def __init__(self, x, y, accessory_key, accessory_data):
+        super().__init__(x, y, accessory_data.get("name", accessory_key), "accessory")
+        self.accessory_key = accessory_key
+        self.accessory_data = accessory_data
+        
+        # 個別画像の設定があればそれをロード、なければ共通アイコンを使用
+        if accessory_data.get("image_path") or accessory_data.get("image_dir"):
+            self._image = self._load_item_image(accessory_data)
+        else:
+            from constants import COMMON_ITEM_IMAGES
+            self._image = self._load_item_image({"image_path": COMMON_ITEM_IMAGES.get("consumable")})
+
+    def draw(self, screen, camera_x, camera_y):
+        if self.is_collected:
+            return
+        draw_x = int(self.x - camera_x + (60 - self.width) // 2)
+        draw_y = int(self.y - camera_y + (60 - self.height) // 2)
+
+        if self._image:
+            screen.blit(self._image, (draw_x, draw_y))
+        else:
+            pygame.draw.rect(screen, (100, 100, 180), (draw_x, draw_y, self.width, self.height))
+            pygame.draw.rect(screen, (50, 50, 150), (draw_x, draw_y, self.width, self.height), 3)
+
+    def collect(self, player):
+        from constants import MAX_EQUIP_SLOTS
+        if player.get_equipment_count() >= MAX_EQUIP_SLOTS:
+            return "装備がいっぱいで 拾えない！"
+            
+        self.is_collected = True
+        if hasattr(player, "equip_accessory_by_key"):
+            player.equip_accessory_by_key(self.accessory_key)
         from wordings import Text
         return Text.Items.GET.format(name=self.name)
 

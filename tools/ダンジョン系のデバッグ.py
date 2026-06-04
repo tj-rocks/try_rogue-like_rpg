@@ -75,8 +75,8 @@ def setup_gungeon_mode(dungeon, player):
         dungeon.enemies = []
         dungeon.dropped_items = [] # Dungeon.draw が見ているのは dropped_items
         
-        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA
-        from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave
+        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, ACCESSORY_DATA
+        from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave, DroppedAccessory
         
         floor_tiles = [(c, r) for r in range(3, h + 2) for c in range(2, w + 2) if dungeon.map_data[r][c] == 1]
         random.shuffle(floor_tiles)
@@ -85,7 +85,8 @@ def setup_gungeon_mode(dungeon, player):
         candidates = []
         # アイテムカタログをスキャン
         for ctype, catalog in [("weapon", WEAPON_DATA), ("armor", ARMOR_DATA), 
-                               ("shield", SHIELD_DATA), ("item", CONSUMABLE_DATA), ("stave", STAVE_DATA)]:
+                               ("shield", SHIELD_DATA), ("item", CONSUMABLE_DATA), ("stave", STAVE_DATA),
+                               ("accessory", ACCESSORY_DATA)]:
             for k, it in catalog.items():
                 # 階層チェックを優先 (Floor制限があるアイテムのみ)
                 min_f = it.get("min_floor", 1)
@@ -119,12 +120,16 @@ def setup_gungeon_mode(dungeon, player):
             tx, ty = floor_tiles[i]
             ctype, ckey = cand
             try:
+                it = None
                 if ctype == "weapon": it = DroppedWeapon(tx * ts, ty * ts, ckey, WEAPON_DATA[ckey])
                 elif ctype == "armor": it = DroppedArmor(tx * ts, ty * ts, ckey, ARMOR_DATA[ckey])
                 elif ctype == "shield": it = DroppedShield(tx * ts, ty * ts, ckey, SHIELD_DATA[ckey])
                 elif ctype == "item": it = DroppedConsumable(tx * ts, ty * ts, ckey, CONSUMABLE_DATA[ckey])
                 elif ctype == "stave": it = DroppedStave(tx * ts, ty * ts, ckey, STAVE_DATA[ckey])
-                dungeon.dropped_items.append(it)
+                elif ctype == "accessory": it = DroppedAccessory(tx * ts, ty * ts, ckey, ACCESSORY_DATA[ckey])
+                if it:
+                    dungeon.dropped_items.append(it)
+                    print(f"  [Debug Spawn] Item {i+1}: {it.name} ({ckey}) at ({tx}, {ty})")
             except Exception as e:
                 print(f"[Debug Error] Failed to spawn {ckey}: {e}")
         
@@ -338,10 +343,10 @@ def main():
                     elif event.key == pygame.K_o:
                         dungeon.debug_overflow = True
                         print(f"[DEBUG] Outbreak Reserved for Next Floor. Go to the stairs!")
+                    elif event.key == pygame.K_l:
+                        dungeon.is_lighted = not dungeon.is_lighted
+                        print(f"[DEBUG] Light Mode: {'ON' if dungeon.is_lighted else 'OFF'}")
 
-            # 常に全表示
-            dungeon.is_lighted = True
-            
             scene = game_state.get("current_scene", "game")
             
             if scene == "game":

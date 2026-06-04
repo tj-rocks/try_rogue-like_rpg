@@ -24,6 +24,7 @@
 
 CONSUMABLE_DATA:
   return_wing:
+    quest_targetable: true
     name: 帰還の道標
     effect: warp_home
     price: 8000
@@ -33,9 +34,10 @@ CONSUMABLE_DATA:
     sound: components/sounds/sfx/stairs.wav
     shop_buyable: true
     max_stack: 1
-    describe: 使うと一瞬で村に帰還できる魔法の羽。非常に高価だが、命を救う最後の手段になる。
+    describe: 使うと一瞬で村に帰還できる魔法の羽 非常に高価だが、命を救う最後の手段になる
     floor_spawnable: true
   revive_amulet:
+    quest_targetable: true
     name: 復活のお守り
     effect: revive
     price:  8000
@@ -45,19 +47,21 @@ CONSUMABLE_DATA:
     floor_spawnable: true
     shop_buyable: false
   expired_potion:
+    quest_targetable: true
     name: くさいポーション
     effect: heal_hp
     heal_amount: 1
     price: 80
     min_rank: F
-    rarity: 4
+    rarity: 2
     image_path: components/pictures/icon/potion2.png
     sound: components/sounds/sfx/recharge.wav
     shop_buyable: false
     max_stack: 5
-    describe: ラベルが剥がれかけ、嫌な沈殿物が見えるポーション。飲んでもほとんど効果がないようだ。
+    describe: ラベルが剥がれかけ、嫌な沈殿物が見えるポーション 飲んでもほとんど効果がないようだ
     floor_spawnable: true
   rotten_potion:
+    quest_targetable: true
     name: 腐ったポーション
     effect: poison_self
     price: 80
@@ -67,9 +71,10 @@ CONSUMABLE_DATA:
     sound: components/sounds/sfx/recharge.wav
     shop_buyable: false
     max_stack: 1
-    describe: どろりと変色し、異臭を放つポーション。絶対に飲んではいけない。
+    describe: どろりと変色し、異臭を放つポーション 絶対に飲んではいけない
     floor_spawnable: true
   trap_remover:
+    quest_targetable: true
     name: 罠解除ツール
     effect: remove_trap
     price: 100
@@ -79,9 +84,10 @@ CONSUMABLE_DATA:
     sound: components/sounds/sfx/select_new.wav
     shop_buyable: true
     max_stack: 3
-    describe: 足元の罠を安全に解除するための道具。罠に向かって使うと、その罠を消去できる。
+    describe: 足元の罠を安全に解除するための道具 罠に向かって使うと、その罠を消去できる
     floor_spawnable: true
   teleport_stone:
+    quest_targetable: true
     name: 転移の石
     price: 2000
     min_rank: F
@@ -90,9 +96,10 @@ CONSUMABLE_DATA:
     sound: components/sounds/sfx/recharge.wav
     shop_buyable: false
     max_stack: 5
-    describe: テレポート屋のサービスを利用するために必要な不思議な石。
+    describe: テレポート屋のサービスを利用するために必要な不思議な石
     floor_spawnable: true
   hp_potion:
+    quest_targetable: true
     name: ヒールポーション
     effect: heal_hp
     heal_amount: 40
@@ -104,9 +111,10 @@ CONSUMABLE_DATA:
     shop_buyable: true
     category: common
     max_stack: 10
-    describe: 傷を癒やす一般的な薬草の煎じ薬。
+    describe: 傷を癒やす一般的な薬草の煎じ薬
     floor_spawnable: true
   antidote_potion:
+    quest_targetable: true
     name: 毒消薬
     effect: antidote
     price: 100
@@ -116,9 +124,10 @@ CONSUMABLE_DATA:
     sound: components/sounds/sfx/drink.wav
     shop_buyable: true
     max_stack: 10
-    describe: 解毒作用を持つ薬。毒状態を回復する。
+    describe: 解毒作用を持つ薬 毒状態を回復する
     floor_spawnable: true
   hi_potion:
+    quest_targetable: true
     name: ハイポーション
     effect: heal_hp
     heal_amount: 70
@@ -130,9 +139,10 @@ CONSUMABLE_DATA:
     shop_buyable: true
     category: common
     max_stack: 3
-    describe: 高度な精製技術で作られた強力な回復薬。
+    describe: 高度な精製技術で作られた強力な回復薬
     floor_spawnable: true
   magic_crystal:
+    quest_targetable: true
     name: 魔力の水晶
     effect: recharge
     recharge_amount: 5
@@ -143,7 +153,7 @@ CONSUMABLE_DATA:
     sound: components/sounds/sfx/recharge.wav
     max_stack: 5
     shop_buyable: true
-    describe: 神秘的な光を放つ水晶。使い古した杖の魔力を回復させることができる。
+    describe: 神秘的な光を放つ水晶 使い古した杖の魔力を回復させることができる
     floor_spawnable: true
   # copper_ore:
   #   name: 銅の鉱石
@@ -182,6 +192,7 @@ CONSUMABLE_DATA:
   #   describe: まばゆい輝きを放つ金の鉱石。非常に価値が高く、武具の性能を大幅に引き出す。
   #   floor_spawnable: true
   red_stone:
+    quest_targetable: true
     name: "赤い鉱石"
     effect: material
     enhance_bonus: 1
@@ -191,9 +202,10 @@ CONSUMABLE_DATA:
     image_path: components/pictures/icon/red_stone.png
     max_stack: 3
     shop_buyable: false
-    describe: "加護が宿る石。鍛冶屋で攻撃関連のパラメータを1つ選択して強化できる。"
+    describe: "加護が宿る石 鍛冶屋で攻撃関連のパラメータを1つ選択して強化できる"
     floor_spawnable: true
   blue_stone:
+    quest_targetable: true
     name: "青い鉱石"
     effect: material
     enhance_bonus: 1
@@ -203,9 +215,10 @@ CONSUMABLE_DATA:
     image_path: components/pictures/icon/blue_stone.png
     max_stack: 3
     shop_buyable: false
-    describe: "加護が宿る石。鍛冶屋で防御・HP関連のパラメータを1つ選択して強化できる。"
+    describe: "加護が宿る石 鍛冶屋で防御・HP関連のパラメータを1つ選択して強化できる"
     floor_spawnable: true
   green_stone:
+    quest_targetable: true
     name: "緑の鉱石"
     effect: material
     enhance_bonus: 1
@@ -215,9 +228,10 @@ CONSUMABLE_DATA:
     image_path: components/pictures/icon/green_stone.png
     max_stack: 3
     shop_buyable: false
-    describe: "加護が宿る石。鍛冶屋で回避や回復、特殊効果などのパラメータを1つ選択して強化できる。"
+    describe: "加護が宿る石 鍛冶屋で回避や回復、特殊効果などのパラメータを1つ選択して強化できる"
     floor_spawnable: true
   purple_stone:
+    quest_targetable: true
     name: "紫の鉱石"
     effect: material
     enhance_bonus: 1
@@ -227,31 +241,11 @@ CONSUMABLE_DATA:
     image_path: components/pictures/icon/purple_stone.png
     max_stack: 3
     shop_buyable: false
-    describe: "加護が宿る石。鍛冶屋で杖関連のパラメータを1つ選択して強化できる。"
+    describe: "加護が宿る石 鍛冶屋で杖関連のパラメータを1つ選択して強化できる"
     floor_spawnable: true
-  basic_lantern:
-    name: カンテラ
-    effect: lantern
-    lantern_key: basic
-    price: 300
-    min_rank: F
-    rarity: 3
-    image_path: components/pictures/icon/basic_lantern.png
-    shop_buyable: true
-    describe: 周囲の闇を照らし出し、視界を確保する。
-    floor_spawnable: true
-  luxury_lantern:
-    name: 上等なカンテラ
-    effect: lantern
-    lantern_key: luxury
-    price: 2000
-    min_rank: B
-    rarity: 4
-    image_path: components/pictures/icon/luxury_lantern.png
-    shop_buyable: true
-    describe: 精巧な細工が施された高級なカンテラ。広範囲を明るく照らし続けることができる。
-    floor_spawnable: true
+
   guild_cert_e:
+    quest_targetable: true
     name: E級ギルド証
     effect: none
     price: 0
@@ -262,9 +256,10 @@ CONSUMABLE_DATA:
     shop_buyable: false
     min_floor: 11
     max_floor: 11
-    describe: E級冒険者の証。ギルドに認められた駆け出し冒険者の象徴。
+    describe: E級冒険者の証 ギルドに認められた駆け出し冒険者の象徴
     floor_spawnable: true
   guild_cert_d:
+    quest_targetable: true
     name: D級ギルド証
     effect: none
     price: 0
@@ -275,9 +270,10 @@ CONSUMABLE_DATA:
     shop_buyable: false
     min_floor: 21
     max_floor: 21
-    describe: D級冒険者の証。一通りの経験を積んだ冒険者として認められた証。
+    describe: D級冒険者の証 一通りの経験を積んだ冒険者として認められた証
     floor_spawnable: true
   guild_cert_c:
+    quest_targetable: true
     name: C級ギルド証
     effect: none
     price: 0
@@ -288,9 +284,10 @@ CONSUMABLE_DATA:
     shop_buyable: false
     min_floor: 30
     max_floor: 30
-    describe: C級冒険者の証。中堅冒険者として、より危険な依頼への参加が許される。
+    describe: C級冒険者の証 中堅冒険者として、より危険な依頼への参加が許される
     floor_spawnable: true
   guild_cert_b:
+    quest_targetable: true
     name: B級ギルド証
     effect: none
     price: 0
@@ -301,9 +298,10 @@ CONSUMABLE_DATA:
     shop_buyable: false
     min_floor: 35
     max_floor: 35
-    describe: B級冒険者の証。熟練の冒険者のみが手にできる栄誉ある証。
+    describe: B級冒険者の証 熟練の冒険者のみが手にできる栄誉ある証
     floor_spawnable: true
   guild_cert_a:
+    quest_targetable: true
     name: A級ギルド証
     effect: none
     price: 0
@@ -314,9 +312,10 @@ CONSUMABLE_DATA:
     shop_buyable: false
     min_floor: 55
     max_floor: 55
-    describe: 'A級冒険者の証。一流の証であり、多くの冒険者の憧れの的。'
+    describe: 'A級冒険者の証 一流の証であり、多くの冒険者の憧れの的'
     floor_spawnable: true
   guild_cert_s:
+    quest_targetable: true
     name: S級ギルド証
     effect: none
     price: 0
@@ -327,9 +326,10 @@ CONSUMABLE_DATA:
     shop_buyable: false
     min_floor: 70
     max_floor: 70
-    describe: S級冒険者の証。英雄に等しい実力を持つ者だけに授与される。
+    describe: S級冒険者の証 英雄に等しい実力を持つ者だけに授与される
     floor_spawnable: true
   guild_cert_ss:
+    quest_targetable: true
     name: SS級ギルド証
     effect: none
     price: 0
@@ -340,9 +340,10 @@ CONSUMABLE_DATA:
     shop_buyable: false
     min_floor: 80
     max_floor: 80
-    describe: SS級冒険者の証。伝説に名を刻む、至高の冒険者の証。
+    describe: SS級冒険者の証 伝説に名を刻む、至高の冒険者の証
     floor_spawnable: true
   adventurer_proof:
+    quest_targetable: true
     name: 冒険者の証
     effect: none
     price: 0
@@ -353,9 +354,10 @@ CONSUMABLE_DATA:
     shop_buyable: false
     min_floor: 5
     max_floor: 5
-    describe: ギルドへの正式加入を認められるための証。これを持ち帰れば一人前の冒険者だ。
+    describe: ギルドへの正式加入を認められるための証 これを持ち帰れば一人前の冒険者だ
     floor_spawnable: true
   fathers_keepsake:
+    quest_targetable: true
     name: 父の遺品
     effect: none
     price: 0
@@ -366,10 +368,11 @@ CONSUMABLE_DATA:
     shop_buyable: false
     min_floor: 99
     max_floor: 99
-    describe: 父が遺した大切な品。かつての名冒険者だった父の記憶が刻まれている。
+    describe: 父が遺した大切な品 かつての名冒険者だった父の記憶が刻まれている
     floor_spawnable: true
 STAVE_DATA:
   knockback_stave:
+    quest_targetable: true
     name: 吹き飛ばしの杖
     effect_type: knockback
     min_rank: F
@@ -385,9 +388,10 @@ STAVE_DATA:
     damage_mult: 0.5
     max_distance: 10
     shop_buyable: true
-    describe: 前方の敵を激しく弾き飛ばす魔法の杖。囲まれた時の脱出に役立つ。
+    describe: 前方の敵を激しく弾き飛ばす魔法の杖 囲まれた時の脱出に役立つ
     floor_spawnable: true
   broken_stave:
+    quest_targetable: true
     name: 壊れた杖
     effect_type: none
     min_rank: F
@@ -398,9 +402,10 @@ STAVE_DATA:
     charges: 0
     image_path: components/pictures/icon/stave.png
     shop_buyable: false
-    describe: 完全に魔力が枯渇し、折れ曲がった杖。何の役にも立たない。
+    describe: 完全に魔力が枯渇し、折れ曲がった杖 何の役にも立たない
     floor_spawnable: true
   fire_stave:
+    quest_targetable: true
     name: 火炎の杖
     effect_type: fire
     min_rank: F
@@ -420,9 +425,10 @@ STAVE_DATA:
       left: [[-1, -1], [-1, 0], [-1, 1], [-2, -1], [-2, 0], [-2, 1]]
       right: [[1, -1], [1, 0], [1, 1], [2, -1], [2, 0], [2, 1]]
     shop_buyable: true
-    describe: 燃え盛る fire を放つ魔法の杖。自分前方の広範囲（2x3）を焼き尽くし、敵に大ダメージを与える。
+    describe: 燃え盛る fire を放つ魔法の杖 自分前方の広範囲（2x3）を焼き尽くし、敵に大ダメージを与える
     floor_spawnable: true
   heal_stave:
+    quest_targetable: true
     name: 回復の杖
     effect_type: heal
     min_rank: F
@@ -438,9 +444,10 @@ STAVE_DATA:
     - 100
     heal_ratio: 0.8
     shop_buyable: true
-    describe: 癒やしの光を放つ魔法の杖。自分や仲間の傷を癒やすことができる。
+    describe: 癒やしの光を放つ魔法の杖 自分や仲間の傷を癒やすことができる
     floor_spawnable: true
   invincible_stave:
+    quest_targetable: true
     name: 無敵の杖
     effect_type: invincible
     min_rank: S
@@ -456,9 +463,10 @@ STAVE_DATA:
     - 150
     duration_turns: 10
     shop_buyable: false
-    describe: 一時的にあらゆる攻撃を無効化する聖なる杖。ここぞという時の切り札。
+    describe: 一時的にあらゆる攻撃を無効化する聖なる杖 ここぞという時の切り札
     floor_spawnable: true
   light_stave:
+    quest_targetable: true
     name: 燈の杖
     effect_type: light_all
     min_rank: F
@@ -473,9 +481,10 @@ STAVE_DATA:
     - 255
     - 200
     shop_buyable: true
-    describe: フロア全体を一瞬で明るく照らす魔法の杖。隠れた罠や敵を暴き出す。
+    describe: フロア全体を一瞬で明るく照らす魔法の杖 隠れた罠や敵を暴き出す
     floor_spawnable: true
   yrden_stave:
+    quest_targetable: true
     name: 障壁の杖
     effect_type: yrden
     min_rank: F
@@ -491,9 +500,10 @@ STAVE_DATA:
     - 255
     duration_turns: 40
     shop_buyable: true
-    describe: 正面の地面に、敵の侵入を防ぐ魔法の防壁（魔法陣）を配置する魔法の杖。
+    describe: 正面の地面に、敵の侵入を防ぐ魔法の防壁（魔法陣）を配置する魔法の杖
     floor_spawnable: true
   enchant_stave:
+    quest_targetable: true
     name: 付与の杖
     effect_type: attack_buff
     min_rank: F
@@ -510,19 +520,5 @@ STAVE_DATA:
     attack_buff_val: 5
     duration_turns: 10
     shop_buyable: true
-    describe: 魔力で武器を強化する付与の杖。10ターンの間、プレイヤーの攻撃力が5上昇する。
+    describe: 魔力で武器を強化する付与の杖 10ターンの間、プレイヤーの攻撃力が5上昇する
     floor_spawnable: true
-#以下は弄らない
-LANTERN_DATA:
-  none:
-    name: なし
-    radius: 1
-    fade_radius: 2
-  basic:
-    name: カンテラ
-    radius: 2
-    fade_radius: 5
-  luxury:
-    name: 上等なカンテラ
-    radius: 5
-    fade_radius: 8

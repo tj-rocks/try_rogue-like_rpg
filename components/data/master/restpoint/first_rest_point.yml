@@ -101,8 +101,9 @@ TILE_MAPPINGS:
     fg_color: '#333'}
   wall_none_3: {char: w, category: wall_none, tile_id: 3, desc: 背景虚無3, bg_color: '#08080c',
     fg_color: '#333'}
-  wood_barrel: {category: obstacle, id: wood_barrel, positions: [{x: 8, y: 5, 
-            flip: false}]}
+  wood_barrel: {category: obstacle, id: wood_barrel, positions: [{x: 12, y: 2, 
+            flip: false}, {x: 13, y: 2, flip: false}, {x: 8, y: 5, flip: false}, {
+          x: 1, y: 8, flip: false}]}
   crate: {category: obstacle, id: crate}
   pot: {category: obstacle, id: pot}
   rubble: {category: obstacle, id: rubble}
@@ -125,7 +126,8 @@ TILE_MAPPINGS:
   inn: {category: npc, id: inn, positions: [{x: 1, y: 4, flip: true}]}
   blacksmith: {category: npc, id: blacksmith, positions: [{x: 11, y: 12, flip: 
             false}]}
-  guild_receptionist: {category: npc, id: guild_receptionist}
+  guild_receptionist: {category: npc, id: guild_receptionist, positions: [{x: 18,
+          y: 2, flip: false}]}
   doctor: {category: npc, id: doctor}
   bank: {category: npc, id: bank, positions: [{x: 14, y: 2, flip: false}]}
   guide_item: {category: npc, id: guide_item}
@@ -157,7 +159,8 @@ TILE_MAPPINGS:
             false}]}
   wall_deco_shield: {category: wall_decoration, desc: 壁掛けの盾, id: 
       wall_decoration_shield, image_path: 
-      components/pictures/dungeon/home/wall_decoration_shield.png}
+      components/pictures/dungeon/home/wall_decoration_shield.png, positions: [{
+            x: 19, y: 1, flip: false}]}
   wall_deco_weapon_shop: {category: wall_decoration, desc: 武器屋の看板, id: 
       wall_decoration_weapon_shop, image_path: 
       components/pictures/dungeon/home/wall_decoration_weapon_shop.png, 
@@ -191,7 +194,8 @@ TILE_MAPPINGS:
       wall_decoration_wooden_roof, image_path: 
       components/pictures/dungeon/home/wall_decoration_wooden_roof.png, 
       positions: [{x: 11, y: 3, flip: false}, {x: 12, y: 3, flip: false}, {x: 13,
-          y: 3, flip: false}, {x: 14, y: 3, flip: false}]}
+          y: 3, flip: false}, {x: 14, y: 3, flip: false}, {x: 18, y: 3, flip: 
+            false}]}
   table: {category: obstacle, id: table, positions: [{x: 11, y: 6, flip: false}, {
           x: 15, y: 6, flip: false}, {x: 19, y: 6, flip: false}]}
   special_P: {char: P, category: special, desc: プレイヤー開始地点, image_path: 

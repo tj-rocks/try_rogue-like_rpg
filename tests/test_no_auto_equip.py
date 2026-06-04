@@ -26,21 +26,23 @@ def test_no_auto_equip_scenario():
     player.unequip_weapon()
     player.unequip_armor()
     player.unequip_shield()
-    player.unequip_lantern()
+    player.unequip_accessory()
     
-    print(f"初期状態: Weapon={player.equipped_weapon}, Armor={player.equipped_armor}, Shield={player.equipped_shield}, Lantern={player.equipped_lantern}")
+    print(f"初期状態: Weapon={player.equipped_weapon}, Armor={player.equipped_armor}, Shield={player.equipped_shield}, Accessory={player.equipped_accessory}")
 
-    # 1. カンテラのテスト
-    lantern_data = CONSUMABLE_DATA.get("basic_lantern")
-    if lantern_data:
-        item_lantern = DroppedConsumable(0, 0, "basic_lantern", lantern_data)
-        item_lantern.collect(player)
+    # 1. アクセサリのテスト
+    from constants import ACCESSORY_DATA
+    from components.sprites.item import DroppedAccessory
+    accessory_data = ACCESSORY_DATA.get("glowing_ring")
+    if accessory_data:
+        item_accessory = DroppedAccessory(0, 0, "glowing_ring", accessory_data)
+        item_accessory.collect(player)
         
-        if player.equipped_lantern is not None:
-            print("❌ 失敗: カンテラが自動装備されました")
+        if player.equipped_accessory is not None:
+            print("❌ 失敗: アクセサリが自動装備されました")
             sys.exit(1)
         else:
-            print("✅ カンテラ：自動装備されませんでした")
+            print("✅ アクセサリ：自動装備されませんでした")
 
     # 2. 武器のテスト
     weapon_key = "iron_sword"

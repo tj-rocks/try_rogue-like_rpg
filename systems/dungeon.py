@@ -5,7 +5,7 @@ import math
 from constants import *
 from components.sprites.npc import NPC
 from components.sprites.enemy import Enemy
-from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave
+from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave, DroppedAccessory
 from systems.ui import Dialog, ConfirmDialog, InventoryDialog, StatusBar, StatusDialog, EnhanceDialog, ItemActionDialog, OreSelectionDialog, ShopDialog, StaveSelectionDialog, GuildDialog, WarehouseDialog
 from systems.guild import GuildSystem
 # from systems.dungeon_settings import dungeon_settings
@@ -1024,9 +1024,9 @@ class Dungeon:
                 play_bgm(bgm_folder + "/" + sound_file)
 
     def spawn_floor_items(self, player):
-        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, ITEM_DROP_RATES
+        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, ACCESSORY_DATA, ITEM_DROP_RATES
         from constants import FLOOR_ITEM_SPAWN_MIN, FLOOR_ITEM_SPAWN_MAX, FLOOR_ITEM_ROOM_RATIO, FLOOR_ITEM_SCALE_EVERY, FLOOR_ITEM_SCALE_ADD
-        from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave
+        from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave, DroppedAccessory
         
         floor = self.current_floor
         rooms = len(self.rooms)
@@ -1077,6 +1077,10 @@ class Dungeon:
             if data.get("category") != "event" and data.get("floor_spawnable", True):
                 if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
                     candidates.append((key, "stave", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
+        for key, data in ACCESSORY_DATA.items():
+            if data.get("category") != "event" and data.get("floor_spawnable", True):
+                if data.get("min_floor", 1) <= floor <= data.get("max_floor", 999):
+                    candidates.append((key, "accessory", data, ITEM_DROP_RATES.get(data.get("rarity", 1), 0.1)))
         if not candidates:
             print(f"[Dungeon] WARNING: No item candidates for Floor {floor}!")
             return
@@ -1102,6 +1106,7 @@ class Dungeon:
                 elif chosen_type == "armor": item = DroppedArmor(px, py, chosen_key, chosen_data)
                 elif chosen_type == "shield": item = DroppedShield(px, py, chosen_key, chosen_data)
                 elif chosen_type == "stave": item = DroppedStave(px, py, chosen_key, chosen_data)
+                elif chosen_type == "accessory": item = DroppedAccessory(px, py, chosen_key, chosen_data)
                 else: continue
                 
                 self.dropped_items.append(item)
@@ -1480,7 +1485,7 @@ class Dungeon:
         return textures
 
     def refresh_shop_stock(self, player_rank="-"):
-        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, ITEM_DROP_RATES
+        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, ACCESSORY_DATA, CONSUMABLE_DATA, STAVE_DATA, ITEM_DROP_RATES
         
         # 出現率をレアリティから算出（ドロップ率の5倍をショップ出現率とする）
         def get_shop_rate(v):
@@ -1493,7 +1498,7 @@ class Dungeon:
             req_rank = v.get("min_rank") or v.get("rank") or "F"
             return self.guild_system.is_rank_at_least(player_rank, req_rank)
 
-        # --- 1. 武器屋 (武器・防具・盾) ---
+        # --- 1. 武器屋 (武器・防具・盾・アクセサリ) ---
         weapon_cands = []
         for k, v in WEAPON_DATA.items():
             if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
@@ -1504,8 +1509,11 @@ class Dungeon:
         for k, v in SHIELD_DATA.items():
             if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
                 weapon_cands.append({"key": k, "type": "shield", "name": v["name"], "price": v["price"], "count": 1})
+        for k, v in ACCESSORY_DATA.items():
+            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
+                weapon_cands.append({"key": k, "type": "accessory", "name": v["name"], "price": v["price"], "count": 1})
         
-        # 最低在庫保証 (武器・防具・盾 合計3枠)
+        # 最低在庫保証 (武器・防具・盾・アクセサリ 合計3枠)
         if not weapon_cands:
             all_buyable = []
             for k, v in WEAPON_DATA.items():
@@ -1514,6 +1522,8 @@ class Dungeon:
                 if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "armor", v))
             for k, v in SHIELD_DATA.items():
                 if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "shield", v))
+            for k, v in ACCESSORY_DATA.items():
+                if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "accessory", v))
             
             if all_buyable:
                 while len(weapon_cands) < 3:

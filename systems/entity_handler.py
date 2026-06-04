@@ -1,7 +1,7 @@
 import pygame
 import random
-from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave, DroppedToken
-from constants import WEAPON_DATA, CONSUMABLE_DATA, ARMOR_DATA, SHIELD_DATA, STAVE_DATA
+from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave, DroppedToken, DroppedAccessory
+from constants import WEAPON_DATA, CONSUMABLE_DATA, ARMOR_DATA, SHIELD_DATA, STAVE_DATA, ACCESSORY_DATA
 from constants import ENEMY_DATA, ITEM_DROP_RATES
 from systems.game_state import game_state
 
@@ -59,6 +59,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                         elif item_key in SHIELD_DATA: rarity = SHIELD_DATA[item_key].get("rarity", 1)
                         elif item_key in CONSUMABLE_DATA: rarity = CONSUMABLE_DATA[item_key].get("rarity", 1)
                         elif item_key in STAVE_DATA: rarity = STAVE_DATA[item_key].get("rarity", 1)
+                        elif item_key in ACCESSORY_DATA: rarity = ACCESSORY_DATA[item_key].get("rarity", 1)
                         
                         weights.append(ITEM_DROP_RATES.get(rarity, 0.1))
                         
@@ -85,6 +86,8 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                         dungeon.dropped_items.append(DroppedConsumable(grid_x, grid_y, item_key, CONSUMABLE_DATA[item_key]))
                     elif item_key in STAVE_DATA:
                         dungeon.dropped_items.append(DroppedStave(grid_x, grid_y, item_key, STAVE_DATA[item_key]))
+                    elif item_key in ACCESSORY_DATA:
+                        dungeon.dropped_items.append(DroppedAccessory(grid_x, grid_y, item_key, ACCESSORY_DATA[item_key]))
                     return True
                 
                 # A. レアドロップ判定
@@ -264,7 +267,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             
             # 認識範囲（隠密補正込み）を取得
             aggro_mod = player.get_aggro_modifier() if hasattr(player, "get_aggro_modifier") else 0
-            effective_radius = max(1, ENEMY_AGGRO_RADIUS + aggro_mod)
+            effective_radius = max(1, ENEMY_AGGRO_RADIUS - aggro_mod)
             
             if dist_x <= effective_radius and dist_y <= effective_radius:
                 active_boss = enemy

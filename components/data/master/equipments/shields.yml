@@ -33,13 +33,14 @@ SHIELD_CATEGORIES:
 
 SHIELD_DATA:
   broken_shield:
+    quest_targetable: true
     name: 壊れた盾
     category: round_shield
     min_rank: F
     max_floor: 999
     rarity: 2
     price: 100
-    image_dir: components/pictures/shield
+    image_dir: components/pictures/shield/broken_shield
     shop_buyable: false
     describe: 大きくひび割れた盾. 気休め程度にはなる.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
@@ -70,13 +71,14 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   wooden_round_shield:
+    quest_targetable: true
     name: 木の円盾
     category: round_shield
     min_rank: F
     max_rank: E
     rarity: 1
     price: 50
-    image_dir: components/pictures/shield
+    image_dir: components/pictures/shield/wooden_round_shield
     shop_buyable: true
     describe: 木板を張り合わせただけの簡素な盾. 初心者向け.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
@@ -107,13 +109,14 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   leather_round_shield:
+    quest_targetable: true
     name: 皮の円盾
     category: round_shield
     min_rank: F
     max_rank: E
     rarity: 2
     price: 200
-    image_dir: components/pictures/shield
+    image_dir: components/pictures/shield/leather_round_shield
     shop_buyable: true
     describe: 丈夫な皮を張った円盾.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
@@ -144,13 +147,14 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   iron_round_shield:
+    quest_targetable: true
     name: 鉄の円盾
     category: round_shield
     min_rank: F
     max_rank: E
     rarity: 2
     price: 300
-    image_dir: components/pictures/shield
+    image_dir: components/pictures/shield/iron_round_shield
     shop_buyable: true
     describe: 鉄で作られた頑丈な盾.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
@@ -181,13 +185,14 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   fullmetal_round_shield:
+    quest_targetable: true
     name: 鋼の円盾
     category: round_shield
     min_rank: E
     max_rank: C
     rarity: 3
     price: 500
-    image_dir: components/pictures/shield
+    image_dir: components/pictures/shield/fullmetal_round_shield
     shop_buyable: false
     describe: 硬い鋼の盾. 近接攻撃を弾きやすい.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
@@ -195,7 +200,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: 1
+        aggro_mod: -1
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -218,15 +223,16 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   fighters_sheld:
+    quest_targetable: true
     name: 戦士の盾
     category: round_shield
     min_rank: D
     max_rank: B
     rarity: 3
     price: 2000
-    image_dir: components/pictures/shield
+    image_dir: components/pictures/shield/fighters_sheld
     shop_buyable: true
-    describe: 標準的な戦士の盾。特別な補正はなく、扱いやすい。
+    describe: 標準的な戦士の盾 特別な補正はなく、扱いやすい
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     floor_spawnable: true
@@ -255,21 +261,22 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   hunters_wood_sheild:
+    quest_targetable: true
     name: 狩人の木盾
     category: round_shield
     min_rank: D
     max_rank: B
     rarity: 3
     price: 1200
-    image_dir: components/pictures/shield
+    image_dir: components/pictures/shield/hunters_wood_sheild
     shop_buyable: true
-    describe: 隠密性と回避力を高めるため、極限まで軽量化された木製の盾。
+    describe: 隠密性と回避力を高めるため、極限まで軽量化された木製の盾
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -2
+        aggro_mod: 2
         attack: 0
         accuracy_close: 20
         accuracy_range: 15
@@ -292,21 +299,22 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   knight_heavy_sheld:
+    quest_targetable: true
     name: 騎士の重盾
     category: large_shield
     min_rank: D
     max_rank: B
     rarity: 4
     price: 4000
-    image_dir: components/pictures/shield
+    image_dir: components/pictures/shield/knight_heavy_sheld
     shop_buyable: true
-    describe: 圧倒的なガード率を誇る重厚な盾。その大きさゆえに身動きが鈍くなり、敵に狙われやすい。
+    describe: 圧倒的なガード率を誇る重厚な盾 その大きさゆえに身動きが鈍くなり、敵に狙われやすい
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: 4
+        aggro_mod: -4
         attack: 2
         accuracy_close: -5
         accuracy_range: -10
@@ -329,15 +337,16 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   mages_sheld:
+    quest_targetable: true
     name: 魔術師の魔導盾
     category: round_shield
     min_rank: D
     max_rank: B
     rarity: 4
     price: 3000
-    image_dir: components/pictures/shield
+    image_dir: components/pictures/shield/mages_sheld
     shop_buyable: true
-    describe: 魔力を帯びた盾。ガード率は控えめだが、攻撃魔法の威力・射程・回数を強化する。
+    describe: 魔力を帯びた盾 ガード率は控えめだが、攻撃魔法の威力・射程・回数を強化する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     floor_spawnable: true
@@ -366,15 +375,16 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   pilgrimss_round_sheld:
+    quest_targetable: true
     name: 巡礼者の丸盾
     category: round_shield
     min_rank: D
     max_rank: B
     rarity: 4
     price: 3200
-    image_dir: components/pictures/shield
+    image_dir: components/pictures/shield/pilgrimss_round_sheld
     shop_buyable: true
-    describe: 聖なる加護を受けた巡礼者の盾。所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する。
+    describe: 聖なる加護を受けた巡礼者の盾 所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     floor_spawnable: true
@@ -403,21 +413,22 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   scount_blackleather_sheld:
+    quest_targetable: true
     name: スカウトの黒革盾
     category: round_shield
     min_rank: D
     max_rank: B
     rarity: 3
     price: 2600
-    image_dir: components/pictures/shield
+    image_dir: components/pictures/shield/scount_blackleather_sheld
     shop_buyable: true
-    describe: 黒く染められた軽量の革盾。敵に見つかりにくくなり、高い回避率と会心率を誇る。
+    describe: 黒く染められた軽量の革盾 敵に見つかりにくくなり、高い回避率と会心率を誇る
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -2
+        aggro_mod: 2
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -440,38 +451,40 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
 
-  # test_all_bonus_shield:
-  #   name: "[TEST]全加護の盾"
-  #   category: round_shield
-  #   min_rank: F
-  #   rarity: 1
-  #   price: 1
-  #   image_dir: components/pictures/shield
-  #   shop_buyable: false
-  #   floor_spawnable: false
-  #   describe: テスト用。全ボーナスが乗っている盾。
-  #   growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-  #   image_scale: 1.0
-  #   bonus:
-  #     common:
-  #       attack: 0
-  #       accuracy_close: 5
-  #       accuracy_range: 5
-  #       crit_rate: 0.05
-  #       hp: 10
-  #       defense: 5
-  #       block_chance_close: 0.21
-  #       block_chance_ranged: 0.21
-  #       lantern_bonus: 0
-  #       regen: 1
-  #       aggro_mod: -2
-  #       stupidity: 1
-  #       armor_penetration: 0.1
-  #     magic:
-  #       fire_damage: 0.05
-  #       fire_range: 1
-  #       heal_ratio: 0.05
-  #       knockback_damage: 0.05
-  #       invincible_turns: 1
-  #       stave_bonus: 5
-  #       light_stave_bonus: 1
+  test_all_bonus_shield:
+    quest_targetable: false
+    name: "[TEST]全加護の盾"
+    category: round_shield
+    min_rank: F
+    max_rank: S
+    rarity: 1
+    price: 1
+    image_dir: components/pictures/shield/test_all_bonus_shield
+    shop_buyable: false
+    floor_spawnable: false
+    describe: テスト用。全ボーナスが乗っている盾
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    image_scale: 1.0
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 5
+        accuracy_range: 5
+        crit_rate: 0.05
+        hp: 10
+        defense: 5
+        block_chance_close: 0.21
+        block_chance_ranged: 0.21
+        lantern_bonus: 0
+        regen: 1
+        aggro_mod: 2
+        stupidity: 1
+        armor_penetration: 0.1
+      magic:
+        fire_damage: 0.05
+        fire_range: 1
+        heal_ratio: 0.05
+        knockback_damage: 0.05
+        invincible_turns: 1
+        stave_bonus: 5
+        light_stave_bonus: 1

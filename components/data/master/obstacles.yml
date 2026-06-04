@@ -20,6 +20,7 @@
 # ==============================================================================
 
 wood_barrel:
+  quest_targetable: true
   name: 樽
   min_rank: "F"
   rarity: 1
@@ -39,6 +40,7 @@ wood_barrel:
   image_scale: 0.8
 
 anvil:
+  quest_targetable: true
   name: 金床
   min_rank: "C"
   rarity: 1
@@ -55,6 +57,7 @@ anvil:
   image_scale: 0.8
 
 crate:
+  quest_targetable: true
   name: 木箱
   min_rank: "F"
   rarity: 1
@@ -74,6 +77,7 @@ crate:
   image_scale: 0.8
 
 pot:
+  quest_targetable: true
   name: 壺
   min_rank: "F"
   rarity: 1
@@ -93,6 +97,7 @@ pot:
   image_scale: 1.0
 
 rubble:
+  quest_targetable: true
   name: 瓦礫
   min_rank: "F"
   rarity: 1
@@ -107,6 +112,7 @@ rubble:
   image_scale: 1.0
 
 well:
+  quest_targetable: true
   name: 井戸
   min_rank: "B"
   rarity: 5
@@ -123,6 +129,7 @@ well:
   image_scale: 1.2
 
 skeleton_obstacle:
+  quest_targetable: true
   name: 骸骨
   min_rank: "E"
   rarity: 2
@@ -137,6 +144,7 @@ skeleton_obstacle:
   image_scale: 0.9
 
 crystal:
+  quest_targetable: true
   name: クリスタル
   min_rank: "E"
   rarity: 2
@@ -156,6 +164,7 @@ crystal:
   image_scale: 0.9
 
 sword_stuck:
+  quest_targetable: true
   name: 刺さった剣
   min_rank: "E"
   rarity: 2
@@ -175,6 +184,7 @@ sword_stuck:
   image_scale: 0.9
 
 web:
+  quest_targetable: true
   name: 蜘蛛の巣
   min_rank: "E"
   rarity: 2
@@ -189,6 +199,7 @@ web:
   image_scale: 1.0
 
 stained_armor_stand:
+  quest_targetable: true
   name: 汚れた鎧立て
   min_rank: "D"
   rarity: 3
@@ -208,6 +219,7 @@ stained_armor_stand:
   image_scale: 1.0
 
 broken_pillar:
+  quest_targetable: true
   name: 壊れた柱
   min_rank: "D"
   rarity: 3
@@ -224,6 +236,7 @@ broken_pillar:
   image_scale: 1.0
 
 statue:
+  quest_targetable: true
   name: 石像
   min_rank: "C"
   rarity: 4
@@ -243,6 +256,7 @@ table:
   name: テーブル
   min_rank: "F"
   rarity: 1
+  quest_targetable: false
   hp: 10
   defense: 10
   evasion: 0
@@ -257,6 +271,7 @@ magic_barrier:
   name: 魔法の防壁
   min_rank: "F"
   rarity: 1
+  quest_targetable: false
   hp: 1
   defense: 0
   evasion: 0

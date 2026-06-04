@@ -30,6 +30,7 @@ ARMOR_CATEGORIES:
 
 ARMOR_DATA:
   broken_armor:
+    quest_targetable: true
     name: 壊れた鎧
     category: medium
     min_rank: F
@@ -38,7 +39,7 @@ ARMOR_DATA:
     price: 100
     image_dir: components/pictures/armor/adventurers_clothes
     shop_buyable: false
-    describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない。
+    describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: false
     bonus:
@@ -66,6 +67,7 @@ ARMOR_DATA:
         light_stave_bonus: 0
 
   adventurers_clothes:
+    quest_targetable: true
     name: 冒険者の服
     category: robe
     min_rank: F
@@ -101,6 +103,7 @@ ARMOR_DATA:
         light_stave_bonus: 0
 
   leather_breastplate:
+    quest_targetable: true
     name: 皮の胸当て
     category: light
     min_rank: F
@@ -113,7 +116,7 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -0.5
+        aggro_mod: 0.5
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -136,6 +139,7 @@ ARMOR_DATA:
         light_stave_bonus: 0
 
   iron_breastplate:
+    quest_targetable: true
     name: 鉄の胸当て
     category: medium
     min_rank: F
@@ -171,6 +175,7 @@ ARMOR_DATA:
         light_stave_bonus: 0
 
   fullmetal_breastplate:
+    quest_targetable: true
     name: 鋼の胸当て
     category: medium
     min_rank: E
@@ -206,6 +211,7 @@ ARMOR_DATA:
         light_stave_bonus: 0
 
   hard_leather_armor:
+    quest_targetable: true
     name: 堅牢な革鎧
     category: light
     min_rank: E
@@ -242,6 +248,7 @@ ARMOR_DATA:
         light_stave_bonus: 0
 
   pilgrim_robe:
+    quest_targetable: true
     name: 巡礼者のローブ
     category: robe
     min_rank: D
@@ -250,7 +257,7 @@ ARMOR_DATA:
     price: 2000
     image_dir: components/pictures/armor/leather_armor
     shop_buyable: true
-    describe: 巡礼者が旅の安全を祈って着る聖なるローブ。魔法の効果を高める力がある。
+    describe: 巡礼者が旅の安全を祈って着る聖なるローブ 魔法の効果を高める力がある
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -278,6 +285,7 @@ ARMOR_DATA:
         light_stave_bonus: 0
 
   hunters_armor:
+    quest_targetable: true
     name: 狩人の鎧
     category: light
     min_rank: D
@@ -286,12 +294,12 @@ ARMOR_DATA:
     price: 1200
     image_dir: components/pictures/armor/hunters_armor
     shop_buyable: true
-    describe: 隠密性に特化した深紺の軽装。防御力は極めて低いが、攻撃の命中率と会心率（10/100）が大きく向上する。
+    describe: 隠密性に特化した深紺の軽装 防御力は極めて低いが、攻撃の命中率と会心率（10/100）が大きく向上する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -2
+        aggro_mod: 2
         attack: 0
         accuracy_close: 20
         accuracy_range: 25
@@ -314,6 +322,7 @@ ARMOR_DATA:
         light_stave_bonus: 0
 
   fighters_armor:
+    quest_targetable: true
     name: 戦士の鎧
     category: medium
     min_rank: D
@@ -322,7 +331,7 @@ ARMOR_DATA:
     price: 2500
     image_dir: components/pictures/armor/fighters_armor
     shop_buyable: true
-    describe: 標準的な戦士の鎧。特にバフやデバフはなく、扱いやすい。
+    describe: 標準的な戦士の鎧 特にバフやデバフはなく、扱いやすい
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -350,6 +359,7 @@ ARMOR_DATA:
         light_stave_bonus: 0
 
   knight_heavy_armor:
+    quest_targetable: true
     name: 騎士の重鎧
     category: heavy
     min_rank: D
@@ -358,12 +368,12 @@ ARMOR_DATA:
     price: 4500
     image_dir: components/pictures/armor/knight_heavy_armor
     shop_buyable: true
-    describe: 鉄板を重ねた非常に強固な鎧。重さゆえに敵に気づかれやすく、回避や命中、視野が低下する。
+    describe: 鉄板を重ねた非常に強固な鎧 重さゆえに敵に気づかれやすく、回避や命中、視野が低下する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: 3
+        aggro_mod: -3
         attack: 2
         accuracy_close: -5
         accuracy_range: -10
@@ -386,6 +396,7 @@ ARMOR_DATA:
         light_stave_bonus: 0
 
   pilgrims_armor:
+    quest_targetable: true
     name: 巡礼者の装衣
     category: robe
     min_rank: D
@@ -394,7 +405,7 @@ ARMOR_DATA:
     price: 3200
     image_dir: components/pictures/armor/pilgrims_armor 
     shop_buyable: true
-    describe: 聖なる加護を受けた巡礼者の軽防具。最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する。
+    describe: 聖なる加護を受けた巡礼者の軽防具 最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -422,6 +433,7 @@ ARMOR_DATA:
         light_stave_bonus: 0
 
   scount_armor:
+    quest_targetable: true
     name: スカウトの鎧
     category: light
     min_rank: D
@@ -430,7 +442,7 @@ ARMOR_DATA:
     price: 2800
     image_dir: components/pictures/armor/scount_armor
     shop_buyable: true
-    describe: 隠密性に特化した偵察用の軽装鎧。敵に見つかりにくくなり、回避率と会心率が高まる。
+    describe: 隠密性に特化した偵察用の軽装鎧 敵に見つかりにくくなり、回避率と会心率が高まる
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -445,7 +457,7 @@ ARMOR_DATA:
         block_chance_ranged: 0.1
         lantern_bonus: 0
         regen: 0
-        aggro_mod: -3
+        aggro_mod: 3
         stupidity: 0
         armor_penetration: 0.1
       magic:
@@ -458,6 +470,7 @@ ARMOR_DATA:
         light_stave_bonus: 0
 
   mages_robe:
+    quest_targetable: true
     name: 魔術師の魔導衣
     category: robe
     min_rank: D
@@ -466,7 +479,7 @@ ARMOR_DATA:
     price: 3200
     image_dir: components/pictures/armor/mages_robe
     shop_buyable: true
-    describe: 魔力の流れを操る高貴な紫の魔導衣。軽装で動きやすく、火炎・吹飛などの攻撃魔法の威力・射程を極限まで引き出す。
+    describe: 魔力の流れを操る高貴な紫の魔導衣 軽装で動きやすく、火炎・吹飛などの攻撃魔法の威力・射程を極限まで引き出す
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -493,37 +506,39 @@ ARMOR_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
-  # test_all_bonus_armor:
-  #   name: "[TEST]全加護の鎧"
-  #   category: light
-  #   min_rank: F
-  #   rarity: 1
-  #   price: 1
-  #   image_dir: components/pictures/armor/leather_armor
-  #   shop_buyable: false
-  #   floor_spawnable: false
-  #   describe: テスト用。全ボーナスが乗っている鎧。
-  #   growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-  #   bonus:
-  #     common:
-  #       attack: 5
-  #       accuracy_close: 10
-  #       accuracy_range: 5
-  #       crit_rate: 0.10
-  #       hp: 30
-  #       defense: 15
-  #       block_chance_close: 0.05
-  #       block_chance_ranged: 0.05
-  #       lantern_bonus: 1
-  #       regen: 2
-  #       aggro_mod: -5
-  #       stupidity: 1
-  #       armor_penetration: 0.3
-  #     magic:
-  #       fire_damage: 0.10
-  #       fire_range: 0
-  #       heal_ratio: 0.15
-  #       knockback_damage: 0.10
-  #       invincible_turns: 0
-  #       stave_bonus: 8
-  #       light_stave_bonus: 0
+  test_all_bonus_armor:
+    quest_targetable: false
+    name: "[TEST]全加護の鎧"
+    category: light
+    min_rank: F
+    max_rank: S
+    rarity: 1
+    price: 1
+    image_dir: components/pictures/armor/leather_armor
+    shop_buyable: false
+    floor_spawnable: false
+    describe: テスト用。全ボーナスが乗っている鎧
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    bonus:
+      common:
+        attack: 5
+        accuracy_close: 10
+        accuracy_range: 5
+        crit_rate: 0.10
+        hp: 30
+        defense: 15
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
+        lantern_bonus: 1
+        regen: 2
+        aggro_mod: 5
+        stupidity: 1
+        armor_penetration: 0.3
+      magic:
+        fire_damage: 0.10
+        fire_range: 0
+        heal_ratio: 0.15
+        knockback_damage: 0.10
+        invincible_turns: 0
+        stave_bonus: 8
+        light_stave_bonus: 0

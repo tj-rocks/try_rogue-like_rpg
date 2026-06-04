@@ -26,11 +26,11 @@ class TestGuildReporting(unittest.TestCase):
         self.player.weapon_inventory = []
         self.player.armor_inventory = []
         self.player.shield_inventory = []
-        self.player.lantern_inventory = []
+        self.player.accessory_inventory = []
         self.player.equipped_weapon = None
         self.player.equipped_armor = None
         self.player.equipped_shield = None
-        self.player.equipped_lantern = None
+        self.player.equipped_accessory = None
         self.player.weapon = None
         
         # GuildDialogのモック
