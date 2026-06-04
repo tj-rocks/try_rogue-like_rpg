@@ -112,6 +112,9 @@ class GuildSystem:
         candidates = []
         for key, data in ENEMY_DATA.items():
             r = data.get("min_rank") or data.get("rank") or "F"
+            # クエスト除外フラグが明示的に設定されている場合は除外
+            if not data.get("quest_targetable", True):
+                continue
             # ボス属性の敵、および特殊な敵はランダムクエストの対象外とする
             if r in allowed_ranks and not data.get("is_boss", False):
                 candidates.append((key, data))
@@ -186,6 +189,9 @@ class GuildSystem:
         for catalog in [WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA]:
             for key, data in catalog.items():
                 target_rank = data.get("min_rank") or data.get("rank") or "F"
+                # クエスト除外フラグが明示的に設定されている場合は除外
+                if not data.get("quest_targetable", True):
+                    continue
                 if target_rank in allowed_ranks and data.get("price", 0) > 0:
                     candidates.append((key, data))
                     

@@ -243,6 +243,7 @@ table:
   name: テーブル
   min_rank: "F"
   rarity: 1
+  quest_targetable: false
   hp: 10
   defense: 10
   evasion: 0
@@ -257,6 +258,7 @@ magic_barrier:
   name: 魔法の防壁
   min_rank: "F"
   rarity: 1
+  quest_targetable: false
   hp: 1
   defense: 0
   evasion: 0
