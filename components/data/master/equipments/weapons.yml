@@ -70,6 +70,7 @@ WEAPON_CATEGORIES:
 
 WEAPON_DATA:
   broken_sword:
+    quest_targetable: true
     name: 壊れかけの剣
     category: onehanded_sword
     min_rank: F
@@ -108,6 +109,7 @@ WEAPON_DATA:
         light_stave_bonus: 0
 
   iron_sword:
+    quest_targetable: true
     name: 鉄の剣
     category: onehanded_sword
     min_rank: F
@@ -147,6 +149,7 @@ WEAPON_DATA:
         light_stave_bonus: 0
 
   old_sword:
+    quest_targetable: true
     name: 古びた剣
     category: onehanded_sword
     min_rank: F
@@ -186,6 +189,7 @@ WEAPON_DATA:
         light_stave_bonus: 0
 
   wooden_stick:
+    quest_targetable: true
     name: 木の棍棒
     category: axe
     min_rank: F
@@ -225,6 +229,7 @@ WEAPON_DATA:
         light_stave_bonus: 0
 
   fullmetal_sword:
+    quest_targetable: true
     name: 鋼の剣
     category: onehanded_sword
     min_rank: E
@@ -303,6 +308,7 @@ WEAPON_DATA:
   #       light_stave_bonus: 0
 
   thiefs_knife:
+    quest_targetable: true
     name: 盗賊のダガー
     category: dagger
     min_rank: E
@@ -342,6 +348,7 @@ WEAPON_DATA:
         light_stave_bonus: 0
 
   fighters_sword:
+    quest_targetable: true
     name: 戦士の剣
     category: onehanded_sword
     min_rank: D
@@ -381,6 +388,7 @@ WEAPON_DATA:
         light_stave_bonus: 0
 
   hunters_rapier:
+    quest_targetable: true
     name: 狩人のレイピア
     category: onehanded_sword
     min_rank: D
@@ -420,6 +428,7 @@ WEAPON_DATA:
         light_stave_bonus: 0
 
   knight_heavy_axe:
+    quest_targetable: true
     name: 騎士の重斧
     category: axe
     min_rank: D
@@ -459,6 +468,7 @@ WEAPON_DATA:
         light_stave_bonus: 0
 
   mages_staff:
+    quest_targetable: true
     name: 魔術師のスタッフ
     category: onehanded_sword
     min_rank: D
@@ -498,6 +508,7 @@ WEAPON_DATA:
         light_stave_bonus: 0
 
   pilgrims_sword:
+    quest_targetable: true
     name: 巡礼者の剣
     category: onehanded_sword
     min_rank: D
@@ -537,6 +548,7 @@ WEAPON_DATA:
         light_stave_bonus: 0
 
   scount_small_knife:
+    quest_targetable: true
     name: スカウトの小刀
     category: dagger
     min_rank: D
@@ -575,40 +587,42 @@ WEAPON_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
-  # test_all_bonus_weapon:
-  #   name: "[TEST]全加護の剣"
-  #   category: onehanded_sword
-  #   min_rank: F
-  #   rarity: 1
-  #   price: 1
-  #   image_path: components/pictures/weapon/iron_sword.png
-  #   sound: components/sounds/sfx/sword_swing.wav
-  #   image_scale: 1.2
-  #   shop_buyable: false
-  #   floor_spawnable: false
-  #   describe: テスト用。全ボーナスが乗っている装備。
-  #   growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-  #   type: onehanded_sword
-  #   bonus:
-  #     common:
-  #       attack: 15
-  #       accuracy_close: 20
-  #       accuracy_range: 10
-  #       crit_rate: 0.15
-  #       hp: 25
-  #       defense: 5
-  #       block_chance_close: 0.08
-  #       block_chance_ranged: 0.08
-  #       lantern_bonus: 0
-  #       regen: 1
-  #       aggro_mod: -2
-  #       stupidity: 1.5
-  #       armor_penetration: 0.2
-  #     magic:
-  #       fire_damage: 0.20
-  #       fire_range: 1
-  #       heal_ratio: 0.10
-  #       knockback_damage: 0.15
-  #       invincible_turns: 1
-  #       stave_bonus: 10
-  #       light_stave_bonus: 0
+  test_all_bonus_weapon:
+    quest_targetable: false
+    name: "[TEST]全加護の剣"
+    category: onehanded_sword
+    min_rank: F
+    max_rank: S
+    rarity: 1
+    price: 1
+    image_path: components/pictures/weapon/iron_sword.png
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.2
+    shop_buyable: false
+    floor_spawnable: false
+    describe: テスト用。全ボーナスが乗っている装備
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    type: onehanded_sword
+    bonus:
+      common:
+        attack: 15
+        accuracy_close: 20
+        accuracy_range: 10
+        crit_rate: 0.15
+        hp: 25
+        defense: 5
+        block_chance_close: 0.08
+        block_chance_ranged: 0.08
+        lantern_bonus: 0
+        regen: 1
+        aggro_mod: -2
+        stupidity: 1.5
+        armor_penetration: 0.2
+      magic:
+        fire_damage: 0.20
+        fire_range: 1
+        heal_ratio: 0.10
+        knockback_damage: 0.15
+        invincible_turns: 1
+        stave_bonus: 10
+        light_stave_bonus: 0

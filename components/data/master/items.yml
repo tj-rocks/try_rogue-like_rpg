@@ -24,6 +24,7 @@
 
 CONSUMABLE_DATA:
   return_wing:
+    quest_targetable: true
     name: 帰還の道標
     effect: warp_home
     price: 8000
@@ -36,6 +37,7 @@ CONSUMABLE_DATA:
     describe: 使うと一瞬で村に帰還できる魔法の羽 非常に高価だが、命を救う最後の手段になる
     floor_spawnable: true
   revive_amulet:
+    quest_targetable: true
     name: 復活のお守り
     effect: revive
     price:  8000
@@ -45,6 +47,7 @@ CONSUMABLE_DATA:
     floor_spawnable: true
     shop_buyable: false
   expired_potion:
+    quest_targetable: true
     name: くさいポーション
     effect: heal_hp
     heal_amount: 1
@@ -58,6 +61,7 @@ CONSUMABLE_DATA:
     describe: ラベルが剥がれかけ、嫌な沈殿物が見えるポーション 飲んでもほとんど効果がないようだ
     floor_spawnable: true
   rotten_potion:
+    quest_targetable: true
     name: 腐ったポーション
     effect: poison_self
     price: 80
@@ -70,6 +74,7 @@ CONSUMABLE_DATA:
     describe: どろりと変色し、異臭を放つポーション 絶対に飲んではいけない
     floor_spawnable: true
   trap_remover:
+    quest_targetable: true
     name: 罠解除ツール
     effect: remove_trap
     price: 100
@@ -82,6 +87,7 @@ CONSUMABLE_DATA:
     describe: 足元の罠を安全に解除するための道具 罠に向かって使うと、その罠を消去できる
     floor_spawnable: true
   teleport_stone:
+    quest_targetable: true
     name: 転移の石
     price: 2000
     min_rank: F
@@ -93,6 +99,7 @@ CONSUMABLE_DATA:
     describe: テレポート屋のサービスを利用するために必要な不思議な石
     floor_spawnable: true
   hp_potion:
+    quest_targetable: true
     name: ヒールポーション
     effect: heal_hp
     heal_amount: 40
@@ -107,6 +114,7 @@ CONSUMABLE_DATA:
     describe: 傷を癒やす一般的な薬草の煎じ薬
     floor_spawnable: true
   antidote_potion:
+    quest_targetable: true
     name: 毒消薬
     effect: antidote
     price: 100
@@ -119,6 +127,7 @@ CONSUMABLE_DATA:
     describe: 解毒作用を持つ薬 毒状態を回復する
     floor_spawnable: true
   hi_potion:
+    quest_targetable: true
     name: ハイポーション
     effect: heal_hp
     heal_amount: 70
@@ -133,6 +142,7 @@ CONSUMABLE_DATA:
     describe: 高度な精製技術で作られた強力な回復薬
     floor_spawnable: true
   magic_crystal:
+    quest_targetable: true
     name: 魔力の水晶
     effect: recharge
     recharge_amount: 5
@@ -182,6 +192,7 @@ CONSUMABLE_DATA:
   #   describe: まばゆい輝きを放つ金の鉱石。非常に価値が高く、武具の性能を大幅に引き出す。
   #   floor_spawnable: true
   red_stone:
+    quest_targetable: true
     name: "赤い鉱石"
     effect: material
     enhance_bonus: 1
@@ -194,6 +205,7 @@ CONSUMABLE_DATA:
     describe: "加護が宿る石 鍛冶屋で攻撃関連のパラメータを1つ選択して強化できる"
     floor_spawnable: true
   blue_stone:
+    quest_targetable: true
     name: "青い鉱石"
     effect: material
     enhance_bonus: 1
@@ -206,6 +218,7 @@ CONSUMABLE_DATA:
     describe: "加護が宿る石 鍛冶屋で防御・HP関連のパラメータを1つ選択して強化できる"
     floor_spawnable: true
   green_stone:
+    quest_targetable: true
     name: "緑の鉱石"
     effect: material
     enhance_bonus: 1
@@ -218,6 +231,7 @@ CONSUMABLE_DATA:
     describe: "加護が宿る石 鍛冶屋で回避や回復、特殊効果などのパラメータを1つ選択して強化できる"
     floor_spawnable: true
   purple_stone:
+    quest_targetable: true
     name: "紫の鉱石"
     effect: material
     enhance_bonus: 1
@@ -231,6 +245,7 @@ CONSUMABLE_DATA:
     floor_spawnable: true
 
   guild_cert_e:
+    quest_targetable: true
     name: E級ギルド証
     effect: none
     price: 0
@@ -244,6 +259,7 @@ CONSUMABLE_DATA:
     describe: E級冒険者の証 ギルドに認められた駆け出し冒険者の象徴
     floor_spawnable: true
   guild_cert_d:
+    quest_targetable: true
     name: D級ギルド証
     effect: none
     price: 0
@@ -257,6 +273,7 @@ CONSUMABLE_DATA:
     describe: D級冒険者の証 一通りの経験を積んだ冒険者として認められた証
     floor_spawnable: true
   guild_cert_c:
+    quest_targetable: true
     name: C級ギルド証
     effect: none
     price: 0
@@ -270,6 +287,7 @@ CONSUMABLE_DATA:
     describe: C級冒険者の証 中堅冒険者として、より危険な依頼への参加が許される
     floor_spawnable: true
   guild_cert_b:
+    quest_targetable: true
     name: B級ギルド証
     effect: none
     price: 0
@@ -283,6 +301,7 @@ CONSUMABLE_DATA:
     describe: B級冒険者の証 熟練の冒険者のみが手にできる栄誉ある証
     floor_spawnable: true
   guild_cert_a:
+    quest_targetable: true
     name: A級ギルド証
     effect: none
     price: 0
@@ -296,6 +315,7 @@ CONSUMABLE_DATA:
     describe: 'A級冒険者の証 一流の証であり、多くの冒険者の憧れの的'
     floor_spawnable: true
   guild_cert_s:
+    quest_targetable: true
     name: S級ギルド証
     effect: none
     price: 0
@@ -309,6 +329,7 @@ CONSUMABLE_DATA:
     describe: S級冒険者の証 英雄に等しい実力を持つ者だけに授与される
     floor_spawnable: true
   guild_cert_ss:
+    quest_targetable: true
     name: SS級ギルド証
     effect: none
     price: 0
@@ -322,6 +343,7 @@ CONSUMABLE_DATA:
     describe: SS級冒険者の証 伝説に名を刻む、至高の冒険者の証
     floor_spawnable: true
   adventurer_proof:
+    quest_targetable: true
     name: 冒険者の証
     effect: none
     price: 0
@@ -335,6 +357,7 @@ CONSUMABLE_DATA:
     describe: ギルドへの正式加入を認められるための証 これを持ち帰れば一人前の冒険者だ
     floor_spawnable: true
   fathers_keepsake:
+    quest_targetable: true
     name: 父の遺品
     effect: none
     price: 0
@@ -349,6 +372,7 @@ CONSUMABLE_DATA:
     floor_spawnable: true
 STAVE_DATA:
   knockback_stave:
+    quest_targetable: true
     name: 吹き飛ばしの杖
     effect_type: knockback
     min_rank: F
@@ -367,6 +391,7 @@ STAVE_DATA:
     describe: 前方の敵を激しく弾き飛ばす魔法の杖 囲まれた時の脱出に役立つ
     floor_spawnable: true
   broken_stave:
+    quest_targetable: true
     name: 壊れた杖
     effect_type: none
     min_rank: F
@@ -380,6 +405,7 @@ STAVE_DATA:
     describe: 完全に魔力が枯渇し、折れ曲がった杖 何の役にも立たない
     floor_spawnable: true
   fire_stave:
+    quest_targetable: true
     name: 火炎の杖
     effect_type: fire
     min_rank: F
@@ -402,6 +428,7 @@ STAVE_DATA:
     describe: 燃え盛る fire を放つ魔法の杖 自分前方の広範囲（2x3）を焼き尽くし、敵に大ダメージを与える
     floor_spawnable: true
   heal_stave:
+    quest_targetable: true
     name: 回復の杖
     effect_type: heal
     min_rank: F
@@ -420,6 +447,7 @@ STAVE_DATA:
     describe: 癒やしの光を放つ魔法の杖 自分や仲間の傷を癒やすことができる
     floor_spawnable: true
   invincible_stave:
+    quest_targetable: true
     name: 無敵の杖
     effect_type: invincible
     min_rank: S
@@ -438,6 +466,7 @@ STAVE_DATA:
     describe: 一時的にあらゆる攻撃を無効化する聖なる杖 ここぞという時の切り札
     floor_spawnable: true
   light_stave:
+    quest_targetable: true
     name: 燈の杖
     effect_type: light_all
     min_rank: F
@@ -455,6 +484,7 @@ STAVE_DATA:
     describe: フロア全体を一瞬で明るく照らす魔法の杖 隠れた罠や敵を暴き出す
     floor_spawnable: true
   yrden_stave:
+    quest_targetable: true
     name: 障壁の杖
     effect_type: yrden
     min_rank: F
@@ -473,6 +503,7 @@ STAVE_DATA:
     describe: 正面の地面に、敵の侵入を防ぐ魔法の防壁（魔法陣）を配置する魔法の杖
     floor_spawnable: true
   enchant_stave:
+    quest_targetable: true
     name: 付与の杖
     effect_type: attack_buff
     min_rank: F

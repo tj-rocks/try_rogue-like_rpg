@@ -48,6 +48,7 @@ ACCESSORY_CATEGORIES:
 
 ACCESSORY_DATA:
   adventurers_lantern:
+    quest_targetable: true
     name: "冒険者のカンテラ"
     category: accessory
     min_rank: F
@@ -86,6 +87,7 @@ ACCESSORY_DATA:
         light_stave_bonus: 0
 
   luminous_gem:
+    quest_targetable: true
     name: "光る宝石"
     category: accessory
     min_rank: D
@@ -124,6 +126,7 @@ ACCESSORY_DATA:
         light_stave_bonus: 0
 
   ring_of_protection:
+    quest_targetable: true
     name: "守護の指輪"
     category: accessory
     min_rank: E

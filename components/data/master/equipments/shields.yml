@@ -33,6 +33,7 @@ SHIELD_CATEGORIES:
 
 SHIELD_DATA:
   broken_shield:
+    quest_targetable: true
     name: 壊れた盾
     category: round_shield
     min_rank: F
@@ -70,6 +71,7 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   wooden_round_shield:
+    quest_targetable: true
     name: 木の円盾
     category: round_shield
     min_rank: F
@@ -107,6 +109,7 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   leather_round_shield:
+    quest_targetable: true
     name: 皮の円盾
     category: round_shield
     min_rank: F
@@ -144,6 +147,7 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   iron_round_shield:
+    quest_targetable: true
     name: 鉄の円盾
     category: round_shield
     min_rank: F
@@ -181,6 +185,7 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   fullmetal_round_shield:
+    quest_targetable: true
     name: 鋼の円盾
     category: round_shield
     min_rank: E
@@ -218,6 +223,7 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   fighters_sheld:
+    quest_targetable: true
     name: 戦士の盾
     category: round_shield
     min_rank: D
@@ -255,6 +261,7 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   hunters_wood_sheild:
+    quest_targetable: true
     name: 狩人の木盾
     category: round_shield
     min_rank: D
@@ -292,6 +299,7 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   knight_heavy_sheld:
+    quest_targetable: true
     name: 騎士の重盾
     category: large_shield
     min_rank: D
@@ -329,6 +337,7 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   mages_sheld:
+    quest_targetable: true
     name: 魔術師の魔導盾
     category: round_shield
     min_rank: D
@@ -366,6 +375,7 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   pilgrimss_round_sheld:
+    quest_targetable: true
     name: 巡礼者の丸盾
     category: round_shield
     min_rank: D
@@ -403,6 +413,7 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   scount_blackleather_sheld:
+    quest_targetable: true
     name: スカウトの黒革盾
     category: round_shield
     min_rank: D
@@ -440,38 +451,40 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
 
-  # test_all_bonus_shield:
-  #   name: "[TEST]全加護の盾"
-  #   category: round_shield
-  #   min_rank: F
-  #   rarity: 1
-  #   price: 1
-  #   image_dir: components/pictures/shield
-  #   shop_buyable: false
-  #   floor_spawnable: false
-  #   describe: テスト用。全ボーナスが乗っている盾。
-  #   growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-  #   image_scale: 1.0
-  #   bonus:
-  #     common:
-  #       attack: 0
-  #       accuracy_close: 5
-  #       accuracy_range: 5
-  #       crit_rate: 0.05
-  #       hp: 10
-  #       defense: 5
-  #       block_chance_close: 0.21
-  #       block_chance_ranged: 0.21
-  #       lantern_bonus: 0
-  #       regen: 1
-  #       aggro_mod: -2
-  #       stupidity: 1
-  #       armor_penetration: 0.1
-  #     magic:
-  #       fire_damage: 0.05
-  #       fire_range: 1
-  #       heal_ratio: 0.05
-  #       knockback_damage: 0.05
-  #       invincible_turns: 1
-  #       stave_bonus: 5
-  #       light_stave_bonus: 1
+  test_all_bonus_shield:
+    quest_targetable: false
+    name: "[TEST]全加護の盾"
+    category: round_shield
+    min_rank: F
+    max_rank: S
+    rarity: 1
+    price: 1
+    image_dir: components/pictures/shield
+    shop_buyable: false
+    floor_spawnable: false
+    describe: テスト用。全ボーナスが乗っている盾
+    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    image_scale: 1.0
+    bonus:
+      common:
+        attack: 0
+        accuracy_close: 5
+        accuracy_range: 5
+        crit_rate: 0.05
+        hp: 10
+        defense: 5
+        block_chance_close: 0.21
+        block_chance_ranged: 0.21
+        lantern_bonus: 0
+        regen: 1
+        aggro_mod: -2
+        stupidity: 1
+        armor_penetration: 0.1
+      magic:
+        fire_damage: 0.05
+        fire_range: 1
+        heal_ratio: 0.05
+        knockback_damage: 0.05
+        invincible_turns: 1
+        stave_bonus: 5
+        light_stave_bonus: 1

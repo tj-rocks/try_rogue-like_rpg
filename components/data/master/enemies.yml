@@ -1,5 +1,6 @@
 ENEMY_DATA:
   slime:
+    quest_targetable: true
     name: スライム
     min_rank: F
     image_folder: components/pictures/enemies/slime
@@ -25,6 +26,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   mawaru_kame:
+    quest_targetable: true
     name: まわるがめ
     min_rank: F
     max_rank: E
@@ -51,6 +53,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   normal_tako:
+    quest_targetable: true
     name: ふつうたこ
     min_rank: F
     image_folder: components/pictures/enemies/tako_doku
@@ -77,6 +80,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   kowai_kusa:
+    quest_targetable: true
     name: こわいくさ
     min_rank: E
     image_folder: components/pictures/enemies/kowai_kusa
@@ -103,6 +107,7 @@ ENEMY_DATA:
     attack_priority: ranged
     damaged_detect_range: 10
   slime_red:
+    quest_targetable: true
     name: あかいスライム
     min_rank: E
     image_folder: components/pictures/enemies/slime
@@ -129,6 +134,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   bakudan_man:
+    quest_targetable: true
     name: バクダンマン
     min_rank: E
     image_folder: components/pictures/enemies/bakudan_man
@@ -154,6 +160,7 @@ ENEMY_DATA:
     attack_priority: ranged
     damaged_detect_range: 10
   doku_kame:
+    quest_targetable: true
     name: どくがめ
     min_rank: E
     image_folder: components/pictures/enemies/kame
@@ -181,6 +188,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   skeleton:
+    quest_targetable: true
     name: スケルトン
     min_rank: D
     image_folder: components/pictures/enemies/skeleton
@@ -205,6 +213,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   kuchitanago:
+    quest_targetable: true
     name: クチタナゴ
     min_rank: D
     image_folder: components/pictures/enemies/kuchitanago
@@ -229,6 +238,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   mushigumo:
+    quest_targetable: true
     name: ムシグモ
     min_rank: D
     image_folder: components/pictures/enemies/mushigumo
@@ -255,6 +265,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   potaro:
+    quest_targetable: true
     name: ポタロウ
     min_rank: D
     image_folder: components/pictures/enemies/potaro
@@ -279,6 +290,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   mini_dragon:
+    quest_targetable: true
     name: ミニドラゴン
     min_rank: C
     image_folder: components/pictures/enemies/mini_dragon
@@ -303,6 +315,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   ohst:
+    quest_targetable: true
     name: オースト
     min_rank: C
     image_folder: components/pictures/enemies/ohst
@@ -327,6 +340,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   skelton_sword:
+    quest_targetable: true
     name: スケルトン剣士
     min_rank: C
     image_folder: components/pictures/enemies/skelton_sword
@@ -351,6 +365,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   skelton_sword_armor:
+    quest_targetable: true
     name: アーマースケルトン
     min_rank: C
     image_folder: components/pictures/enemies/skelton_sword_armor
@@ -375,6 +390,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 10
   suisui_slime:
+    quest_targetable: true
     name: スイスイスライム
     min_rank: F
     min_floor: 10
@@ -405,6 +421,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 100
   sukesuke_skeleton:
+    quest_targetable: true
     name: スケスケスケルトン
     min_rank: E
     min_floor: 20
@@ -435,6 +452,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 100
   gogo_ghost:
+    quest_targetable: true
     name: ゴーゴーゴースト
     min_rank: D
     min_floor: 29
@@ -465,6 +483,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 100
   undead_father:
+    quest_targetable: true
     name: 父の亡霊
     min_rank: B
     min_floor: 50
@@ -494,6 +513,7 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 100
   deka_komori:
+    quest_targetable: true
     name: デカコウモリ
     min_rank: C
     min_floor: 35
