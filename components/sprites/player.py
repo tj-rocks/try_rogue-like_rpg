@@ -719,7 +719,7 @@ class Player(Entity):
             (self.accessory_inventory, self.equipped_accessory)
         ]:
             inst = self._find_equip_inst(inv, eid)
-            if inst: mod += inst.get_stat("aggro_mod", 0)
+            if inst: mod += inst.get_stat("aggro_mod", 0) + inst.get_enhance_bonus("aggro_mod")
         return mod
 
     def unequip_accessory(self): self.equipped_accessory = None

@@ -200,7 +200,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: 1
+        aggro_mod: -1
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -276,7 +276,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -2
+        aggro_mod: 2
         attack: 0
         accuracy_close: 20
         accuracy_range: 15
@@ -314,7 +314,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: 4
+        aggro_mod: -4
         attack: 2
         accuracy_close: -5
         accuracy_range: -10
@@ -428,7 +428,7 @@ SHIELD_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -2
+        aggro_mod: 2
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
@@ -477,7 +477,7 @@ SHIELD_DATA:
         block_chance_ranged: 0.21
         lantern_bonus: 0
         regen: 1
-        aggro_mod: -2
+        aggro_mod: 2
         stupidity: 1
         armor_penetration: 0.1
       magic:

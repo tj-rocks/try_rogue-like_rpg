@@ -325,7 +325,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -3
+        aggro_mod: 3
         attack: 12
         accuracy_close: 20
         accuracy_range: 10
@@ -405,7 +405,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -2
+        aggro_mod: 2
         attack: 11
         accuracy_close: 20
         accuracy_range: 20
@@ -445,7 +445,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: 3
+        aggro_mod: -3
         attack: 20
         accuracy_close: -4
         accuracy_range: -10
@@ -485,7 +485,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -2
+        aggro_mod: 2
         attack: 10
         accuracy_close: 0
         accuracy_range: 0
@@ -565,7 +565,7 @@ WEAPON_DATA:
     floor_spawnable: true
     bonus:
       common:
-        aggro_mod: -2
+        aggro_mod: 2
         attack: 9
         accuracy_close: 15
         accuracy_range: 10
@@ -615,7 +615,7 @@ WEAPON_DATA:
         block_chance_ranged: 0.08
         lantern_bonus: 0
         regen: 1
-        aggro_mod: -2
+        aggro_mod: 2
         stupidity: 1.5
         armor_penetration: 0.2
       magic:

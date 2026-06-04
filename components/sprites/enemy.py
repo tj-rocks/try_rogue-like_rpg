@@ -386,7 +386,7 @@ class Enemy(Entity):
                 best_dx, best_dy = tdx, tdy
         
         dx, dy = best_dx, best_dy
-        rad = max(1, self.detect_range + player.get_aggro_modifier())
+        rad = max(1, self.detect_range - player.get_aggro_modifier())
         if getattr(self, "damage_flash_timer", 0) > 0: rad = max(rad, self.damaged_detect_range)
         if abs(dx) > rad or abs(dy) > rad: return
         # 困惑度テーブルを参照してぼーっと確率を決定

@@ -267,7 +267,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             
             # 認識範囲（隠密補正込み）を取得
             aggro_mod = player.get_aggro_modifier() if hasattr(player, "get_aggro_modifier") else 0
-            effective_radius = max(1, ENEMY_AGGRO_RADIUS + aggro_mod)
+            effective_radius = max(1, ENEMY_AGGRO_RADIUS - aggro_mod)
             
             if dist_x <= effective_radius and dist_y <= effective_radius:
                 active_boss = enemy
