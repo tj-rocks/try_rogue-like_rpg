@@ -953,6 +953,21 @@ TILE_MAPPINGS:
       - x: 19
         y: 35
         flip: false
+  negative_man1:
+    category: npc
+    id: negative_man1
+  adventurer_man2:
+    category: npc
+    id: adventurer_man2
+  positive_woman1:
+    category: npc
+    id: positive_woman1
+  negative_woman1:
+    category: npc
+    id: negative_woman1
+  negative_woman2:
+    category: npc
+    id: negative_woman2
   wall_deco_ivy:
     category: wall_decoration
     desc: 壁のツタ
@@ -1523,6 +1538,15 @@ TILE_MAPPINGS:
       - x: 24
         y: 36
         flip: false
+  dedicated_weapon_shop:
+    category: npc
+    id: dedicated_weapon_shop
+  dedicated_armor_shop:
+    category: npc
+    id: dedicated_armor_shop
+  dedicated_accessory_shop:
+    category: npc
+    id: dedicated_accessory_shop
   special_P:
     char: P
     category: special

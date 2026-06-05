@@ -70,7 +70,7 @@ FIXED_QUESTS:
     ending: false
   # --- 以下、ボス討伐クエスト ---
   - id: boss_hunt_deka_komori
-    min_rank: D
+    min_rank: C
     max_rank: B
     type: hunt
     target_key: deka_komori

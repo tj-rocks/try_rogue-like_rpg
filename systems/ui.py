@@ -2101,6 +2101,24 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             dialog.is_active = True
                                             shop_dialog.open_shop("武器屋", dungeon.weapon_shop_stock)
                                             return
+                                    elif getattr(npc, "role", None) == "dedicated_weapon_shop":
+                                        if shop_dialog and dungeon:
+                                            dialog.text = Text.NPC.DEDICATED_WEAPON_SHOP_WELCOME
+                                            dialog.is_active = True
+                                            shop_dialog.open_shop("武器専門店", dungeon.dedicated_weapon_shop_stock)
+                                            return
+                                    elif getattr(npc, "role", None) == "dedicated_armor_shop":
+                                        if shop_dialog and dungeon:
+                                            dialog.text = Text.NPC.DEDICATED_ARMOR_SHOP_WELCOME
+                                            dialog.is_active = True
+                                            shop_dialog.open_shop("防具専門店", dungeon.dedicated_armor_shop_stock)
+                                            return
+                                    elif getattr(npc, "role", None) == "dedicated_accessory_shop":
+                                        if shop_dialog and dungeon:
+                                            dialog.text = Text.NPC.DEDICATED_ACCESSORY_SHOP_WELCOME
+                                            dialog.is_active = True
+                                            shop_dialog.open_shop("アクセサリ専門店", dungeon.dedicated_accessory_shop_stock)
+                                            return
                                     elif getattr(npc, "role", None) == "item_shop":
                                         if shop_dialog and dungeon:
                                             dialog.text = Text.NPC.ITEM_SHOP_WELCOME
@@ -2341,8 +2359,11 @@ class GuildDialog:
             # 次のランクまでのギルドポイントを説明する案内項目をメニューに追加
             if next_rank_data:
                 needed_gp = next_rank_data["required_gp"] - player.guild_point
+                already_active = any(q.get("is_rank_up") for q in player.active_quests)
                 if needed_gp > 0:
                     info_desc = f"次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です \n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
+                elif already_active:
+                    info_desc = f"次の{next_rank_data['rank']}ランクへの昇級試験を受注しています！\n(クエスト目標を確認して、対象フロア最奥へ向かってください)"
                 else:
                     info_desc = f"次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(昇級試験を受けられます)"
             else:
