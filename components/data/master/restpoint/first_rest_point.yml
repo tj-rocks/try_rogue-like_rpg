@@ -139,7 +139,8 @@ TILE_MAPPINGS:
   teleport_wizard: {category: npc, id: teleport_wizard, positions: [{x: 1, y: 12,
           flip: true}]}
   guild_staff: {category: npc, id: guild_staff}
-  crank_adventurer: {category: npc, id: crank_adventurer}
+  crank_adventurer: {category: npc, id: crank_adventurer, positions: [{x: 9, y: 
+            12, flip: false}]}
   crank_adventurer2: {category: npc, id: crank_adventurer2, positions: [{x: 20, 
             y: 6, flip: false}]}
   crank_adventurer3: {category: npc, id: crank_adventurer3, positions: [{x: 16, 
@@ -150,6 +151,10 @@ TILE_MAPPINGS:
   guide_bank: {category: npc, id: guide_bank, positions: [{x: 12, y: 6, flip: 
             false}]}
   villager: {category: npc, id: villager, positions: [{x: 15, y: 5, flip: false}]}
+  negative_man1: {category: npc, id: negative_man1}
+  positive_woman1: {category: npc, id: positive_woman1}
+  negative_woman1: {category: npc, id: negative_woman1}
+  negative_woman2: {category: npc, id: negative_woman2}
   wall_deco_ivy: {category: wall_decoration, desc: 壁のツタ, id: wall_decoration_0, 
       image_path: components/pictures/dungeon/shallow/wall_decoration_0.png, 
       positions: [{x: 9, y: 1, flip: false}, {x: 17, y: 1, flip: false}, {x: 20, 
@@ -197,7 +202,8 @@ TILE_MAPPINGS:
           y: 3, flip: false}, {x: 14, y: 3, flip: false}, {x: 18, y: 3, flip: 
             false}]}
   table: {category: obstacle, id: table, positions: [{x: 11, y: 6, flip: false}, {
-          x: 15, y: 6, flip: false}, {x: 19, y: 6, flip: false}]}
+          x: 15, y: 6, flip: false}, {x: 19, y: 6, flip: false}, {x: 8, y: 12, 
+            flip: false}]}
   special_P: {char: P, category: special, desc: プレイヤー開始地点, image_path: 
       components/pictures/player/walk/down_idel.png, bg_image_path: 
       components/pictures/dungeon/home/floor_lawn.png, bg_color: '#2244cc', 

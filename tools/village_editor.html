@@ -212,6 +212,59 @@ header h1 {
 #rank-popup .btn-rank-ok   { background: #2563eb; color:#fff; flex:1; }
 #rank-popup .btn-rank-clear{ background: #374151; color:#9ca3af; flex:1; }
 #rank-popup .btn-rank-close{ background: transparent; border:none; color:#6b7280; font-size:14px; cursor:pointer; margin-left:auto; padding:0; }
+
+/* --- NPC Speech Bubble Styling --- */
+.speech-bubble {
+  position: absolute;
+  background: #1e293b;
+  color: #f8fafc;
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  max-width: 250px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s ease;
+  line-height: 1.4;
+  font-family: inherit;
+}
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 20px;
+  border-width: 10px 10px 0;
+  border-style: solid;
+  border-color: #3b82f6 transparent;
+  display: block;
+  width: 0;
+}
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 21px;
+  border-width: 9px 9px 0;
+  border-style: solid;
+  border-color: #1e293b transparent;
+  display: block;
+  width: 0;
+  z-index: 1;
+}
+.speech-bubble .next-indicator {
+  font-size: 10px;
+  color: #64748b;
+  text-align: right;
+  margin-top: 6px;
+  animation: bubble-blink 1s infinite alternate;
+}
+@keyframes bubble-blink {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
 </style>
 </head>
 <body>
@@ -432,6 +485,73 @@ let showSymbols = false; // デフォルトで綺麗なグラフィック表示
 
 // ブラウザによる画像アセットキャッシュを完全に回避するためのクエリトークン
 let cacheBuster = '?v=' + new Date().getTime();
+
+// --- NPC Speech Bubble State & Control ---
+let activeBubble = null;
+let activeDialogueList = [];
+let activeDialogueIndex = 0;
+
+function showSpeechBubble(cell, dialogueList) {
+  if (activeBubble) {
+    activeBubble.remove();
+    activeBubble = null;
+  }
+  
+  if (!dialogueList || dialogueList.length === 0) return;
+  
+  activeDialogueList = dialogueList;
+  activeDialogueIndex = 0;
+  
+  const bubble = document.createElement('div');
+  bubble.className = 'speech-bubble';
+  
+  const textDiv = document.createElement('div');
+  textDiv.className = 'bubble-text';
+  bubble.appendChild(textDiv);
+  
+  const indicator = document.createElement('div');
+  indicator.className = 'next-indicator';
+  bubble.appendChild(indicator);
+  
+  function updateText() {
+    textDiv.textContent = activeDialogueList[activeDialogueIndex];
+    if (activeDialogueIndex === activeDialogueList.length - 1) {
+      indicator.textContent = '■ 閉じる';
+    } else {
+      indicator.textContent = '▶ クリックで進む';
+    }
+  }
+  
+  updateText();
+  
+  bubble.addEventListener('click', (e) => {
+    e.stopPropagation();
+    activeDialogueIndex++;
+    if (activeDialogueIndex < activeDialogueList.length) {
+      updateText();
+    } else {
+      bubble.remove();
+      activeBubble = null;
+    }
+  });
+  
+  document.body.appendChild(bubble);
+  activeBubble = bubble;
+  
+  const rect = cell.getBoundingClientRect();
+  const bubbleHeight = bubble.offsetHeight;
+  bubble.style.left = `${window.scrollX + rect.left}px`;
+  bubble.style.top = `${window.scrollY + rect.top - bubbleHeight - 12}px`;
+}
+
+// Close bubble when clicking outside
+document.addEventListener('click', (e) => {
+  if (activeBubble && !activeBubble.contains(e.target)) {
+    activeBubble.remove();
+    activeBubble = null;
+  }
+});
+
 
 // ==============================================================================
 // パレット生成
@@ -716,6 +836,19 @@ function drawGrid() {
 
       // ドラッグ・クリックハンドラ
       cell.addEventListener('mousedown', e => {
+        if (e.ctrlKey || e.metaKey || e.shiftKey) {
+          e.preventDefault();
+          e.stopPropagation();
+          const entId = entityMapData[ri][ci];
+          if (entId) {
+            const tileInfo = TILE[entId];
+            if (tileInfo && tileInfo[8] && tileInfo[8].length > 0) {
+              showSpeechBubble(cell, tileInfo[8]);
+              return;
+            }
+          }
+          return;
+        }
         isMouseDown = true;
         mouseButton = e.button; // 0: left, 2: right
         if (mouseButton === 2) {
@@ -739,8 +872,16 @@ function drawGrid() {
 
       cell.addEventListener('mouseenter', e => {
         const info = TILE[ch] || DEFAULT_TILE;
+        let suffix = "";
+        const entId = entityMapData[ri][ci];
+        if (entId) {
+          const entInfo = TILE[entId];
+          if (entInfo && entInfo[8] && entInfo[8].length > 0) {
+            suffix = " (Ctrl+クリックでセリフ確認)";
+          }
+        }
         document.getElementById('coord-info').textContent =
-          `行: ${ri+1}  列: ${ci+1}  文字: "${ch}"  [${info[3]}]`;
+          `行: ${ri+1}  列: ${ci+1}  文字: "${ch}"  [${info[3]}]${suffix}`;
           
         if (isMouseDown) {
           if (mouseButton === 2) {
@@ -800,6 +941,14 @@ function setCell(ri, ci, ch, cell) {
           } else {
               entityMapData[ri][ci] = tileId;
               entityFlipMapData[ri][ci] = false;
+              if (tileId === 'dedicated_weapon_shop' || tileId === 'dedicated_armor_shop' || tileId === 'dedicated_accessory_shop') {
+                  if (!entityRankMapData[ri]) entityRankMapData[ri] = [];
+                  entityRankMapData[ri][ci] = { min_rank: 'D', max_rank: null };
+              } else {
+                  if (entityRankMapData[ri]) {
+                      entityRankMapData[ri][ci] = null;
+                  }
+              }
           }
       } else {
           baseMapData[ri][ci] = t ? (t[2] || ch) : ch;
@@ -1086,7 +1235,8 @@ async function loadTileDefinitions() {
           imgPath,
           bgImgPath,
           val.category || 'floor',
-          val.subcategory || null
+          val.subcategory || null,
+          val.dialogue || []
         ];
       });
       console.log("🟢 Dynamic tile definitions loaded from village.yml / npcs.yml / obstacles.yml!");
@@ -1113,12 +1263,46 @@ async function initEditor() {
     console.log("⚠️ アセット一覧APIへの接続に失敗しました。全アセットをデフォルトで表示します。");
   }
 
+  let defaultMap = 'village.txt';
+  // 1.5. サーバーから利用可能なマップファイルリストを取得し、セレクトボックスを構築
+  try {
+    const res = await fetch('/api/available_maps');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'success' && data.files && data.files.length > 0) {
+        const selector = document.getElementById('map-file-selector');
+        if (selector) {
+          selector.innerHTML = '';
+          data.files.forEach(f => {
+            const opt = document.createElement('option');
+            opt.value = f;
+            if (f === 'village.txt') {
+              opt.textContent = `🏡 村マップ (${f})`;
+            } else if (f.includes('rest_point')) {
+              opt.textContent = `⛺ 休憩所マップ (${f})`;
+            } else {
+              opt.textContent = `🗺️ ${f}`;
+            }
+            selector.appendChild(opt);
+          });
+        }
+        if (data.files.includes('village.txt')) {
+          defaultMap = 'village.txt';
+        } else {
+          defaultMap = data.files[0];
+        }
+      }
+    }
+  } catch (e) {
+    console.log("⚠️ マップ一覧APIへの接続に失敗しました。デフォルトのセレクトボックスを使用します。");
+  }
+
   // 2. パレット構築 & 初期キャラ選択
   buildPalette();
   selectChar('.');
 
-  // 3. デフォルトマップ village.txt をロード
-  await switchMapFile('village.txt');
+  // 3. デフォルトマップをロード
+  await switchMapFile(defaultMap);
 }
 
 function applyStoredPositions() {

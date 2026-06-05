@@ -205,15 +205,16 @@ DUNGEON_IMAGES:
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    map: first_rest_point.txt
+    # map: first_rest_point.txt
 # ==========================================
 # Dランク 到達可能階層 (22F 〜 30F)
 # ==========================================
   "22":
     image: wood
     sound: sandstone_floor2.mp3
-    brightness: 1
+    brightness: 5
     wall_decoration_ratio: 0.3
+    map: second_rest_point.txt
   "23":
     image: wood
     sound: sandstone_floor2.mp3

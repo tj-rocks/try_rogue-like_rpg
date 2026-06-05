@@ -48,33 +48,88 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 response = {"status": "error", "message": str(e)}
                 self.wfile.write(json.dumps(response).encode('utf-8'))
+        elif self.path == "/api/available_maps":
+            try:
+                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                if base_dir not in sys.path:
+                    sys.path.append(base_dir)
+                from systems.data_loader import load_master_data
+                
+                village_data = load_master_data("village.yml") or {}
+                config = village_data.get("CONFIG", {})
+                map_dir_rel = config.get("map_dir", "components/data/dungeon")
+                map_dir = os.path.join(base_dir, map_dir_rel)
+                
+                files = []
+                if os.path.exists(map_dir):
+                    files = [f for f in os.listdir(map_dir) 
+                             if os.path.isfile(os.path.join(map_dir, f)) 
+                             and f.endswith('.txt') and not f.startswith('.')]
+                files.sort()
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {"status": "success", "files": files}
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {"status": "error", "message": str(e)}
+                self.wfile.write(json.dumps(response).encode('utf-8'))
         elif self.path.startswith("/api/tile_definitions"):
             try:
                 import urllib.parse
                 parsed_url = urllib.parse.urlparse(self.path)
                 query_params = urllib.parse.parse_qs(parsed_url.query)
                 map_file = os.path.basename(query_params.get("map_file", ["village.txt"])[0])
-                master_file = "village.yml"
-                if map_file != "village.txt":
-                    candidate = f"restpoint/{map_file.replace('.txt', '.yml')}"
-                    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                    if os.path.exists(os.path.join(base_dir, "components/data/master", candidate)):
-                        master_file = candidate
-                
                 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                 if base_dir not in sys.path:
                     sys.path.append(base_dir)
                 from systems.data_loader import load_master_data
                 
-                # 1. Load base tile mappings and config from the dynamic master file
-                village_data = load_master_data(master_file) or {}
-                tile_mappings = {}
-                # Shallow copy to avoid mutating cache
-                tile_mappings_raw = village_data.get("TILE_MAPPINGS", {})
-                for k, v in tile_mappings_raw.items():
-                    if isinstance(v, dict):
-                        tile_mappings[k] = dict(v)
+                # Base is always village.yml
+                village_data = load_master_data("village.yml") or {}
+                base_mappings = village_data.get("TILE_MAPPINGS", {})
                 config = village_data.get("CONFIG", {})
+                
+                # Look for custom config
+                custom_file = None
+                if map_file != "village.txt":
+                    candidate = f"restpoint/{map_file.replace('.txt', '.yml')}"
+                    if os.path.exists(os.path.join(base_dir, "components/data/master", candidate)):
+                        custom_file = candidate
+                
+                tile_mappings = {}
+                is_village_map = (map_file == "village.txt")
+                
+                if custom_file:
+                    custom_data = load_master_data(custom_file) or {}
+                    custom_mappings = custom_data.get("TILE_MAPPINGS", {})
+                    for k, v in base_mappings.items():
+                        if isinstance(v, dict):
+                            tile_mappings[k] = dict(v)
+                            if k in custom_mappings and isinstance(custom_mappings[k], dict):
+                                if "positions" in custom_mappings[k]:
+                                    tile_mappings[k]["positions"] = custom_mappings[k]["positions"]
+                                else:
+                                    tile_mappings[k].pop("positions", None)
+                            else:
+                                tile_mappings[k].pop("positions", None)
+                    # Load any additional map-specific custom mappings not present in base
+                    for k, v in custom_mappings.items():
+                        if isinstance(v, dict) and k not in tile_mappings:
+                            tile_mappings[k] = dict(v)
+                else:
+                    for k, v in base_mappings.items():
+                        if isinstance(v, dict):
+                            tile_mappings[k] = dict(v)
+                            # Clear positions for rest points / custom maps if no custom yml exists
+                            if not is_village_map:
+                                tile_mappings[k].pop("positions", None)
                 
 
                 # 2. Enrich NPCs and Obstacles dynamically using IDs defined in village.yml
@@ -99,6 +154,7 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                             
                             tile["image_path"] = f"{img}/{image_file}" if img else ""
                             tile["desc"] = data.get("name", tile.get("desc"))
+                            tile["dialogue"] = data.get("dialogue", [])
                             # 施設NPC(role有) vs セリフだけのNPC(role無) を区別
                             role = data.get("role")
                             if role:
@@ -183,11 +239,20 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                         grouped.setdefault(ent_id, []).append(pos_entry)
 
                 master_file = "village.yml"
+                target_file = "village.yml"
                 if filename != "village.txt":
                     candidate = f"restpoint/{filename.replace('.txt', '.yml')}"
+                    target_file = candidate
                     if os.path.exists(os.path.join(base_dir, "components/data/master", candidate)):
                         master_file = candidate
-                village_yml_path = os.path.join(base_dir, "components", "data", "master", master_file)
+                    else:
+                        master_file = "village.yml"
+                
+                load_path = os.path.join(base_dir, "components", "data", "master", master_file)
+                save_path = os.path.join(base_dir, "components", "data", "master", target_file)
+                
+                # Ensure the parent directory for restpoints exists
+                os.makedirs(os.path.dirname(save_path), exist_ok=True)
                 
                 try:
                     import importlib
@@ -206,22 +271,28 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                     yaml = YAML()
                     yaml.preserve_quotes = True
                     yaml.indent(mapping=2, sequence=4, offset=2)
-                    with open(village_yml_path, "r", encoding="utf-8") as f:
+                    with open(load_path, "r", encoding="utf-8") as f:
                         village_yml_data = yaml.load(f)
                 else:
-                    with open(village_yml_path, "r", encoding="utf-8") as f:
+                    with open(load_path, "r", encoding="utf-8") as f:
                         village_yml_data = pyyaml.safe_load(f) or {}
                 
                 # positionsを各定義に注入
                 mappings = village_yml_data.get("TILE_MAPPINGS", {})
+                is_new_file = (load_path != save_path)
+                
                 for k, v in mappings.items():
                     if not isinstance(v, dict):
                         continue
-                    # k は weapon_shop や floor_0 などのIDキー
+                    
+                    # If this is a new config file created from village.yml template,
+                    # we must first purge any inherited village positions to start fresh.
+                    if is_new_file and "positions" in v:
+                        del v["positions"]
+                        
                     if k in grouped:
                         v["positions"] = grouped[k]
                     else:
-                        # 存在しなければ削除
                         if "positions" in v:
                             del v["positions"]
                 
@@ -230,10 +301,10 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                     del village_yml_data["ENTITIES"]
                 
                 if has_ruamel:
-                    with open(village_yml_path, "w", encoding="utf-8") as f:
+                    with open(save_path, "w", encoding="utf-8") as f:
                         yaml.dump(village_yml_data, f)
                 else:
-                    with open(village_yml_path, "w", encoding="utf-8") as f:
+                    with open(save_path, "w", encoding="utf-8") as f:
                         pyyaml.dump(village_yml_data, f, Dumper=IndentedSafeDumper, allow_unicode=True, sort_keys=False, indent=2)
                 
                 # 正常終了のレスポンス

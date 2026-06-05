@@ -122,6 +122,9 @@ class Dungeon:
         self.weapon_shop_stock = []
         self.item_shop_stock = []
         self.magic_shop_stock = []
+        self.dedicated_weapon_shop_stock = []
+        self.dedicated_armor_shop_stock = []
+        self.dedicated_accessory_shop_stock = []
         if self.player:
             self.player = None
 
@@ -206,6 +209,9 @@ class Dungeon:
         self.weapon_shop_stock = []
         self.item_shop_stock = []
         self.magic_shop_stock = []
+        self.dedicated_weapon_shop_stock = []
+        self.dedicated_armor_shop_stock = []
+        self.dedicated_accessory_shop_stock = []
         
         self.shake_amount = 0
         self.shake_timer = 0
@@ -726,18 +732,50 @@ class Dungeon:
                 self.npcs = []
                 self.rooms = []
                 ts = self.tile_size
-                # Load dynamic tile mappings from map-specific yml if exists, else village.yml
+                # Load dynamic tile mappings. Base definitions are always from village.yml.
                 base_name = os.path.splitext(os.path.basename(map_name))[0]
-                master_file = "village.yml"
                 from systems.data_loader import load_master_data, MASTER_DATA_DIR
+                
+                village_data = load_master_data("village.yml") or {}
+                base_mappings = village_data.get("TILE_MAPPINGS", {})
+                
+                # Check for map-specific custom yml config
+                custom_file = None
                 candidate = f"restpoint/{base_name}.yml"
                 if os.path.exists(os.path.join(MASTER_DATA_DIR, candidate)):
-                    master_file = candidate
+                    custom_file = candidate
                 elif os.path.exists(os.path.join(MASTER_DATA_DIR, f"{base_name}.yml")):
-                    master_file = f"{base_name}.yml"
+                    custom_file = f"{base_name}.yml"
                 
-                village_data = load_master_data(master_file) or {}
-                tile_mappings_raw = village_data.get("TILE_MAPPINGS", {})
+                # Build tile_mappings_raw by copying base definitions, and mapping positions only if allowed
+                tile_mappings_raw = {}
+                is_village_map = (base_name == "village")
+                
+                if custom_file:
+                    custom_data = load_master_data(custom_file) or {}
+                    custom_mappings = custom_data.get("TILE_MAPPINGS", {})
+                    for k, v in base_mappings.items():
+                        if isinstance(v, dict):
+                            tile_mappings_raw[k] = dict(v)
+                            if k in custom_mappings and isinstance(custom_mappings[k], dict):
+                                # Apply map-specific positions if defined, else clear them
+                                if "positions" in custom_mappings[k]:
+                                    tile_mappings_raw[k]["positions"] = custom_mappings[k]["positions"]
+                                else:
+                                    tile_mappings_raw[k].pop("positions", None)
+                            else:
+                                tile_mappings_raw[k].pop("positions", None)
+                    # Load any additional map-specific custom mappings not present in base
+                    for k, v in custom_mappings.items():
+                        if isinstance(v, dict) and k not in tile_mappings_raw:
+                            tile_mappings_raw[k] = dict(v)
+                else:
+                    for k, v in base_mappings.items():
+                        if isinstance(v, dict):
+                            tile_mappings_raw[k] = dict(v)
+                            # Clear positions for rest points / custom maps if no custom yml exists
+                            if not is_village_map:
+                                tile_mappings_raw[k].pop("positions", None)
                 
                 # 地形文字マッピング（village.txtのパース用）
                 tile_mappings = {}
@@ -861,7 +899,8 @@ class Dungeon:
                 self.enemies = [e for e in self.enemies if getattr(e, "is_static", False)]
                 
                 # --- [NEW] 外部化されたエンティティ座標データ (positions) からキャラ/障害物を配置 ---
-                print(f"[DEBUG-NPC] Loading entities from TILE_MAPPINGS in {master_file}. Total entries: {len(tile_mappings_raw)}")
+                source_yml = custom_file if custom_file else "village.yml"
+                print(f"[DEBUG-NPC] Loading entities from TILE_MAPPINGS in {source_yml}. Total entries: {len(tile_mappings_raw)}")
                 for ent_id, tile_info in tile_mappings_raw.items():
                     if not isinstance(tile_info, dict): continue
                     positions = tile_info.get("positions", [])
@@ -869,7 +908,7 @@ class Dungeon:
                     
                     if not positions:
                         if cat in ("npc", "obstacle"):
-                            print(f"[DEBUG-NPC] Entity '{ent_id}' has NO positions listed in {master_file}!")
+                            print(f"[DEBUG-NPC] Entity '{ent_id}' has NO positions listed in {source_yml}!")
                         continue
                     
                     print(f"[DEBUG-NPC] Found entity '{ent_id}' ({cat}) with {len(positions)} positions.")
@@ -884,6 +923,8 @@ class Dungeon:
                         
                         # --- ランクフィルタ ---
                         min_rank = pos.get("min_rank")
+                        if ent_id in ("dedicated_weapon_shop", "dedicated_armor_shop", "dedicated_accessory_shop") and not min_rank:
+                            min_rank = "D"
                         max_rank = pos.get("max_rank")
                         if min_rank or max_rank:
                             from constants import RANK_ORDER
@@ -1509,9 +1550,11 @@ class Dungeon:
         for k, v in SHIELD_DATA.items():
             if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
                 weapon_cands.append({"key": k, "type": "shield", "name": v["name"], "price": v["price"], "count": 1})
-        for k, v in ACCESSORY_DATA.items():
-            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
-                weapon_cands.append({"key": k, "type": "accessory", "name": v["name"], "price": v["price"], "count": 1})
+        # アクセサリは村(階層が0)の時のみ総合店に並べる
+        if self.current_floor == 0:
+            for k, v in ACCESSORY_DATA.items():
+                if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
+                    weapon_cands.append({"key": k, "type": "accessory", "name": v["name"], "price": v["price"], "count": 1})
         
         # 最低在庫保証 (武器・防具・盾・アクセサリ 合計3枠)
         if not weapon_cands:
@@ -1522,8 +1565,9 @@ class Dungeon:
                 if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "armor", v))
             for k, v in SHIELD_DATA.items():
                 if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "shield", v))
-            for k, v in ACCESSORY_DATA.items():
-                if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "accessory", v))
+            if self.current_floor == 0:
+                for k, v in ACCESSORY_DATA.items():
+                    if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "accessory", v))
             
             if all_buyable:
                 while len(weapon_cands) < 3:
@@ -1531,6 +1575,52 @@ class Dungeon:
                     weapon_cands.append({"key": k, "type": t, "name": v["name"], "price": v["price"], "count": 1})
         
         self.weapon_shop_stock = weapon_cands[:10]
+
+        # --- 1.2 武器専用屋 (武器のみ) ---
+        d_weapon_cands = []
+        for k, v in WEAPON_DATA.items():
+            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
+                d_weapon_cands.append({"key": k, "type": "weapon", "name": v["name"], "price": v["price"], "count": 1})
+        if not d_weapon_cands:
+            all_weapons = [(k, v) for k, v in WEAPON_DATA.items() if v.get("shop_buyable", True) and is_rank_ok(v)]
+            if all_weapons:
+                while len(d_weapon_cands) < 3:
+                    k, v = random.choice(all_weapons)
+                    d_weapon_cands.append({"key": k, "type": "weapon", "name": v["name"], "price": v["price"], "count": 1})
+        self.dedicated_weapon_shop_stock = d_weapon_cands[:10]
+
+        # --- 1.3 防具専用屋 (防具・盾のみ) ---
+        d_armor_cands = []
+        for k, v in ARMOR_DATA.items():
+            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
+                d_armor_cands.append({"key": k, "type": "armor", "name": v["name"], "price": v["price"], "count": 1})
+        for k, v in SHIELD_DATA.items():
+            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
+                d_armor_cands.append({"key": k, "type": "shield", "name": v["name"], "price": v["price"], "count": 1})
+        if not d_armor_cands:
+            all_armors = []
+            for k, v in ARMOR_DATA.items():
+                if v.get("shop_buyable", True) and is_rank_ok(v): all_armors.append((k, "armor", v))
+            for k, v in SHIELD_DATA.items():
+                if v.get("shop_buyable", True) and is_rank_ok(v): all_armors.append((k, "shield", v))
+            if all_armors:
+                while len(d_armor_cands) < 3:
+                    k, t, v = random.choice(all_armors)
+                    d_armor_cands.append({"key": k, "type": t, "name": v["name"], "price": v["price"], "count": 1})
+        self.dedicated_armor_shop_stock = d_armor_cands[:10]
+
+        # --- 1.4 アクセサリ専用屋 (アクセサリのみ) ---
+        d_acc_cands = []
+        for k, v in ACCESSORY_DATA.items():
+            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
+                d_acc_cands.append({"key": k, "type": "accessory", "name": v["name"], "price": v["price"], "count": 1})
+        if not d_acc_cands:
+            all_accs = [(k, v) for k, v in ACCESSORY_DATA.items() if v.get("shop_buyable", True) and is_rank_ok(v)]
+            if all_accs:
+                while len(d_acc_cands) < 3:
+                    k, v = random.choice(all_accs)
+                    d_acc_cands.append({"key": k, "type": "accessory", "name": v["name"], "price": v["price"], "count": 1})
+        self.dedicated_accessory_shop_stock = d_acc_cands[:10]
 
         # --- 2. 道具屋 (消耗品) ---
         item_cands = []

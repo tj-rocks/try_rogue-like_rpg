@@ -29,7 +29,10 @@ def test_all_shops_purchase():
     shop_list = [
         ("武器屋", dungeon.weapon_shop_stock),
         ("道具屋", dungeon.item_shop_stock),
-        ("魔法屋", dungeon.magic_shop_stock)
+        ("魔法屋", dungeon.magic_shop_stock),
+        ("武器専門店", dungeon.dedicated_weapon_shop_stock),
+        ("防具専門店", dungeon.dedicated_armor_shop_stock),
+        ("アクセサリ専門店", dungeon.dedicated_accessory_shop_stock)
     ]
     
     print(f"テスト対象店舗数: {len(shop_list)}")
@@ -56,6 +59,7 @@ def test_all_shops_purchase():
         if item_type == "weapon": player.equip_weapon_by_key(item_key)
         elif item_type == "armor": player.equip_armor_by_key(item_key)
         elif item_type == "shield": player.equip_shield_by_key(item_key)
+        elif item_type == "accessory": player.equip_accessory_by_key(item_key)
         elif item_type == "consumable": player.add_item_to_inventory(item_key)
         elif item_type == "stave":
             from components.sprites.player import StaveInstance
