@@ -26,6 +26,7 @@ wood_barrel:
   quest_targetable: true
   name: 樽
   min_rank: "F"
+  max_rank: "SS"
   rarity: 1
   hp: 2
   defense: 0
@@ -48,6 +49,7 @@ anvil:
   quest_targetable: true
   name: 金床
   min_rank: "C"
+  max_rank: "SS"
   rarity: 1
   hp: 1
   defense: 0
@@ -70,6 +72,7 @@ crate:
   quest_targetable: true
   name: 木箱
   min_rank: "F"
+  max_rank: "SS"
   rarity: 1
   hp: 2
   defense: 0
@@ -92,6 +95,7 @@ pot:
   quest_targetable: true
   name: 壺
   min_rank: "F"
+  max_rank: "SS"
   rarity: 1
   hp: 1
   defense: 0
@@ -114,6 +118,7 @@ rubble:
   quest_targetable: true
   name: 瓦礫
   min_rank: "F"
+  max_rank: "SS"
   rarity: 1
   hp: 3
   defense: 0
@@ -134,6 +139,7 @@ well:
   quest_targetable: true
   name: 井戸
   min_rank: "B"
+  max_rank: "SS"
   rarity: 5
   hp: 5
   defense: 50
@@ -156,6 +162,7 @@ skeleton_obstacle:
   quest_targetable: true
   name: 骸骨
   min_rank: "E"
+  max_rank: "SS"
   rarity: 2
   hp: 1
   defense: 0
@@ -176,6 +183,7 @@ crystal:
   quest_targetable: true
   name: クリスタル
   min_rank: "E"
+  max_rank: "SS"
   rarity: 2
   hp: 4
   defense: 20
@@ -198,6 +206,7 @@ sword_stuck:
   quest_targetable: true
   name: 刺さった剣
   min_rank: "E"
+  max_rank: "SS"
   rarity: 2
   hp: 2
   defense: 0
@@ -220,6 +229,7 @@ web:
   quest_targetable: true
   name: 蜘蛛の巣
   min_rank: "E"
+  max_rank: "SS"
   rarity: 2
   hp: 1
   defense: 0
@@ -240,6 +250,7 @@ stained_armor_stand:
   quest_targetable: true
   name: 汚れた鎧立て
   min_rank: "D"
+  max_rank: "SS"
   rarity: 3
   hp: 3
   defense: 10
@@ -262,6 +273,7 @@ broken_pillar:
   quest_targetable: true
   name: 壊れた柱
   min_rank: "D"
+  max_rank: "SS"
   rarity: 3
   hp: 4
   defense: 5
@@ -284,6 +296,7 @@ statue:
   quest_targetable: true
   name: 石像
   min_rank: "C"
+  max_rank: "SS"
   rarity: 4
   hp: 5
   defense: 30
@@ -305,6 +318,7 @@ statue:
 table:
   name: テーブル
   min_rank: "F"
+  max_rank: "SS"
   rarity: 1
   quest_targetable: false
   hp: 10
@@ -320,6 +334,7 @@ table:
 magic_barrier:
   name: 魔法の防壁
   min_rank: "F"
+  max_rank: "SS"
   rarity: 1
   quest_targetable: false
   hp: 1
