@@ -184,7 +184,7 @@ crystal:
   name: クリスタル
   min_rank: "E"
   max_rank: "SS"
-  rarity: 2
+  rarity: 4
   hp: 4
   defense: 20
   evasion: 0
@@ -196,7 +196,7 @@ crystal:
   max_spawns: 2
   drops:
     normal: []
-    rare: [blue_stone, green_stone]
+    rare: [red_stone, blue_stone, green_stone, purple_stone]
   normal_drop_rate: 0.0
   rare_drop_rate: 0.08
   image_path: components/pictures/obstacles/crystal.png
