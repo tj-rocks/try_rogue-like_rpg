@@ -1070,6 +1070,10 @@ class Dungeon:
         if self.is_outbreak:
             from constants import OUTBREAK_ITEM_MULT
             count = int(count * OUTBREAK_ITEM_MULT)
+            
+        # フロア設定によるアイテム出現比率の適用 (例: 0.5で半減)
+        ratio_mult = self.floor_info.get("item_ratio", 1.0)
+        count = max(0, int(count * ratio_mult))
         
         # ランクアップアイテムのチェック
         cert_to_spawn = None
