@@ -26,11 +26,31 @@ from systems.dungeon import Dungeon, warp_to_floor
 
 # --- グローバル・ログ出力の制御 ---
 import builtins
-from constants import ENABLE_DEBUG_LOGGING
+_original_print = builtins.print
 
+def _dummy_print(*args, **kwargs):
+    pass
+
+from constants import ENABLE_DEBUG_LOGGING
 if not ENABLE_DEBUG_LOGGING:
-    # デバッグログが無効な場合、print関数を空の関数に置き換えて出力と負荷をゼロにする
-    _original_print = builtins.print
-    def _dummy_print(*args, **kwargs):
-        pass
     builtins.print = _dummy_print
+
+def toggle_debug_logging(dialog=None):
+    import constants
+    constants.ENABLE_DEBUG_LOGGING = not constants.ENABLE_DEBUG_LOGGING
+    if constants.ENABLE_DEBUG_LOGGING:
+        builtins.print = _original_print
+        _original_print("[SYSTEM] デバッグログ表示をONにしました。")
+        if dialog:
+            dialog.text = "デバッグログ表示をONにしました。"
+            dialog.is_active = True
+            from constants import COMBAT_LOG_WAIT_FRAMES
+            dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+    else:
+        _original_print("[SYSTEM] デバッグログ表示をOFFにしました。")
+        builtins.print = _dummy_print
+        if dialog:
+            dialog.text = "デバッグログ表示をOFFにしました。"
+            dialog.is_active = True
+            from constants import COMBAT_LOG_WAIT_FRAMES
+            dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES

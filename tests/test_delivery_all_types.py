@@ -89,7 +89,7 @@ class TestDeliveryAllTypes(unittest.TestCase):
 
     def test_delivery_accessory(self):
         """アクセサリでの納品達成・削除テスト"""
-        target_key = "glowing_ring"
+        target_key = "luminous_gem"
         self.player.active_quests = [{"type": "delivery", "target_key": target_key, "amount": 1, "title": "アクセサリ納品"}]
         self.player.accessory_inventory.append(EquipInstance("accessory", target_key))
         

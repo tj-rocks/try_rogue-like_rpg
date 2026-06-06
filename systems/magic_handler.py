@@ -350,16 +350,14 @@ def _effect_knockback(player, settings, dungeon, dialog):
     if hit_other:
         # 衝突ダメージ（攻撃力の半分）
         dmg = int(player.attack * settings.get("collision_dmg_mult", 0.5))
-        hit_other.hp -= dmg
-        target_enemy.hp -= dmg
+        hit_other.take_damage(dmg)
+        target_enemy.take_damage(dmg)
         msg += f"\n{hit_other.name} にぶつかって 両者に {dmg} ダメージ！"
-        if hit_other.hp <= 0:
+        if hit_other.is_dead:
             msg += f"\n{hit_other.name} を 倒した！"
-            hit_other.is_dead = True
     
-    if target_enemy.hp <= 0:
+    if target_enemy.is_dead:
         msg += f"\n{target_enemy.name} を 倒した！"
-        target_enemy.is_dead = True
         
     return msg
 

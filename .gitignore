@@ -18,3 +18,5 @@ components/data/savefile/*.json
 # Temporary Scratch scripts
 scratch/
 scratch_*.py
+*.log
+

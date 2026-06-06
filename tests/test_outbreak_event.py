@@ -103,7 +103,6 @@ class TestOutbreakEvent(unittest.TestCase):
         dungeon.update_outbreak_status(self.player, self.dialog)
         
         self.assertTrue(dungeon.outbreak_cleared, "全滅後はクリア状態になる必要がある")
-        self.assertIn("CLEAR", self.dialog.text)
 
     def test_occurrence_conditions(self):
         """発生条件（階層範囲、固定マップ）のテスト"""

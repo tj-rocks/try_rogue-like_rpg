@@ -26,14 +26,14 @@ def test_accessory_pickup_scenario():
     initial_equipped = player.equipped_accessory
     print(f"初期状態のアクセサリ: {initial_equipped}")
 
-    # 2. アクセサリアイテムの生成 (glowing_ring)
+    # 2. アクセサリアイテムの生成 (luminous_gem)
     from constants import ACCESSORY_DATA
-    accessory_data = ACCESSORY_DATA.get("glowing_ring")
+    accessory_data = ACCESSORY_DATA.get("luminous_gem")
     if not accessory_data:
-        print("❌ エラー: glowing_ring が ACCESSORY_DATA に見つかりません")
+        print("❌ エラー: luminous_gem が ACCESSORY_DATA に見つかりません")
         sys.exit(1)
     
-    item_sprite = DroppedAccessory(0, 0, "glowing_ring", accessory_data)
+    item_sprite = DroppedAccessory(0, 0, "luminous_gem", accessory_data)
 
     # 3. アイテム取得実行
     msg = item_sprite.collect(player)
@@ -55,9 +55,9 @@ def test_accessory_pickup_scenario():
         sys.exit(1)
 
     accessory_inst = player._find_equip_inst(player.accessory_inventory, player.accessory_inventory[0].iid)
-    if not accessory_inst or accessory_inst.key != "glowing_ring":
+    if not accessory_inst or accessory_inst.key != "luminous_gem":
         key = accessory_inst.key if accessory_inst else "None"
-        print(f"❌ エラー: インベントリ内のアクセサリが 'glowing_ring' になっていません (現在: {key})")
+        print(f"❌ エラー: インベントリ内のアクセサリが 'luminous_gem' になっていません (現在: {key})")
         sys.exit(1)
     
     # 6. 検証: 装備インスタンスの名前

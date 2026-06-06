@@ -54,6 +54,12 @@ def main():
             running, events = handle_events()
             if not running: break
 
+            # デバッグログのON/OFF切り替え (KEY_DEBUG)
+            from constants import KEY_DEBUG
+            for event in events:
+                if event.type == pygame.KEYDOWN and event.key == KEY_DEBUG:
+                    toggle_debug_logging(ui_elements.get("dialog"))
+
             scene = game_state["current_scene"]
             
             # BGMの切り替え管理

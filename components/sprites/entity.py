@@ -46,7 +46,7 @@ class Entity:
                 grids.append((gx, gy))
         return grids
 
-    def can_move_grid(self, tx, ty, dungeon):
+    def can_move_grid(self, tx, ty, dungeon, debug_log=False):
         """指定したピクセル座標 (tx, ty) へ、自分のサイズを維持したまま移動可能か判定する"""
         # 移動する敵が魔法の防壁（magic_barrier）と現在重なっている場合、別グリッドへの移動を禁止する（閉じ込め）
         if self.__class__.__name__ == "Enemy" and not getattr(self, "is_static", False):
@@ -57,31 +57,40 @@ class Entity:
                     if e != self and not getattr(e, "is_dead", False) and getattr(e, "is_static", False) and getattr(e, "type", "") == "magic_barrier":
                         e_grids = e.get_occupied_grids(dungeon.tile_size)
                         if any(g in e_grids for g in curr_grids):
+                            if debug_log and hasattr(self, "_log_trace"):
+                                self._log_trace(dungeon, f"can_move_grid: Blocked by magic_barrier at target grid ({tx//dungeon.tile_size}, {ty//dungeon.tile_size})")
                             return False
 
         occupied_grids = self.get_occupied_grids_at(tx, ty, dungeon.tile_size)
         for gx, gy in occupied_grids:
             if not (0 <= gx < dungeon.map_width and 0 <= gy < dungeon.map_height):
+                if debug_log and hasattr(self, "_log_trace"):
+                    self._log_trace(dungeon, f"can_move_grid: Out of bounds at ({gx}, {gy})")
                 return False
             if dungeon.map_data[gy][gx] == 0:
-                wall_type = dungeon._get_wall_texture_key(gx, gy)
-                if wall_type == "wall_single":
-                    return False
+                if debug_log and hasattr(self, "_log_trace"):
+                    self._log_trace(dungeon, f"can_move_grid: Wall at ({gx}, {gy})")
                 return False
 
             if getattr(dungeon, "player", None) and dungeon.player != self:
                 p_grids = dungeon.player.get_occupied_grids(dungeon.tile_size)
                 if (gx, gy) in p_grids:
+                    if debug_log and hasattr(self, "_log_trace"):
+                        self._log_trace(dungeon, f"can_move_grid: Blocked by Player at ({gx}, {gy})")
                     return False
             for e in dungeon.enemies:
                 if e != self and not getattr(e, "is_dead", False):
                     e_grids = e.get_occupied_grids(dungeon.tile_size)
                     if (gx, gy) in e_grids:
+                        if debug_log and hasattr(self, "_log_trace"):
+                            self._log_trace(dungeon, f"can_move_grid: Blocked by Enemy {e.name}#{id(e)%10000} at ({gx}, {gy})")
                         return False
             if hasattr(dungeon, "npcs"):
                 for n in dungeon.npcs:
                     n_grids = n.get_occupied_grids(dungeon.tile_size)
                     if (gx, gy) in n_grids:
+                        if debug_log and hasattr(self, "_log_trace"):
+                            self._log_trace(dungeon, f"can_move_grid: Blocked by NPC {n.name} at ({gx}, {gy})")
                         return False
         return True
 
@@ -138,3 +147,6 @@ class Entity:
         self.damage_flash_timer = 60 + HIT_STUN_DURATION
         if self.hp <= 0:
             self.is_dead = True
+            self.is_attacking = False
+            self.is_moving = False
+            self.target_x, self.target_y = self.x, self.y

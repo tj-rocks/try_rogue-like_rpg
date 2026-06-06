@@ -879,6 +879,16 @@ TILE_MAPPINGS:
       - x: 36
         y: 35
         flip: false
+  negative_woman_village:
+    category: npc
+    id: negative_woman_village
+    positions:
+      - x: 19
+        y: 6
+        flip: false
+      - x: 20
+        y: 33
+        flip: false
   crank_adventurer2:
     category: npc
     id: crank_adventurer2
