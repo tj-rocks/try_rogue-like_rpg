@@ -29,6 +29,21 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             normal_drop_rate = getattr(enemy, "normal_drop_rate", 0.1)
             rare_drop_rate = getattr(enemy, "rare_drop_rate", 0.01)
             
+            # 階層ランク別のドロップ設定が含まれている場合の抽出処理
+            if isinstance(drops, dict) and any(r in drops for r in ["F", "E", "D", "C", "B", "A", "S", "SS"]):
+                floor = dungeon.current_floor
+                if floor <= 11: current_rank = "F"
+                elif floor <= 21: current_rank = "E"
+                elif floor <= 30: current_rank = "D"
+                elif floor <= 40: current_rank = "C"
+                elif floor <= 55: current_rank = "B"
+                elif floor <= 70: current_rank = "A"
+                elif floor <= 80: current_rank = "S"
+                else: current_rank = "SS"
+                drops = drops.get(current_rank, {})
+                normal_drop_rate = drops.get("normal_drop_rate", normal_drop_rate)
+                rare_drop_rate = drops.get("rare_drop_rate", rare_drop_rate)
+            
             # 1. 討伐の証（クエスト対象）の優先ドロップ判定
             dropped_token = False
             active_quests = getattr(player, "active_quests", [])

@@ -195,10 +195,41 @@ crystal:
   max_concurrent: 2
   max_spawns: 2
   drops:
-    normal: []
-    rare: [red_stone, blue_stone, green_stone, purple_stone]
-  normal_drop_rate: 0.0
-  rare_drop_rate: 0.08
+    E:
+      normal: []
+      rare: [blue_stone, green_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.08
+    D:
+      normal: []
+      rare: [blue_stone, green_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.08
+    C:
+      normal: []
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.08
+    B:
+      normal: []
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.08
+    A:
+      normal: []
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.08
+    S:
+      normal: []
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.08
+    SS:
+      normal: []
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.08
   image_path: components/pictures/obstacles/crystal.png
   image_scale: 0.9
 
