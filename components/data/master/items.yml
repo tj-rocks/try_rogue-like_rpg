@@ -538,7 +538,7 @@ STAVE_DATA:
     effect_type: attack_buff
     min_rank: F
     max_rank: SS
-    rarity: 3
+    rarity: 5
     price: 1500
     selling_price: 150
     charges: 5
@@ -548,8 +548,8 @@ STAVE_DATA:
     - 100
     - 200
     - 255
-    attack_buff_val: 5
-    duration_turns: 10
+    attack_buff_val: 15
+    duration_turns: 30
     shop_buyable: true
-    describe: 魔力で武器を強化する付与の杖 10ターンの間、プレイヤーの攻撃力が5上昇する
+    describe: 魔力で武器を強化する付与の杖 30ターンの間、プレイヤーの攻撃力が15上昇する
     floor_spawnable: true
