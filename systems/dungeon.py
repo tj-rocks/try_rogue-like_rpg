@@ -334,17 +334,6 @@ class Dungeon:
                             self.textures[key] = load_and_scale(path)
                             # wall_top_variants に含めることでゲートとして選ばれるようにする
                             self.available_wall_top_variants.append(key)
-            # もし wall_decoration_variants が空の場合、フォールバックとして shallow テーマから読み込む
-            if not self.available_wall_decoration_variants:
-                fallback_dir = main_path + "/shallow"
-                if os.path.exists(fallback_dir):
-                    for f in os.listdir(fallback_dir):
-                        if f.endswith(".png") and f.startswith("wall_decoration"):
-                            key = f[:-4]
-                            path = os.path.join(fallback_dir, f)
-                            self.textures[key] = load_and_scale(path)
-                            self.available_wall_decoration_variants.append(key)
-                            print(f"[Dungeon] Loaded fallback wall_decoration '{key}' from {path}")
 
             # バリデーションとベースキーの補完
             for base_key, variant_list in [("floor", self.available_floor_variants), 

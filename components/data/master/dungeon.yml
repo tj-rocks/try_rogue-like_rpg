@@ -260,53 +260,53 @@ DUNGEON_IMAGES:
 # Cランク 到達可能階層 (31F 〜 40F)
 # ==========================================
   "31":
-    image: evil_castle
+    image: deep_rock
     sound: turning_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     map: third_rest_point.txt
   "32":
-    image: evil_castle
-    sound: turning_point.mp3
+    image: deep_rock
+    sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "33":
-    image: evil_castle
-    sound: turning_point.mp3
+    image: deep_rock
+    sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "34":
-    image: evil_castle
-    sound: turning_point.mp3
+    image: deep_rock
+    sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "35":
-    image: evil_castle
+    image: lava
     sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "36":
-    image: evil_castle
+    image: lava
     sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "37":
-    image: evil_castle
+    image: lava
     sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "38":
-    image: evil_castle
+    image: lava
     sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "39":
-    image: evil_castle
+    image: lava
     sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "40":
-    image: evil_castle
+    image: lava
     sound: dungeon_boss.mp3
     brightness: 1
     wall_decoration_ratio: 0.3

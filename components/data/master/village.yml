@@ -19,6 +19,14 @@ TILE_MAPPINGS:
     image_path: components/pictures/dungeon/home/floor_wooden.png
     bg_color: '#2a2a1a'
     fg_color: '#6a6a2a'
+  floor_wooden_black:
+    char: '"'
+    category: floor
+    tile_id: 9
+    desc: 内床 (黒フローリング)
+    image_path: components/pictures/dungeon/home/floor_wooden_black.png
+    bg_color: '#1a1a0a'
+    fg_color: '#3a3a1a'
   floor_purple_stone:
     char: ':'
     category: floor
