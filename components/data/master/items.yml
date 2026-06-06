@@ -400,7 +400,7 @@ STAVE_DATA:
     effect_type: knockback
     min_rank: F
     max_rank: SS
-    rarity: 5
+    rarity: 2
     price: 800
     selling_price: 80
     charges: 5
@@ -421,7 +421,7 @@ STAVE_DATA:
     min_rank: F
     max_rank: SS
     max_floor: 999
-    rarity: 5
+    rarity: 1
     price: 800
     selling_price: 80
     charges: 0
@@ -435,7 +435,7 @@ STAVE_DATA:
     effect_type: fire
     min_rank: F
     max_rank: SS
-    rarity: 1
+    rarity: 2
     price: 1200
     selling_price: 120
     charges: 5
@@ -459,7 +459,7 @@ STAVE_DATA:
     effect_type: heal
     min_rank: F
     max_rank: SS
-    rarity: 1
+    rarity: 2
     price: 1200
     selling_price: 120
     charges: 5
@@ -469,7 +469,7 @@ STAVE_DATA:
     - 100
     - 255
     - 100
-    heal_ratio: 0.8
+    heal_ratio: 0.7
     shop_buyable: true
     describe: 癒やしの光を放つ魔法の杖 自分や仲間の傷を癒やすことができる
     floor_spawnable: true
@@ -477,9 +477,9 @@ STAVE_DATA:
     quest_targetable: true
     name: 無敵の杖
     effect_type: invincible
-    min_rank: S
+    min_rank: D
     max_rank: SS
-    rarity: 7
+    rarity: 5
     price: 3000
     selling_price: 200
     charges: 5
@@ -489,7 +489,7 @@ STAVE_DATA:
     - 255
     - 255
     - 150
-    duration_turns: 10
+    duration_turns: 30
     shop_buyable: false
     describe: 一時的にあらゆる攻撃を無効化する聖なる杖 ここぞという時の切り札
     floor_spawnable: true
@@ -539,8 +539,8 @@ STAVE_DATA:
     min_rank: F
     max_rank: SS
     rarity: 5
-    price: 1500
-    selling_price: 150
+    price: 3500
+    selling_price: 350
     charges: 5
     sound: components/sounds/sfx/invincible.wav
     image_path: components/pictures/icon/stave.png
