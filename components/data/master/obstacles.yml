@@ -59,9 +59,9 @@ anvil:
   max_concurrent: 2
   max_spawns: 2
   drops:
-    normal: [gold]
+    normal: []
     rare: [purple_stone]
-  normal_drop_rate: 0.30
+  normal_drop_rate: 0.0
   rare_drop_rate: 0.05
   image_path: components/pictures/dungeon/other_objects/anvil.png
   image_scale: 0.8
@@ -103,9 +103,9 @@ pot:
   max_concurrent: 5
   max_spawns: 10
   drops:
-    normal: [gold]
+    normal: [expired_potion]
     rare: []
-  normal_drop_rate: 0.60
+  normal_drop_rate: 0.30
   rare_drop_rate: 0.0
   image_path: components/pictures/obstacles/pot.png
   image_scale: 1.0
@@ -123,9 +123,9 @@ rubble:
   min_floor: null
   max_floor: null
   drops:
-    normal: [gold, expired_potion]
+    normal: [expired_potion]
     rare: []
-  normal_drop_rate: 0.25
+  normal_drop_rate: 0.15
   rare_drop_rate: 0.0
   image_path: components/pictures/obstacles/rubble.png
   image_scale: 1.0
@@ -187,10 +187,10 @@ crystal:
   max_concurrent: 2
   max_spawns: 2
   drops:
-    normal: [gold]
-    rare: []
-  normal_drop_rate: 1.00
-  rare_drop_rate: 0.0
+    normal: []
+    rare: [blue_stone, green_stone]
+  normal_drop_rate: 0.0
+  rare_drop_rate: 0.08
   image_path: components/pictures/obstacles/crystal.png
   image_scale: 0.9
 
@@ -273,9 +273,9 @@ broken_pillar:
   max_concurrent: 2
   max_spawns: 3
   drops:
-    normal: [gold]
+    normal: []
     rare: [green_stone]
-  normal_drop_rate: 0.30
+  normal_drop_rate: 0.0
   rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/broken_pillar.png
   image_scale: 1.0
@@ -295,10 +295,10 @@ statue:
   max_concurrent: 1
   max_spawns: 1
   drops:
-    normal: [gold]
+    normal: []
     rare: [red_stone, blue_stone]
-  normal_drop_rate: 0.50
-  rare_drop_rate: 0.10
+  normal_drop_rate: 0.0
+  rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/statue.png
   image_scale: 1.1
 
