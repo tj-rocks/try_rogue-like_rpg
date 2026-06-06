@@ -30,7 +30,7 @@ def setup_ui_relations(ui_elements, player, dungeon, game_state):
     event_inv_dialog = ui_elements["event_inventory_dialog"]
 
     # セットアップ実行
-    inventory_dialog.setup(player, dialog, game_state, dungeon, stave_selection_dialog, item_action_dialog)
+    inventory_dialog.setup(player, dialog, game_state, dungeon, stave_selection_dialog, item_action_dialog, confirm_dialog=confirm_dialog)
     inventory_dialog.menu_dialog = menu_dialog # 参照を持たせる
     
     stave_selection_dialog.setup(player, dialog)
@@ -42,13 +42,13 @@ def setup_ui_relations(ui_elements, player, dungeon, game_state):
         ore_selection_dialog.parameter_selection_dialog = parameter_selection_dialog
         parameter_selection_dialog._back_dialog = ore_selection_dialog
     
-    equip_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog)
+    equip_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog, confirm_dialog=confirm_dialog)
     equip_dialog.menu_dialog = menu_dialog
     
-    stave_inv_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog)
+    stave_inv_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog, confirm_dialog=confirm_dialog)
     stave_inv_dialog.menu_dialog = menu_dialog
     
-    event_inv_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog)
+    event_inv_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog, confirm_dialog=confirm_dialog)
     event_inv_dialog.menu_dialog = menu_dialog
     
     ui_elements["guild_dialog"].cutscene_manager = ui_elements["cutscene_manager"]

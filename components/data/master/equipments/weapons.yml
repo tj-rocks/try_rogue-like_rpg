@@ -100,6 +100,8 @@ WEAPON_DATA:
         regen: 2
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -140,6 +142,8 @@ WEAPON_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -180,6 +184,8 @@ WEAPON_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -220,6 +226,8 @@ WEAPON_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -260,6 +268,8 @@ WEAPON_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -339,6 +349,8 @@ WEAPON_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.2
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -360,32 +372,34 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.2
     shop_buyable: true
-    describe: 標準的な戦士の片手剣 特別な補正はなく、扱いやすい
+    describe: 余計な特殊効果はないが、圧倒的な基礎火力を誇る無骨な鉄剣。秘薬の効果をさらに高める。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
     bonus:
       common:
         aggro_mod: 0
-        attack: 17
-        accuracy_close: 5
+        attack: 22
+        accuracy_close: 20
         accuracy_range: 0
-        crit_rate: 0.05
+        crit_rate: 0
         hp: 0
         defense: 0
-        block_chance_close: 0.01
+        block_chance_close: 0
         block_chance_ranged: 0
         lantern_bonus: 0
         regen: 0
         stupidity: 0
-        armor_penetration: 0
+        armor_penetration: 0.2
+        buff_value_ratio: 0.2
+        buff_duration_ratio: 0.2
       magic:
         fire_damage: 0
         fire_range: 0
         heal_ratio: 0
         knockback_damage: 0
         invincible_turns: 0
-        stave_bonus: 0
+        stave_bonus: 1
         light_stave_bonus: 0
 
   hunters_rapier:
@@ -419,6 +433,8 @@ WEAPON_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -459,6 +475,8 @@ WEAPON_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -499,6 +517,8 @@ WEAPON_DATA:
         regen: 10
         stupidity: 0
         armor_penetration: 0.1
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -539,6 +559,8 @@ WEAPON_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.3
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -579,6 +601,8 @@ WEAPON_DATA:
         aggro_mod: 2
         stupidity: 1.5
         armor_penetration: 0.2
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.20
         fire_range: 1

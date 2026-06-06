@@ -13,6 +13,37 @@ from constants import (
 import os
 from wordings import Text
 
+EQUIP_STAT_LABEL_MAP = {
+    "attack_bonus": "攻撃力",
+    "defense_bonus": "防御力",
+    "hp_bonus": "最大HP",
+    "dex_bonus": "器用さ",
+    "crit_bonus": "会心率",
+    "block_chance_close": "近距離回避率",
+    "block_chance_ranged": "遠距離回避率",
+    "aggro_mod": "感知補正",
+    "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION,
+    "stupidity": Text.UI.STAT_CONFUSION_ICON
+}
+
+EQUIP_MAGIC_LABEL_MAP = {
+    "magic_fire_damage":    "炎ダメージ",
+    "magic_fire_range":     "炎射程",
+    "magic_heal_ratio":     "回復量",
+    "magic_knockback_damage":"吹飛ダメージ",
+    "magic_invincible_turns":"無敵ターン",
+    "magic_stave_bonus":     "杖回数",
+    "magic_light_stave_bonus": "燈杖回",
+    "magic_barrier_turns":     "障壁ターン",
+}
+
+def format_stat_value(val):
+    if val % 1 == 0:
+        val_str = str(int(val))
+    else:
+        val_str = str(round(val, 2))
+    return f"+{val_str}" if val > 0 else val_str
+
 def draw_opening_scene(screen, image, alpha):
     """オープニング画像をフェードインしながら描画する"""
     if not image: return
@@ -1007,6 +1038,17 @@ class BaseListDialog:
                 from systems.resources import load_image, scale_image_aspect
                 img = load_image(img_path)
                 if img:
+                    if hasattr(self, "item_data") and self.cursor_idx < len(self.item_data):
+                        itype, key_or_iid = self.item_data[self.cursor_idx]
+                        if itype == "consumable":
+                            from constants import CONSUMABLE_DATA
+                            cdata = CONSUMABLE_DATA.get(key_or_iid, {})
+                            tint = cdata.get("color_tint")
+                            if tint:
+                                img = img.copy()
+                                w, h = img.get_size()
+                                lower_rect = pygame.Rect(0, h // 2, w, h // 2)
+                                img.fill((*tint, 255), rect=lower_rect, special_flags=pygame.BLEND_RGBA_MULT)
                     scaled_img = scale_image_aspect(img, 80, 80)
                     # 中央寄せにするための計算
                     img_w, img_h = scaled_img.get_size()
@@ -1148,7 +1190,7 @@ class ParameterSelectionDialog(BaseListDialog):
             "magic_heal_ratio": "[癒]回復量", "magic_knockback_damage": "[風]吹飛ダメ",
             "magic_invincible_turns": "[聖]無敵ターン",
             "magic_stave_bonus": "[魔]杖回数", "magic_light_stave_bonus": "[光]燈杖回",
-            "magic_yrden_turns": "[印]障壁ターン",
+            "magic_barrier_turns": "障壁ターン",
             "accuracy_bonus_close": "命中率",
             "accuracy_bonus": "命中率",
         }
@@ -1300,7 +1342,7 @@ class InventoryDialog(BaseListDialog):
             "magic_invincible_turns":"[聖]無敵ターン",
             "magic_stave_bonus":     "[魔]杖回数",
             "magic_light_stave_bonus": "[光]燈杖回",
-            "magic_yrden_turns":     "[印]障壁ターン",
+            "magic_barrier_turns":     "障壁ターン",
         }
         
         def fmt(val):
@@ -1353,12 +1395,16 @@ class InventoryDialog(BaseListDialog):
 
     def get_title(self): return Text.UI.INVENTORY_TITLE
 
-    def setup(self, player, dialog, game_state, dungeon, stave_selection_dialog, item_action_dialog):
+    def setup(self, player, dialog, game_state, dungeon, stave_selection_dialog, item_action_dialog, confirm_dialog=None):
         from systems.item_handler import make_use_item_callback
         self.player = player
         self.dialog = dialog
         self.dungeon = dungeon
-        self.on_select = make_use_item_callback(player, dialog, self, game_state, stave_selection_dialog=stave_selection_dialog)
+        self.on_select = make_use_item_callback(
+            player, dialog, self, game_state,
+            stave_selection_dialog=stave_selection_dialog,
+            confirm_dialog=confirm_dialog
+        )
         self.action_dialog = item_action_dialog
 
     # --- InventoryDialog 固有のデータ更新 ---
@@ -1432,50 +1478,27 @@ class InventoryDialog(BaseListDialog):
     def _build_detail_lines(self, player, data):
         itype, key = data
         lines = []
-        from wordings import Text
-        S_MAP = {"attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
-                 "dex_bonus": "器用さ", "crit_bonus": "会心率",
-                 "block_chance_close": "近距離回避率",
-                 "block_chance_ranged": "遠距離回避率", "aggro_mod": "感知補正",
-                 "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON}
-        MAGIC_MAP = {
-            "magic_fire_damage":    "炎ダメージ",
-            "magic_fire_range":     "炎射程",
-            "magic_heal_ratio":     "回復量",
-            "magic_knockback_damage":"吹飛ダメージ",
-            "magic_invincible_turns":"無敵ターン",
-            "magic_stave_bonus":     "杖回数",
-            "magic_light_stave_bonus": "燈杖回",
-            "magic_yrden_turns":     "障壁ターン",
-        }
-        
-        def fmt(val):
-            if val % 1 == 0:
-                val_str = str(int(val))
-            else:
-                val_str = str(round(val, 2))
-            return f"+{val_str}" if val > 0 else val_str
 
         if itype in ("weapon", "armor", "shield", "accessory", "stave"):
             inv = getattr(player, itype + "_inventory", [])
             inst = player._find_equip_inst(inv, key)
             if not inst: return []
             lines.append(inst.get_name())
-            for k, label in S_MAP.items():
+            for k, label in EQUIP_STAT_LABEL_MAP.items():
                 val = inst.get_stat(k, 0)
                 if inst.enhance > 0:
                     val += inst.get_enhance_bonus(k)
                 if val:
                     is_pct = k in ("crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
                     val_to_use = val * 100 if is_pct and isinstance(val, float) else val
-                    lines.append(f"{label}: {fmt(val_to_use)}%" if is_pct else f"{label}: {fmt(val)}")
+                    lines.append(f"{label}: {format_stat_value(val_to_use)}%" if is_pct else f"{label}: {format_stat_value(val)}")
             # 魔法ボーナスの表示
-            for mk, mlabel in MAGIC_MAP.items():
+            for mk, mlabel in EQUIP_MAGIC_LABEL_MAP.items():
                 mval = inst.get_stat(mk, 0)
                 if mval:
                     is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
                     val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
-                    lines.append(f"{mlabel}: {fmt(val_to_use)}%" if is_pct else f"{mlabel}: {fmt(mval)}")
+                    lines.append(f"{mlabel}: {format_stat_value(val_to_use)}%" if is_pct else f"{mlabel}: {format_stat_value(mval)}")
             desc = inst.get_stat("describe", "")
             if desc: lines.extend(["", desc])
         else:
@@ -1731,7 +1754,44 @@ class StatusBar:
         
         # HPテキスト
         hp_text = f"HP {player.hp}/{player.max_hp}"
+        hp_text_w = self.font.size(hp_text)[0]
         draw_text_shadow(hp_text, self.font, COLOR_TEXT, (bar_x + bar_w + 12, bar_y - 4))
+
+        # --- 秘薬バフバー (HPテキストの右横・インライン) ---
+        buff_turns = 0
+        buff_max = 1
+        buff_color = None
+        if getattr(player, "attack_buff_turns", 0) > 0:
+            buff_turns = player.attack_buff_turns
+            buff_max = max(1, getattr(player, "attack_buff_max_turns", buff_turns))
+            buff_color = (231, 76, 60)    # 赤：戦士
+        elif getattr(player, "regen_buff_turns", 0) > 0:
+            buff_turns = player.regen_buff_turns
+            buff_max = max(1, getattr(player, "regen_buff_max_turns", buff_turns))
+            buff_color = (46, 204, 113)   # 緑：巡礼
+        elif getattr(player, "magic_buff_turns", 0) > 0:
+            buff_turns = player.magic_buff_turns
+            buff_max = max(1, getattr(player, "magic_buff_max_turns", buff_turns))
+            buff_color = (155, 89, 182)   # 紫：賢者
+
+        if buff_color:
+            bbar_x = bar_x + bar_w + 12 + hp_text_w + 10
+            bbar_y = bar_y
+            bbar_w = 60
+            bbar_h = bar_h  # HPバーと同じ高さ
+            ratio = buff_turns / buff_max
+            fill_w = max(1, int(bbar_w * ratio))
+
+            # 背景
+            pygame.draw.rect(screen, (50, 60, 70), (bbar_x - 2, bbar_y - 2, bbar_w + 4, bbar_h + 4), border_radius=3)
+            pygame.draw.rect(screen, COLOR_BG, (bbar_x, bbar_y, bbar_w, bbar_h), border_radius=2)
+            # バー本体
+            pygame.draw.rect(screen, buff_color, (bbar_x, bbar_y, fill_w, bbar_h), border_radius=2)
+            # グロス（上半分ハイライト）
+            bright = (min(buff_color[0]+50,255), min(buff_color[1]+50,255), min(buff_color[2]+50,255))
+            pygame.draw.rect(screen, bright, (bbar_x, bbar_y, fill_w, bbar_h//2), border_radius=2)
+            # 枠
+            pygame.draw.rect(screen, buff_color, (bbar_x, bbar_y, bbar_w, bbar_h), 1, border_radius=2)
 
         # 攻撃・防御・盾 (HPの下)
         stat_y = bar_y + 24
@@ -1739,11 +1799,7 @@ class StatusBar:
         draw_text_shadow(Text.UI.ATK_LABEL.format(atk=atk_val), self.font, COLOR_TEXT, (bar_x, stat_y))
         def_val = player.total_defense
         draw_text_shadow(Text.UI.DEF_LABEL.format(defense=def_val), self.font, COLOR_TEXT, (bar_x + 110, stat_y))
-        # 回避率（近接/射撃）の描画
-        eva_close = int(player.block_chance_close * 100)
-        eva_ranged = int(player.block_chance_ranged * 100)
-        eva_text = f"回避 近:{eva_close}% 遠:{eva_ranged}%"
-        draw_text_shadow(eva_text, self.font, COLOR_TEXT, (bar_x + 220, stat_y))
+
 
         # --- 階層 (中央上) ---
         floor_str = Text.UI.VILLAGE if floor_level == 0 else Text.UI.FLOOR.format(level=floor_level)
@@ -1765,53 +1821,10 @@ class StatusBar:
         rank_name = player.guild_rank
         draw_text_shadow(f"Rank: {rank_name}", self.font, (241, 196, 15), (rx, ry + 23))
         
-        # 呪い表示 (Rankの下・Hollow表示とジェム◆◆◆◆◆の描画)
-        curse_level = getattr(player, "curse_level", 0)
-        draw_text_shadow(Text.UI.HOLLOW_LABEL, self.font, COLOR_TEXT, (rx, ry + 46))
-        
-        gem_start_x = rx + 75
-        gem_y = ry + 59
-        for i in range(5):
-            gx = gem_start_x + i * 16
-            # 1. 影を描画 (1pxオフセット)
-            pygame.draw.polygon(screen, (10, 15, 20), [
-                (gx + 6 + 1, gem_y + 1),
-                (gx + 12 + 1, gem_y + 6 + 1),
-                (gx + 6 + 1, gem_y + 12 + 1),
-                (gx + 1, gem_y + 6 + 1)
-            ])
-            if i < curse_level:
-                # 活性化した呪い：怪しく光る赤紫・クリムゾンの炎
-                pygame.draw.polygon(screen, (231, 76, 60), [
-                    (gx + 6, gem_y),
-                    (gx + 12, gem_y + 6),
-                    (gx + 6, gem_y + 12),
-                    (gx, gem_y + 6)
-                ])
-                # 内側の光沢ハイライト
-                pygame.draw.polygon(screen, (255, 130, 110), [
-                    (gx + 6, gem_y + 2),
-                    (gx + 9, gem_y + 6),
-                    (gx + 6, gem_y + 10),
-                    (gx + 3, gem_y + 6)
-                ])
-            else:
-                # 休眠状態：暗いガラスのようなグレーの枠
-                pygame.draw.polygon(screen, (30, 35, 45), [
-                    (gx + 6, gem_y),
-                    (gx + 12, gem_y + 6),
-                    (gx + 6, gem_y + 12),
-                    (gx, gem_y + 6)
-                ])
-                pygame.draw.polygon(screen, (70, 80, 95), [
-                    (gx + 6, gem_y),
-                    (gx + 12, gem_y + 6),
-                    (gx + 6, gem_y + 12),
-                    (gx, gem_y + 6)
-                ], 1)
-
         if getattr(player, "is_debug", False):
-            draw_text_shadow(f"GP: {player.guild_point}", self.font, COLOR_TEXT, (rx, ry + 70))
+            draw_text_shadow(f"GP: {player.guild_point}", self.font, COLOR_TEXT, (rx, ry + 46))
+
+        # (バフ表示はHPバー右横に移動済み・ここには何も描画しない)
 
 
 # --- 視界制限（カンテラ）システム ---
@@ -2252,15 +2265,30 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             guild_guide_dialog.is_active = True
                                             return
                                     elif getattr(npc, "role", None) == "priest":
+                                        from constants import CURSE_RECOVERY_COST_GOLD_MULTIPLIER
                                         cost = max(1, player.guild_point // 10)
+                                        gold_cost = cost * CURSE_RECOVERY_COST_GOLD_MULTIPLIER
                                         if getattr(player, "curse_level", 0) > 0:
                                             dialog.text = Text.NPC.PRIEST_WELCOME
                                             dialog.is_active = True
                                             if confirm_dialog:
-                                                confirm_dialog.text = Text.NPC.PRIEST_CURE_CONFIRM.format(cost=cost)
+                                                confirm_dialog.text = Text.NPC.PRIEST_CURE_CONFIRM.format(cost=cost, gold_cost=gold_cost)
                                                 def on_priest_yes():
-                                                    if player.guild_point >= cost:
+                                                    if player.guild_point < cost:
+                                                        dialog.text = Text.NPC.PRIEST_NO_GP.format(cost=cost)
+                                                        dialog.is_active = True
+                                                        from systems.audio_manager import play_sfx
+                                                        from constants import SOUND_CANCEL
+                                                        play_sfx(SOUND_CANCEL)
+                                                    elif player.coin < gold_cost:
+                                                        dialog.text = Text.NPC.PRIEST_NO_GOLD.format(gold_cost=gold_cost)
+                                                        dialog.is_active = True
+                                                        from systems.audio_manager import play_sfx
+                                                        from constants import SOUND_CANCEL
+                                                        play_sfx(SOUND_CANCEL)
+                                                    else:
                                                         player.guild_point -= cost
+                                                        player.coin -= gold_cost
                                                         player.curse_level -= 1
                                                         player.cursed_stats = ["hp"] if player.curse_level > 0 else []
                                                         dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat="最大HP")
@@ -2269,12 +2297,6 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                         from constants import SOUND_SELECT
                                                         sound_manager.play_sfx(SOUND_SELECT)
                                                         player.save_to_file()
-                                                    else:
-                                                        dialog.text = Text.NPC.PRIEST_NO_GP.format(cost=cost)
-                                                        dialog.is_active = True
-                                                        from systems.audio_manager import play_sfx
-                                                        from constants import SOUND_CANCEL
-                                                        play_sfx(SOUND_CANCEL)
                                                 def on_priest_no():
                                                     dialog.text = Text.NPC.PRIEST_DECLINE
                                                     dialog.is_active = True
@@ -3088,7 +3110,7 @@ class StatusDialog:
             total_heal_ratio = get_total_bonus("magic_heal_ratio")
             total_knockback = get_total_bonus("magic_knockback_damage")
             total_invincible = get_total_bonus("magic_invincible_turns")
-            total_yrden = get_total_bonus("magic_yrden_turns")
+            total_barrier = get_total_bonus("magic_barrier_turns")
 
             def format_val(val):
                 if val % 1 == 0:
@@ -3169,8 +3191,8 @@ class StatusDialog:
             if total_invincible != 0:
                 right_lines.append(f"無敵効果  {format_val(total_invincible)}ターン")
                 has_magic_bonus = True
-            if total_yrden != 0:
-                right_lines.append(f"障壁ターン {format_val(total_yrden)}ターン")
+            if total_barrier != 0:
+                right_lines.append(f"障壁ターン {format_val(total_barrier)}ターン")
                 has_magic_bonus = True
 
             if not has_magic_bonus:
@@ -3476,27 +3498,91 @@ class ShopDialog(BaseListDialog):
             # SELLモードで装備インスタンスの場合は6番目の要素（マスターデータのキー）を使用する
             master_key = selected[5] if len(selected) > 5 else selected[0]
             
-            from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, STAVE_DATA, CONSUMABLE_DATA
-            catalog = {"weapon": WEAPON_DATA, "armor": ARMOR_DATA, "shield": SHIELD_DATA, "stave": STAVE_DATA, "consumable": CONSUMABLE_DATA}
+            from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, ACCESSORY_DATA, STAVE_DATA, CONSUMABLE_DATA
+            catalog = {"weapon": WEAPON_DATA, "armor": ARMOR_DATA, "shield": SHIELD_DATA, "accessory": ACCESSORY_DATA, "stave": STAVE_DATA, "consumable": CONSUMABLE_DATA}
             info = catalog.get(itype, {}).get(master_key, {})
-            lines = [f"【{selected[2]}】", ""]
-            if itype == "shield":
-                if info.get("block_chance_close", 0) != 0: lines.append(f"近距離回避率: {int(info['block_chance_close']*100)}%")
-                if info.get("block_chance_ranged", 0) != 0: lines.append(f"遠距離回避率: {int(info['block_chance_ranged']*100)}%")
-                # 特定の回避率がない場合は何も表示しない
-                if info.get("hp_bonus", 0) != 0: lines.append(f"最大HP: +{info['hp_bonus']}")
-            elif itype == "weapon":
-                if info.get("attack_bonus", 0) != 0: lines.append(f"攻撃力: +{info['attack_bonus']}")
-                if info.get("hp_bonus", 0) != 0: lines.append(f"最大HP: +{info['hp_bonus']}")
-            elif itype == "armor":
-                if info.get("defense_bonus", 0) != 0: lines.append(f"防御力: +{info['defense_bonus']}")
-                if info.get("hp_bonus", 0) != 0: lines.append(f"最大HP: +{info['hp_bonus']}")
-            else: # その他（巻物やポーションなど）
-                if info.get("attack_bonus", 0) != 0: lines.append(f"攻撃力: +{info['attack_bonus']}")
-                if info.get("defense_bonus", 0) != 0: lines.append(f"防御力: +{info['defense_bonus']}")
-                if info.get("hp_bonus", 0) != 0: lines.append(f"最大HP: +{info['hp_bonus']}")
-            lines.append(""); lines.append(info.get("describe", "詳細情報はありません") if selected[1] != "cancel" else "店を出ます")
-            draw_text_wrapped(screen, self.font, "\n".join(lines), sep_x + 30, self.y + 80, self.width // 2 - 60, color=(220, 230, 240))
+            
+            # --- 画像のロードと描画 (下半分着色対応) ---
+            detail_y_offset = 0
+            img_path = None
+            if selected[1] != "cancel":
+                img_path = info.get("image_path")
+                if not img_path and info.get("image_dir"):
+                    import os
+                    idir = info.get("image_dir")
+                    if os.path.exists(idir):
+                        p = os.path.join(idir, "down.png")
+                        if os.path.exists(p): img_path = p
+                        else:
+                            p = os.path.join(idir, f"{master_key}.png")
+                            if os.path.exists(p): img_path = p
+                            else:
+                                try:
+                                    files = [f for f in os.listdir(idir) if f.endswith(".png")]
+                                    if files: img_path = os.path.join(idir, files[0])
+                                except: pass
+                                
+            if img_path:
+                from systems.resources import load_image, scale_image_aspect
+                img = load_image(img_path)
+                if img:
+                    tint = info.get("color_tint")
+                    if tint:
+                        img = img.copy()
+                        w, h = img.get_size()
+                        lower_rect = pygame.Rect(0, h // 2, w, h // 2)
+                        img.fill((*tint, 255), rect=lower_rect, special_flags=pygame.BLEND_RGBA_MULT)
+                    scaled_img = scale_image_aspect(img, 80, 80)
+                    img_w, img_h = scaled_img.get_size()
+                    screen.blit(scaled_img, (sep_x + 30 + (80 - img_w) // 2, self.y + 80 + (80 - img_h) // 2))
+                    detail_y_offset = 90
+
+            # --- ステータス詳細行の組み立て ---
+            lines = []
+            if selected[1] == "cancel":
+                lines.append(Text.UI.QUIT)
+                lines.append("")
+                lines.append("店を出ます")
+            else:
+                # 装備インスタンス（またはダミーの作成）
+                inst = None
+                from components.sprites.player import EquipInstance, StaveInstance
+                if itype in ("weapon", "armor", "shield", "accessory"):
+                    inst = EquipInstance(itype, master_key, enhance=0)
+                elif itype == "stave":
+                    charges = info.get("charges", 5)
+                    inst = StaveInstance(master_key, charges=charges)
+
+                if inst:
+                    lines.append(inst.get_name())
+                    lines.append("")
+                    # 基本ステータスの表示
+                    for k, label in EQUIP_STAT_LABEL_MAP.items():
+                        val = inst.get_stat(k, 0)
+                        if val:
+                            is_pct = k in ("crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
+                            val_to_use = val * 100 if is_pct and isinstance(val, float) else val
+                            lines.append(f"{label}: {format_stat_value(val_to_use)}%" if is_pct else f"{label}: {format_stat_value(val)}")
+                    # 魔法ボーナスの表示
+                    for mk, mlabel in EQUIP_MAGIC_LABEL_MAP.items():
+                        mval = inst.get_stat(mk, 0)
+                        if mval:
+                            is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
+                            val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
+                            lines.append(f"{mlabel}: {format_stat_value(val_to_use)}%" if is_pct else f"{format_stat_value(mval)}")
+                    
+                    desc = inst.get_stat("describe", "")
+                    if desc:
+                        lines.append("")
+                        lines.append(desc)
+                else:
+                    lines.append(f"【{selected[2]}】")
+                    lines.append("")
+                    desc = info.get("describe", "詳細情報はありません")
+                    if desc:
+                        lines.append(desc)
+
+            draw_text_wrapped(screen, self.font, "\n".join(lines), sep_x + 30, self.y + 80 + detail_y_offset, self.width // 2 - 60, color=(220, 230, 240))
 
 class WarehouseDialog(BaseListDialog):
     """預かり屋（倉庫）でのアイテム出し入れを行うダイアログ"""

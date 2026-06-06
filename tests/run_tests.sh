@@ -102,6 +102,7 @@ TEST_FILES=(
     "tests/test_blacksmith_stones.py"
     "tests/test_smart_ranged_move.py"
     "tests/test_full_inventory_pickup.py"
+    "tests/test_potions.py"
 )
 
 SUCCESS_COUNT=0

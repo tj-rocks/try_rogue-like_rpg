@@ -217,7 +217,14 @@ def execute_stave(player, stave, dungeon, dialog):
     if stave.charges <= 0:
         return "回数が足りない！"
 
-    stave.charges -= 1
+    import random
+    stave_bonus = int(getattr(player, "get_magic_bonus", lambda k: 0)("stave_bonus"))
+    is_saved = False
+    if stave_bonus > 0 and random.randint(1, 100) <= stave_bonus:
+        is_saved = True
+
+    if not is_saved:
+        stave.charges -= 1
     effect_type = settings.get("effect_type")
     print(f"[MAGIC] Execute Stave: {stave.name} (Key: {stave.key}, Effect: {effect_type})")
 
@@ -228,6 +235,8 @@ def execute_stave(player, stave, dungeon, dialog):
         sound_manager.play_sfx(sound_path)
 
     msg = f"{player.name} は {stave.name} を振った！\n"
+    if is_saved:
+        msg = f"{player.name} は {stave.name} を振った！（魔力が共鳴し回数を消費しなかった！）\n"
     
     if effect_type == "knockback":
         msg += _effect_knockback(player, settings, dungeon, dialog)
@@ -239,10 +248,8 @@ def execute_stave(player, stave, dungeon, dialog):
         msg += _effect_invincible(player, settings, dungeon, dialog)
     elif effect_type == "light_all":
         msg += _effect_light_all(player, settings, dungeon, dialog, stave)
-    elif effect_type == "yrden":
-        msg += _effect_yrden(player, settings, dungeon, dialog, stave)
-    elif effect_type == "attack_buff":
-        msg += _effect_attack_buff(player, settings, dungeon, dialog)
+    elif effect_type == "barrier":
+        msg += _effect_barrier(player, settings, dungeon, dialog, stave)
     else:
         msg += "しかし 何もおきなかった！"
 
@@ -469,7 +476,7 @@ def _effect_light_all(player, settings, dungeon, dialog, stave=None):
         return msg
     return "しかし 何も 起こらなかった"
 
-def _effect_yrden(player, settings, dungeon, dialog, stave=None):
+def _effect_barrier(player, settings, dungeon, dialog, stave=None):
     """正面1マスに敵の侵入を防ぐ魔法の防壁（障害物）を配置する"""
     gx = int((player.x + player.width / 2) // dungeon.tile_size)
     gy = int((player.y + player.height / 2) // dungeon.tile_size)
@@ -519,7 +526,7 @@ def _effect_yrden(player, settings, dungeon, dialog, stave=None):
     
     # 5ターン（ベース値）と装備ボーナスの加算
     base_turns = settings.get("duration_turns", 5)
-    bonus_turns = int(getattr(player, "get_magic_bonus", lambda k: 0)("yrden_turns"))
+    bonus_turns = int(getattr(player, "get_magic_bonus", lambda k: 0)("barrier_turns"))
     barrier.lifetime_turns = base_turns + bonus_turns
     
     dungeon.enemies.append(barrier)
@@ -530,16 +537,3 @@ def _effect_yrden(player, settings, dungeon, dialog, stave=None):
     dungeon.magic_effects.append(DirectionalFlashEffect(tx, ty, size=tile_size, color=(200, 100, 255)))
     
     return f"正面の床に 魔法の防壁 が出現した！（持続: {barrier.lifetime_turns}ターン）"
-
-def _effect_attack_buff(player, settings, dungeon, dialog):
-    """攻撃力上昇バフ付与"""
-    turns = settings.get("duration_turns", 10)
-    buff_val = settings.get("attack_buff_val", 5)
-    
-    player.attack_buff_turns = turns
-    player.attack_buff_val = buff_val
-    
-    # 青白くフラッシュ
-    dungeon.magic_effects.append(FlashEffect(color=settings.get("effect_color", [100, 200, 255])))
-    
-    return f"武器に魔力が 宿った！\n{turns}ターンの間 攻撃力が {buff_val} 上昇した！"

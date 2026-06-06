@@ -45,11 +45,12 @@ def test_death_penalty():
             handle_death_sequence(player, dungeon, dialog, game_state)
     
     # 検証: 所持金
-    # 1. 元 1000 -> 半分で 500
-    # 2. 治療費 (DOCTOR_FEE) が引かれる
-    expected_coin = 500 - DOCTOR_FEE
-    print(f"所持金検証: 期待値 {expected_coin}, 実際 {player.coin}")
-    assert player.coin == expected_coin
+    # 総資産 1863 (手持ち 1000 + 預金 500 + 所持品 363) の半分 (931) が没収される。
+    # 預金 500 は維持されるため、手持ち 1000 から 931 が引かれて 69 になる。
+    print(f"所持金検証: 期待値 69, 実際 {player.coin}")
+    assert player.coin == 69
+    print(f"銀行預金検証: 期待値 500, 実際 {player.bank_coin}")
+    assert player.bank_coin == 500
     
     # 検証: 装備保存 (アイテムロストなしのため装備も全て維持される)
     print(f"装備検証: weapon_inventory={len(player.weapon_inventory)}, equipped_weapon={player.equipped_weapon}")
@@ -74,8 +75,8 @@ def test_death_debt():
     print("--- 死亡時借金テスト開始 ---")
     
     player = Player()
-    player.coin = 10 # 治療費に足りない
-    player.bank_coin = 0
+    player.coin = 10
+    player.bank_coin = 1000
     player.hp = 0
     player.is_dead = True
     
@@ -88,10 +89,12 @@ def test_death_debt():
         with patch("components.sprites.player.Player.save_to_file"):
             handle_death_sequence(player, dungeon, dialog, game_state)
             
-    # 検証: 借金 (10 // 2 = 5. 5 - DOCTOR_FEE = 負の値)
-    # 現在 DOCTOR_FEE = 20 なので、 5 - 20 = -15
-    print(f"借金検証: 実際 {player.coin}")
-    assert player.coin < 0
+    # 検証: 総資産 1110 (手持ち 10 + 預金 1000 + 所持品 100) の半分 (555) が没収される。
+    # 預金 1000 は維持され、手持ち 10 から 555 引かれて -545 (借金) になる。
+    print(f"所持金検証: 期待値 -545, 実際 {player.coin}")
+    assert player.coin == -545
+    print(f"銀行預金検証: 期待値 1000, 実際 {player.bank_coin}")
+    assert player.bank_coin == 1000
     print("[OK] 死亡時借金テスト合格！")
 
 def test_respawn_position():

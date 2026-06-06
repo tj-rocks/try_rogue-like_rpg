@@ -189,6 +189,8 @@ def get_normalized_equipment_data(floor_map):
         "aggro_mod":          "aggro_mod",
         "stupidity":          "stupidity",
         "armor_penetration":  "armor_penetration",
+        "buff_value_ratio":   "magic_buff_value_ratio",
+        "buff_duration_ratio":"magic_buff_duration_ratio",
     }
 
     def _flatten_bonus(item_dict):

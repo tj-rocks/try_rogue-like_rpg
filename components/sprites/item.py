@@ -131,6 +131,12 @@ class DroppedConsumable(Item):
             path = COMMON_ITEM_IMAGES.get("consumable")
             
         self._image = self._load_item_image({"image_path": path})
+        if self._image and "color_tint" in item_data:
+            tint = item_data["color_tint"]
+            self._image = self._image.copy()
+            w, h = self._image.get_size()
+            lower_rect = pygame.Rect(0, h // 2, w, h // 2)
+            self._image.fill((*tint, 255), rect=lower_rect, special_flags=pygame.BLEND_RGBA_MULT)
 
     def draw(self, screen, camera_x, camera_y):
         if self.is_collected:

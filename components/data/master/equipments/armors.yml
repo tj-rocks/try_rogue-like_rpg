@@ -58,6 +58,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
@@ -95,6 +97,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -132,6 +136,8 @@ ARMOR_DATA:
         regen: 1
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -169,6 +175,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -206,6 +214,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -243,6 +253,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.1
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -280,6 +292,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
@@ -296,10 +310,10 @@ ARMOR_DATA:
     min_rank: D
     max_rank: B
     rarity: 3
-    price: 2500
+    price: 4500
     image_dir: components/pictures/armor/fighters_armor
     shop_buyable: true
-    describe: 標準的な戦士の鎧 特にバフやデバフはなく、扱いやすい
+    describe: 標準的な戦士の鎧。装備すると秘薬の持続時間が延長される。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -317,6 +331,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0.2
+        buff_duration_ratio: 0.2
       magic:
         fire_damage: 0
         fire_range: 0
@@ -354,6 +370,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -383,7 +401,7 @@ ARMOR_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0
-        hp: 30
+        hp: 20
         defense: 12
         block_chance_close: 0
         block_chance_ranged: 0
@@ -391,6 +409,8 @@ ARMOR_DATA:
         regen: 1
         stupidity: 0
         armor_penetration: 0.1
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -428,6 +448,8 @@ ARMOR_DATA:
         aggro_mod: 3
         stupidity: 0
         armor_penetration: 0.1
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -465,6 +487,8 @@ ARMOR_DATA:
         aggro_mod: 5
         stupidity: 1
         armor_penetration: 0.3
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.10
         fire_range: 0

@@ -39,9 +39,9 @@ wood_barrel:
   drops:
     common:
       normal: [hp_potion, antidote_potion,old_sword]
-      rare: [hi_potion]
+      rare: [hi_potion, pilgrim_potion, warrior_potion, sage_potion]
       normal_drop_rate: 0.10
-      rare_drop_rate: 0.05
+      rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/barrel.png
   image_scale: 0.8
 
@@ -87,9 +87,9 @@ crate:
   drops:
     common:
       normal: [hp_potion, antidote_potion,old_sword]
-      rare: [hi_potion,teleport_stone]
+      rare: [hi_potion, teleport_stone, pilgrim_potion, warrior_potion, sage_potion]
       normal_drop_rate: 0.40
-      rare_drop_rate: 0.05
+      rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/crate.png
   image_scale: 0.8
 
@@ -111,9 +111,9 @@ pot:
   drops:
     common:
       normal: [expired_potion, rotten_potion]
-      rare: [hi_potion,teleport_stone]
+      rare: [hi_potion, teleport_stone, pilgrim_potion, warrior_potion, sage_potion]
       normal_drop_rate: 0.30
-      rare_drop_rate: 0.05
+      rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/pot.png
   image_scale: 1.0
 

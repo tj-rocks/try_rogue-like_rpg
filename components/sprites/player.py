@@ -300,6 +300,9 @@ class Player(Entity):
                     bonus += val * 100
                 else:
                     bonus += val
+        # 雷霆の秘薬バフ（会心率）の加算
+        if getattr(self, "attack_buff_turns", 0) > 0:
+            bonus += getattr(self, "attack_buff_crit", 0)
         return int(bonus)
 
     @property
@@ -343,6 +346,9 @@ class Player(Entity):
             inst = self._find_equip_inst(inv, eid)
             if inst:
                 total += inst.get_stat(flat_key, 0)
+        # 賢者の秘薬バフの加算（魔法系効果 key にのみ適用）
+        if getattr(self, "magic_buff_turns", 0) > 0 and key in ("fire_damage", "heal_ratio", "knockback_damage", "invincible_turns", "light_stave_bonus"):
+            total += getattr(self, "magic_buff_val", 0)
         return total
 
     @property
@@ -382,6 +388,9 @@ class Player(Entity):
         ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("armor_penetration", 0.0)
+        # 雷霆の秘薬バフ（防御無視）の加算
+        if getattr(self, "attack_buff_turns", 0) > 0:
+            bonus += getattr(self, "attack_buff_armor_pen", 0.0)
         return bonus
     
     @property
@@ -444,6 +453,10 @@ class Player(Entity):
         self.invincible_turns = 0
         self.attack_buff_turns = 0
         self.attack_buff_val = 0
+        self.regen_buff_turns = 0
+        self.regen_buff_val = 0
+        self.magic_buff_turns = 0
+        self.magic_buff_val = 0
         self.regen_pool = 0.0
         self.waving_stave_inst = None
         self._status = "normal"
@@ -560,18 +573,29 @@ class Player(Entity):
                     self.step_toggle = not self.step_toggle; turn_consumed = True
                     
         if turn_consumed:
+            messages = []
             if self.invincible_turns > 0:
                 self.invincible_turns -= 1
-                if self.invincible_turns == 0 and dialog:
-                    msg = "無敵状態が 切れた！"
-                    if dialog.is_active: dialog.text += "\n" + msg
-                    else: dialog.text = msg; dialog.is_active = True; game_state["dialog_modal"] = False; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+                if self.invincible_turns == 0:
+                    messages.append("無敵状態が 切れた！")
             if getattr(self, "attack_buff_turns", 0) > 0:
                 self.attack_buff_turns -= 1
-                if self.attack_buff_turns == 0 and dialog:
-                    msg = "攻撃力上昇の効果が 切れた！"
-                    if dialog.is_active: dialog.text += "\n" + msg
-                    else: dialog.text = msg; dialog.is_active = True; game_state["dialog_modal"] = False; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+                if self.attack_buff_turns == 0:
+                    messages.append("攻撃力上昇の効果が 切れた！")
+            if getattr(self, "regen_buff_turns", 0) > 0:
+                self.regen_buff_turns -= 1
+                if self.regen_buff_turns == 0:
+                    messages.append("自然回復上昇の効果が 切れた！")
+            if getattr(self, "magic_buff_turns", 0) > 0:
+                self.magic_buff_turns -= 1
+                if self.magic_buff_turns == 0:
+                    messages.append("魔法強化の効果が 切れた！")
+            
+            if messages and dialog:
+                msg = "\n".join(messages)
+                if dialog.is_active: dialog.text += "\n" + msg
+                else: dialog.text = msg; dialog.is_active = True; game_state["dialog_modal"] = False; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+
             if self.is_moving: self.start_enemy_turn(dungeon)
             else: self.enemy_turn_pending = True
 
@@ -797,7 +821,20 @@ class Player(Entity):
             import math; p = (math.sin(pygame.time.get_ticks()/150)+1)/2; gs = int(self.width*(1.1+p*0.3)); gsf = pygame.Surface((gs*2,gs*2), pygame.SRCALPHA)
             a = int(100+p*100); pygame.draw.circle(gsf, (255,215,0,a), (gs,gs), gs, 3); pygame.draw.circle(gsf, (255,255,200,a//2), (gs,gs), gs//2)
             screen.blit(gsf, (draw_x+self.width//2-gs, draw_y+self.height//2-gs))
+        # 秘薬バフパーティクル（サークルエフェクトは削除し、各バフ色に合わせた泡のみを表示）
+        has_any_buff = False
+        buff_color = None
         if getattr(self, "attack_buff_turns", 0) > 0:
+            has_any_buff = True
+            buff_color = (231, 76, 60)    # 赤：戦士
+        elif getattr(self, "regen_buff_turns", 0) > 0:
+            has_any_buff = True
+            buff_color = (46, 204, 113)   # 緑：巡礼
+        elif getattr(self, "magic_buff_turns", 0) > 0:
+            has_any_buff = True
+            buff_color = (155, 89, 182)   # 紫：賢者
+
+        if has_any_buff:
             import math
             import random
             if not hasattr(self, "buff_particles"):
@@ -811,8 +848,12 @@ class Player(Entity):
                     "age": 0,
                     "max_age": random.randint(30, 50),
                     "speed": random.uniform(0.5, 1.2),
-                    "size": random.randint(2, 4)
+                    "size": random.randint(2, 4),
+                    "color": buff_color
                 })
+
+        if hasattr(self, "buff_particles") and self.buff_particles:
+            import math
             for p in self.buff_particles[:]:
                 p["age"] += 1
                 if p["age"] >= p["max_age"]:
@@ -822,15 +863,9 @@ class Player(Entity):
                 p["rel_x"] += math.sin(p["age"] / 5) * 0.3
                 alpha = int(200 * (1.0 - p["age"] / p["max_age"]))
                 p_surf = pygame.Surface((p["size"] * 2, p["size"] * 2), pygame.SRCALPHA)
-                pygame.draw.circle(p_surf, (100, 200, 255, alpha), (p["size"], p["size"]), p["size"])
+                col = p.get("color", (255, 255, 255))
+                pygame.draw.circle(p_surf, (col[0], col[1], col[2], alpha), (p["size"], p["size"]), p["size"])
                 screen.blit(p_surf, (draw_x + self.width // 2 + p["rel_x"] - p["size"], draw_y + self.height // 2 + p["rel_y"] - p["size"]))
-            p_val = (math.sin(pygame.time.get_ticks() / 150) + 1) / 2
-            gs = int(self.width * (1.0 + p_val * 0.2))
-            gsf = pygame.Surface((gs * 2, gs * 2), pygame.SRCALPHA)
-            a = int(60 + p_val * 60)
-            pygame.draw.circle(gsf, (100, 180, 255, a), (gs, gs), gs, 2)
-            pygame.draw.circle(gsf, (150, 220, 255, a // 2), (gs, gs), gs - 3)
-            screen.blit(gsf, (draw_x + self.width // 2 - gs, draw_y + self.height // 2 - gs))
         if self.weapon:
             over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
             if over:
@@ -1098,9 +1133,14 @@ class Player(Entity):
                 if dialog.is_active: dialog.text += "\n" + msg
                 else: dialog.text = msg; dialog.is_active = True; game_state["dialog_modal"] = False; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
         elif self.hp < self.max_hp:
-            from constants import PLAYER_REGEN_BASE, PLAYER_REGEN_MULTIPLIER
-            self.regen_pool = round(self.regen_pool + PLAYER_REGEN_BASE + (self.regen_bonus * PLAYER_REGEN_MULTIPLIER), 3)
-            if self.regen_pool >= 1.0: rec = int(self.regen_pool); self.hp = min(self.max_hp, self.hp + rec); self.regen_pool -= rec
+            # 燕バフによる自動回復 (毎ターン hp が regen_buff_val 分だけ回復)
+            if getattr(self, "regen_buff_turns", 0) > 0:
+                self.hp = min(self.max_hp, self.hp + getattr(self, "regen_buff_val", 2))
+            
+            if self.hp < self.max_hp:
+                from constants import PLAYER_REGEN_BASE, PLAYER_REGEN_MULTIPLIER
+                self.regen_pool = round(self.regen_pool + PLAYER_REGEN_BASE + (self.regen_bonus * PLAYER_REGEN_MULTIPLIER), 3)
+                if self.regen_pool >= 1.0: rec = int(self.regen_pool); self.hp = min(self.max_hp, self.hp + rec); self.regen_pool -= rec
 
     def start_falling(self, tile_size):
         self.is_falling = True
@@ -1119,6 +1159,13 @@ class Player(Entity):
             "invincible_turns": self.invincible_turns,
             "attack_buff_turns": getattr(self, "attack_buff_turns", 0),
             "attack_buff_val": getattr(self, "attack_buff_val", 0),
+            "attack_buff_crit": getattr(self, "attack_buff_crit", 0),
+            "attack_buff_armor_pen": getattr(self, "attack_buff_armor_pen", 0.0),
+            "regen_buff_turns": getattr(self, "regen_buff_turns", 0),
+            "regen_buff_val": getattr(self, "regen_buff_val", 0),
+            "regen_buff_heal_boost": getattr(self, "regen_buff_heal_boost", 0.0),
+            "magic_buff_turns": getattr(self, "magic_buff_turns", 0),
+            "magic_buff_val": getattr(self, "magic_buff_val", 0),
             "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
             "completed_fixed_quests": self.completed_fixed_quests, "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
             "current_floor": self.current_floor, "max_reached_floor": self.max_reached_floor, "equip_id_counter": globals().get("_equip_id_counter", 0),
@@ -1159,6 +1206,13 @@ class Player(Entity):
         self.invincible_turns = int(data.get("invincible_turns", 0))
         self.attack_buff_turns = int(data.get("attack_buff_turns", 0))
         self.attack_buff_val = int(data.get("attack_buff_val", 0))
+        self.attack_buff_crit = int(data.get("attack_buff_crit", 0))
+        self.attack_buff_armor_pen = float(data.get("attack_buff_armor_pen", 0.0))
+        self.regen_buff_turns = int(data.get("regen_buff_turns", 0))
+        self.regen_buff_val = int(data.get("regen_buff_val", 0))
+        self.regen_buff_heal_boost = float(data.get("regen_buff_heal_boost", 0.0))
+        self.magic_buff_turns = int(data.get("magic_buff_turns", 0))
+        self.magic_buff_val = float(data.get("magic_buff_val", 0))
         self.guild_point = int(data.get("guild_point", 0)); self.guild_rank = data.get("guild_rank", "F")
         self.active_quests = data.get("active_quests", [])
         for q in self.active_quests:

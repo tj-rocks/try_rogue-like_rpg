@@ -252,10 +252,10 @@ def main():
         player.add_item_to_inventory("teleport_stone", 50)
         
         # 強化用の石を追加
-        player.add_item_to_inventory("red_stone", 9)
-        player.add_item_to_inventory("blue_stone", 9)
-        player.add_item_to_inventory("green_stone", 9)
-        player.add_item_to_inventory("purple_stone", 9)
+        player.add_item_to_inventory("red_stone", 2)
+        player.add_item_to_inventory("blue_stone", 2)
+        player.add_item_to_inventory("green_stone", 2)
+        player.add_item_to_inventory("purple_stone", 2)
         
         # 検証用の武器・防具・盾を追加
         from components.sprites.player import EquipInstance
