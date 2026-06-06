@@ -14,7 +14,10 @@
 # - max_floor     : 出現終了階。nullの場合はrankから自動計算。
 # - max_concurrent: その階に同時に存在できる最大数。
 # - max_spawns    : その階で合計で出現する最大数。
-# - drops         : 破壊時に落とすアイテムのリスト (itemとrateを指定)。
+# - drops         : 破壊時に落とすアイテムのリスト。
+#                   敵と同じように normal/rare の辞書形式にします。
+# - normal_drop_rate: 通常ドロップの確率 (0.0 〜 1.0)
+# - rare_drop_rate  : レアドロップの確率 (0.0 〜 1.0)
 # - image_path    : 画像ファイルへのパス。
 # - image_scale   : 表示サイズのスケーリング (1.0 = 標準)。
 # ==============================================================================
@@ -34,8 +37,10 @@ wood_barrel:
   max_concurrent: 2
   max_spawns: 2
   drops:
-  - item: hp_potion
-    rate: 0.1
+    normal: [hp_potion]
+    rare: []
+  normal_drop_rate: 0.10
+  rare_drop_rate: 0.0
   image_path: components/pictures/obstacles/barrel.png
   image_scale: 0.8
 
@@ -54,10 +59,10 @@ anvil:
   max_concurrent: 2
   max_spawns: 2
   drops:
-  - item: gold
-    rate: 0.3
-  - item: purple_stone
-    rate: 0.05
+    normal: [gold]
+    rare: [purple_stone]
+  normal_drop_rate: 0.30
+  rare_drop_rate: 0.05
   image_path: components/pictures/dungeon/other_objects/anvil.png
   image_scale: 0.8
 
@@ -76,8 +81,10 @@ crate:
   max_concurrent: 4
   max_spawns: 3
   drops:
-  - item: hp_potion
-    rate: 0.4
+    normal: [hp_potion]
+    rare: []
+  normal_drop_rate: 0.40
+  rare_drop_rate: 0.0
   image_path: components/pictures/obstacles/crate.png
   image_scale: 0.8
 
@@ -96,8 +103,10 @@ pot:
   max_concurrent: 5
   max_spawns: 10
   drops:
-  - item: gold
-    rate: 0.6
+    normal: [gold]
+    rare: []
+  normal_drop_rate: 0.60
+  rare_drop_rate: 0.0
   image_path: components/pictures/obstacles/pot.png
   image_scale: 1.0
 
@@ -114,10 +123,10 @@ rubble:
   min_floor: null
   max_floor: null
   drops:
-  - item: gold
-    rate: 0.15
-  - item: expired_potion
-    rate: 0.1
+    normal: [gold, expired_potion]
+    rare: []
+  normal_drop_rate: 0.25
+  rare_drop_rate: 0.0
   image_path: components/pictures/obstacles/rubble.png
   image_scale: 1.0
 
@@ -136,12 +145,10 @@ well:
   max_concurrent: 1
   max_spawns: 1
   drops:
-  - item: hp_potion
-    rate: 0.3
-  - item: hi_potion
-    rate: 0.2
-  - item: return_wing
-    rate: 0.05
+    normal: [hp_potion, hi_potion]
+    rare: [return_wing]
+  normal_drop_rate: 0.50
+  rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/well.png
   image_scale: 1.2
 
@@ -158,12 +165,10 @@ skeleton_obstacle:
   min_floor: null
   max_floor: null
   drops:
-  - item: broken_sword
-    rate: 0.1
-  - item: broken_armor
-    rate: 0.1
-  - item: rotten_potion
-    rate: 0.2
+    normal: [rotten_potion]
+    rare: [broken_sword, broken_armor]
+  normal_drop_rate: 0.20
+  rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/skeleton.png
   image_scale: 0.9
 
@@ -182,8 +187,10 @@ crystal:
   max_concurrent: 2
   max_spawns: 2
   drops:
-  - item: gold
-    rate: 1.0
+    normal: [gold]
+    rare: []
+  normal_drop_rate: 1.00
+  rare_drop_rate: 0.0
   image_path: components/pictures/obstacles/crystal.png
   image_scale: 0.9
 
@@ -202,8 +209,10 @@ sword_stuck:
   max_concurrent: 1
   max_spawns: 1
   drops:
-  - item: iron_sword
-    rate: 0.2
+    normal: []
+    rare: [iron_sword]
+  normal_drop_rate: 0.0
+  rare_drop_rate: 0.20
   image_path: components/pictures/obstacles/sword_stuck.png
   image_scale: 0.9
 
@@ -220,10 +229,10 @@ web:
   min_floor: null
   max_floor: null
   drops:
-  - item: antidote_potion
-    rate: 0.15
-  - item: rotten_potion
-    rate: 0.1
+    normal: [antidote_potion, rotten_potion]
+    rare: []
+  normal_drop_rate: 0.25
+  rare_drop_rate: 0.0
   image_path: components/pictures/obstacles/web.png
   image_scale: 1.0
 
@@ -242,8 +251,10 @@ stained_armor_stand:
   max_concurrent: 1
   max_spawns: 2
   drops:
-  - item: adventurers_clothes
-    rate: 0.1
+    normal: []
+    rare: [adventurers_clothes]
+  normal_drop_rate: 0.0
+  rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/stained_armor_stand.png
   image_scale: 1.0
 
@@ -262,10 +273,10 @@ broken_pillar:
   max_concurrent: 2
   max_spawns: 3
   drops:
-  - item: gold
-    rate: 0.3
-  - item: green_stone
-    rate: 0.05
+    normal: [gold]
+    rare: [green_stone]
+  normal_drop_rate: 0.30
+  rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/broken_pillar.png
   image_scale: 1.0
 
@@ -284,12 +295,10 @@ statue:
   max_concurrent: 1
   max_spawns: 1
   drops:
-  - item: gold
-    rate: 0.5
-  - item: red_stone
-    rate: 0.05
-  - item: blue_stone
-    rate: 0.05
+    normal: [gold]
+    rare: [red_stone, blue_stone]
+  normal_drop_rate: 0.50
+  rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/statue.png
   image_scale: 1.1
 
@@ -324,4 +333,3 @@ magic_barrier:
   max_spawns: 0
   image_path: components/pictures/obstacles/magic_barrier.png
   image_scale: 1.0
-
