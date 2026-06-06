@@ -29,6 +29,7 @@ CONSUMABLE_DATA:
     effect: warp_home
     price: 8000
     min_rank: F
+    max_rank: SS
     rarity: 7
     image_path: components/pictures/icon/hane.png
     sound: components/sounds/sfx/stairs.wav
@@ -42,6 +43,7 @@ CONSUMABLE_DATA:
     effect: revive
     price:  8000
     min_rank: D
+    max_rank: SS
     rarity: 7
     image_path: components/pictures/icon/omamori.png
     floor_spawnable: true
@@ -53,6 +55,7 @@ CONSUMABLE_DATA:
     heal_amount: 1
     price: 80
     min_rank: F
+    max_rank: SS
     rarity: 2
     image_path: components/pictures/icon/potion2.png
     sound: components/sounds/sfx/recharge.wav
@@ -66,6 +69,7 @@ CONSUMABLE_DATA:
     effect: poison_self
     price: 80
     min_rank: F
+    max_rank: SS
     rarity: 3
     image_path: components/pictures/icon/potion2.png
     sound: components/sounds/sfx/recharge.wav
@@ -79,6 +83,7 @@ CONSUMABLE_DATA:
     effect: remove_trap
     price: 100
     min_rank: F
+    max_rank: SS
     rarity: 3
     image_path: components/pictures/icon/tool.png
     sound: components/sounds/sfx/select_new.wav
@@ -91,6 +96,7 @@ CONSUMABLE_DATA:
     name: 転移の石
     price: 2000
     min_rank: F
+    max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/gem_teleport.png
     sound: components/sounds/sfx/recharge.wav
@@ -105,6 +111,7 @@ CONSUMABLE_DATA:
     heal_amount: 40
     price: 100
     min_rank: F
+    max_rank: SS
     rarity: 1
     image_path: components/pictures/icon/hp_potion.png
     sound: components/sounds/sfx/drink.wav
@@ -119,6 +126,7 @@ CONSUMABLE_DATA:
     effect: antidote
     price: 100
     min_rank: F
+    max_rank: SS
     rarity: 1
     image_path: components/pictures/icon/hp_potion.png
     sound: components/sounds/sfx/drink.wav
@@ -133,6 +141,7 @@ CONSUMABLE_DATA:
     heal_amount: 70
     price: 600
     min_rank: F
+    max_rank: SS
     rarity: 3
     image_path: components/pictures/icon/hi_potion.png
     sound: components/sounds/sfx/drink.wav
@@ -148,6 +157,7 @@ CONSUMABLE_DATA:
     recharge_amount: 5
     price: 2000
     min_rank: C
+    max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/magic_crystal.png
     sound: components/sounds/sfx/recharge.wav
@@ -198,6 +208,7 @@ CONSUMABLE_DATA:
     enhance_bonus: 1
     price: 8000
     min_rank: F
+    max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/red_stone.png
     max_stack: 3
@@ -211,6 +222,7 @@ CONSUMABLE_DATA:
     enhance_bonus: 1
     price: 8000
     min_rank: F
+    max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/blue_stone.png
     max_stack: 3
@@ -224,6 +236,7 @@ CONSUMABLE_DATA:
     enhance_bonus: 1
     price: 8000
     min_rank: F
+    max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/green_stone.png
     max_stack: 3
@@ -237,6 +250,7 @@ CONSUMABLE_DATA:
     enhance_bonus: 1
     price: 8000
     min_rank: F
+    max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/purple_stone.png
     max_stack: 3
@@ -250,6 +264,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -264,6 +279,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -278,6 +294,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -292,6 +309,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -306,6 +324,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -320,6 +339,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -334,6 +354,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -348,6 +369,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: "-"
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -362,6 +384,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/item.png
@@ -376,6 +399,7 @@ STAVE_DATA:
     name: 吹き飛ばしの杖
     effect_type: knockback
     min_rank: F
+    max_rank: SS
     rarity: 5
     price: 800
     selling_price: 80
@@ -395,6 +419,7 @@ STAVE_DATA:
     name: 壊れた杖
     effect_type: none
     min_rank: F
+    max_rank: SS
     max_floor: 999
     rarity: 5
     price: 800
@@ -409,6 +434,7 @@ STAVE_DATA:
     name: 火炎の杖
     effect_type: fire
     min_rank: F
+    max_rank: SS
     rarity: 1
     price: 1200
     selling_price: 120
@@ -432,6 +458,7 @@ STAVE_DATA:
     name: 回復の杖
     effect_type: heal
     min_rank: F
+    max_rank: SS
     rarity: 1
     price: 1200
     selling_price: 120
@@ -451,6 +478,7 @@ STAVE_DATA:
     name: 無敵の杖
     effect_type: invincible
     min_rank: S
+    max_rank: SS
     rarity: 7
     price: 3000
     selling_price: 200
@@ -470,6 +498,7 @@ STAVE_DATA:
     name: 燈の杖
     effect_type: light_all
     min_rank: F
+    max_rank: SS
     rarity: 1
     price: 1500
     selling_price: 150
@@ -488,6 +517,7 @@ STAVE_DATA:
     name: 障壁の杖
     effect_type: yrden
     min_rank: F
+    max_rank: SS
     rarity: 2
     price: 1500
     selling_price: 150
@@ -507,6 +537,7 @@ STAVE_DATA:
     name: 付与の杖
     effect_type: attack_buff
     min_rank: F
+    max_rank: SS
     rarity: 3
     price: 1500
     selling_price: 150

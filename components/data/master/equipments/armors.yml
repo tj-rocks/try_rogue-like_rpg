@@ -34,6 +34,7 @@ ARMOR_DATA:
     name: 壊れた鎧
     category: medium
     min_rank: F
+    max_rank: SS
     max_floor: 999
     rarity: 2
     price: 100
@@ -71,6 +72,7 @@ ARMOR_DATA:
     name: 冒険者の服
     category: robe
     min_rank: F
+    max_rank: SS
     rarity: 1
     price: 150
     image_dir: components/pictures/armor/adventurers_clothes
@@ -107,6 +109,7 @@ ARMOR_DATA:
     name: 皮の胸当て
     category: light
     min_rank: F
+    max_rank: SS
     rarity: 1
     price: 490
     image_dir: components/pictures/armor/leather_armor
@@ -143,6 +146,7 @@ ARMOR_DATA:
     name: 鉄の胸当て
     category: medium
     min_rank: F
+    max_rank: SS
     rarity: 2
     price: 550
     image_dir: components/pictures/armor/iron_armor
@@ -179,6 +183,7 @@ ARMOR_DATA:
     name: 鋼の胸当て
     category: medium
     min_rank: E
+    max_rank: SS
     rarity: 3
     price: 1800
     image_dir: components/pictures/armor/fullmetal_armor

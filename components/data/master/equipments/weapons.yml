@@ -74,6 +74,7 @@ WEAPON_DATA:
     name: 壊れかけの剣
     category: onehanded_sword
     min_rank: F
+    max_rank: SS
     max_floor: 999
     rarity: 2
     price: 70

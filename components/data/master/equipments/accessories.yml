@@ -52,6 +52,7 @@ ACCESSORY_DATA:
     name: "冒険者のカンテラ"
     category: accessory
     min_rank: F
+    max_rank: SS
     rarity: 4
     price: 80
     image_path: components/pictures/icon/basic_lantern.png
