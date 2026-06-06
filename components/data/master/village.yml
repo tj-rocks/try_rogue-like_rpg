@@ -406,6 +406,14 @@ TILE_MAPPINGS:
     image_path: components/pictures/dungeon/home/wall_top_stone_blocks.png
     bg_color: '#2a2a2a'
     fg_color: '#888'
+  wall_top_stone:
+    char: s
+    category: wall_top
+    tile_id: 12
+    desc: 壁12 (石壁)
+    image_path: components/pictures/dungeon/home/wall_top_stone.png
+    bg_color: '#2a2a2a'
+    fg_color: '#888'
   wall_none_0:
     char: ;
     category: wall_none
@@ -851,16 +859,13 @@ TILE_MAPPINGS:
       - x: 28
         y: 6
         flip: true
-      - x: 37
-        y: 30
+      - x: 34
+        y: 32
         flip: false
   tutorial_man1:
     category: npc
     id: tutorial_man1
     positions:
-      - x: 18
-        y: 5
-        flip: true
       - x: 18
         y: 7
         flip: true
@@ -883,9 +888,6 @@ TILE_MAPPINGS:
     category: npc
     id: story_negative2
     positions:
-      - x: 19
-        y: 6
-        flip: false
       - x: 20
         y: 33
         flip: false
@@ -902,9 +904,6 @@ TILE_MAPPINGS:
       - x: 38
         y: 33
         flip: false
-      - x: 25
-        y: 34
-        flip: false
   tutorial_woman2:
     category: npc
     id: tutorial_woman2
@@ -918,9 +917,6 @@ TILE_MAPPINGS:
       - x: 37
         y: 13
         flip: false
-      - x: 34
-        y: 32
-        flip: true
   apprentice:
     category: npc
     id: apprentice
@@ -969,9 +965,20 @@ TILE_MAPPINGS:
   story_kirakira2:
     category: npc
     id: story_kirakira2
+    positions:
+      - x: 37
+        y: 30
+        flip: false
   story_kirakira1:
     category: npc
     id: story_kirakira1
+    positions:
+      - x: 18
+        y: 5
+        flip: false
+      - x: 25
+        y: 34
+        flip: false
   story_dark1:
     category: npc
     id: story_dark1
@@ -1524,11 +1531,11 @@ TILE_MAPPINGS:
 
   # ーーーーーーーーーーーーーーーーーーーーーーーーーーーー
     positions:
-      - x: 19
+      - x: 17
         y: 5
         flip: false
       - x: 19
-        y: 7
+        y: 5
         flip: false
       - x: 15
         y: 16

@@ -366,7 +366,7 @@ ARMOR_DATA:
     max_rank: B
     rarity: 4
     price: 3200
-    image_dir: components/pictures/armor/pilgrims_armor 
+    image_dir: components/pictures/armor/pilgrims_armor
     shop_buyable: true
     describe: 聖なる加護を受けた巡礼者の軽防具 最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
