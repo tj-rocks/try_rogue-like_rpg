@@ -264,7 +264,7 @@ DUNGEON_IMAGES:
     sound: turning_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
-    map: first_rest_point.txt
+    map: third_rest_point.txt
   "32":
     image: evil_castle
     sound: turning_point.mp3

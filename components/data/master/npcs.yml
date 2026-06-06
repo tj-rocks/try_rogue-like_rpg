@@ -9,121 +9,121 @@ dedicated_weapon_shop:
   name: 武器屋
   image_path: components/pictures/npc/man_middleage_weapon
   dialogue:
-  - 武器屋「うちは武器の専門店だ！最高の業物を取り揃えているぜ」
+  - うちは武器の専門店だ！最高の業物を取り揃えているぜ
   role: dedicated_weapon_shop
 
 dedicated_armor_shop:
   name: 防具屋
-  image_path: components/pictures/npc/negative_man_armor
+  image_path: components/pictures/npc/man_armor_v
   dialogue:
-  - 防具屋「命あっての物種だ。うちは頑丈な鎧と盾の専門店だよ」
+  - 命あっての物種だ。うちは頑丈な鎧と盾の専門店だよ
   role: dedicated_armor_shop
 
 dedicated_accessory_shop:
   name: アクセサリ屋
   image_path: components/pictures/npc/woman_accessory_h
   dialogue:
-  - アクセサリ屋「いらっしゃい。不思議な加護を宿す装飾品の専門店です」
+  - いらっしゃい。不思議な加護を宿す装飾品の専門店です
   role: dedicated_accessory_shop
 
 weapon_shop:
   name: 武器屋
   image_path: components/pictures/npc/man_middleage_h
   dialogue:
-  - 武器屋「いらっしゃい！何にする？」
+  - いらっしゃい！何にする？
   role: weapon_shop
 
 item_shop:
   name: 道具屋
   image_path: components/pictures/npc/man_young_h
   dialogue:
-  - 道具屋「旅の準備は整ったかい？」
+  - 旅の準備は整ったかい？
   role: item_shop
 
 merchant:
   name: 商人
   image_path: components/pictures/npc/man_rich_h
   dialogue:
-  - 商人「ダンジョンで拾ったお宝は俺が買い取ってやるぜ！」
+  - ダンジョンで拾ったお宝は俺が買い取ってやるぜ！
   role: merchant
 
 storage:
   name: 預かり屋
   image_path: components/pictures/npc/man_gentleman_v
   dialogue:
-  - 預かり屋「荷物を預かろうか？」
+  - 荷物を預かろうか？
   role: storage
 
 inn:
   name: 宿屋
   image_path: components/pictures/npc/woman_maid_h
   dialogue:
-  - 宿屋「ゆっくり休んでいってね」
+  - ゆっくり休んでいってね
   role: inn
 
 blacksmith:
   name: 鍛冶屋
   image_path: components/pictures/npc/man_artisan_v
   dialogue:
-  - 鍛冶屋「俺ぁ鍛冶屋だ 鉱石を持ってこれば装備を叩き直してやるぜ」
+  - 俺ぁ鍛冶屋だ 鉱石を持ってこれば装備を叩き直してやるぜ
   role: blacksmith
 
 villager:
   name: 村人
   image_path: components/pictures/npc/girl_town_v
   dialogue:
-  - 村人「この先は危険だよ 1Fへ行くするには右の階段を使ってね」
+  - この先は危険だよ 1Fへ行くするには右の階段を使ってね
 
 guild_receptionist:
   name: ギルド受付
   image_path: components/pictures/npc/girl_town_v
   dialogue:
-  - ギルド受付「ようこそ冒険者ギルドへ」
+  - ようこそ冒険者ギルドへ
   role: guild_receptionist
 
 guild_master:
   name: ギルドマスター
   image_path: components/pictures/npc/man_middleage_h
   dialogue:
-  - ギルドマスター「よくぞ来た、若き冒険者よ ギルドへ歓迎する！」
+  - よくぞ来た、若き冒険者よ ギルドへ歓迎する！
   role: guild_receptionist
 
 doctor:
   name: 医者
   image_path: components/pictures/npc/man_doctor_h
   dialogue:
-  - 医者「……気がついたかい？無茶はしちゃいけないよ」
+  - ……気がついたかい？無茶はしちゃいけないよ
   role: doctor
 
 bank:
   name: 銀行員
   image_path: components/pictures/npc/woman_old_v
   dialogue:
-  - 銀行員「大切なお金をお預かりします」
+  - 大切なお金をお預かりします
   role: bank
 
 wizard:
   name: 魔法屋
   image_path: components/pictures/npc/woman_witch_h
   dialogue:
-  - 魔導士「ほっほっほ、若き冒険者よ 魔法の真髄を知りたいか？」
-  - 魔導士「このダンジョンには、時として魔力の残滓が渦巻く場所があるのじゃ」
-  - 魔導士「杖を振る時は、その残数をよく確認するのじゃぞ 空の杖を振っても、何も起きぬからの」
+  - ほっほっほ、若き冒険者よ 魔法の真髄を知りたいか？
+  - このダンジョンには、時として魔力の残滓が渦巻く場所があるのじゃ
+  - 杖を振る時は、その残数をよく確認するのじゃぞ 空の杖を振っても、何も起きぬからの
   role: magic_shop
 
 teleport_wizard:
   name: テレポート屋
   image_path: components/pictures/npc/man_wizard_h
   dialogue:
-  - テレポート屋「フフフ…… 世界の理を超えて、お望みの場所へ飛ばしてやろう」
-  - テレポート屋「ただし……それなりの『対価』はもらうぞ？」
+  - フフフ…… 世界の理を超えて、お望みの場所へ飛ばしてやろう
+  - ただし……それなりの『対価』はもらうぞ？
   role: teleport
 
 priest:
   name: 神官
   image_path: components/pictures/npc/man_sage_v
   dialogue:
-  - 神官「私は神の奇跡によって、あなたの死の呪いを祓うことができます」
+  - 私は神の奇跡によって、あなたの死の呪いを祓うことができます
   role: priest
 
 # --- チュートリアル担当NPC群 ---
@@ -131,158 +131,185 @@ crank_adventurer:
   name: 中堅冒険者
   image_path: components/pictures/npc/man_fighter_v
   dialogue:
-  - 中堅冒険者「よぉ新人！ 冒険の準備は進んでるか？ まずはギルドに所属しないとダンジョンに入ることすらできないぞ」
-  - 中堅冒険者「それと、装備はケチるなよ 身の丈に合った武器と防具を武器屋できちんと揃えるんだ 裸同然で潜るのは自殺志願者だけだ」
-  - 中堅冒険者「あと、一番大事なのは『引き際』だ 欲張って深くに行きすぎるなよ 自分の限界を感じたら、早めに引き返すのがプロの冒険者ってやつだ！」
+  - よぉ新人！ 冒険の準備は進んでるか？ まずはギルドに所属しないとダンジョンに入ることすらできないぞ
+  - それと、装備はケチるなよ 身の丈に合った武器と防具を武器屋できちんと揃えるんだ 裸同然で潜るのは自殺志願者だけだ
+  - あと、一番大事なのは『引き際』だ 欲張って深くに行きすぎるなよ 自分の限界を感じたら、早めに引き返すのがプロの冒険者ってやつだ！
 
 negative_woman_village:
   name: 冒険者
   image_path: components/pictures/npc/woman_fighter_v_rest2
   dialogue:
-  - 冒険者「あんたのおやじさんの足取りを追うなら深層を目指しなさい」
-  - 冒険者「でも、無理は禁物よ」
-  - 冒険者「ギルドの連中は信用しないほうがいいわ」
+  - あんたのおやじさんの足取りを追うなら深層を目指しなさい
+  - でも、無理は禁物よ
+  - ギルドの連中は信用しないほうがいいわ
 
 crank_adventurer2:
   name: 先輩冒険者
   image_path: components/pictures/npc/woman_fighter_v
   dialogue:
-  - 先輩冒険者「あら、新人君？ 冒険者らしくなってきたじゃない 先輩から一つ、身に染みるアドバイスをあげるね」
-  - 先輩冒険者「手に入れたコインは、持ち歩かずにすぐ銀行へ預けること！ ダンジョンで力尽きると、手持ちのコインは半分になっちゃうの ……私、これで何度泣いたか分からないわ」
-  - 先輩冒険者「あと、HPが減ったら絶対に無理しないで、すぐに街へ戻るか回復すること 回復薬をケチって全滅するなんて、一番ダサいんだからね？」
+  - あら、新人君？ 冒険者らしくなってきたじゃない 先輩から一つ、身に染みるアドバイスをあげるね
+  - ダンジョンで死ぬと呪われるけど、神官に話しかければ直してくれるわよ
+  - でもギルドポイントの1/5を支払わなきゃいけないの。新人のうちはいいけどランクが上がると辛いわよね
+  - あと、HPが減ったら絶対に無理しないで、すぐに街へ戻るか回復すること 回復薬をケチって全滅するなんて、一番ダサいんだからね？
 
 crank_adventurer3:
   name: 先輩冒険者
   image_path: components/pictures/npc/woman_fighter_v
   dialogue:
-  - 先輩冒険者「ふふっ 冒険者って意外に安全な職業なのよ」
-  - 先輩冒険者「だって、ダンジョンの中で死んでも、死んだらそこで終わり…じゃないわよ？ちゃんと街まで戻ってこられるんだから」
-  - 先輩冒険者「もちろん、ちょっとだけ呪われるけどね ……まあ、ギルドで治療もできるし、大したことないわ」
+  - ふふっ 冒険者って意外に安全な職業なのよ
+  - だって、ダンジョンの中で死んでも、死んだらそこで終わり…じゃないわよ？ちゃんと街まで戻ってこられるんだから
+  - もちろん、ちょっとだけ呪われるけどね ……まあ、ギルドで治療もできるし、大したことないわ
 
 guide_inn:
   name: 宿屋の看板娘
   image_path: components/pictures/npc/woman_maid_h
   dialogue:
-  - 案内人「宿屋で休むと、HPが全回復して記録も行われるわ」
-  - 案内人「貴重な装備品を手に入れたり、大切なアイテムを手に入れたら、泊まっていくといいわ」
+  - 宿屋で休むと、HPが全回復して記録も行われるわ
+  - 貴重な装備品を手に入れたり、大切なアイテムを手に入れたら、泊まっていくといいわ
 
 guide_guild:
   name: ギルド職員
   image_path: components/pictures/npc/woman_ordinary_h
   dialogue:
-  - 案内人「まずはギルドで『クエスト』を受けて、冒険の目的を決めましょう」
-  - 案内人「クエストを達成してポイントを貯めれば、より深い階層への通行許可が下りるわよ」
+  - まずはギルドで『クエスト』を受けて、冒険の目的を決めましょう
+  - クエストを達成してポイントを貯めれば、より深い階層への通行許可が下りるわよ
 
 guide_doctor:
   name: 医療助手
   image_path: components/pictures/npc/woman_ordinary_h
   dialogue:
-  - 案内人「もしダンジョンでHPが0になっても、お医者様がここまで運んでくれるわ」
-  - 案内人「ただし、持っていたコインや一部のアイテムを失うこともあるから注意してね」
+  - もしダンジョンでHPが0になっても、お医者様がここまで運んでくれるわ
+  - ただし、持っていたコインや一部のアイテムを失うこともあるから注意してね
 
 guide_bank:
   name: 村人
   image_path: components/pictures/npc/man_young_h
   dialogue:
-  - 案内人「手持ちのコインを銀行に預けておけば、倒れた時でも没収されずに済むよ」
-  - 案内人「まとまったお金が手に入ったら、こまめに預けに来るのが冒険者の知恵だね」
+  - 手持ちのコインを銀行に預けておけば、倒れた時でも没収されずに済むよ
+  - まとまったお金が手に入ったら、こまめに預けに来るのが冒険者の知恵だね
 
 apprentice:
   name: 見習い冒険者
   image_path: components/pictures/npc/boy_young_v
   dialogue:
-  - 見習い「ぼくもいつか、あなたみたいな強い冒険者になりたいな！」
-  - 見習い「まずは基本の『移動』と『攻撃』をマスターしなきゃ」
-  - 見習い「矢印キーで移動して、敵の隣に行けば自動で攻撃できるんだよね？」
+  - ぼくもいつか、あなたみたいな強い冒険者になりたいな！
+  - まずは基本の『移動』と『攻撃』をマスターしなきゃ
+  - 矢印キーで移動して、敵の隣に行けば自動で攻撃できるんだよね？
 
 guild_guide:
   name: ギルド職員
   image_path: components/pictures/npc/woman_ordinary_h
   dialogue:
-  - 案内人「冒険者ギルドへようこそ」
-  - 案内人 "新たな冒険者さんを歓迎するわ"
-  - 案内人「クエストを達成してランクを上げれば、より深い階層へ進めるようになるわ！」
-  - 案内人「受付でクエストを受注できますよランクアップ目指して頑張ってくださいね」
+  - 冒険者ギルドへようこそ
+  - 新たな冒険者さんを歓迎するわ
+  - クエストを達成してランクを上げれば、より深い階層へ進めるようになるわ！
+  - 受付でクエストを受注できますよランクアップ目指して頑張ってくださいね
   role: guild_guide
 
 pub_master:
   name: パブのマスター
   image_path: components/pictures/npc/woman_ordinary2_h
   dialogue:
-  - マスター「ようこそいらっしゃい、冒険者さん ここは冒険者の疲れを癒すパブさ」
-  - マスター「冒険者は危険も少なく稼ぎもでかい いい仕事だね」
-  - マスター「嫌なことがあったらここにきて、うまい酒を飲んで忘れちまいな」
+  - ようこそいらっしゃい、冒険者さん ここは冒険者の疲れを癒すパブさ
+  - 冒険者は危険も少なく稼ぎもでかい いい仕事だね
+  - 嫌なことがあったらここにきて、うまい酒を飲んで忘れちまいな
 
 guild_staff:
   name: ギルド職員
   image_path: components/pictures/npc/woman_scientist_v
   dialogue:
-  - 看護師「ダンジョンで死んでも諦めないでください ダンジョンの呪いはかかりますが生きて帰れます」
-  - 看護師「もし呪いにかかってしまったら、ギルドにいる神官様に解いてもらいましょう」
-  - 看護師「とはいえ迷宮から帰ってこない冒険者もいます お気をつけて」
+  - ダンジョンで死んでも諦めないでください ダンジョンの呪いはかかりますが生きて帰れます
+  - もし呪いにかかってしまったら、ギルドにいる神官様に解いてもらいましょう
+  - とはいえ迷宮から帰ってこない冒険者もいます お気をつけて
 
-negative_man1:
-  name: 冒険者
-  image_path: components/pictures/npc/man_fighter_v_rest2
-  dialogue:
-  - 冒険者「ギルドは何か隠してるかもしれない」
-  - 冒険者「地上じゃ言えないがお前の親父は何か重大な秘密を探ってたらしいぜ」
-  - 冒険者「まあ、深くは関わらないほうがいいぜ」
+# --- ストーリー担当NPC ---
 
-negative_woman1:
-  name: 冒険者
-  image_path: components/pictures/npc/woman_fighter_v_rest2
-  dialogue:
-  - 冒険者「あんたのおやじさんが言っていたのだけれど」
-  - 冒険者「ダンジョンの呪いはみんなが考えているのとは別ものかもしれないわ」
-  - 冒険者「ギルドはそれを隠して冒険者は安全と宣伝しているのかもしれないわね」
-  - 冒険者「あんたのおやじさんは真実を突き止めようとしていたのかもしれないわ」
-
-negative_woman2:
-  name: 冒険者
-  image_path: components/pictures/npc/woman_fighter_v_rest2
-  dialogue:
-  - 冒険者「あんたのおやじさんが何をしようとしてたのか知らないけど」
-  - 冒険者「深いところには近づかないほうがいいわ」
-  - 冒険者「ギルドの連中は、表向きの顔と裏の顔があるみたいよ」
-
-positive_woman1:
-  name: 冒険者
-  image_path: components/pictures/npc/woman_fighter_v
-  dialogue:
-  - 冒険者「ここからは武器と防具を鍛えなさい」
-  - 冒険者「鉱石は決して売らないで自分のために使うのよ」
-  - 冒険者「Dランクからはユニークな装備が手に入るわ。ステータスを高めて上手く使いこなしなさい、冒険が格段に楽になるからね」
-  - 冒険者「私は帰還の道標を持ってるからもう少し潜って珍しいアイテムをもっと見つけるわ。まだまだこれからよ！」
-
-adventurer_man2:
+story_kirakira2:
   name: 冒険者
   image_path: components/pictures/npc/man_fighter_v
   dialogue:
-  - 冒険者「Dランクからの装備は、色々と特殊な特徴があってステータスを高められるらしいね」
-  - 冒険者「そういうのを上手く使えれば、少しは冒険も楽になるのかな……」
-  - 冒険者「アクセサリは手に入れただけじゃあまり強くならないけど、鍛えればきっと役に立つって噂だよ」
-  - 冒険者「おれは次のランクを目指して頑張るぜ」
+  - よぉ新人！ 冒険の準備は進んでるか？ まずはギルドに所属しないとダンジョンに入ることすらできないぞ
+  - それと、装備はケチるなよ 身の丈に合った武器と防具を武器屋できちんと揃えるんだ 裸同然で潜るのは自殺志願者だけだ
+  - あと、一番大事なのは『引き際』だ 欲張って深くに行きすぎるなよ 自分の限界を感じたら、早めに引き返すのがプロの冒険者ってやつだ！
 
+story_positive1:
+  name: 冒険者
+  image_path: components/pictures/npc/man_fighter_v
+  dialogue:
+  - Dランクからの装備は、色々と特殊な特徴があってステータスを高められるらしいね
+  - そういうのを上手く使えれば、少しは冒険も楽になるのかな……
+  - アクセサリは手に入れただけじゃあまり強くならないけど、鍛えればきっと役に立つって噂だよ
+  - おれは次のランクを目指して頑張るぜ
+
+story_kirakira1:
+  name: 冒険者
+  image_path: components/pictures/npc/woman_fighter_v
+  dialogue:
+  - ふふっ 冒険者って意外に安全な職業なのよ
+  - だって、ダンジョンの中で死んでも、死んだらそこで終わり…じゃないわよ？ちゃんと街まで戻ってこられるんだから
+  - もちろん、ちょっとだけ呪われるけどね ……まあ、ギルドで治療もできるし、大したことないわ
+
+story_positive2:
+  name: 冒険者
+  image_path: components/pictures/npc/woman_fighter_v
+  dialogue:
+  - ここからは武器と防具を鍛えなさい
+  - 鉱石は決して売らないで自分のために使うのよ
+  - Dランクからはユニークな装備が手に入るわ。ステータスを高めて上手く使いこなしなさい、冒険が格段に楽になるからね
+  - 私は帰還の道標を持ってるからもう少し潜って珍しいアイテムをもっと見つけるわ。まだまだこれからよ！
+
+story_negative1:
+  name: 冒険者
+  image_path: components/pictures/npc/man_fighter2_v
+  dialogue:
+  - ギルドは何か隠してるかもしれない
+  - 地上じゃ言えないがお前の親父は何か重大な秘密を探ってたらしいぜ
+  - まあ、深くは関わらないほうがいいぜ
+
+story_negative2:
+  name: 冒険者
+  image_path: components/pictures/npc/woman_fighter2_v
+  dialogue:
+  - あんたのおやじさんの足取りを追うなら深層を目指しなさい
+  - でも、無理は禁物よ
+  - ギルドの連中は信用しないほうがいいわ
+
+story_negative3:
+  name: 冒険者
+  image_path: components/pictures/npc/woman_fighter2_v
+  dialogue:
+  - あんたのおやじさんが何をしようとしてたのか知らないけど
+  - 深いところには近づかないほうがいいわ
+  - ギルドの連中は、表向きの顔と裏の顔があるみたいよ
+
+story_dark1:
+  name: 冒険者
+  image_path: components/pictures/npc/woman_fighter2_v
+  dialogue:
+  - あんたのおやじさんが言っていたのだけれど
+  - ダンジョンの呪いはみんなが考えているのとは別ものかもしれないわ
+  - ギルドはそれを隠して冒険者は安全と宣伝していると思うの
+  - あんたのおやじさんは真実を突き止めようとしていたと思う
+  - 誰に聞かれているかわからないからこれ以上は言えないけど
 
 # --- レガシーNPC（殿堂入り） ---
 legacy_bat:
   name: コウモリ先輩
   image_path: components/pictures/enemies/bat
   dialogue:
-  - コウモリ先輩「キィキィ...（昔はオレたちも、お前と一緒にバグと戦ったもんだぜ...）」
-  - コウモリ先輩「キィ...（入院中もよくデバッグしたよな 懐かしいぜ...）」
+  - キィキィ...（昔はオレたちも、お前と一緒にバグと戦ったもんだぜ...）
+  - キィ...（入院中もよくデバッグしたよな 懐かしいぜ...）
 
 legacy_dragon:
   name: ドラゴン先輩
   image_path: components/pictures/enemies/dragon
   dialogue:
-  - ドラゴン先輩「グルル...（病院のベッドの上で、何度もクラッシュ画面を見たな...）」
-  - ドラゴン先輩「グルア！（あの頃のバグに比べれば、今のモンスターなんて可愛いもんさ！）」
+  - グルル...（病院のベッドの上で、何度もクラッシュ画面を見たな...）
+  - グルア！（あの頃のバグに比べれば、今のモンスターなんて可愛いもんさ！）
 
 legacy_ghost:
   name: ゴースト先輩
   image_path: components/pictures/enemies/ghost
   dialogue:
-  - ゴースト先輩「ヒュードロドロ...（エラーログの海をさまよった日々も、今となってはいい思い出さ...）」
-  - ゴースト先輩「ヒヒヒ...（たまには俺たちのことも思い出してくれよな...）」
+  - ヒュードロドロ...（エラーログ of the sea をさまよった日々も、今となってはいい思い出さ...）
+  - ヒヒヒ...（たまには俺たちのことも思い出してくれよな...）
