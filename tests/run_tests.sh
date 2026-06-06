@@ -100,6 +100,8 @@ TEST_FILES=(
     "tests/test_equip_kago_bonus.py"
     "tests/test_armor_penetration.py"
     "tests/test_blacksmith_stones.py"
+    "tests/test_smart_ranged_move.py"
+    "tests/test_full_inventory_pickup.py"
 )
 
 SUCCESS_COUNT=0

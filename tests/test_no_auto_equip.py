@@ -33,9 +33,9 @@ def test_no_auto_equip_scenario():
     # 1. アクセサリのテスト
     from constants import ACCESSORY_DATA
     from components.sprites.item import DroppedAccessory
-    accessory_data = ACCESSORY_DATA.get("glowing_ring")
+    accessory_data = ACCESSORY_DATA.get("luminous_gem")
     if accessory_data:
-        item_accessory = DroppedAccessory(0, 0, "glowing_ring", accessory_data)
+        item_accessory = DroppedAccessory(0, 0, "luminous_gem", accessory_data)
         item_accessory.collect(player)
         
         if player.equipped_accessory is not None:

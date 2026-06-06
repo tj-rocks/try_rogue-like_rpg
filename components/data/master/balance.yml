@@ -97,6 +97,7 @@ ENEMY_AI:
   # 複数の低困惑度（低stupidity）敵がいる場合、最接近以外の敵がプレイヤーの退路を塞ぐ動きをする。
   # 削除したい場合は enemy.py の [ESCAPE_BLOCK] ブロックと _get_escape_block_target メソッドも消すこと。
   ENEMY_ESCAPE_BLOCK_ENABLED: true
+  BOSS_NO_QUEST_SPAWN_CHANCE: 0.45   # 討伐依頼を受託していない状態でのボス出現確率 (0.05 = 5%)
 
   # 困惑度 (stupidity) ごとのぼーっと確率テーブル
   # 敵が行動するとき、この確率でランダム移動（ぼーっとする）してしまいます。

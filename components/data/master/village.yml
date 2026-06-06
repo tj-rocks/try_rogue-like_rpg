@@ -854,9 +854,9 @@ TILE_MAPPINGS:
       - x: 37
         y: 30
         flip: false
-  crank_adventurer:
+  tutorial_man1:
     category: npc
-    id: crank_adventurer
+    id: tutorial_man1
     positions:
       - x: 18
         y: 5
@@ -879,9 +879,19 @@ TILE_MAPPINGS:
       - x: 36
         y: 35
         flip: false
-  crank_adventurer2:
+  story_negative2:
     category: npc
-    id: crank_adventurer2
+    id: story_negative2
+    positions:
+      - x: 19
+        y: 6
+        flip: false
+      - x: 20
+        y: 33
+        flip: false
+  tutorial_woman1:
+    category: npc
+    id: tutorial_woman1
     positions:
       - x: 26
         y: 13
@@ -895,9 +905,9 @@ TILE_MAPPINGS:
       - x: 25
         y: 34
         flip: false
-  crank_adventurer3:
+  tutorial_woman2:
     category: npc
-    id: crank_adventurer3
+    id: tutorial_woman2
     positions:
       - x: 20
         y: 5
@@ -953,21 +963,21 @@ TILE_MAPPINGS:
       - x: 19
         y: 35
         flip: false
-  negative_man1:
+  story_negative1:
     category: npc
-    id: negative_man1
-  adventurer_man2:
+    id: story_negative1
+  story_kirakira2:
     category: npc
-    id: adventurer_man2
-  positive_woman1:
+    id: story_kirakira2
+  story_kirakira1:
     category: npc
-    id: positive_woman1
-  negative_woman1:
+    id: story_kirakira1
+  story_dark1:
     category: npc
-    id: negative_woman1
-  negative_woman2:
+    id: story_dark1
+  story_negative3:
     category: npc
-    id: negative_woman2
+    id: story_negative3
   wall_deco_ivy:
     category: wall_decoration
     desc: 壁のツタ

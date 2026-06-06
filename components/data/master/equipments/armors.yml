@@ -247,43 +247,6 @@ ARMOR_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
-  pilgrim_robe:
-    quest_targetable: true
-    name: 巡礼者のローブ
-    category: robe
-    min_rank: D
-    max_rank: B
-    rarity: 6
-    price: 2000
-    image_dir: components/pictures/armor/leather_armor
-    shop_buyable: true
-    describe: 巡礼者が旅の安全を祈って着る聖なるローブ 魔法の効果を高める力がある
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    floor_spawnable: true
-    bonus:
-      common:
-        aggro_mod: 0
-        attack: 0
-        accuracy_close: 0
-        accuracy_range: 0
-        crit_rate: 0.0
-        hp: 5
-        defense: 15
-        block_chance_close: 0.05
-        block_chance_ranged: 0.05
-        lantern_bonus: 0
-        regen: 15
-        stupidity: 0
-        armor_penetration: 0.0
-      magic:
-        fire_damage: 0.0
-        fire_range: 0
-        heal_ratio: 0.0
-        knockback_damage: 0.0
-        invincible_turns: 0
-        stave_bonus: 0
-        light_stave_bonus: 0
-
   hunters_armor:
     quest_targetable: true
     name: 狩人の鎧
@@ -466,43 +429,6 @@ ARMOR_DATA:
         heal_ratio: 0
         knockback_damage: 0
         invincible_turns: 0
-        stave_bonus: 0
-        light_stave_bonus: 0
-
-  mages_robe:
-    quest_targetable: true
-    name: 魔術師の魔導衣
-    category: robe
-    min_rank: D
-    max_rank: B
-    rarity: 4
-    price: 3200
-    image_dir: components/pictures/armor/mages_robe
-    shop_buyable: true
-    describe: 魔力の流れを操る高貴な紫の魔導衣 軽装で動きやすく、火炎・吹飛などの攻撃魔法の威力・射程を極限まで引き出す
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
-    floor_spawnable: true
-    bonus:
-      common:
-        aggro_mod: 0
-        attack: 0
-        accuracy_close: 0
-        accuracy_range: 0
-        crit_rate: 0.0
-        hp: 0
-        defense: 10
-        block_chance_close: 0.0
-        block_chance_ranged: 0.0
-        lantern_bonus: 0
-        regen: 0
-        stupidity: 0
-        armor_penetration: 0.0
-      magic:
-        fire_damage: 0.20
-        fire_range: 1
-        heal_ratio: 0.0
-        knockback_damage: 0.20
-        invincible_turns: 1
         stave_bonus: 0
         light_stave_bonus: 0
 

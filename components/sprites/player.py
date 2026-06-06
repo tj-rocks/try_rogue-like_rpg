@@ -448,6 +448,7 @@ class Player(Entity):
         self.waving_stave_inst = None
         self._status = "normal"
         self.status_timer = 0
+        self.last_item_warned_pos = None
         self._init_images()
         self.current_floor = 0
         self.max_reached_floor = 0
@@ -1111,7 +1112,7 @@ class Player(Entity):
 
     def to_dict(self):
         return {
-            "x": self.x, "y": self.y, "hp": self.hp, "max_hp": self.max_hp, "coin": self.coin, "bank_coin": getattr(self, "bank_coin", 0), "attack": self.attack, "defense": self.defense,
+            "x": self.x, "y": self.y, "hp": self.hp, "max_hp": self._base_max_hp, "coin": self.coin, "bank_coin": getattr(self, "bank_coin", 0), "attack": self.attack, "defense": self.defense,
             "items": [dict(it) for it in self.items], "weapon_inventory": [eq.to_dict() for eq in self.weapon_inventory], "armor_inventory": [eq.to_dict() for eq in self.armor_inventory],
             "shield_inventory": [eq.to_dict() for eq in self.shield_inventory], "equipped_weapon": self.equipped_weapon, "equipped_armor": self.equipped_armor, "equipped_shield": self.equipped_shield,
             "stave_inventory": [st.to_dict() for st in self.stave_inventory], "accessory_inventory": [eq.to_dict() for eq in self.accessory_inventory], "equipped_accessory": self.equipped_accessory,

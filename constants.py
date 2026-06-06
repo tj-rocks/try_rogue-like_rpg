@@ -168,6 +168,7 @@ STUPIDITY_WANDER_RATES = {int(k): float(v)
 
 # 逃げ道封鎖AI 有効フラグ (balance.yml ENEMY_ESCAPE_BLOCK_ENABLED)
 ENEMY_ESCAPE_BLOCK_ENABLED: bool = _ai.get("ENEMY_ESCAPE_BLOCK_ENABLED", True)
+BOSS_NO_QUEST_SPAWN_CHANCE = _ai.get("BOSS_NO_QUEST_SPAWN_CHANCE", 0.05)
 
 # ------------------------------------------------------------------------------
 # ⚔️ COMBAT (戦闘システム・演出)

@@ -18,7 +18,7 @@ def test_shop_sell_accessory():
     player = Player()
     
     # プレイヤーにアクセサリを持たせる
-    accessory_inst = EquipInstance("accessory", "glowing_ring")
+    accessory_inst = EquipInstance("accessory", "luminous_gem")
     player.accessory_inventory.append(accessory_inst)
     
     initial_coin = player.coin

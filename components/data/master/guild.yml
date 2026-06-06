@@ -72,7 +72,7 @@ GUILD_RANKS:
   amount_range:
   - 3
   - 5
-  limit_floor: 35
+  limit_floor: 40
   rank_up_item: guild_cert_c
   rank_up_reward_gold: 10000
 - rank: B

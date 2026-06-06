@@ -115,6 +115,15 @@ def apply_rank_floor_logic(data_dict, floor_map):
             min_rk = "F"
         
         f_range_min = floor_map[min_rk]
+        
+        # ボスであり、かつ出現階層が明示的に設定されていない場合は、そのランクの到達限界階層（limit）に設定する
+        if v.get("is_boss"):
+            if v.get("min_floor") is None:
+                v["min_floor"] = f_range_min["limit"]
+            if v.get("max_floor") is None:
+                v["max_floor"] = f_range_min["limit"]
+            continue
+
         if v.get("min_floor") is None:
             v["min_floor"] = f_range_min["min"]
             

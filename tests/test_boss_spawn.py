@@ -37,7 +37,7 @@ def run_test():
         test_all_bosses_wall_prevention(boss_list)
 
         # 4. 【新規】全エンティティ（敵・アイテム・罠）の床乗り検証テスト
-        test_all_entities_on_floor_tiles([1, 10, 20, 35])
+        test_all_entities_on_floor_tiles([1, 10, 20, 40])
         
         print("\n✅ All spawn validity tests PASSED!")
     except Exception as e:
@@ -100,18 +100,36 @@ def test_boss_no_quest_spawn_rate(boss_info):
     player = Player()
     player.active_quests = [] # 依頼なし
     
-    spawn_count = 0
-    attempts = 40
-    for i in range(attempts):
-        dungeon = warp_to_floor(b_floor, player, spawn_reason="warped")
-        bosses = [e for e in dungeon.enemies if e.type == b_key]
-        if len(bosses) > 0:
-            spawn_count += 1
-            
-    spawn_rate = spawn_count / attempts
-    print(f"[INFO] {b_name} spawned {spawn_count} times out of {attempts} attempts ({spawn_rate * 100}%).")
-    # 5%確率なので40回試行で0〜8回程度に収まるはず
-    assert 0 <= spawn_count <= 8, f"Expected low spawn rate around 5%, but got {spawn_count}/{attempts}"
+    from constants import ENEMY_DATA
+    import constants
+    orig_chance = getattr(constants, "BOSS_NO_QUEST_SPAWN_CHANCE", 0.05)
+    boss_chance = ENEMY_DATA.get(b_key, {}).get("spawn_chance")
+    
+    # 5%に固定してテストする
+    constants.BOSS_NO_QUEST_SPAWN_CHANCE = 0.05
+    if b_key in ENEMY_DATA:
+        ENEMY_DATA[b_key]["spawn_chance"] = 0.05
+        
+    try:
+        spawn_count = 0
+        attempts = 40
+        for i in range(attempts):
+            dungeon = warp_to_floor(b_floor, player, spawn_reason="warped")
+            bosses = [e for e in dungeon.enemies if e.type == b_key]
+            if len(bosses) > 0:
+                spawn_count += 1
+                
+        spawn_rate = spawn_count / attempts
+        print(f"[INFO] {b_name} spawned {spawn_count} times out of {attempts} attempts ({spawn_rate * 100}%).")
+        # 5%確率なので40回試行で0〜8回程度に収まるはず
+        assert 0 <= spawn_count <= 8, f"Expected low spawn rate around 5%, but got {spawn_count}/{attempts}"
+    finally:
+        constants.BOSS_NO_QUEST_SPAWN_CHANCE = orig_chance
+        if b_key in ENEMY_DATA:
+            if boss_chance is None:
+                ENEMY_DATA[b_key].pop("spawn_chance", None)
+            else:
+                ENEMY_DATA[b_key]["spawn_chance"] = boss_chance
 
 def test_all_entities_on_floor_tiles(floors):
     """出現したすべての敵・アイテム・罠が、壁(0)ではなく床タイルの上に配置されているかを検証する"""

@@ -5,7 +5,7 @@
 # - F ランク: 〜 11F
 # - E ランク: 〜 21F
 # - D ランク: 〜 30F
-# - C ランク: 〜 35F
+# - C ランク: 〜 40F
 # - B ランク: 〜 55F
 # - A ランク: 〜 70F
 # - S ランク: 〜 80F
@@ -141,13 +141,13 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
   '10':
     image: standard
-    sound: dungeon_boss.mp3
+    sound: goto_unknown_area.mp3
     brightness: 2
     map: null
   '11':
     image: standard
-    sound: just_move.mp3
-    brightness: 5
+    sound: goto_unknown_area.mp3
+    brightness: 2
     # map: first_rest_point.txt
     wall_decoration_ratio: 0.3
 
@@ -157,7 +157,7 @@ DUNGEON_IMAGES:
   '12':
     image: standard
     sound: just_move.mp3
-    brightness: 2
+    brightness: 5
     map: first_rest_point.txt
     wall_decoration_ratio: 0.3
   '13':
@@ -211,7 +211,7 @@ DUNGEON_IMAGES:
 # ==========================================
   "22":
     image: wood
-    sound: sandstone_floor2.mp3
+    sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     map: second_rest_point.txt
@@ -237,81 +237,82 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
   "27":
     image: rock
-    sound: sandstone_floor2.mp3
+    sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "28":
     image: rock
-    sound: sandstone_floor2.mp3
+    sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "29":
     image: rock
-    sound: sandstone_floor2.mp3
+    sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "30":
     image: rock
-    sound: just_move.mp3
+    sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
 
 # ==========================================
-# Cランク 到達可能階層 (31F 〜 35F)
+# Cランク 到達可能階層 (31F 〜 40F)
 # ==========================================
   "31":
     image: evil_castle
-    sound: just_move.mp3
-    brightness: 1
+    sound: turning_point.mp3
+    brightness: 5
     wall_decoration_ratio: 0.3
+    map: third_rest_point.txt
   "32":
     image: evil_castle
-    sound: just_move.mp3
+    sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "33":
     image: evil_castle
-    sound: just_move.mp3
+    sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "34":
     image: evil_castle
-    sound: just_move.mp3
+    sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "35":
     image: evil_castle
-    sound: just_move.mp3
+    sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-# ==========================================
-# Bランク 到達可能階層 (36F 〜 55F)
-# ==========================================
   "36":
-    image: standard
-    sound: just_move.mp3
+    image: evil_castle
+    sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "37":
-    image: standard
-    sound: just_move.mp3
+    image: evil_castle
+    sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "38":
-    image: standard
-    sound: just_move.mp3
+    image: evil_castle
+    sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "39":
-    image: standard
-    sound: just_move.mp3
+    image: evil_castle
+    sound: turning_point.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "40":
-    image: temple
-    sound: sandstone_floor.mp3
+    image: evil_castle
+    sound: dungeon_boss.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
+# ==========================================
+# Bランク 到達可能階層 (41F 〜 55F)
+# ==========================================
   "41":
     image: temple
     sound: sandstone_floor.mp3

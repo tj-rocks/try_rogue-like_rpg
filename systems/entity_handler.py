@@ -15,6 +15,9 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
         if enemy.is_dead:
             # 敵が死んでも点滅中は少し待つ（痛そうな顔を見せるため）
             if enemy.damage_flash_timer > 0:
+                if not hasattr(enemy, "_death_logged"):
+                    enemy._log_trace(dungeon, f"[DEATH-DEBUG] is_dead=True, damage_flash_timer={enemy.damage_flash_timer}, attack_pre_delay_timer={getattr(enemy, 'attack_pre_delay_timer', 0)}, peak_hold_timer={getattr(enemy, 'peak_hold_timer', 0)}")
+                    enemy._death_logged = True
                 enemy.update_animation(dt)
                 continue
 
@@ -116,6 +119,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                 # 撃破メッセージを表示 (モーダル表示：入力を待つ)
                 show_dialog(dialog, f"{enemy.name} を 討伐した！", modal=True, auto_close=0)
 
+            enemy._log_trace(dungeon, f"[DEATH-DEBUG] removing enemy from dungeon.enemies (len before: {len(dungeon.enemies)})")
             dungeon.enemies.remove(enemy)
             reason = "Destroyed" if getattr(enemy, "is_static", False) else "Killed"
             enemy.__class__.log_population(dungeon, reason)
@@ -123,40 +127,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
 
         
         # ★ 全ての敵のアニメーション（滑らかな移動や攻撃）を毎フレーム更新する
-        moved = enemy.update(dungeon, dt)
-        if moved:
-            # 敵が移動を完了した瞬間に足元の罠をチェック
-            egx = int((enemy.x + enemy.width / 2) // dungeon.tile_size)
-            egy = int((enemy.y + enemy.height / 2) // dungeon.tile_size)
-            for trap in dungeon.traps[:]:
-                if trap.x == egx and trap.y == egy:
-                    # 敵が罠を踏んだ！
-                    # ダメージ床や地雷は敵にも効くようにする
-                    if trap.type == "damage_floor":
-                        dmg = trap.data.get("damage", 10)
-                        enemy.hp -= dmg
-                        trap.is_revealed = True
-                        from systems.magic_handler import FlashEffect
-                        dungeon.magic_effects.append(FlashEffect(color=(255, 0, 0), duration=8))
-                    elif trap.type == "mine":
-                        enemy.hp = enemy.hp // 2
-                        trap.is_revealed = True
-                        from systems.magic_handler import FireEffect
-                        dungeon.magic_effects.append(FireEffect(enemy.x, enemy.y, size=80, color=(255, 150, 0)))
-                        dungeon.traps.remove(trap)
-                        dungeon.trigger_shake(10, 20)
-                    elif trap.type == "pitfall":
-                        enemy.hp = 0
-                        enemy.is_dead = True
-                        trap.is_revealed = True
-                        dungeon.trigger_shake(5, 15)
-                    
-                    if enemy.hp <= 0:
-                        enemy.is_dead = True
-                        # 罠で死んだ場合も撃破演出（ボスなら）
-                        if getattr(enemy, "is_boss", False):
-                            from systems.ui import show_dialog
-                            show_dialog(dialog, f"{enemy.name} を 討伐した！")
+        enemy.update(dungeon, dt)
 
     # 2. 敵の「思考（行動決定）」を処理する
     from systems.game_state import game_state
@@ -172,7 +143,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             idx = game_state["current_enemy_idx"]
             enemy = enemies[idx]
             
-            if getattr(enemy, "has_acted", False) or getattr(enemy, "is_dead", False):
+            if getattr(enemy, "has_acted", False) or getattr(enemy, "is_dead", False) or getattr(enemy, "is_static", False):
                 game_state["current_enemy_idx"] += 1
                 continue
             
@@ -194,14 +165,16 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                 # 全ての敵の行動決定が終わった
                 pass 
 
-        # 全ての敵が行動決定を終えたら、全員の移動アニメーション完了を待つ
+        # 全ての敵が行動決定を終えており、且つ全員の移動アニメーションが完了している場合のみプレイヤーのターンに戻す
+        all_thinking_done = (game_state["current_enemy_idx"] >= len(enemies))
+        
         all_moving_done = True
         for e in enemies:
             if e.is_moving or e.is_attacking:
                 all_moving_done = False
                 break
         
-        if all_moving_done and not (dialog and dialog.is_active):
+        if all_thinking_done and all_moving_done and not (dialog and dialog.is_active):
             # --- プレイヤーにターンを戻す前の処理 ---
             player.apply_turn_effects(dungeon, dialog)
             
@@ -210,7 +183,33 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             
             game_state["turn_state"] = "player"
             game_state["current_enemy_idx"] = 0
+            
+            # [DEBUG] ターン終了時に全エネミーのステータスをダンプ
+            try:
+                with open("enemy_ai.log", "a", encoding="utf-8") as f:
+                    f.write(f"=== TURN END ENEMY DUMP (Floor {dungeon.current_floor}) ===\n")
+                    for e in enemies:
+                        f.write(f"  [{e.name}#{id(e)%10000}]: pos=({e.x},{e.y}), target=({e.target_x},{e.target_y}), is_dead={getattr(e, 'is_dead', False)}, has_acted={getattr(e, 'has_acted', False)}, is_moving={getattr(e, 'is_moving', False)}, is_attacking={getattr(e, 'is_attacking', False)}, flash={getattr(e, 'damage_flash_timer', 0)}, speed={getattr(e, 'move_speed', 0)}\n")
+                    f.write("========================================================\n")
+            except:
+                pass
+
             for e in enemies:
+                # 障害物（is_static）の寿命ターンの更新
+                if getattr(e, "is_static", False) and hasattr(e, "lifetime_turns") and e.lifetime_turns is not None:
+                    e.lifetime_turns -= 1
+                    if e.lifetime_turns <= 0:
+                        e.is_dead = True
+                        if dialog:
+                            from constants import COMBAT_LOG_WAIT_FRAMES
+                            msg = f"{e.name} は 消滅した！"
+                            if dialog.is_active:
+                                dialog.text += "\n" + msg
+                            else:
+                                dialog.text = msg
+                                dialog.is_active = True
+                            dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+
                 e.has_acted = False # リセット
                 if hasattr(e, "has_dealt_impact_damage"):
                     e.has_dealt_impact_damage = False
@@ -219,11 +218,19 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
     px = int((player.x + dungeon.tile_size / 2) // dungeon.tile_size)
     py = int((player.y + dungeon.tile_size / 2) // dungeon.tile_size)
     
+    has_uncollected_item_at_player = False
     for item in dungeon.dropped_items[:]:
         if not getattr(item, "is_collected", False):
             ix = int((item.x + dungeon.tile_size / 2) // dungeon.tile_size)
             iy = int((item.y + dungeon.tile_size / 2) // dungeon.tile_size)
             if px == ix and py == iy:
+                has_uncollected_item_at_player = True
+                
+                # すでにこのマスで警告を表示済みの場合はスキップ
+                last_warned = getattr(player, "last_item_warned_pos", None)
+                if last_warned == (px, py):
+                    continue
+                
                 if hasattr(item, "collect"):
                     try:
                         msg = item.collect(player)
@@ -237,15 +244,16 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                         # 実際に取得できた場合のみ、リストから削除する
                         if getattr(item, "is_collected", False):
                             dungeon.dropped_items.remove(item)
+                            player.last_item_warned_pos = None
                         else:
-                            # 拾えなかった場合、プレイヤーを一歩手前に押し戻す（アイテムを消さないため）
-                            player.x = player.prev_x
-                            player.y = player.prev_y
-                            player.target_x = player.prev_x
-                            player.target_y = player.prev_y
-                            player.is_moving = False
+                            # 拾えなかった場合、位置を記録
+                            player.last_item_warned_pos = (px, py)
                     except Exception as e:
                         print(f"[Error] Failed to collect item: {e}")
+                break
+                
+    if not has_uncollected_item_at_player:
+        player.last_item_warned_pos = None
 
     # 3. 敵のリスポーン処理（ターン制へ移行したため、ここでは何もしない）
     # 4. ボスBGMの切り替え判定 [NEW]

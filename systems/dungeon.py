@@ -691,9 +691,6 @@ class Dungeon:
         if len(alive_enemies) == 0:
             self.outbreak_cleared = True
             
-            dialog.text = "＜CLEAR＞\nフロアの魔物を一掃した！"
-            dialog.is_active = True
-            
             # BGMを元に戻すか、無音にする
             from systems.audio_manager import stop_bgm
             stop_bgm()

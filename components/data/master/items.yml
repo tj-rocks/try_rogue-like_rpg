@@ -296,8 +296,8 @@ CONSUMABLE_DATA:
     category: event
     image_path: components/pictures/icon/certificate.png
     shop_buyable: false
-    min_floor: 35
-    max_floor: 35
+    min_floor: 40
+    max_floor: 40
     describe: B級冒険者の証 熟練の冒険者のみが手にできる栄誉ある証
     floor_spawnable: true
   guild_cert_a:

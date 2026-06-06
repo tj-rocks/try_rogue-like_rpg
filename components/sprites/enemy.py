@@ -51,6 +51,7 @@ class Enemy(Entity):
         else: self.stupidity = data.get("stupidity", 0)
         self.dash_distance = data.get("dash_distance", 50)
         self.is_long_range = False; self.attack_priority = data.get("attack_priority", "close")
+        self.smart_ranged_move = data.get("smart_ranged_move", True)
         self.bgm = data.get("bgm"); self.crit_rate = data.get("crit_rate", 0.01)
         self.accuracy_close = data.get("accuracy_close", data.get("accuracy_bonus", 100))
         self.accuracy_ranged = data.get("accuracy_ranged", data.get("accuracy_bonus", 100))
@@ -85,6 +86,17 @@ class Enemy(Entity):
                         else: self.images[d] = pygame.Surface((self.width, self.height))
             if not self.images: self.images = {d: pygame.Surface((self.width, self.height)) for d in ["up", "down", "left", "right"]}
             Enemy._image_cache[cache_key] = self.images
+
+    def _log_trace(self, dungeon, msg):
+        try:
+            with open("enemy_ai.log", "a", encoding="utf-8") as f:
+                floor = getattr(dungeon, 'current_floor', '?')
+                f.write(f"[Floor {floor}] [{self.name}#{id(self)%10000}] at ({int(self.x//dungeon.tile_size)}, {int(self.y//dungeon.tile_size)}): {msg}\n")
+            import constants
+            if constants.ENABLE_DEBUG_LOGGING:
+                print(f"[TRACE-AI] [{self.name}#{id(self)%10000}]: {msg}")
+        except:
+            pass
 
     def draw(self, screen, camera_x, camera_y):
         import math; draw_x, draw_y = self.x - camera_x, self.y - camera_y
@@ -129,7 +141,10 @@ class Enemy(Entity):
     def _move_randomly(self, dungeon, all_entities):
         d = random.choice([("right", dungeon.tile_size, 0), ("left", -dungeon.tile_size, 0), ("down", 0, dungeon.tile_size), ("up", 0, -dungeon.tile_size)])
         tx, ty = self.x + d[1], self.y + d[2]
-        if self.can_move_grid(tx, ty, dungeon): self.target_x, self.target_y, self.facing, self.is_moving, self.step_toggle = tx, ty, d[0], True, not self.step_toggle
+        if self.can_move_grid(tx, ty, dungeon, debug_log=True):
+            self.target_x, self.target_y, self.facing, self.is_moving, self.step_toggle = tx, ty, d[0], True, not self.step_toggle
+        else:
+            self._log_trace(dungeon, f"_move_randomly: failed to move to {d[0]} ({tx//dungeon.tile_size}, {ty//dungeon.tile_size})")
 
     def _is_in_attack_range(self, dx, dy): return (abs(dx) <= self.attack_range and dy == 0 and dx != 0) or (abs(dy) <= self.attack_range and dx == 0 and dy != 0)
 
@@ -188,27 +203,20 @@ class Enemy(Entity):
 
     def _move_smartly_check_success(self, player, dungeon, all_entities, px, py, mx, my, occs=None, ideal=None):
         if ideal is None: ideal = max(0, self.attack_range - 1)
-        pdx, pdy = (1 if player.facing == "right" else -1 if player.facing == "left" else 0), (1 if player.facing == "down" else -1 if player.facing == "up" else 0)
-        ppx, ppy = px + pdx, py + pdy; cur_s = abs(abs(ppx-mx)+abs(ppy-my) - ideal); valid = []
+        cur_s = abs(abs(px-mx)+abs(py-my) - ideal); valid = []
         for f, dx, dy in [("right",dungeon.tile_size,0),("left",-dungeon.tile_size,0),("down",0,dungeon.tile_size),("up",0,-dungeon.tile_size)]:
             tx, ty = self.x+dx, self.y+dy
             if self.can_move_grid(tx, ty, dungeon):
                 tgx, tgy = int((tx+self.width/2)//dungeon.tile_size), int((ty+self.height/2)//dungeon.tile_size)
-                s = abs(abs(ppx-tgx)+abs(ppy-tgy) - ideal)
+                s = abs(abs(px-tgx)+abs(py-tgy) - ideal)
                 if s <= cur_s: valid.append({"f":f, "dx":dx, "dy":dy, "s":s, "dc":abs(abs(px-tgx)+abs(py-tgy) - self.attack_range)})
-        # [FIX] cur_s==0 だが実際には攻撃できない場合（斜めなど）: プレイヤー直接位置を基準に再計算
-        if not valid:
-            cur_s2 = abs(px-mx) + abs(py-my)
-            for f, dx, dy in [("right",dungeon.tile_size,0),("left",-dungeon.tile_size,0),("down",0,dungeon.tile_size),("up",0,-dungeon.tile_size)]:
-                tx, ty = self.x+dx, self.y+dy
-                if self.can_move_grid(tx, ty, dungeon):
-                    tgx, tgy = int((tx+self.width/2)//dungeon.tile_size), int((ty+self.height/2)//dungeon.tile_size)
-                    s2 = abs(px-tgx) + abs(py-tgy)
-                    if s2 < cur_s2: valid.append({"f":f, "dx":dx, "dy":dy, "s":s2-cur_s2, "dc":abs(s2 - self.attack_range)})
         if valid:
             valid.sort(key=lambda m: (m["s"], m["dc"])); best_s = valid[0]["s"]
-            chosen = random.choice([m for m in valid if m["s"] == best_s])
-            if chosen["s"] < cur_s or chosen["s"] < 0 or random.random() < 0.5: self.target_x, self.target_y, self.facing, self.is_moving, self.step_toggle = self.x+chosen["dx"], self.y+chosen["dy"], chosen["f"], True, not self.step_toggle; return True
+            if best_s < cur_s:
+                chosen = random.choice([m for m in valid if m["s"] == best_s])
+                self.target_x, self.target_y, self.facing, self.is_moving, self.step_toggle = self.x+chosen["dx"], self.y+chosen["dy"], chosen["f"], True, not self.step_toggle
+                self._log_trace(dungeon, f"_move_smartly: chose movement to {chosen['f']} ({self.target_x//dungeon.tile_size}, {self.target_y//dungeon.tile_size})")
+                return True
         return False
 
     # ════════════════════════════════════════════════════════════════
@@ -336,17 +344,23 @@ class Enemy(Entity):
         for facing, sdx, sdy in steps:
             tx, ty = self.x + sdx, self.y + sdy
             # can_move_grid がすでに地形と他エンティティ（味方含む）との衝突を判定している
-            if self.can_move_grid(tx, ty, dungeon):
+            if self.can_move_grid(tx, ty, dungeon, debug_log=True):
                 self.target_x, self.target_y = tx, ty
                 self.facing = facing; self.is_moving = True
                 self.step_toggle = not self.step_toggle
+                self._log_trace(dungeon, f"_move_toward_grid: moving to {facing} ({tx//dungeon.tile_size}, {ty//dungeon.tile_size})")
                 return True
+            else:
+                self._log_trace(dungeon, f"_move_toward_grid: failed step to {facing} ({tx//dungeon.tile_size}, {ty//dungeon.tile_size})")
                 
         return False
 
     def take_turn(self, player, dungeon, all_entities, dialog=None, occupied_cells=None):
-        if getattr(self, "is_dead", False): return
+        if getattr(self, "is_dead", False):
+            self._log_trace(dungeon, "take_turn bypassed: is_dead=True")
+            return
         if self.is_static:
+            self._log_trace(dungeon, "take_turn bypassed: is_static=True")
             if hasattr(self, "lifetime_turns") and self.lifetime_turns is not None:
                 self.lifetime_turns -= 1
                 if self.lifetime_turns <= 0:
@@ -369,6 +383,7 @@ class Enemy(Entity):
                 e_grids = e.get_occupied_grids(dungeon.tile_size)
                 if any(g in e_grids for g in my_grids):
                     # 閉じ込められているため、ターンをスキップ（攻撃も移動も行わない）
+                    self._log_trace(dungeon, "is trapped in magic_barrier. Skipping turn.")
                     return
 
         mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
@@ -388,10 +403,18 @@ class Enemy(Entity):
         dx, dy = best_dx, best_dy
         rad = max(1, self.detect_range - player.get_aggro_modifier())
         if getattr(self, "damage_flash_timer", 0) > 0: rad = max(rad, self.damaged_detect_range)
-        if abs(dx) > rad or abs(dy) > rad: return
+        
+        # 感知範囲外チェック
+        if abs(dx) > rad or abs(dy) > rad:
+            self._log_trace(dungeon, f"out of range (dist to player: {abs(dx)},{abs(dy)} > detect_range: {rad}) | self:({self.x},{self.y}) player_target:({player.target_x},{player.target_y}) player_actual:({player.x},{player.y}) ts:{dungeon.tile_size}")
+            return
+            
         # 困惑度テーブルを参照してぼーっと確率を決定
         wander_chance = STUPIDITY_WANDER_RATES.get(self.stupidity, self.stupidity / 10.0)
-        if wander_chance > 0 and random.random() < wander_chance: self._move_randomly(dungeon, all_entities); return
+        if wander_chance > 0 and random.random() < wander_chance:
+            self._log_trace(dungeon, f"decided to WANDER (chance: {wander_chance})")
+            self._move_randomly(dungeon, all_entities)
+            return
 
         # ── [ESCAPE_BLOCK] 逃げ道封鎖AI + フランク (削除時はこのブロックごと除去) ──
         if (abs(dx) + abs(dy)) > 1:
@@ -411,32 +434,69 @@ class Enemy(Entity):
                 # 自分が最接近ではない → 逃げ道封鎖を優先、次いでフランク
                 if ENEMY_ESCAPE_BLOCK_ENABLED and my_dist > min_ally_dist:
                     block = self._get_escape_block_target(px, py, all_entities, dungeon)
-                    if block and self._move_toward_grid(block[0], block[1], dungeon, all_entities):
-                        return
+                    if block:
+                        moved = self._move_toward_grid(block[0], block[1], dungeon, all_entities)
+                        self._log_trace(dungeon, f"attempting escape block to ({block[0]}, {block[1]}). moved={moved}")
+                        if moved:
+                            return
+                    else:
+                        self._log_trace(dungeon, "escape block target was None")
                 # 最接近 or 封鎖失敗 → フランク（包囲）を試みる
                 flank = self._get_flank_target(px, py, all_entities, dungeon)
                 if flank:
                     ftx, fty = flank
                     if (mx, my) != (ftx, fty) and abs(mx - ftx) + abs(my - fty) > 1:
-                        if self._move_toward_grid(ftx, fty, dungeon, all_entities):
+                        moved = self._move_toward_grid(ftx, fty, dungeon, all_entities)
+                        self._log_trace(dungeon, f"attempting flank to ({ftx}, {fty}). moved={moved}")
+                        if moved:
                             return
+                    else:
+                        self._log_trace(dungeon, f"flank target ({ftx}, {fty}) too close or self is already there")
+                else:
+                    self._log_trace(dungeon, "flank target was None")
         # ── [/ESCAPE_BLOCK] ──────────────────────────────────────────
 
         if self.stupidity < 7:
-            ideal = 1 if self.attack_priority == "close" else (2 if self.attack_range == 2 else max(1, self.attack_range - 1))
-            los = self._is_in_attack_range(dx, dy) and self._is_line_of_sight_clear(dx, dy, dungeon, all_entities); gdist = abs(dx)+abs(dy)
-            if gdist == ideal:
-                if los: self._handle_attack(dx, dy, player, dialog); return
-                if self._move_smartly_check_success(player, dungeon, all_entities, px, py, mx, my, occupied_cells, ideal): return
-            elif gdist == 1 and self.attack_priority == "ranged" and self.attack_range > 1:
-                if random.random() < 0.7 and self._move_smartly_check_success(player, dungeon, all_entities, px, py, mx, my, occupied_cells, ideal): return
-                self._handle_attack(dx, dy, player, dialog); return
+            if not self.smart_ranged_move:
+                ideal = 1
             else:
-                if los: self._handle_attack(dx, dy, player, dialog); return
-                if self._move_smartly_check_success(player, dungeon, all_entities, px, py, mx, my, occupied_cells, ideal): return
+                ideal = 1 if self.attack_priority == "close" else (2 if self.attack_range == 2 else max(1, self.attack_range - 1))
+            los = self._is_in_attack_range(dx, dy) and self._is_line_of_sight_clear(dx, dy, dungeon, all_entities); gdist = abs(dx)+abs(dy)
+            self._log_trace(dungeon, f"AI status: gdist={gdist}, ideal={ideal}, los={los}, attack_priority={self.attack_priority}")
+            if gdist == ideal:
+                if los:
+                    self._log_trace(dungeon, "close-attacking player.")
+                    self._handle_attack(dx, dy, player, dialog)
+                    return
+                smart_moved = self._move_smartly_check_success(player, dungeon, all_entities, px, py, mx, my, occupied_cells, ideal)
+                self._log_trace(dungeon, f"tried smart move to ideal dist {ideal}. success={smart_moved}")
+                if smart_moved:
+                    return
+            elif gdist == 1 and self.smart_ranged_move and self.attack_priority == "ranged" and self.attack_range > 1:
+                smart_moved = self._move_smartly_check_success(player, dungeon, all_entities, px, py, mx, my, occupied_cells, ideal)
+                self._log_trace(dungeon, f"backing away for ranged attack (smart_moved={smart_moved})")
+                if random.random() < 0.7 and smart_moved:
+                    return
+                self._log_trace(dungeon, "ranged-attacking close player")
+                self._handle_attack(dx, dy, player, dialog)
+                return
+            else:
+                if los:
+                    self._log_trace(dungeon, "attacking player from distance")
+                    self._handle_attack(dx, dy, player, dialog)
+                    return
+                smart_moved = self._move_smartly_check_success(player, dungeon, all_entities, px, py, mx, my, occupied_cells, ideal)
+                self._log_trace(dungeon, f"moved smartly check: {smart_moved}")
+                if smart_moved:
+                    return
                 # [FIX] 斜め位置などでスマート移動が失敗した場合のフォールバック: プレイヤーへ1歩直接接近
                 if (abs(dx) + abs(dy)) > 1:
-                    self._move_toward_grid(px, py, dungeon, all_entities)
+                    moved = self._move_toward_grid(px, py, dungeon, all_entities)
+                    self._log_trace(dungeon, f"moved toward player ({px}, {py}) (moved: {moved})")
+                else:
+                    self._log_trace(dungeon, "no fallback move: too close or diagonal but dist <= 1")
+        else:
+            self._log_trace(dungeon, f"skipping turn because stupidity is {self.stupidity} (>= 7)")
 
     def update(self, dungeon, dt=1/60):
         if self.is_static: self.update_animation(dt); return
@@ -468,7 +528,7 @@ class Enemy(Entity):
 
     @classmethod
     def spawn_enemies(cls, dungeon, player=None, is_outbreak=False):
-        from constants import (ENEMY_SPAWN_MIN, ENEMY_SPAWN_MAX, ENEMY_SPAWN_ATTEMPTS, ENEMY_SPAWN_SAFE_RADIUS, ENEMY_SPAWN_SCATTER, ENEMY_DATA, ENEMY_TOTAL_MAX, ENEMY_TOTAL_SCALE_EVERY, ENEMY_TOTAL_SCALE_ADD, OBSTACLE_SPAWN_MIN, OBSTACLE_SPAWN_MAX, OBSTACLE_SPAWN_SCALE_EVERY, OBSTACLE_SPAWN_SCALE_ADD, OBSTACLE_SPAWN_LIMIT, OBSTACLE_TOTAL_MAX, OBSTACLE_TOTAL_SCALE_EVERY, OBSTACLE_TOTAL_SCALE_ADD)
+        from constants import (ENEMY_SPAWN_MIN, ENEMY_SPAWN_MAX, ENEMY_SPAWN_ATTEMPTS, ENEMY_SPAWN_SAFE_RADIUS, ENEMY_SPAWN_SCATTER, ENEMY_DATA, ENEMY_TOTAL_MAX, ENEMY_TOTAL_SCALE_EVERY, ENEMY_TOTAL_SCALE_ADD, OBSTACLE_SPAWN_MIN, OBSTACLE_SPAWN_MAX, OBSTACLE_SPAWN_SCALE_EVERY, OBSTACLE_SPAWN_SCALE_ADD, OBSTACLE_SPAWN_LIMIT, OBSTACLE_TOTAL_MAX, OBSTACLE_TOTAL_SCALE_EVERY, OBSTACLE_TOTAL_SCALE_ADD, BOSS_NO_QUEST_SPAWN_CHANCE)
         enemies = []; floor = getattr(dungeon, "current_floor", 1); pgx, pgy = (int(player.x//dungeon.tile_size), int(player.y//dungeon.tile_size)) if player else (-999,-999)
         mt = [k for k, v in ENEMY_DATA.items() if not v.get("is_static", False)]; ot = [k for k, v in ENEMY_DATA.items() if v.get("is_static", False)]
         ef = min(floor, OBSTACLE_SPAWN_LIMIT); nr = len(dungeon.rooms)
@@ -486,12 +546,20 @@ class Enemy(Entity):
         boss_types = [t for t in mt if ENEMY_DATA[t].get("is_boss") and ENEMY_DATA[t].get("min_floor") == floor]
         for b_type in boss_types:
             has_quest = False
+            is_promo_exam = False
             if player and hasattr(player, "active_quests"):
                 has_quest = any(q.get("target_key") == b_type for q in player.active_quests)
+                
+                # 昇格試験の判定: プレイヤーが昇級クエストを持っており、かつそのボスのランクがプレイヤーの現在ランクと一致する場合
+                has_rank_up_quest = any(q.get("is_rank_up") for q in player.active_quests)
+                boss_rank = ENEMY_DATA[b_type].get("min_rank") or ENEMY_DATA[b_type].get("rank")
+                if has_rank_up_quest and boss_rank == player.guild_rank:
+                    is_promo_exam = True
             
-            if not has_quest and player is not None:
-                if random.random() >= 0.05:
-                    print(f"[Dungeon] Boss {b_type} skipped: no quest and did not roll 5% chance.")
+            if not has_quest and not is_promo_exam and player is not None:
+                spawn_chance = ENEMY_DATA[b_type].get("spawn_chance", BOSS_NO_QUEST_SPAWN_CHANCE)
+                if random.random() >= spawn_chance:
+                    print(f"[Dungeon] Boss {b_type} skipped: no quest, no promotion exam, and did not roll {spawn_chance*100}% chance.")
                     continue
 
             spawned = False
