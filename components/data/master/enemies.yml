@@ -199,9 +199,9 @@ ENEMY_DATA:
       rare: [old_sword, iron_sword]
     normal_drop_rate: 0.15
     rare_drop_rate: 0.03
-    hp: 20
-    attack: 15
-    defense: 25
+    hp: 24
+    attack: 20
+    defense: 33
     evasion: 10
     exp: 12
     reward_gold: 200
@@ -225,8 +225,8 @@ ENEMY_DATA:
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
     hp: 20
-    attack: 16
-    defense: 38
+    attack: 19
+    defense: 40
     evasion: 10
     exp: 15
     reward_gold: 30
@@ -252,7 +252,7 @@ ENEMY_DATA:
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
     hp: 17
-    attack: 13
+    attack: 17
     defense: 25
     evasion: 10
     exp: 15
@@ -277,7 +277,7 @@ ENEMY_DATA:
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
     hp: 21
-    attack: 18
+    attack: 22
     defense: 25
     evasion: 10
     exp: 15
@@ -301,9 +301,9 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 2
-    attack: 3
-    defense: 17
+    hp: 30
+    attack: 25
+    defense: 50
     evasion: 10
     exp: 15
     reward_gold: 30
@@ -326,13 +326,13 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 32
-    attack: 29
-    defense: 0
+    hp: 25
+    attack: 12
+    defense: 40
     evasion: 20
     exp: 15
     reward_gold: 30
-    accuracy_close: 100
+    accuracy_close: 80
     accuracy_ranged: 100
     attack_range: 1
     stupidity: 3
@@ -351,8 +351,8 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 1
-    attack: 2
+    hp: 20
+    attack: 25
     defense: 25
     evasion: 18
     exp: 15
@@ -376,9 +376,9 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 2
-    attack: 3
-    defense: 17
+    hp: 20
+    attack: 20
+    defense: 90
     evasion: 10
     exp: 15
     reward_gold: 30
@@ -472,13 +472,13 @@ ENEMY_DATA:
       rare: [fullmetal_sword, fullmetal_round_shield, fullmetal_breastplate]
     normal_drop_rate: 0.25
     rare_drop_rate: 0.15
-    hp: 88
-    attack: 24
-    defense: 56
+    hp: 95
+    attack: 25
+    defense: 70
     evasion: 30
     exp: 50
     reward_gold: 1000
-    accuracy_close: 90
+    accuracy_close: 96
     accuracy_ranged: 90
     attack_range: 5
     stupidity: 0
@@ -505,7 +505,7 @@ ENEMY_DATA:
     normal_drop_rate: 0.25
     rare_drop_rate: 0.20
     hp: 120
-    attack: 26
+    attack: 20
     defense: 60
     evasion: 25
     exp: 80
