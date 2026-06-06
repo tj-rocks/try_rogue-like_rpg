@@ -137,7 +137,7 @@ def setup_gungeon_mode(dungeon, player):
         from components.sprites.trap import Trap
         dungeon.traps = []
         trap_start_idx = len(candidates)
-        trap_keys = [k for k in TRAP_DATA.keys() if k != "flood_switch"]
+        trap_keys = list(TRAP_DATA.keys())
         for i, trap_key in enumerate(trap_keys):
             if trap_start_idx + i >= len(floor_tiles): break
             tx, ty = floor_tiles[trap_start_idx + i]

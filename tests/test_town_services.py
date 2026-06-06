@@ -105,7 +105,7 @@ class MockNPC:
     def __init__(self, role, dialogue):
         self.role = role
         self.dialogue = dialogue
-    def get_dialogue(self):
+    def get_dialogue(self, player=None):
         return self.dialogue
 
 def test_priest_services():

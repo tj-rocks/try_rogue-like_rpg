@@ -16,8 +16,7 @@
 # - max_spawns    : その階で合計で出現する最大数。
 # - drops         : 破壊時に落とすアイテムのリスト。
 #                   敵と同じように normal/rare の辞書形式にします。
-# - normal_drop_rate: 通常ドロップの確率 (0.0 〜 1.0)
-# - rare_drop_rate  : レアドロップの確率 (0.0 〜 1.0)
+#                   common キー配下にデフォルト設定を配置し、ランク名キーで上書き可能です。
 # - image_path    : 画像ファイルへのパス。
 # - image_scale   : 表示サイズのスケーリング (1.0 = 標準)。
 # ==============================================================================
@@ -32,16 +31,17 @@ wood_barrel:
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 50
+  reward_gold: 10
   min_floor: null
   max_floor: null
   max_concurrent: 2
   max_spawns: 2
   drops:
-    normal: [hp_potion]
-    rare: []
-  normal_drop_rate: 0.10
-  rare_drop_rate: 0.0
+    common:
+      normal: [hp_potion, antidote_potion,old_sword]
+      rare: [hi_potion]
+      normal_drop_rate: 0.10
+      rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/barrel.png
   image_scale: 0.8
 
@@ -55,16 +55,17 @@ anvil:
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 50
+  reward_gold: 10
   min_floor: null
   max_floor: null
   max_concurrent: 2
   max_spawns: 2
   drops:
-    normal: []
-    rare: [purple_stone]
-  normal_drop_rate: 0.0
-  rare_drop_rate: 0.05
+    common:
+      normal: [old_sword]
+      rare: [purple_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.05
   image_path: components/pictures/dungeon/other_objects/anvil.png
   image_scale: 0.8
 
@@ -78,16 +79,17 @@ crate:
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 60
+  reward_gold: 12
   min_floor: null
   max_floor: null
   max_concurrent: 4
   max_spawns: 3
   drops:
-    normal: [hp_potion]
-    rare: []
-  normal_drop_rate: 0.40
-  rare_drop_rate: 0.0
+    common:
+      normal: [hp_potion, antidote_potion,old_sword]
+      rare: [hi_potion,teleport_stone]
+      normal_drop_rate: 0.40
+      rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/crate.png
   image_scale: 0.8
 
@@ -101,16 +103,17 @@ pot:
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 50
+  reward_gold: 10
   min_floor: null
   max_floor: null
   max_concurrent: 5
   max_spawns: 10
   drops:
-    normal: [expired_potion]
-    rare: []
-  normal_drop_rate: 0.30
-  rare_drop_rate: 0.0
+    common:
+      normal: [expired_potion, rotten_potion]
+      rare: [hi_potion,teleport_stone]
+      normal_drop_rate: 0.30
+      rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/pot.png
   image_scale: 1.0
 
@@ -124,14 +127,15 @@ rubble:
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 80
+  reward_gold: 16
   min_floor: null
   max_floor: null
   drops:
-    normal: [expired_potion]
-    rare: []
-  normal_drop_rate: 0.15
-  rare_drop_rate: 0.0
+    common:
+      normal: [expired_potion, rotten_potion]
+      rare: [teleport_stone]
+      normal_drop_rate: 0.15
+      rare_drop_rate: 0.0
   image_path: components/pictures/obstacles/rubble.png
   image_scale: 1.0
 
@@ -145,16 +149,17 @@ well:
   defense: 50
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 1500
+  reward_gold: 300
   min_floor: null
   max_floor: null
   max_concurrent: 1
   max_spawns: 1
   drops:
-    normal: [hp_potion, hi_potion]
-    rare: [return_wing]
-  normal_drop_rate: 0.50
-  rare_drop_rate: 0.05
+    common:
+      normal: [hp_potion, hi_potion]
+      rare: [return_wing,revive_amulet,teleport_stone]
+      normal_drop_rate: 0.50
+      rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/well.png
   image_scale: 1.2
 
@@ -168,14 +173,15 @@ skeleton_obstacle:
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 150
+  reward_gold: 30
   min_floor: null
   max_floor: null
   drops:
-    normal: [rotten_potion]
-    rare: [broken_sword, broken_armor]
-  normal_drop_rate: 0.20
-  rare_drop_rate: 0.10
+    common:
+      normal: [broken_sword, broken_armor]
+      rare: [return_wing,revive_amulet,teleport_stone]
+      normal_drop_rate: 0.20
+      rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/skeleton.png
   image_scale: 0.9
 
@@ -189,47 +195,27 @@ crystal:
   defense: 20
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 350
+  reward_gold: 70
   min_floor: null
   max_floor: null
   max_concurrent: 2
   max_spawns: 2
   drops:
-    E:
-      normal: []
-      rare: [blue_stone, green_stone]
-      normal_drop_rate: 0.0
-      rare_drop_rate: 0.08
-    D:
+    common:
       normal: []
       rare: [blue_stone, green_stone]
       normal_drop_rate: 0.0
       rare_drop_rate: 0.08
     C:
-      normal: []
       rare: [red_stone, blue_stone, green_stone, purple_stone]
-      normal_drop_rate: 0.0
-      rare_drop_rate: 0.08
     B:
-      normal: []
       rare: [red_stone, blue_stone, green_stone, purple_stone]
-      normal_drop_rate: 0.0
-      rare_drop_rate: 0.08
     A:
-      normal: []
       rare: [red_stone, blue_stone, green_stone, purple_stone]
-      normal_drop_rate: 0.0
-      rare_drop_rate: 0.08
     S:
-      normal: []
       rare: [red_stone, blue_stone, green_stone, purple_stone]
-      normal_drop_rate: 0.0
-      rare_drop_rate: 0.08
     SS:
-      normal: []
       rare: [red_stone, blue_stone, green_stone, purple_stone]
-      normal_drop_rate: 0.0
-      rare_drop_rate: 0.08
   image_path: components/pictures/obstacles/crystal.png
   image_scale: 0.9
 
@@ -243,16 +229,17 @@ sword_stuck:
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 250
+  reward_gold: 50
   min_floor: null
   max_floor: null
   max_concurrent: 1
   max_spawns: 1
   drops:
-    normal: []
-    rare: [iron_sword]
-  normal_drop_rate: 0.0
-  rare_drop_rate: 0.20
+    common:
+      normal: [iron_sword, fullmetal_sword, thiefs_knife]
+      rare: ["@current_rank_weapons", "@current_rank_armors"]
+      normal_drop_rate: 0.30
+      rare_drop_rate: 0.20
   image_path: components/pictures/obstacles/sword_stuck.png
   image_scale: 0.9
 
@@ -266,14 +253,15 @@ web:
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 100
+  reward_gold: 20
   min_floor: null
   max_floor: null
   drops:
-    normal: [antidote_potion, rotten_potion]
-    rare: []
-  normal_drop_rate: 0.25
-  rare_drop_rate: 0.0
+    common:
+      normal: [antidote_potion, rotten_potion]
+      rare: [teleport_stone]
+      normal_drop_rate: 0.25
+      rare_drop_rate: 0.0
   image_path: components/pictures/obstacles/web.png
   image_scale: 1.0
 
@@ -287,16 +275,17 @@ stained_armor_stand:
   defense: 10
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 450
+  reward_gold: 90
   min_floor: null
   max_floor: null
   max_concurrent: 1
   max_spawns: 2
   drops:
-    normal: []
-    rare: [adventurers_clothes]
-  normal_drop_rate: 0.0
-  rare_drop_rate: 0.10
+    common:
+      normal: [iron_sword, fullmetal_sword, thiefs_knife]
+      rare: ["@current_rank_weapons", "@current_rank_armors"]
+      normal_drop_rate: 0.30
+      rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/stained_armor_stand.png
   image_scale: 1.0
 
@@ -310,16 +299,17 @@ broken_pillar:
   defense: 5
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 500
+  reward_gold: 100
   min_floor: null
   max_floor: null
   max_concurrent: 2
   max_spawns: 3
   drops:
-    normal: []
-    rare: [green_stone]
-  normal_drop_rate: 0.0
-  rare_drop_rate: 0.05
+    common:
+      normal: []
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/broken_pillar.png
   image_scale: 1.0
 
@@ -333,16 +323,17 @@ statue:
   defense: 30
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 800
+  reward_gold: 160
   min_floor: null
   max_floor: null
   max_concurrent: 1
   max_spawns: 1
   drops:
-    normal: []
-    rare: [red_stone, blue_stone]
-  normal_drop_rate: 0.0
-  rare_drop_rate: 0.05
+    common:
+      normal: []
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/statue.png
   image_scale: 1.1
 

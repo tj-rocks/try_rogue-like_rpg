@@ -164,7 +164,7 @@ WEAPON_DATA:
     describe: 長年放置され、刃がこぼれた古い剣 戦うには心もとない
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
-    floor_spawnable: false
+    floor_spawnable: true
     bonus:
       common:
         aggro_mod: 0

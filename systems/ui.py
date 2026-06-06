@@ -2188,7 +2188,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             bank_dialog.is_active = True
                                             return
                                     elif getattr(npc, "role", None) == "doctor":
-                                        dialog.text = "\n".join(npc.get_dialogue()); dialog.is_active = True
+                                        dialog.text = "\n".join(npc.get_dialogue(player)); dialog.is_active = True
                                         from constants import DOCTOR_FEE, POISON_CURE_FEE
                                         
                                         def make_heal_callback(fee, cure_poison=False):
@@ -2239,7 +2239,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                 dialog.is_active = True
                                                 return
                                             # 先に挨拶を表示
-                                            dialog.text = "\n".join(npc.get_dialogue())
+                                            dialog.text = "\n".join(npc.get_dialogue(player))
                                             dialog.is_active = True
                                             # ダイアログが開いた後にテレポートUIを起動
                                             teleport_dialog.is_active = True
@@ -2247,7 +2247,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                         guild_guide_dialog = kwargs.get("guild_guide_dialog")
                                         if guild_guide_dialog:
                                             guild_guide_dialog.setup_options(player)
-                                            dialog.text = "\n".join(npc.get_dialogue())
+                                            dialog.text = "\n".join(npc.get_dialogue(player))
                                             dialog.is_active = True
                                             guild_guide_dialog.is_active = True
                                             return
@@ -2286,7 +2286,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             dialog.is_active = True
                                         return
                                     else:
-                                        dialog.set_pages(npc.get_dialogue())
+                                        dialog.set_pages(npc.get_dialogue(player))
                                     return
                 elif event.key == KEY_MENU:
                     if menu_dialog: menu_dialog.is_active = True

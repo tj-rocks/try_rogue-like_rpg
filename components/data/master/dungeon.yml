@@ -66,12 +66,6 @@ TRAP_DATA:
     color: [180, 0, 255]
     sound: components/sounds/sfx/damage.wav
     image_path: components/pictures/trap/damage_floor.png
-  flood_switch:
-    name: 怪しいスイッチ
-    weight: 0
-    color: [0, 200, 255]
-    sound: components/sounds/sfx/click.wav
-    image_path: components/pictures/trap/switch.png
 
 DUNGEON_IMAGES:
   path: components/pictures/dungeon

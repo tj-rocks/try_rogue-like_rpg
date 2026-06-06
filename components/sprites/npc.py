@@ -61,7 +61,15 @@ class NPC(Entity):
         if "武器屋" in name: self.color = (200, 50, 50) # 赤
         elif "道具屋" in name: self.color = (50, 50, 200) # 青
         
-    def get_dialogue(self):
+    def get_dialogue(self, player=None):
+        rank = player.guild_rank if player else None
+        if isinstance(self.dialogue, dict):
+            if rank and rank in self.dialogue:
+                return self.dialogue[rank]
+            elif "default" in self.dialogue:
+                return self.dialogue["default"]
+            else:
+                return list(self.dialogue.values())[0]
         return self.dialogue if self.dialogue else [Text.NPC.GENERIC_FALLBACK.format(name=self.name)]
 
 

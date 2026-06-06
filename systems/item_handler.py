@@ -53,9 +53,6 @@ def use_consumable(item_key, player, dungeon=None):
         found = False
         for t in list(dungeon.traps):
             if t.x == tx and t.y == ty:
-                if t.type == "flood_switch":
-                    msg = "この仕掛けは解除できない！"
-                    return msg
                 dungeon.traps.remove(t)
                 found = True
         

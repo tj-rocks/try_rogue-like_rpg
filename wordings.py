@@ -259,4 +259,3 @@ class Text:
         PITFALL = "真っ暗な穴に 落ちていく..."
         DAMAGE_FLOOR = "{damage} ダメージを受けた"
         MINE = "地雷を踏んだ {damage} ダメージ"
-        FLOOD_SWITCH = "怪しいスイッチを踏んだ 部屋の奥から咆哮が聞こえる…"
