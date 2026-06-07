@@ -105,7 +105,7 @@ ENEMY_DATA:
     close_attack_effect: physical_heavy
     ranged_attack_effect: arrow
     attack_priority: ranged
-    smart_ranged_move: true
+    smart_ranged_move: false
     damaged_detect_range: 10
   slime_red:
     quest_targetable: true
@@ -159,7 +159,7 @@ ENEMY_DATA:
     close_attack_effect: explosion
     ranged_attack_effect: explosion
     attack_priority: ranged
-    smart_ranged_move: true
+    smart_ranged_move: false
     damaged_detect_range: 10
   doku_kame:
     quest_targetable: true
@@ -248,7 +248,7 @@ ENEMY_DATA:
       normal: []
       rare: []
     status: poison
-    status_chance: 40
+    status_chance: 20
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
     hp: 17

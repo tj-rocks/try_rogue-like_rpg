@@ -379,7 +379,7 @@ SHIELD_DATA:
         block_chance_close: 0.1
         block_chance_ranged: 0.1
         lantern_bonus: 0
-        regen: 1
+        regen: 10
         stupidity: 0
         armor_penetration: 0.1
         buff_value_ratio: 0

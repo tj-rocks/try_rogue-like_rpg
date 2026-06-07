@@ -401,12 +401,12 @@ ARMOR_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0
-        hp: 20
+        hp: 10
         defense: 12
         block_chance_close: 0
         block_chance_ranged: 0
         lantern_bonus: 0
-        regen: 1
+        regen: 5
         stupidity: 0
         armor_penetration: 0.1
         buff_value_ratio: 0

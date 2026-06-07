@@ -276,7 +276,6 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
                     confirm_dialog = kwargs.get("confirm_dialog")
                     if has_other_buff and confirm_dialog:
                         # 確認ダイアログを出して、Yesなら使用・Noなら何もしない
-                        from wordings import Text
                         item_name = item_data.get("name", "この秘薬")
                         confirm_dialog.text = Text.Items.BUFF_OVERWRITE_CONFIRM.format(name=item_name)
                         def _do_use(iid=item_key_or_iid, p=player, d=current_dungeon):
