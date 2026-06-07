@@ -34,6 +34,7 @@ ARMOR_DATA:
     name: 壊れた鎧
     category: medium
     min_rank: F
+    max_rank: SS
     max_floor: 999
     rarity: 2
     price: 100
@@ -57,6 +58,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
@@ -71,6 +74,7 @@ ARMOR_DATA:
     name: 冒険者の服
     category: robe
     min_rank: F
+    max_rank: SS
     rarity: 1
     price: 150
     image_dir: components/pictures/armor/adventurers_clothes
@@ -93,6 +97,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -107,6 +113,7 @@ ARMOR_DATA:
     name: 皮の胸当て
     category: light
     min_rank: F
+    max_rank: SS
     rarity: 1
     price: 490
     image_dir: components/pictures/armor/leather_armor
@@ -129,6 +136,8 @@ ARMOR_DATA:
         regen: 1
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -143,6 +152,7 @@ ARMOR_DATA:
     name: 鉄の胸当て
     category: medium
     min_rank: F
+    max_rank: SS
     rarity: 2
     price: 550
     image_dir: components/pictures/armor/iron_armor
@@ -165,6 +175,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -179,6 +191,7 @@ ARMOR_DATA:
     name: 鋼の胸当て
     category: medium
     min_rank: E
+    max_rank: SS
     rarity: 3
     price: 1800
     image_dir: components/pictures/armor/fullmetal_armor
@@ -201,6 +214,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -238,6 +253,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.1
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -275,6 +292,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
@@ -291,10 +310,10 @@ ARMOR_DATA:
     min_rank: D
     max_rank: B
     rarity: 3
-    price: 2500
+    price: 4500
     image_dir: components/pictures/armor/fighters_armor
     shop_buyable: true
-    describe: 標準的な戦士の鎧 特にバフやデバフはなく、扱いやすい
+    describe: 標準的な戦士の鎧。装備すると秘薬の持続時間が延長される。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -312,6 +331,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0.2
+        buff_duration_ratio: 0.2
       magic:
         fire_damage: 0
         fire_range: 0
@@ -349,6 +370,8 @@ ARMOR_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -366,7 +389,7 @@ ARMOR_DATA:
     max_rank: B
     rarity: 4
     price: 3200
-    image_dir: components/pictures/armor/pilgrims_armor 
+    image_dir: components/pictures/armor/pilgrims_armor
     shop_buyable: true
     describe: 聖なる加護を受けた巡礼者の軽防具 最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
@@ -378,7 +401,7 @@ ARMOR_DATA:
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0
-        hp: 30
+        hp: 20
         defense: 12
         block_chance_close: 0
         block_chance_ranged: 0
@@ -386,6 +409,8 @@ ARMOR_DATA:
         regen: 1
         stupidity: 0
         armor_penetration: 0.1
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -423,6 +448,8 @@ ARMOR_DATA:
         aggro_mod: 3
         stupidity: 0
         armor_penetration: 0.1
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0
         fire_range: 0
@@ -460,6 +487,8 @@ ARMOR_DATA:
         aggro_mod: 5
         stupidity: 1
         armor_penetration: 0.3
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.10
         fire_range: 0

@@ -99,6 +99,7 @@ PLAYER_REGEN_MULTIPLIER = _p.get("regen_multiplier", 0.05)
 _curse = _balance.get("CURSE_SYSTEM", {})
 CURSE_REDUCTION_RATE = _curse.get("reduction_rate", 0.10)
 CURSE_RECOVERY_COST_GP_PER_LEVEL = _curse.get("recovery_cost_gp_per_level", 50)
+CURSE_RECOVERY_COST_GOLD_MULTIPLIER = _curse.get("recovery_cost_gold_multiplier", 10)
 
 PLAYER_WEAPON   = "old_sword"
 PLAYER_ARMOR    = "adventurers_clothes"
@@ -272,6 +273,7 @@ GP_RANK_DIFF_MULTIPLIERS = _gq.get("GP_RANK_DIFF_MULTIPLIERS", {
 _guild = load_master_data("guild.json")
 GUILD_RANKS = _guild.get("GUILD_RANKS", [])
 RANK_ORDER  = _guild.get("RANK_ORDER", [])
+RANKUP_GIFTS = _guild.get("RANKUP_GIFTS", [])
 RANK_FLOOR_MAP = generate_rank_floor_map(GUILD_RANKS)
 
 # --- 各種データの正規化読み込み ---

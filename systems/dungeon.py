@@ -334,17 +334,6 @@ class Dungeon:
                             self.textures[key] = load_and_scale(path)
                             # wall_top_variants に含めることでゲートとして選ばれるようにする
                             self.available_wall_top_variants.append(key)
-            # もし wall_decoration_variants が空の場合、フォールバックとして shallow テーマから読み込む
-            if not self.available_wall_decoration_variants:
-                fallback_dir = main_path + "/shallow"
-                if os.path.exists(fallback_dir):
-                    for f in os.listdir(fallback_dir):
-                        if f.endswith(".png") and f.startswith("wall_decoration"):
-                            key = f[:-4]
-                            path = os.path.join(fallback_dir, f)
-                            self.textures[key] = load_and_scale(path)
-                            self.available_wall_decoration_variants.append(key)
-                            print(f"[Dungeon] Loaded fallback wall_decoration '{key}' from {path}")
 
             # バリデーションとベースキーの補完
             for base_key, variant_list in [("floor", self.available_floor_variants), 
@@ -978,7 +967,8 @@ class Dungeon:
                                           image_path=data["image_path"],
                                           base_image_path=tile_info.get("base_image_path", data.get("base_image_path")),
                                           role=role,
-                                          flip=pos.get("flip", False))
+                                          flip=pos.get("flip", False),
+                                          alpha=data.get("alpha"))
                                 self.npcs.append(npc)
                                 if role == "inn": self.inn_pos = (c, r)
                                 if role == "doctor": self.clinic_pos = (c, r)
@@ -1081,6 +1071,10 @@ class Dungeon:
         if self.is_outbreak:
             from constants import OUTBREAK_ITEM_MULT
             count = int(count * OUTBREAK_ITEM_MULT)
+            
+        # フロア設定によるアイテム出現比率の適用 (例: 0.5で半減)
+        ratio_mult = self.floor_info.get("item_ratio", 1.0)
+        count = max(0, int(count * ratio_mult))
         
         # ランクアップアイテムのチェック
         cert_to_spawn = None
@@ -1759,7 +1753,7 @@ class Dungeon:
                     pass 
         return self
 
-    def draw(self, screen, camera_x, camera_y):
+    def draw(self, screen, camera_x, camera_y, player=None):
         # [SAFETY] クリーンアップ済みのダンジョンの場合は描画をスキップ
         if self.map_data is None:
             screen.fill((0, 0, 0))
@@ -1834,7 +1828,7 @@ class Dungeon:
         for t in self.traps: t.draw(screen, camera_x, camera_y, self.tile_size)
         for i in self.dropped_items: i.draw(screen, camera_x, camera_y)
         for n in self.npcs:
-            if camera_x - n.width <= n.x <= camera_x + sw and camera_y - n.height <= n.y <= camera_y + sh: n.draw(screen, camera_x, camera_y)
+            if camera_x - n.width <= n.x <= camera_x + sw and camera_y - n.height <= n.y <= camera_y + sh: n.draw(screen, camera_x, camera_y, player)
         
         # マジックエフェクトを最前面（UI除く）に描画
         for f in self.magic_effects: f.draw(screen, camera_x, camera_y)

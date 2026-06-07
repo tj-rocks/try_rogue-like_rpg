@@ -146,8 +146,12 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                         data = npcs.get(entity_id)
                         if data:
                             img = data.get("image_path", "")
+                            # image_path が辞書形式（ランク別）の場合は "default" キーを優先して使う
+                            if isinstance(img, dict):
+                                img = img.get("default") or next(iter(img.values()), "")
+                            img = img or ""
                             # Check file naming rules for guide NPCs vs normal NPCs
-                            if os.path.exists(os.path.join(base_dir, img, "0.png")):
+                            if os.path.exists(os.path.join(base_dir, str(img), "0.png")):
                                 image_file = "0.png"
                             else:
                                 image_file = "idel.png"
@@ -295,6 +299,23 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                     else:
                         if "positions" in v:
                             del v["positions"]
+                
+                # YMLに未定義だがエディタで配置されたNPCエントリを自動追加
+                # (village.yml経由で新しく追加されたNPC等がここで保存される)
+                base_npcs = load_master_data("npcs.yml") or {}
+                for ent_id, positions in grouped.items():
+                    if ent_id not in mappings:
+                        # npcs.ymlにあるNPCならcategory=npcで追加
+                        if ent_id in base_npcs:
+                            mappings[ent_id] = {"category": "npc", "id": ent_id, "positions": positions}
+                        else:
+                            # obstacleやwall_decorationは village.yml のベースから探す
+                            base_mappings = (load_master_data("village.yml") or {}).get("TILE_MAPPINGS", {})
+                            if ent_id in base_mappings and isinstance(base_mappings[ent_id], dict):
+                                entry = dict(base_mappings[ent_id])
+                                entry.pop("positions", None)  # village座標は使わない
+                                entry["positions"] = positions
+                                mappings[ent_id] = entry
                 
                 # 古いENTITIESブロック（もし残っていれば）を完全に排除
                 if "ENTITIES" in village_yml_data:

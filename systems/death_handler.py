@@ -6,6 +6,53 @@ from constants import (
 from wordings import Text
 from systems.audio_manager import play_bgm
 
+def calculate_carried_items_value(player):
+    """
+    プレイヤーが持ち歩いているインベントリ内のすべてのアイテム・装備品の売却額の合計を計算する。
+    """
+    from constants import (
+        CONSUMABLE_DATA, WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, STAVE_DATA, ACCESSORY_DATA
+    )
+
+    def get_sell_price(data):
+        if "selling_price" in data:
+            return int(data["selling_price"])
+        return int(data.get("price", 0) // 3)
+
+    total_val = 0
+
+    # 1. 消耗品
+    for item in player.items:
+        info = CONSUMABLE_DATA.get(item["key"], {})
+        total_val += get_sell_price(info) * item["count"]
+
+    # 2. 武器
+    for eq in player.weapon_inventory:
+        data = WEAPON_DATA.get(eq.key, {})
+        total_val += get_sell_price(data)
+
+    # 3. 鎧
+    for eq in player.armor_inventory:
+        data = ARMOR_DATA.get(eq.key, {})
+        total_val += get_sell_price(data)
+
+    # 4. 盾
+    for eq in player.shield_inventory:
+        data = SHIELD_DATA.get(eq.key, {})
+        total_val += get_sell_price(data)
+
+    # 5. 杖
+    for st in player.stave_inventory:
+        data = STAVE_DATA.get(st.key, {})
+        total_val += get_sell_price(data)
+
+    # 6. アクセサリ
+    for eq in getattr(player, "accessory_inventory", []):
+        data = ACCESSORY_DATA.get(eq.key, {})
+        total_val += get_sell_price(data)
+
+    return total_val
+
 def handle_death_sequence(player, dungeon, dialog, game_state):
     """
     プレイヤー死亡時の演出シーケンス（タイマー、メッセージ、ペナルティ、復活）を処理する。
@@ -55,23 +102,13 @@ def handle_death_sequence(player, dungeon, dialog, game_state):
             player.condition = "normal"
             player.status_timer = 0
 
-            # 所持金を半分にする（銀行預金は無事）
-            player.coin //= 2
-            
-            # 医者の治療費を適用（優先度：手持ち -> 銀行 -> 借金）
-            fee = DOCTOR_FEE
-            if player.coin >= fee:
-                player.coin -= fee
-            else:
-                fee -= player.coin
-                player.coin = 0
-                if player.bank_coin >= fee:
-                    player.bank_coin -= fee
-                else:
-                    # 銀行にも足りなければ借金（マイナス）
-                    fee -= player.bank_coin
-                    player.bank_coin = 0
-                    player.coin = -fee
+            # 総資産 = 所持金 + 預金 + 所持品の売却価値合計
+            carried_items_val = calculate_carried_items_value(player)
+            total_money = player.coin + player.bank_coin + carried_items_val
+            penalty = 0
+            if total_money > 0:
+                penalty = total_money // 2
+                player.coin -= penalty
 
             # 診療所へワープ
             dungeon = warp_to_floor(0, player, is_death=True, spawn_reason="continue")
@@ -85,7 +122,7 @@ def handle_death_sequence(player, dungeon, dialog, game_state):
             if player.curse_level > 0:
                 curse_msg = f"\n\n🚨【死の呪い】段階 {player.curse_level}/5\n最大HPが {player.curse_level * 10}% 低下中"
 
-            dialog.text = Text.System.DOCTOR_REVIVE + curse_msg
+            dialog.text = Text.System.DOCTOR_REVIVE.format(penalty=penalty) + curse_msg
             game_state["dialog_modal"] = True
             dialog.is_active = True
             game_state["death_sequence_step"] = 4

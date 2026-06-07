@@ -124,7 +124,7 @@ ENEMY_DATA:
     defense: 20
     evasion: 15
     exp: 5
-    reward_gold: 20
+    reward_gold: 100
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
@@ -179,7 +179,7 @@ ENEMY_DATA:
     defense: 50
     evasion: 5
     exp: 8
-    reward_gold: 25
+    reward_gold: 100
     accuracy_close: 90
     accuracy_ranged: 100
     attack_range: 1
@@ -199,9 +199,9 @@ ENEMY_DATA:
       rare: [old_sword, iron_sword]
     normal_drop_rate: 0.15
     rare_drop_rate: 0.03
-    hp: 20
-    attack: 15
-    defense: 25
+    hp: 24
+    attack: 20
+    defense: 33
     evasion: 10
     exp: 12
     reward_gold: 200
@@ -225,11 +225,11 @@ ENEMY_DATA:
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
     hp: 20
-    attack: 16
-    defense: 38
+    attack: 19
+    defense: 40
     evasion: 10
     exp: 15
-    reward_gold: 30
+    reward_gold: 200
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 2
@@ -252,11 +252,11 @@ ENEMY_DATA:
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
     hp: 17
-    attack: 13
+    attack: 17
     defense: 25
     evasion: 10
     exp: 15
-    reward_gold: 30
+    reward_gold: 220
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 2
@@ -277,11 +277,11 @@ ENEMY_DATA:
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
     hp: 21
-    attack: 18
+    attack: 22
     defense: 25
     evasion: 10
     exp: 15
-    reward_gold: 30
+    reward_gold: 200
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
@@ -301,12 +301,12 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 2
-    attack: 3
-    defense: 17
+    hp: 30
+    attack: 25
+    defense: 50
     evasion: 10
     exp: 15
-    reward_gold: 30
+    reward_gold: 450
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
@@ -326,13 +326,13 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 32
-    attack: 29
-    defense: 0
+    hp: 25
+    attack: 12
+    defense: 40
     evasion: 20
     exp: 15
-    reward_gold: 30
-    accuracy_close: 100
+    reward_gold: 400
+    accuracy_close: 80
     accuracy_ranged: 100
     attack_range: 1
     stupidity: 3
@@ -351,12 +351,12 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 1
-    attack: 2
+    hp: 20
+    attack: 25
     defense: 25
     evasion: 18
     exp: 15
-    reward_gold: 30
+    reward_gold: 400
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
@@ -376,12 +376,12 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 0.1
     rare_drop_rate: 0.0
-    hp: 2
-    attack: 3
-    defense: 17
+    hp: 20
+    attack: 20
+    defense: 90
     evasion: 10
     exp: 15
-    reward_gold: 30
+    reward_gold: 450
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
@@ -472,13 +472,13 @@ ENEMY_DATA:
       rare: [fullmetal_sword, fullmetal_round_shield, fullmetal_breastplate]
     normal_drop_rate: 0.25
     rare_drop_rate: 0.15
-    hp: 88
-    attack: 24
-    defense: 56
+    hp: 95
+    attack: 25
+    defense: 70
     evasion: 30
     exp: 50
     reward_gold: 1000
-    accuracy_close: 90
+    accuracy_close: 96
     accuracy_ranged: 90
     attack_range: 5
     stupidity: 0
@@ -505,7 +505,7 @@ ENEMY_DATA:
     normal_drop_rate: 0.25
     rare_drop_rate: 0.20
     hp: 120
-    attack: 26
+    attack: 20
     defense: 60
     evasion: 25
     exp: 80
@@ -519,6 +519,33 @@ ENEMY_DATA:
     ranged_attack_effect: sonic_wave
     attack_priority: close
     damaged_detect_range: 100
+
+  guild_assassin:
+    quest_targetable: true
+    name: ギルドの刺客
+    min_rank: S
+    image_folder: components/pictures/enemies/skelton_sword_armor
+    crit_rate: 0.15
+    drops:
+      normal: [hp_potion]
+      rare: [hunters_rapier]
+    normal_drop_rate: 0.20
+    rare_drop_rate: 0.05
+    hp: 150
+    attack: 40
+    defense: 35
+    evasion: 35
+    exp: 200
+    reward_gold: 1000
+    accuracy_close: 95
+    accuracy_ranged: 90
+    attack_range: 1
+    stupidity: 1
+    image_scale: 1.0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: sonic_wave
+    attack_priority: close
+    damaged_detect_range: 50
   undead_father:
     quest_targetable: true
     name: 父の亡霊

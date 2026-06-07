@@ -229,6 +229,7 @@ TELEPORT_CONFIG:
 # ------------------------------------------------------------------------------
 CURSE_SYSTEM:
   reduction_rate: 0.10             # 1つ呪われるごとの能力下降率 (0.10 = 10%)
-  recovery_cost_gp_per_level: 50   # 1段階呪いを解くのに必要なギルドポイント (GP)
+  recovery_cost_gp_per_level: 50   # 1段階呪いを解くのに必要なギルドポイント (GP) - ※動的に計算されるため未使用、または基準値
+  recovery_cost_gold_multiplier: 10 # 呪いを解く際に消費GPの何倍のゴールドが必要か
 
 

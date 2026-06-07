@@ -226,7 +226,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             floor_map = generate_rank_floor_map(ranks_list)
             
             enemies = get_normalized_enemy_data(floor_map)
-            weapons, armor, shields, w_cats, a_cats, s_cats = get_normalized_equipment_data(floor_map)
+            weapons, armor, shields, accessories, w_cats, a_cats, s_cats, acc_cats = get_normalized_equipment_data(floor_map)
             
             print(f"[API] Normalized {len(enemies)} enemies, {len(weapons)} weapons, {len(armor)} armors")
             
@@ -237,11 +237,12 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 "weapons": weapons,
                 "armor": armor,
                 "shields": shields,
+                "accessories": accessories,
                 "raw_enemies": load_master_data("enemies.yml"),
                 "raw_equipment": {
-                    **load_master_data("weapons.yml"),
-                    **load_master_data("armors.yml"),
-                    **load_master_data("shields.yml")
+                    **load_master_data("equipments/weapons.yml"),
+                    **load_master_data("equipments/armors.yml"),
+                    **load_master_data("equipments/shields.yml")
                 }
             }
             self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))

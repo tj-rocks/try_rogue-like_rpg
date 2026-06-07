@@ -6,7 +6,8 @@ from systems.ui import (
     EquipDialog, EnhanceDialog, ItemActionDialog, OreSelectionDialog, ShopDialog,
     ParameterSelectionDialog,
     StaveSelectionDialog, GuildDialog, WarehouseDialog, BankDialog, MenuDialog,
-    StaveInventoryDialog, EventInventoryDialog, TeleportDialog, GuildGuideDialog
+    StaveInventoryDialog, EventInventoryDialog, TeleportDialog, GuildGuideDialog,
+    OreGiftDialog
 )
 from wordings import Text
 
@@ -30,7 +31,7 @@ def setup_ui_relations(ui_elements, player, dungeon, game_state):
     event_inv_dialog = ui_elements["event_inventory_dialog"]
 
     # セットアップ実行
-    inventory_dialog.setup(player, dialog, game_state, dungeon, stave_selection_dialog, item_action_dialog)
+    inventory_dialog.setup(player, dialog, game_state, dungeon, stave_selection_dialog, item_action_dialog, confirm_dialog=confirm_dialog)
     inventory_dialog.menu_dialog = menu_dialog # 参照を持たせる
     
     stave_selection_dialog.setup(player, dialog)
@@ -42,16 +43,17 @@ def setup_ui_relations(ui_elements, player, dungeon, game_state):
         ore_selection_dialog.parameter_selection_dialog = parameter_selection_dialog
         parameter_selection_dialog._back_dialog = ore_selection_dialog
     
-    equip_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog)
+    equip_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog, confirm_dialog=confirm_dialog)
     equip_dialog.menu_dialog = menu_dialog
     
-    stave_inv_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog)
+    stave_inv_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog, confirm_dialog=confirm_dialog)
     stave_inv_dialog.menu_dialog = menu_dialog
     
-    event_inv_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog)
+    event_inv_dialog.setup(player, dialog, game_state, dungeon, None, item_action_dialog, confirm_dialog=confirm_dialog)
     event_inv_dialog.menu_dialog = menu_dialog
     
     ui_elements["guild_dialog"].cutscene_manager = ui_elements["cutscene_manager"]
+    ui_elements["guild_dialog"].ore_gift_dialog = ui_elements.get("ore_gift_dialog")
 
     # メニューのコールバック設定
     def on_inventory(): inventory_dialog.is_active = True
@@ -152,5 +154,6 @@ def init_ui_elements(screen_width, screen_height):
         "event_inventory_dialog": EventInventoryDialog(screen_width, screen_height),
         "teleport_dialog": TeleportDialog(screen_width, screen_height),
         "guild_guide_dialog": GuildGuideDialog(screen_width, screen_height),
+        "ore_gift_dialog": OreGiftDialog(screen_width, screen_height),
         "cutscene_manager": CutsceneManager(screen_width, screen_height),
     }

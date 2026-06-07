@@ -105,50 +105,69 @@ class MockNPC:
     def __init__(self, role, dialogue):
         self.role = role
         self.dialogue = dialogue
-    def get_dialogue(self):
+    def get_dialogue(self, player=None):
         return self.dialogue
 
 def test_priest_services():
     print("\n--- 神官解呪テスト開始 ---")
     player = Player()
     player.guild_point = 100
+    player.coin = 1000
     player.curse_level = 1
     player.cursed_stats = ["hp"]
     
     dialog = Dialog(800, 600)
     confirm = ConfirmDialog(800, 600)
     
+    from constants import CURSE_RECOVERY_COST_GOLD_MULTIPLIER
     cost = max(1, player.guild_point // 10)
+    gold_cost = cost * CURSE_RECOVERY_COST_GOLD_MULTIPLIER
     assert cost == 10
+    assert gold_cost == 100
     
-    # 1. 呪われている状態で話しかけると、歓迎ダイアログと確認ダイアログがアクティブになる
-    assert player.curse_level == 1
-    dialog.text = Text.NPC.PRIEST_WELCOME
-    dialog.is_active = True
-    confirm.text = Text.NPC.PRIEST_CURE_CONFIRM.format(cost=cost)
-    
-    # yesコールバックを定義
-    def on_priest_yes():
-        if player.guild_point >= cost:
+    # 1. ゴールドが足りない場合のテスト
+    player.coin = 50  # 100G必要だが50Gしかない
+    def on_priest_yes_no_gold():
+        if player.guild_point < cost:
+            pass
+        elif player.coin < gold_cost:
+            dialog.text = Text.NPC.PRIEST_NO_GOLD.format(gold_cost=gold_cost)
+        else:
             player.guild_point -= cost
+            player.coin -= gold_cost
             player.curse_level -= 1
             player.cursed_stats = ["hp"] if player.curse_level > 0 else []
             dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat="最大HP")
-            dialog.is_active = True
-            player.save_to_file()
             
-    confirm.on_yes = on_priest_yes
-    confirm.is_active = True
+    confirm.on_yes = on_priest_yes_no_gold
+    confirm.on_yes()
+    assert "ゴールドが足りない" in dialog.text
+    assert player.curse_level == 1  # 解除されていないこと
+    assert player.guild_point == 100
+    assert player.coin == 50
+    print("[OK] ゴールド不足による解呪不可を確認")
     
-    assert confirm.is_active == True
-    assert dialog.is_active == True
-    
-    # Yesボタンを押す
+    # 2. 呪われている状態でGPとゴールドが十分ある場合
+    player.coin = 1000
+    def on_priest_yes_success():
+        if player.guild_point < cost:
+            pass
+        elif player.coin < gold_cost:
+            dialog.text = Text.NPC.PRIEST_NO_GOLD.format(gold_cost=gold_cost)
+        else:
+            player.guild_point -= cost
+            player.coin -= gold_cost
+            player.curse_level -= 1
+            player.cursed_stats = ["hp"] if player.curse_level > 0 else []
+            dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat="最大HP")
+
+    confirm.on_yes = on_priest_yes_success
     confirm.on_yes()
     
-    # 2. 解呪後の状態検証
-    print(f"解呪後: GP={player.guild_point}, 呪いレベル={player.curse_level}, 被デバフステータス数={len(player.cursed_stats)}")
+    # 解呪後の状態検証
+    print(f"解呪後: GP={player.guild_point}, 所持金={player.coin}, 呪いレベル={player.curse_level}, 被デバフステータス数={len(player.cursed_stats)}")
     assert player.guild_point == 90
+    assert player.coin == 900
     assert player.curse_level == 0
     assert len(player.cursed_stats) == 0
     

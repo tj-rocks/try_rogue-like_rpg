@@ -76,11 +76,7 @@ class Trap:
             dungeon.magic_effects.append(FireEffect(tx, ty, size=120, color=(255, 180, 50)))
             msg += Text.Trap.MINE.format(damage=dmg)
             
-        elif self.type == "flood_switch":
-            # フロードスイッチ：氾濫イベント開始
-            dungeon.trigger_overflow(player, dialog)
-            msg = Text.Trap.FLOOD_SWITCH
-            
+
         # [NEW] ステータス異常の付与
         inflict_status = self.data.get("status")
         if inflict_status:
@@ -93,7 +89,7 @@ class Trap:
 
     def draw(self, screen, camera_x, camera_y, tile_size):
         """発見済みの罠のみ描画する (スイッチは常に表示)"""
-        if not self.is_revealed and self.type != "flood_switch":
+        if not self.is_revealed:
             return
             
         draw_x = self.x * tile_size - camera_x
@@ -115,9 +111,5 @@ class Trap:
             elif self.type == "mine":
                 points = [(tile_size//2, 8), (8, tile_size-8), (tile_size-8, tile_size-8)]
                 pygame.draw.polygon(s, (*color, 150), points)
-            elif self.type == "flood_switch":
-                # スイッチは水色の台座
-                margin = tile_size // 6
-                pygame.draw.rect(s, (0, 200, 255, 180), (margin, margin, tile_size - margin*2, tile_size - margin*2), border_radius=5)
-                pygame.draw.circle(s, (255, 255, 255, 200), (tile_size//2, tile_size//2), tile_size//6)
+
             screen.blit(s, (draw_x, draw_y))

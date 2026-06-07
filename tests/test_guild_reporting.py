@@ -229,6 +229,99 @@ class TestGuildReporting(unittest.TestCase):
         self.assertTrue(confirm_dialog.is_active)
         self.assertEqual(confirm_dialog.text, Text.UI.GUILD_REPORT_CONFIRM_GENERIC)
 
+    def test_rank_up_gift_exchange(self):
+        """昇格報告時にお祝いプレゼントの選択と付与が正しく機能することをテスト"""
+        from systems.ui import OreGiftDialog
+        from constants import KEY_CONFIRM
+        
+        # 1. 昇格報告の準備
+        quest = {
+            "id": "rank_up_E",
+            "type": "delivery",
+            "is_rank_up": True,
+            "target_key": "guild_cert_e",
+            "amount": 1,
+            "next_rank": "E",
+            "title": "Eランクへの昇格",
+            "reward_gold": 2500,
+            "reward_gp": 0
+        }
+        self.player.active_quests.append(quest)
+        self.player.event_items.append({"key": "guild_cert_e", "count": 1})
+        self.player.guild_rank = "F"
+        
+        # mock save_to_file to avoid physical saving during tests
+        self.player.save_to_file = MagicMock()
+        
+        # 2. OreGiftDialogをセットアップ
+        ore_dialog = OreGiftDialog(1200, 900)
+        self.guild_dialog.ore_gift_dialog = ore_dialog
+        
+        # 3. 報告実行
+        self.guild_dialog._report_quest(self.player, quest, self.message_dialog)
+        
+        # 4. 検証: ランクがEになり、OreGiftDialogがアクティブになっていること
+        self.assertEqual(self.player.guild_rank, "E")
+        self.assertTrue(ore_dialog.is_active)
+        self.assertGreater(len(ore_dialog.ores), 0)
+        
+        # 5. プレゼントの選択とお祝いの獲得をシミュレート (最初のアイテムを選択)
+        selected_key, selected_name = ore_dialog.ores[0]
+        
+        # 決定キー入力を送信
+        event = pygame.event.Event(pygame.KEYDOWN, key=KEY_CONFIRM)
+        ore_dialog.handle_events([event])
+        
+        # 6. 検証: プレゼントUIが非アクティブになり、プレイヤーのインベントリに選んだアイテムがあること
+        self.assertFalse(ore_dialog.is_active)
+        self.assertTrue(any(i["key"] == selected_key for i in self.player.items) or \
+                        any(i["key"] == selected_key for i in self.player.event_items))
+        self.assertIn(selected_name, self.message_dialog.text)
+
+    def test_rank_up_inventory_full(self):
+        """インベントリがいっぱいの時に昇格報告が遮断され、ダイアログが閉じることをテスト"""
+        from constants import MAX_ITEM_SLOTS
+        
+        # 1. 昇格報告の準備
+        quest = {
+            "id": "rank_up_E",
+            "type": "delivery",
+            "is_rank_up": True,
+            "target_key": "guild_cert_e",
+            "amount": 1,
+            "next_rank": "E",
+            "title": "Eランクへの昇格",
+            "reward_gold": 2500,
+            "reward_gp": 0
+        }
+        self.player.active_quests.append(quest)
+        self.player.event_items.append({"key": "guild_cert_e", "count": 1})
+        self.player.guild_rank = "F"
+        
+        # 2. インベントリを満タンにする
+        self.player.items = [{"key": "hp_potion", "count": 1} for _ in range(MAX_ITEM_SLOTS)]
+        
+        # 3. ギルドダイアログのアクティブ化
+        self.guild_dialog.is_active = True
+        self.guild_dialog.npc_role = "guild_rankup"
+        self.guild_dialog.setup(self.player, self.guild_dialog.dungeon_ref)
+        
+        # 4. handle_eventsを実行して報告処理の開始を試みる
+        confirm_dialog = MagicMock()
+        confirm_dialog.is_active = False
+        
+        self.guild_dialog.handle_events([], self.player, self.message_dialog, confirm_dialog)
+        
+        # 5. 検証: 確認ダイアログは表示されず、ギルドダイアログが閉じ、警告メッセージが表示されること
+        self.assertFalse(confirm_dialog.is_active)
+        self.assertFalse(self.guild_dialog.is_active)
+        self.assertTrue(self.message_dialog.is_active)
+        self.assertIn("バッグがいっぱい", self.message_dialog.text)
+        
+        # 報告保留も解除され、クエスト自体はまだ未達成のまま残っていること
+        self.assertIsNone(self.guild_dialog._pending_report)
+        self.assertEqual(len(self.player.active_quests), 1)
+        self.assertEqual(self.player.guild_rank, "F")
 
 
 if __name__ == "__main__":

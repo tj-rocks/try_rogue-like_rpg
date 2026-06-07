@@ -40,7 +40,7 @@ GUILD_RANKS:
   rank_up_item: adventurer_proof
   rank_up_reward_gold: 1000
 - rank: E
-  required_gp: 100
+  required_gp: 150
   allowed_ranks:
   - F
   - E
@@ -52,7 +52,7 @@ GUILD_RANKS:
   rank_up_item: guild_cert_e
   rank_up_reward_gold: 2500
 - rank: D
-  required_gp: 280
+  required_gp: 600
   allowed_ranks:
   - E
   - D
@@ -64,7 +64,7 @@ GUILD_RANKS:
   rank_up_item: guild_cert_d
   rank_up_reward_gold: 5000
 - rank: C
-  required_gp: 610
+  required_gp: 1800
   allowed_ranks:
   - D
   - C
@@ -76,7 +76,7 @@ GUILD_RANKS:
   rank_up_item: guild_cert_c
   rank_up_reward_gold: 10000
 - rank: B
-  required_gp: 1160
+  required_gp: 4500
   allowed_ranks:
   - C
   - B
@@ -88,7 +88,7 @@ GUILD_RANKS:
   rank_up_item: guild_cert_b
   rank_up_reward_gold: 25000
 - rank: A
-  required_gp: 1960
+  required_gp: 10000
   allowed_ranks:
   - B
   - A
@@ -99,7 +99,7 @@ GUILD_RANKS:
   limit_floor: 70
   rank_up_item: guild_cert_a
 - rank: S
-  required_gp: 3560
+  required_gp: 20000
   allowed_ranks:
   - A
   - S
@@ -110,7 +110,7 @@ GUILD_RANKS:
   limit_floor: 80
   rank_up_item: guild_cert_s
 - rank: SS
-  required_gp: 6560
+  required_gp: 40000
   allowed_ranks:
   - S
   - SS
@@ -130,3 +130,12 @@ RANK_ORDER:
 - A
 - S
 - SS
+
+RANKUP_GIFTS:
+- red_stone
+- blue_stone
+- green_stone
+- purple_stone
+- return_wing
+- teleport_stone
+- revive_amulet

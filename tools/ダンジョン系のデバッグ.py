@@ -83,11 +83,35 @@ def setup_gungeon_mode(dungeon, player):
 
         # [NEW] 出現可能なアイテムをリストアップ
         candidates = []
+        
+        # 進行中のクエストアイテムは確定で追加する（ただし出現階層条件を満たす場合のみ）
+        for q in player.active_quests:
+            tk = q.get("target_key")
+            if tk:
+                # アイテムデータから階層制限を取得してチェック
+                item_data = (WEAPON_DATA.get(tk) or ARMOR_DATA.get(tk) or 
+                             SHIELD_DATA.get(tk) or CONSUMABLE_DATA.get(tk) or 
+                             STAVE_DATA.get(tk) or ACCESSORY_DATA.get(tk))
+                if item_data:
+                    min_f = item_data.get("min_floor", 1)
+                    max_f = item_data.get("max_floor", 999)
+                    if not (min_f <= dungeon.current_floor <= max_f):
+                        continue
+                
+                if tk in WEAPON_DATA: candidates.append(("weapon", tk))
+                elif tk in ARMOR_DATA: candidates.append(("armor", tk))
+                elif tk in SHIELD_DATA: candidates.append(("shield", tk))
+                elif tk in CONSUMABLE_DATA: candidates.append(("item", tk))
+                elif tk in STAVE_DATA: candidates.append(("stave", tk))
+                elif tk in ACCESSORY_DATA: candidates.append(("accessory", tk))
+                
         # アイテムカタログをスキャン
         for ctype, catalog in [("weapon", WEAPON_DATA), ("armor", ARMOR_DATA), 
                                ("shield", SHIELD_DATA), ("item", CONSUMABLE_DATA), ("stave", STAVE_DATA),
                                ("accessory", ACCESSORY_DATA)]:
             for k, it in catalog.items():
+                if it.get("category") == "event":
+                    continue
                 # 階層チェックを優先 (Floor制限があるアイテムのみ)
                 min_f = it.get("min_floor", 1)
                 max_f = it.get("max_floor", 999)
@@ -137,7 +161,7 @@ def setup_gungeon_mode(dungeon, player):
         from components.sprites.trap import Trap
         dungeon.traps = []
         trap_start_idx = len(candidates)
-        trap_keys = [k for k in TRAP_DATA.keys() if k != "flood_switch"]
+        trap_keys = list(TRAP_DATA.keys())
         for i, trap_key in enumerate(trap_keys):
             if trap_start_idx + i >= len(floor_tiles): break
             tx, ty = floor_tiles[trap_start_idx + i]
@@ -252,10 +276,10 @@ def main():
         player.add_item_to_inventory("teleport_stone", 50)
         
         # 強化用の石を追加
-        player.add_item_to_inventory("red_stone", 9)
-        player.add_item_to_inventory("blue_stone", 9)
-        player.add_item_to_inventory("green_stone", 9)
-        player.add_item_to_inventory("purple_stone", 9)
+        player.add_item_to_inventory("red_stone", 2)
+        player.add_item_to_inventory("blue_stone", 2)
+        player.add_item_to_inventory("green_stone", 2)
+        player.add_item_to_inventory("purple_stone", 2)
         
         # 検証用の武器・防具・盾を追加
         from components.sprites.player import EquipInstance

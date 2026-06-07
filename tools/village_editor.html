@@ -1236,7 +1236,7 @@ async function loadTileDefinitions() {
           bgImgPath,
           val.category || 'floor',
           val.subcategory || null,
-          val.dialogue || []
+          Array.isArray(val.dialogue) ? val.dialogue : (val.dialogue ? (val.dialogue.default || Object.values(val.dialogue)[0] || []) : [])
         ];
       });
       console.log("🟢 Dynamic tile definitions loaded from village.yml / npcs.yml / obstacles.yml!");

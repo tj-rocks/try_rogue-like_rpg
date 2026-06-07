@@ -20,22 +20,67 @@ def use_consumable(item_key, player, dungeon=None):
     # ---- エフェクト処理 ----
     if effect == "heal_hp":
         amount = data.get("heal_amount", 20)
+        if getattr(player, "regen_buff_turns", 0) > 0:
+            boost = getattr(player, "regen_buff_heal_boost", 0.0)
+            amount = round(amount * (1 + boost))
         old_hp = player.hp
         player.hp = min(player.max_hp, player.hp + amount)
         recovered = player.hp - old_hp
         msg = Text.Items.RECOVER_HP.format(item=data['name'], recovered=recovered)
     elif effect == "antidote":
         player.condition = "normal"
-        msg = f"{data['name']}を使用した 毒が消えた"
+        msg = Text.Items.ANTIDOTE_USE.format(name=data['name'])
     elif effect == "poison_self":
         player.condition = "poison"
-        msg = f"{data['name']}を使用した！ ウッ、身体が毒に侵された！"
+        msg = Text.Items.POISON_SELF_USE.format(name=data['name'])
+    elif effect == "buff_attack":
+        duration_ratio = getattr(player, "get_magic_bonus", lambda k: 0)("buff_duration_ratio")
+        value_ratio = getattr(player, "get_magic_bonus", lambda k: 0)("buff_value_ratio")
+        player.attack_buff_turns = round(data.get("duration", 10) * (1 + duration_ratio))
+        player.attack_buff_max_turns = player.attack_buff_turns  # HUDバー用
+        player.attack_buff_val = round(data.get("value", 5) * (1 + value_ratio))
+        player.attack_buff_crit = data.get("crit_bonus", 0)
+        player.attack_buff_armor_pen = data.get("armor_pen", 0.0)
+        # 他の秘薬バフをクリア
+        player.regen_buff_turns = 0
+        player.magic_buff_turns = 0
+        msg = Text.Items.BUFF_ATTACK_USE.format(name=data['name'])
+    elif effect == "buff_regen":
+        duration_ratio = getattr(player, "get_magic_bonus", lambda k: 0)("buff_duration_ratio")
+        value_ratio = getattr(player, "get_magic_bonus", lambda k: 0)("buff_value_ratio")
+        player.regen_buff_turns = round(data.get("duration", 15) * (1 + duration_ratio))
+        player.regen_buff_max_turns = player.regen_buff_turns  # HUDバー用
+        player.regen_buff_val = round(data.get("value", 2) * (1 + value_ratio))
+        player.regen_buff_heal_boost = data.get("heal_boost", 0.0)
+        # 他の秘薬バフをクリア
+        player.attack_buff_turns = 0
+        player.magic_buff_turns = 0
+        msg = Text.Items.BUFF_REGEN_USE.format(name=data['name'])
+    elif effect == "buff_magic":
+        duration_ratio = getattr(player, "get_magic_bonus", lambda k: 0)("buff_duration_ratio")
+        value_ratio = getattr(player, "get_magic_bonus", lambda k: 0)("buff_value_ratio")
+        player.magic_buff_turns = round(data.get("duration", 15) * (1 + duration_ratio))
+        player.magic_buff_max_turns = player.magic_buff_turns  # HUDバー用
+        player.magic_buff_val = data.get("value", 0.30) * (1 + value_ratio)
+        # 他の秘薬バフをクリア
+        player.attack_buff_turns = 0
+        player.regen_buff_turns = 0
+        # 所持しているすべての杖の使用回数を回復する
+        stave_recovery = data.get("stave_recovery", 0)
+        recovered_staves = 0
+        for stave in getattr(player, "stave_inventory", []):
+            stave.charges += stave_recovery
+            recovered_staves += 1
+        msg = Text.Items.BUFF_MAGIC_USE.format(
+            name=data['name'],
+            stave_recovery=stave_recovery
+        )
     elif effect == "material":
         msg = Text.Items.MATERIAL_DESC
         return msg
     # effect == "lantern" was deprecated
     elif effect == "warp_home":
-        msg = f"{data['name']}を使用した 身体が光に包まれる..."
+        msg = Text.Items.WARP_HOME_USE.format(name=data['name'])
     elif effect == "remove_trap":
         if not dungeon:
             return "ここでは使用できない"
@@ -53,9 +98,6 @@ def use_consumable(item_key, player, dungeon=None):
         found = False
         for t in list(dungeon.traps):
             if t.x == tx and t.y == ty:
-                if t.type == "flood_switch":
-                    msg = "この仕掛けは解除できない！"
-                    return msg
                 dungeon.traps.remove(t)
                 found = True
         
@@ -222,12 +264,39 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
                     else:
                         dialog.text = "システムエラー: 選択ダイアログがありません"
             else:
+                # バフ系消耗品の場合、別のバフが有効なら確認ダイアログを出す
+                buff_effects = ("buff_attack", "buff_regen", "buff_magic")
+                effect = item_data.get("effect")
+                if effect in buff_effects:
+                    has_other_buff = (
+                        getattr(player, "attack_buff_turns", 0) > 0 or
+                        getattr(player, "regen_buff_turns", 0) > 0 or
+                        getattr(player, "magic_buff_turns", 0) > 0
+                    )
+                    confirm_dialog = kwargs.get("confirm_dialog")
+                    if has_other_buff and confirm_dialog:
+                        # 確認ダイアログを出して、Yesなら使用・Noなら何もしない
+                        from wordings import Text
+                        item_name = item_data.get("name", "この秘薬")
+                        confirm_dialog.text = Text.Items.BUFF_OVERWRITE_CONFIRM.format(name=item_name)
+                        def _do_use(iid=item_key_or_iid, p=player, d=current_dungeon):
+                            dialog.text = use_consumable(iid, p, d)
+                            p.enemy_turn_pending = True
+                            game_state["dialog_modal"] = True
+                            dialog.is_active = True
+                        confirm_dialog.on_yes = _do_use
+                        confirm_dialog.on_no = None
+                        confirm_dialog.is_active = True
+                        return  # 確認待ちなので、ここでいったん終了
+
                 # 帰還の道標（warp_home）の特殊処理
                 if item_data.get("effect") == "warp_home":
                     # ワープ実行
                     from systems.dungeon import warp_to_floor
                     dialog.text = use_consumable(item_key_or_iid, player, current_dungeon)
-                    current_dungeon.next_dungeon = warp_to_floor(0, player, spawn_reason="return")
+                    def do_warp():
+                        current_dungeon.next_dungeon = warp_to_floor(0, player, spawn_reason="return")
+                    dialog.on_close_callback = do_warp
                 else:
                     dialog.text = use_consumable(item_key_or_iid, player, current_dungeon)
             

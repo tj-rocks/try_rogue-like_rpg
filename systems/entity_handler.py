@@ -5,6 +5,49 @@ from constants import WEAPON_DATA, CONSUMABLE_DATA, ARMOR_DATA, SHIELD_DATA, STA
 from constants import ENEMY_DATA, ITEM_DROP_RATES
 from systems.game_state import game_state
 
+def resolve_dynamic_drops(item_list, current_rank):
+    """
+    ドロップリスト内の '@' から始まる特別なキーワード（例: '@current_rank_weapons', '@current_rank_armors'）
+    を、該当ランク（またはそれに最も近い下位ランク）の全ての対象アイテムキーのリストに動的に展開します。
+    """
+    if not isinstance(item_list, list):
+        return item_list
+        
+    RANKS = ["F", "E", "D", "C", "B", "A", "S", "SS"]
+    
+    def get_query_rank(category_data):
+        # 該当ランクのアイテムが直接存在する場合はそれを返す
+        if any(item.get("min_rank") == current_rank for item in category_data.values()):
+            return current_rank
+        # 存在しない場合（例: Cランクの武器が存在しないなど）、存在する最も近い下位ランクを探す
+        try:
+            current_idx = RANKS.index(current_rank)
+        except ValueError:
+            current_idx = len(RANKS) - 1
+            
+        for i in range(current_idx - 1, -1, -1):
+            r = RANKS[i]
+            if any(item.get("min_rank") == r for item in category_data.values()):
+                return r
+        return "F"
+
+    resolved = []
+    for item in item_list:
+        if isinstance(item, str) and item.startswith("@"):
+            if item == "@current_rank_weapons":
+                target_rank = get_query_rank(WEAPON_DATA)
+                weapons = [k for k, v in WEAPON_DATA.items() if v.get("min_rank") == target_rank]
+                resolved.extend(weapons)
+            elif item == "@current_rank_armors":
+                target_rank = get_query_rank(ARMOR_DATA)
+                armors = [k for k, v in ARMOR_DATA.items() if v.get("min_rank") == target_rank]
+                resolved.extend(armors)
+            else:
+                resolved.append(item)
+        else:
+            resolved.append(item)
+    return resolved
+
 def update_dungeon_entities(dungeon, player, dt, dialog=None):
     """
     ダンジョン内の動的なエンティティ（敵・アイテム・NPC）の状態を更新する。
@@ -28,6 +71,40 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             drops = getattr(enemy, "drops", {})
             normal_drop_rate = getattr(enemy, "normal_drop_rate", 0.1)
             rare_drop_rate = getattr(enemy, "rare_drop_rate", 0.01)
+            
+            # 現在のフロアに応じたランクを計算
+            floor = dungeon.current_floor
+            if floor <= 11: current_rank = "F"
+            elif floor <= 21: current_rank = "E"
+            elif floor <= 30: current_rank = "D"
+            elif floor <= 40: current_rank = "C"
+            elif floor <= 55: current_rank = "B"
+            elif floor <= 70: current_rank = "A"
+            elif floor <= 80: current_rank = "S"
+            else: current_rank = "SS"
+            
+            # 階層ランク別または共通ドロップ設定が含まれている場合の抽出・マージ処理
+            if isinstance(drops, dict) and ("common" in drops or any(r in drops for r in ["F", "E", "D", "C", "B", "A", "S", "SS"])):
+                common_cfg = drops.get("common", {})
+                rank_cfg = drops.get(current_rank, {})
+                
+                if isinstance(common_cfg, dict):
+                    merged = common_cfg.copy()
+                    if isinstance(rank_cfg, dict):
+                        merged.update(rank_cfg)
+                    drops = merged
+                else:
+                    drops = rank_cfg if isinstance(rank_cfg, dict) else {}
+                
+                normal_drop_rate = drops.get("normal_drop_rate", normal_drop_rate)
+                rare_drop_rate = drops.get("rare_drop_rate", rare_drop_rate)
+                
+            # 動的ドロップ設定（@表記）の解決
+            if isinstance(drops, dict):
+                if "normal" in drops:
+                    drops["normal"] = resolve_dynamic_drops(drops["normal"], current_rank)
+                if "rare" in drops:
+                    drops["rare"] = resolve_dynamic_drops(drops["rare"], current_rank)
             
             # 1. 討伐の証（クエスト対象）の優先ドロップ判定
             dropped_token = False

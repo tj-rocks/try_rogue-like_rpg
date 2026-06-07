@@ -29,6 +29,7 @@ CONSUMABLE_DATA:
     effect: warp_home
     price: 8000
     min_rank: F
+    max_rank: SS
     rarity: 7
     image_path: components/pictures/icon/hane.png
     sound: components/sounds/sfx/stairs.wav
@@ -42,6 +43,7 @@ CONSUMABLE_DATA:
     effect: revive
     price:  8000
     min_rank: D
+    max_rank: SS
     rarity: 7
     image_path: components/pictures/icon/omamori.png
     floor_spawnable: true
@@ -53,6 +55,7 @@ CONSUMABLE_DATA:
     heal_amount: 1
     price: 80
     min_rank: F
+    max_rank: SS
     rarity: 2
     image_path: components/pictures/icon/potion2.png
     sound: components/sounds/sfx/recharge.wav
@@ -66,6 +69,7 @@ CONSUMABLE_DATA:
     effect: poison_self
     price: 80
     min_rank: F
+    max_rank: SS
     rarity: 3
     image_path: components/pictures/icon/potion2.png
     sound: components/sounds/sfx/recharge.wav
@@ -79,6 +83,7 @@ CONSUMABLE_DATA:
     effect: remove_trap
     price: 100
     min_rank: F
+    max_rank: SS
     rarity: 3
     image_path: components/pictures/icon/tool.png
     sound: components/sounds/sfx/select_new.wav
@@ -91,6 +96,7 @@ CONSUMABLE_DATA:
     name: 転移の石
     price: 2000
     min_rank: F
+    max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/gem_teleport.png
     sound: components/sounds/sfx/recharge.wav
@@ -102,9 +108,10 @@ CONSUMABLE_DATA:
     quest_targetable: true
     name: ヒールポーション
     effect: heal_hp
-    heal_amount: 40
+    heal_amount: 30
     price: 100
     min_rank: F
+    max_rank: SS
     rarity: 1
     image_path: components/pictures/icon/hp_potion.png
     sound: components/sounds/sfx/drink.wav
@@ -119,6 +126,7 @@ CONSUMABLE_DATA:
     effect: antidote
     price: 100
     min_rank: F
+    max_rank: SS
     rarity: 1
     image_path: components/pictures/icon/hp_potion.png
     sound: components/sounds/sfx/drink.wav
@@ -130,9 +138,10 @@ CONSUMABLE_DATA:
     quest_targetable: true
     name: ハイポーション
     effect: heal_hp
-    heal_amount: 70
+    heal_amount: 60
     price: 600
     min_rank: F
+    max_rank: SS
     rarity: 3
     image_path: components/pictures/icon/hi_potion.png
     sound: components/sounds/sfx/drink.wav
@@ -141,6 +150,64 @@ CONSUMABLE_DATA:
     max_stack: 3
     describe: 高度な精製技術で作られた強力な回復薬
     floor_spawnable: true
+  pilgrim_potion:
+    quest_targetable: true
+    name: 巡礼者の秘薬
+    effect: buff_regen
+    duration: 70
+    value: 2
+    heal_boost: 0.20
+    price: 1500
+    selling_price: 150
+    min_rank: F
+    max_rank: SS
+    rarity: 2
+    image_path: components/pictures/icon/special_potion.png
+    sound: components/sounds/sfx/drink.wav
+    shop_buyable: true
+    max_stack: 2
+    describe: 15ターンの間、毎ターンHPを2回復し、回復アイテムの効果を20%上昇させる秘薬。
+    floor_spawnable: true
+    color_tint: [100, 255, 100]
+  warrior_potion:
+    quest_targetable: true
+    name: 戦士の秘薬
+    effect: buff_attack
+    duration: 70
+    value: 5
+    crit_bonus: 10
+    armor_pen: 0.20
+    price: 1500
+    selling_price: 150
+    min_rank: F
+    max_rank: SS
+    rarity: 3
+    image_path: components/pictures/icon/special_potion.png
+    sound: components/sounds/sfx/drink.wav
+    shop_buyable: true
+    max_stack: 2
+    describe: 10ターンの間、攻撃力を5、防御無視を20%、会心率を10%上昇させる秘薬。
+    floor_spawnable: true
+    color_tint: [255, 100, 100]
+  sage_potion:
+    quest_targetable: true
+    name: 賢者の秘薬
+    effect: buff_magic
+    duration: 70
+    value: 0.30
+    stave_recovery: 3
+    price: 1500
+    selling_price: 150
+    min_rank: F
+    max_rank: SS
+    rarity: 3
+    image_path: components/pictures/icon/special_potion.png
+    sound: components/sounds/sfx/drink.wav
+    shop_buyable: true
+    max_stack: 2
+    describe: 15ターンの間、魔法効果を30%上昇させ、さらに所持しているすべての杖の使用回数を3回復する秘薬。
+    floor_spawnable: true
+    color_tint: [180, 100, 255]
   magic_crystal:
     quest_targetable: true
     name: 魔力の水晶
@@ -148,6 +215,7 @@ CONSUMABLE_DATA:
     recharge_amount: 5
     price: 2000
     min_rank: C
+    max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/magic_crystal.png
     sound: components/sounds/sfx/recharge.wav
@@ -155,42 +223,6 @@ CONSUMABLE_DATA:
     shop_buyable: true
     describe: 神秘的な光を放つ水晶 使い古した杖の魔力を回復させることができる
     floor_spawnable: true
-  # copper_ore:
-  #   name: 銅の鉱石
-  #   effect: material
-  #   enhance_bonus: 1
-  #   price: 500
-  #   min_rank: F
-  #   rarity: 3
-  #   image_path: components/pictures/icon/copper_ore.png
-  #   max_stack: 99
-  #   shop_buyable: true
-  #   describe: どこにでもある一般的な銅の鉱石。鍛冶屋で装備の強化に利用できる。
-  #   floor_spawnable: true
-  # iron_ore:
-  #   name: 鉄の鉱石
-  #   effect: material
-  #   enhance_bonus: 1
-  #   price: 600
-  #   min_rank: D
-  #   rarity: 3
-  #   image_path: components/pictures/icon/iron_ore.png
-  #   max_stack: 99
-  #   shop_buyable: true
-  #   describe: 硬度の高い鉄の鉱石。装備をより強力に叩き直すための必需品。
-  #   floor_spawnable: true
-  # gold_ore:
-  #   name: 金の鉱石
-  #   effect: material
-  #   enhance_bonus: 2
-  #   price: 1000
-  #   min_rank: B
-  #   rarity: 2
-  #   image_path: components/pictures/icon/gold_ore.png
-  #   max_stack: 99
-  #   shop_buyable: true
-  #   describe: まばゆい輝きを放つ金の鉱石。非常に価値が高く、武具の性能を大幅に引き出す。
-  #   floor_spawnable: true
   red_stone:
     quest_targetable: true
     name: "赤い鉱石"
@@ -198,6 +230,7 @@ CONSUMABLE_DATA:
     enhance_bonus: 1
     price: 8000
     min_rank: F
+    max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/red_stone.png
     max_stack: 3
@@ -211,6 +244,7 @@ CONSUMABLE_DATA:
     enhance_bonus: 1
     price: 8000
     min_rank: F
+    max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/blue_stone.png
     max_stack: 3
@@ -224,6 +258,7 @@ CONSUMABLE_DATA:
     enhance_bonus: 1
     price: 8000
     min_rank: F
+    max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/green_stone.png
     max_stack: 3
@@ -237,6 +272,7 @@ CONSUMABLE_DATA:
     enhance_bonus: 1
     price: 8000
     min_rank: F
+    max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/purple_stone.png
     max_stack: 3
@@ -250,6 +286,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -264,6 +301,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -278,6 +316,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -292,6 +331,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -306,6 +346,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -320,6 +361,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -334,6 +376,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -348,6 +391,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: "-"
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/certificate.png
@@ -362,6 +406,7 @@ CONSUMABLE_DATA:
     effect: none
     price: 0
     min_rank: G
+    max_rank: SS
     rarity: 1
     category: event
     image_path: components/pictures/icon/item.png
@@ -376,7 +421,8 @@ STAVE_DATA:
     name: 吹き飛ばしの杖
     effect_type: knockback
     min_rank: F
-    rarity: 5
+    max_rank: SS
+    rarity: 2
     price: 800
     selling_price: 80
     charges: 5
@@ -395,8 +441,9 @@ STAVE_DATA:
     name: 壊れた杖
     effect_type: none
     min_rank: F
+    max_rank: SS
     max_floor: 999
-    rarity: 5
+    rarity: 1
     price: 800
     selling_price: 80
     charges: 0
@@ -409,7 +456,8 @@ STAVE_DATA:
     name: 火炎の杖
     effect_type: fire
     min_rank: F
-    rarity: 1
+    max_rank: SS
+    rarity: 2
     price: 1200
     selling_price: 120
     charges: 5
@@ -432,7 +480,8 @@ STAVE_DATA:
     name: 回復の杖
     effect_type: heal
     min_rank: F
-    rarity: 1
+    max_rank: SS
+    rarity: 2
     price: 1200
     selling_price: 120
     charges: 5
@@ -442,7 +491,7 @@ STAVE_DATA:
     - 100
     - 255
     - 100
-    heal_ratio: 0.8
+    heal_ratio: 0.7
     shop_buyable: true
     describe: 癒やしの光を放つ魔法の杖 自分や仲間の傷を癒やすことができる
     floor_spawnable: true
@@ -450,8 +499,9 @@ STAVE_DATA:
     quest_targetable: true
     name: 無敵の杖
     effect_type: invincible
-    min_rank: S
-    rarity: 7
+    min_rank: D
+    max_rank: SS
+    rarity: 5
     price: 3000
     selling_price: 200
     charges: 5
@@ -461,7 +511,7 @@ STAVE_DATA:
     - 255
     - 255
     - 150
-    duration_turns: 10
+    duration_turns: 30
     shop_buyable: false
     describe: 一時的にあらゆる攻撃を無効化する聖なる杖 ここぞという時の切り札
     floor_spawnable: true
@@ -470,6 +520,7 @@ STAVE_DATA:
     name: 燈の杖
     effect_type: light_all
     min_rank: F
+    max_rank: SS
     rarity: 1
     price: 1500
     selling_price: 150
@@ -483,11 +534,12 @@ STAVE_DATA:
     shop_buyable: true
     describe: フロア全体を一瞬で明るく照らす魔法の杖 隠れた罠や敵を暴き出す
     floor_spawnable: true
-  yrden_stave:
+  barrier_stave:
     quest_targetable: true
     name: 障壁の杖
-    effect_type: yrden
+    effect_type: barrier
     min_rank: F
+    max_rank: SS
     rarity: 2
     price: 1500
     selling_price: 150
@@ -502,23 +554,4 @@ STAVE_DATA:
     shop_buyable: true
     describe: 正面の地面に、敵の侵入を防ぐ魔法の防壁（魔法陣）を配置する魔法の杖
     floor_spawnable: true
-  enchant_stave:
-    quest_targetable: true
-    name: 付与の杖
-    effect_type: attack_buff
-    min_rank: F
-    rarity: 3
-    price: 1500
-    selling_price: 150
-    charges: 5
-    sound: components/sounds/sfx/invincible.wav
-    image_path: components/pictures/icon/stave.png
-    effect_color:
-    - 100
-    - 200
-    - 255
-    attack_buff_val: 5
-    duration_turns: 10
-    shop_buyable: true
-    describe: 魔力で武器を強化する付与の杖 10ターンの間、プレイヤーの攻撃力が5上昇する
-    floor_spawnable: true
+

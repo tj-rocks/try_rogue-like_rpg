@@ -14,7 +14,9 @@
 # - max_floor     : 出現終了階。nullの場合はrankから自動計算。
 # - max_concurrent: その階に同時に存在できる最大数。
 # - max_spawns    : その階で合計で出現する最大数。
-# - drops         : 破壊時に落とすアイテムのリスト (itemとrateを指定)。
+# - drops         : 破壊時に落とすアイテムのリスト。
+#                   敵と同じように normal/rare の辞書形式にします。
+#                   common キー配下にデフォルト設定を配置し、ランク名キーで上書き可能です。
 # - image_path    : 画像ファイルへのパス。
 # - image_scale   : 表示サイズのスケーリング (1.0 = 標準)。
 # ==============================================================================
@@ -23,19 +25,23 @@ wood_barrel:
   quest_targetable: true
   name: 樽
   min_rank: "F"
+  max_rank: "SS"
   rarity: 1
   hp: 2
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 50
+  reward_gold: 10
   min_floor: null
   max_floor: null
   max_concurrent: 2
   max_spawns: 2
   drops:
-  - item: hp_potion
-    rate: 0.1
+    common:
+      normal: [hp_potion, antidote_potion,old_sword]
+      rare: [hi_potion, pilgrim_potion, warrior_potion, sage_potion]
+      normal_drop_rate: 0.10
+      rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/barrel.png
   image_scale: 0.8
 
@@ -43,16 +49,23 @@ anvil:
   quest_targetable: true
   name: 金床
   min_rank: "C"
+  max_rank: "SS"
   rarity: 1
   hp: 1
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 50
+  reward_gold: 10
   min_floor: null
   max_floor: null
   max_concurrent: 2
   max_spawns: 2
+  drops:
+    common:
+      normal: [old_sword]
+      rare: [purple_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.05
   image_path: components/pictures/dungeon/other_objects/anvil.png
   image_scale: 0.8
 
@@ -60,19 +73,23 @@ crate:
   quest_targetable: true
   name: 木箱
   min_rank: "F"
+  max_rank: "SS"
   rarity: 1
   hp: 2
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 60
+  reward_gold: 12
   min_floor: null
   max_floor: null
   max_concurrent: 4
   max_spawns: 3
   drops:
-  - item: hp_potion
-    rate: 0.4
+    common:
+      normal: [hp_potion, antidote_potion,old_sword]
+      rare: [hi_potion, teleport_stone, pilgrim_potion, warrior_potion, sage_potion]
+      normal_drop_rate: 0.40
+      rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/crate.png
   image_scale: 0.8
 
@@ -80,19 +97,23 @@ pot:
   quest_targetable: true
   name: 壺
   min_rank: "F"
+  max_rank: "SS"
   rarity: 1
   hp: 1
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 50
+  reward_gold: 10
   min_floor: null
   max_floor: null
   max_concurrent: 5
   max_spawns: 10
   drops:
-  - item: gold
-    rate: 0.6
+    common:
+      normal: [expired_potion, rotten_potion]
+      rare: [hi_potion, teleport_stone, pilgrim_potion, warrior_potion, sage_potion]
+      normal_drop_rate: 0.30
+      rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/pot.png
   image_scale: 1.0
 
@@ -100,14 +121,21 @@ rubble:
   quest_targetable: true
   name: 瓦礫
   min_rank: "F"
+  max_rank: "SS"
   rarity: 1
   hp: 3
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 80
+  reward_gold: 16
   min_floor: null
   max_floor: null
+  drops:
+    common:
+      normal: [expired_potion, rotten_potion]
+      rare: [teleport_stone]
+      normal_drop_rate: 0.15
+      rare_drop_rate: 0.0
   image_path: components/pictures/obstacles/rubble.png
   image_scale: 1.0
 
@@ -115,16 +143,23 @@ well:
   quest_targetable: true
   name: 井戸
   min_rank: "B"
+  max_rank: "SS"
   rarity: 5
   hp: 5
   defense: 50
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 1500
+  reward_gold: 300
   min_floor: null
   max_floor: null
   max_concurrent: 1
   max_spawns: 1
+  drops:
+    common:
+      normal: [hp_potion, hi_potion]
+      rare: [return_wing,revive_amulet,teleport_stone]
+      normal_drop_rate: 0.50
+      rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/well.png
   image_scale: 1.2
 
@@ -132,14 +167,21 @@ skeleton_obstacle:
   quest_targetable: true
   name: 骸骨
   min_rank: "E"
+  max_rank: "SS"
   rarity: 2
   hp: 1
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 150
+  reward_gold: 30
   min_floor: null
   max_floor: null
+  drops:
+    common:
+      normal: [broken_sword, broken_armor]
+      rare: [return_wing,revive_amulet,teleport_stone]
+      normal_drop_rate: 0.20
+      rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/skeleton.png
   image_scale: 0.9
 
@@ -147,19 +189,33 @@ crystal:
   quest_targetable: true
   name: クリスタル
   min_rank: "E"
-  rarity: 2
+  max_rank: "SS"
+  rarity: 4
   hp: 4
   defense: 20
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 350
+  reward_gold: 70
   min_floor: null
   max_floor: null
   max_concurrent: 2
   max_spawns: 2
   drops:
-  - item: gold
-    rate: 1.0
+    common:
+      normal: []
+      rare: [blue_stone, green_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.08
+    C:
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+    B:
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+    A:
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+    S:
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+    SS:
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
   image_path: components/pictures/obstacles/crystal.png
   image_scale: 0.9
 
@@ -167,19 +223,23 @@ sword_stuck:
   quest_targetable: true
   name: 刺さった剣
   min_rank: "E"
+  max_rank: "SS"
   rarity: 2
   hp: 2
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 250
+  reward_gold: 50
   min_floor: null
   max_floor: null
   max_concurrent: 1
   max_spawns: 1
   drops:
-  - item: iron_sword
-    rate: 0.2
+    common:
+      normal: [iron_sword, fullmetal_sword, thiefs_knife]
+      rare: ["@current_rank_weapons", "@current_rank_armors"]
+      normal_drop_rate: 0.30
+      rare_drop_rate: 0.20
   image_path: components/pictures/obstacles/sword_stuck.png
   image_scale: 0.9
 
@@ -187,14 +247,21 @@ web:
   quest_targetable: true
   name: 蜘蛛の巣
   min_rank: "E"
+  max_rank: "SS"
   rarity: 2
   hp: 1
   defense: 0
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 100
+  reward_gold: 20
   min_floor: null
   max_floor: null
+  drops:
+    common:
+      normal: [antidote_potion, rotten_potion]
+      rare: [teleport_stone]
+      normal_drop_rate: 0.25
+      rare_drop_rate: 0.0
   image_path: components/pictures/obstacles/web.png
   image_scale: 1.0
 
@@ -202,19 +269,23 @@ stained_armor_stand:
   quest_targetable: true
   name: 汚れた鎧立て
   min_rank: "D"
+  max_rank: "SS"
   rarity: 3
   hp: 3
   defense: 10
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 450
+  reward_gold: 90
   min_floor: null
   max_floor: null
   max_concurrent: 1
   max_spawns: 2
   drops:
-  - item: adventurers_clothes
-    rate: 0.1
+    common:
+      normal: [iron_sword, fullmetal_sword, thiefs_knife]
+      rare: ["@current_rank_weapons", "@current_rank_armors"]
+      normal_drop_rate: 0.30
+      rare_drop_rate: 0.10
   image_path: components/pictures/obstacles/stained_armor_stand.png
   image_scale: 1.0
 
@@ -222,16 +293,23 @@ broken_pillar:
   quest_targetable: true
   name: 壊れた柱
   min_rank: "D"
+  max_rank: "SS"
   rarity: 3
   hp: 4
   defense: 5
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 500
+  reward_gold: 100
   min_floor: null
   max_floor: null
   max_concurrent: 2
   max_spawns: 3
+  drops:
+    common:
+      normal: []
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/broken_pillar.png
   image_scale: 1.0
 
@@ -239,22 +317,30 @@ statue:
   quest_targetable: true
   name: 石像
   min_rank: "C"
+  max_rank: "SS"
   rarity: 4
   hp: 5
   defense: 30
   evasion: 0
   crit_rate: 0.0
-  reward_gold: 800
+  reward_gold: 160
   min_floor: null
   max_floor: null
   max_concurrent: 1
   max_spawns: 1
+  drops:
+    common:
+      normal: []
+      rare: [red_stone, blue_stone, green_stone, purple_stone]
+      normal_drop_rate: 0.0
+      rare_drop_rate: 0.05
   image_path: components/pictures/obstacles/statue.png
   image_scale: 1.1
 
 table:
   name: テーブル
   min_rank: "F"
+  max_rank: "SS"
   rarity: 1
   quest_targetable: false
   hp: 10
@@ -270,6 +356,7 @@ table:
 magic_barrier:
   name: 魔法の防壁
   min_rank: "F"
+  max_rank: "SS"
   rarity: 1
   quest_targetable: false
   hp: 1
@@ -283,4 +370,3 @@ magic_barrier:
   max_spawns: 0
   image_path: components/pictures/obstacles/magic_barrier.png
   image_scale: 1.0
-

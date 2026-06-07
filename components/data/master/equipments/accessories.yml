@@ -17,6 +17,8 @@
 #        regen: 0
 #        stupidity: 0
 #        armor_penetration: 0.0
+#        buff_value_ratio: 0.0
+#        buff_duration_ratio: 0.0
 #      magic:
 #        fire_damage: 0.0
 #        fire_range: 0
@@ -52,6 +54,7 @@ ACCESSORY_DATA:
     name: "冒険者のカンテラ"
     category: accessory
     min_rank: F
+    max_rank: SS
     rarity: 4
     price: 80
     image_path: components/pictures/icon/basic_lantern.png
@@ -77,6 +80,8 @@ ACCESSORY_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
@@ -117,6 +122,8 @@ ACCESSORY_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
@@ -157,6 +164,8 @@ ACCESSORY_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
@@ -197,6 +206,8 @@ ACCESSORY_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
@@ -237,6 +248,8 @@ ACCESSORY_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
@@ -277,6 +290,8 @@ ACCESSORY_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
@@ -317,6 +332,8 @@ ACCESSORY_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
@@ -357,6 +374,8 @@ ACCESSORY_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
@@ -397,6 +416,8 @@ ACCESSORY_DATA:
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
         fire_range: 0
