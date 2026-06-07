@@ -492,10 +492,6 @@ TILE_MAPPINGS:
   story_positive1:
     category: npc
     id: story_positive1
-    positions:
-      - x: 18
-        y: 13
-        flip: false
   story_positive2:
     category: npc
     id: story_positive2
@@ -503,16 +499,9 @@ TILE_MAPPINGS:
       - x: 21
         y: 5
         flip: true
-      - x: 16
-        y: 13
-        flip: true
   story_dark1:
     category: npc
     id: story_dark1
-    positions:
-      - x: 13
-        y: 17
-        flip: false
   story_negative3:
     category: npc
     id: story_negative3
@@ -701,3 +690,94 @@ TILE_MAPPINGS:
     image_path: components/pictures/dungeon/stairs/stairs_up.png
     bg_color: '#44cc22'
     fg_color: '#fff'
+  story_noname5:
+    category: npc
+    id: story_noname5
+    positions:
+      - x: 22
+        y: 4
+        flip: false
+  story_noname2:
+    category: npc
+    id: story_noname2
+    positions:
+      - x: 12
+        y: 12
+        flip: false
+  story_noname1:
+    category: npc
+    id: story_noname1
+    positions:
+      - x: 16
+        y: 13
+        flip: true
+  story_olivia:
+    category: npc
+    id: story_olivia
+    positions:
+      - x: 18
+        y: 13
+        flip: false
+  story_geisel:
+    category: npc
+    id: story_geisel
+    positions:
+      - x: 31
+        y: 13
+        flip: true
+  story_kaya:
+    category: npc
+    id: story_kaya
+    positions:
+      - x: 33
+        y: 13
+        flip: false
+  story_rain:
+    category: npc
+    id: story_rain
+    positions:
+      - x: 31
+        y: 16
+        flip: true
+  story_yuru:
+    category: npc
+    id: story_yuru
+    positions:
+      - x: 33
+        y: 16
+        flip: false
+  story_noname4:
+    category: npc
+    id: story_noname4
+    positions:
+      - x: 11
+        y: 17
+        flip: true
+  story_noname3:
+    category: npc
+    id: story_noname3
+    positions:
+      - x: 13
+        y: 17
+        flip: false
+  story_helena:
+    category: npc
+    id: story_helena
+    positions:
+      - x: 16
+        y: 17
+        flip: true
+  story_gareth:
+    category: npc
+    id: story_gareth
+    positions:
+      - x: 18
+        y: 17
+        flip: false
+  story_camila:
+    category: npc
+    id: story_camila
+    positions:
+      - x: 32
+        y: 18
+        flip: false

@@ -300,6 +300,23 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                         if "positions" in v:
                             del v["positions"]
                 
+                # YMLに未定義だがエディタで配置されたNPCエントリを自動追加
+                # (village.yml経由で新しく追加されたNPC等がここで保存される)
+                base_npcs = load_master_data("npcs.yml") or {}
+                for ent_id, positions in grouped.items():
+                    if ent_id not in mappings:
+                        # npcs.ymlにあるNPCならcategory=npcで追加
+                        if ent_id in base_npcs:
+                            mappings[ent_id] = {"category": "npc", "id": ent_id, "positions": positions}
+                        else:
+                            # obstacleやwall_decorationは village.yml のベースから探す
+                            base_mappings = (load_master_data("village.yml") or {}).get("TILE_MAPPINGS", {})
+                            if ent_id in base_mappings and isinstance(base_mappings[ent_id], dict):
+                                entry = dict(base_mappings[ent_id])
+                                entry.pop("positions", None)  # village座標は使わない
+                                entry["positions"] = positions
+                                mappings[ent_id] = entry
+                
                 # 古いENTITIESブロック（もし残っていれば）を完全に排除
                 if "ENTITIES" in village_yml_data:
                     del village_yml_data["ENTITIES"]
