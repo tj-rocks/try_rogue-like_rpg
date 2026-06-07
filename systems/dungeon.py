@@ -967,7 +967,8 @@ class Dungeon:
                                           image_path=data["image_path"],
                                           base_image_path=tile_info.get("base_image_path", data.get("base_image_path")),
                                           role=role,
-                                          flip=pos.get("flip", False))
+                                          flip=pos.get("flip", False),
+                                          alpha=data.get("alpha"))
                                 self.npcs.append(npc)
                                 if role == "inn": self.inn_pos = (c, r)
                                 if role == "doctor": self.clinic_pos = (c, r)
@@ -1752,7 +1753,7 @@ class Dungeon:
                     pass 
         return self
 
-    def draw(self, screen, camera_x, camera_y):
+    def draw(self, screen, camera_x, camera_y, player=None):
         # [SAFETY] クリーンアップ済みのダンジョンの場合は描画をスキップ
         if self.map_data is None:
             screen.fill((0, 0, 0))
@@ -1827,7 +1828,7 @@ class Dungeon:
         for t in self.traps: t.draw(screen, camera_x, camera_y, self.tile_size)
         for i in self.dropped_items: i.draw(screen, camera_x, camera_y)
         for n in self.npcs:
-            if camera_x - n.width <= n.x <= camera_x + sw and camera_y - n.height <= n.y <= camera_y + sh: n.draw(screen, camera_x, camera_y)
+            if camera_x - n.width <= n.x <= camera_x + sw and camera_y - n.height <= n.y <= camera_y + sh: n.draw(screen, camera_x, camera_y, player)
         
         # マジックエフェクトを最前面（UI除く）に描画
         for f in self.magic_effects: f.draw(screen, camera_x, camera_y)

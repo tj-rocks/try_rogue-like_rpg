@@ -477,9 +477,6 @@ TILE_MAPPINGS:
   tutorial_woman2:
     category: npc
     id: tutorial_woman2
-  apprentice:
-    category: npc
-    id: apprentice
   pub_master:
     category: npc
     id: pub_master
@@ -492,10 +489,6 @@ TILE_MAPPINGS:
   story_negative1:
     category: npc
     id: story_negative1
-    positions:
-      - x: 31
-        y: 16
-        flip: true
   story_positive1:
     category: npc
     id: story_positive1
@@ -520,16 +513,9 @@ TILE_MAPPINGS:
       - x: 13
         y: 17
         flip: false
-      - x: 33
-        y: 19
-        flip: false
   story_negative3:
     category: npc
     id: story_negative3
-    positions:
-      - x: 33
-        y: 16
-        flip: false
   dedicated_weapon_shop:
     category: npc
     id: dedicated_weapon_shop

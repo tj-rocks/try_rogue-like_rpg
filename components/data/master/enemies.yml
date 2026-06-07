@@ -519,6 +519,33 @@ ENEMY_DATA:
     ranged_attack_effect: sonic_wave
     attack_priority: close
     damaged_detect_range: 100
+
+  guild_assassin:
+    quest_targetable: true
+    name: ギルドの刺客
+    min_rank: S
+    image_folder: components/pictures/enemies/skelton_sword_armor
+    crit_rate: 0.15
+    drops:
+      normal: [hp_potion]
+      rare: [hunters_rapier]
+    normal_drop_rate: 0.20
+    rare_drop_rate: 0.05
+    hp: 150
+    attack: 40
+    defense: 35
+    evasion: 35
+    exp: 200
+    reward_gold: 1000
+    accuracy_close: 95
+    accuracy_ranged: 90
+    attack_range: 1
+    stupidity: 1
+    image_scale: 1.0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: sonic_wave
+    attack_priority: close
+    damaged_detect_range: 50
   undead_father:
     quest_targetable: true
     name: 父の亡霊

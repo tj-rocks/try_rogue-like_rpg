@@ -33,6 +33,7 @@ game_state = {
     "equip_active": False,       # 装備画面用
     "stave_inventory_active": False, # 杖インベントリ用
     "event_item_active": False,  # 貴重品インベントリ用
+    "ore_gift_active": False,    # 鉱石プレゼント選択用
 }
 
 # どのダイアログ（メニュー）が開いていても、ゲーム全体をポーズするための共通判定関数
@@ -55,4 +56,5 @@ def is_paused():
             game_state.get("equip_active", False) or
             game_state.get("stave_inventory_active", False) or
             game_state.get("teleport_active", False) or
+            game_state.get("ore_gift_active", False) or
             game_state.get("event_item_active", False))

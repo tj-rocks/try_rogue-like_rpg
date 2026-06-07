@@ -273,6 +273,7 @@ GP_RANK_DIFF_MULTIPLIERS = _gq.get("GP_RANK_DIFF_MULTIPLIERS", {
 _guild = load_master_data("guild.json")
 GUILD_RANKS = _guild.get("GUILD_RANKS", [])
 RANK_ORDER  = _guild.get("RANK_ORDER", [])
+RANKUP_GIFTS = _guild.get("RANKUP_GIFTS", [])
 RANK_FLOOR_MAP = generate_rank_floor_map(GUILD_RANKS)
 
 # --- 各種データの正規化読み込み ---

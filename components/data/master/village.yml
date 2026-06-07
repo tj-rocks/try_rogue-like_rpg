@@ -766,6 +766,10 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+  guild_rankup_officer:
+    category: npc
+    id: guild_rankup_officer
+    positions:
       - x: 33
         y: 4
         flip: false
@@ -860,9 +864,6 @@ TILE_MAPPINGS:
       - x: 28
         y: 6
         flip: true
-      - x: 34
-        y: 32
-        flip: false
   tutorial_man1:
     category: npc
     id: tutorial_man1
@@ -879,18 +880,15 @@ TILE_MAPPINGS:
       - x: 23
         y: 32
         flip: true
-      - x: 23
-        y: 34
-        flip: true
       - x: 36
         y: 35
         flip: false
-  story_negative2:
+  story_kaya:
     category: npc
-    id: story_negative2
+    id: story_kaya
     positions:
-      - x: 20
-        y: 33
+      - x: 25
+        y: 36
         flip: false
   tutorial_woman1:
     category: npc
@@ -899,36 +897,15 @@ TILE_MAPPINGS:
       - x: 26
         y: 13
         flip: true
-      - x: 25
-        y: 32
-        flip: false
-      - x: 38
-        y: 33
-        flip: false
   tutorial_woman2:
     category: npc
     id: tutorial_woman2
     positions:
       - x: 20
-        y: 5
-        flip: false
-      - x: 20
         y: 7
         flip: false
       - x: 37
         y: 13
-        flip: false
-  apprentice:
-    category: npc
-    id: apprentice
-    positions:
-      - x: 19
-        y: 4
-        flip: false
-        min_rank: E
-        max_rank: SS
-      - x: 19
-        y: 32
         flip: false
   pub_master:
     category: npc
@@ -949,43 +926,103 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
-      - x: 25
-        y: 36
-        flip: false
   villager:
     category: npc
     id: villager
   # ーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+  story_geisel:
+    category: npc
+    id: story_geisel
+    positions:
+      - x: 23
+        y: 36
+        flip: true
+  story_yuru:
+    category: npc
+    id: story_yuru
+    positions:
+      - x: 36
+        y: 15
+        flip: false
+  story_rain:
+    category: npc
+    id: story_rain
+    positions:
+      - x: 25
+        y: 32
+        flip: false
+  story_camila:
+    category: npc
+    id: story_camila
+    positions:
+      - x: 19
+        y: 32
+        flip: false
+  story_gareth:
+    category: npc
+    id: story_gareth
+    positions:
+      - x: 20
+        y: 5
+        flip: false
+  story_helena:
+    category: npc
+    id: story_helena
+    positions:
+      - x: 18
+        y: 5
+        flip: true
+  story_olivia:
+    category: npc
+    id: story_olivia
+  story_noname1:
+    category: npc
+    id: story_noname1
+    positions:
+      - x: 20
+        y: 36
+        flip: false
+  story_noname2:
+    category: npc
+    id: story_noname2
     positions:
       - x: 19
         y: 35
         flip: false
-  story_negative1:
+  story_noname3:
     category: npc
-    id: story_negative1
-  story_kirakira2:
+    id: story_noname3
+    positions:
+      - x: 38
+        y: 33
+        flip: false
+  story_noname4:
     category: npc
-    id: story_kirakira2
+    id: story_noname4
+    positions:
+      - x: 25
+        y: 15
+        flip: true
+  story_noname5:
+    category: npc
+    id: story_noname5
+  crank_adventurer:
+    category: npc
+    id: crank_adventurer
     positions:
       - x: 37
-        y: 30
+        y: 18
         flip: false
-  story_kirakira1:
+  crank_adventurer2:
     category: npc
-    id: story_kirakira1
+    id: crank_adventurer2
     positions:
-      - x: 18
-        y: 5
-        flip: false
-      - x: 25
-        y: 34
-        flip: false
-  story_dark1:
-    category: npc
-    id: story_dark1
-  story_negative3:
-    category: npc
-    id: story_negative3
+      - x: 26
+        y: 18
+        flip: true
+      - x: 33
+        y: 32
+        flip: true
   wall_deco_ivy:
     category: wall_decoration
     desc: 壁のツタ
@@ -1532,11 +1569,11 @@ TILE_MAPPINGS:
 
   # ーーーーーーーーーーーーーーーーーーーーーーーーーーーー
     positions:
-      - x: 17
+      - x: 19
         y: 5
         flip: false
       - x: 19
-        y: 5
+        y: 7
         flip: false
       - x: 15
         y: 16

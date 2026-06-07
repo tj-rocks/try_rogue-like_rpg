@@ -83,11 +83,35 @@ def setup_gungeon_mode(dungeon, player):
 
         # [NEW] 出現可能なアイテムをリストアップ
         candidates = []
+        
+        # 進行中のクエストアイテムは確定で追加する（ただし出現階層条件を満たす場合のみ）
+        for q in player.active_quests:
+            tk = q.get("target_key")
+            if tk:
+                # アイテムデータから階層制限を取得してチェック
+                item_data = (WEAPON_DATA.get(tk) or ARMOR_DATA.get(tk) or 
+                             SHIELD_DATA.get(tk) or CONSUMABLE_DATA.get(tk) or 
+                             STAVE_DATA.get(tk) or ACCESSORY_DATA.get(tk))
+                if item_data:
+                    min_f = item_data.get("min_floor", 1)
+                    max_f = item_data.get("max_floor", 999)
+                    if not (min_f <= dungeon.current_floor <= max_f):
+                        continue
+                
+                if tk in WEAPON_DATA: candidates.append(("weapon", tk))
+                elif tk in ARMOR_DATA: candidates.append(("armor", tk))
+                elif tk in SHIELD_DATA: candidates.append(("shield", tk))
+                elif tk in CONSUMABLE_DATA: candidates.append(("item", tk))
+                elif tk in STAVE_DATA: candidates.append(("stave", tk))
+                elif tk in ACCESSORY_DATA: candidates.append(("accessory", tk))
+                
         # アイテムカタログをスキャン
         for ctype, catalog in [("weapon", WEAPON_DATA), ("armor", ARMOR_DATA), 
                                ("shield", SHIELD_DATA), ("item", CONSUMABLE_DATA), ("stave", STAVE_DATA),
                                ("accessory", ACCESSORY_DATA)]:
             for k, it in catalog.items():
+                if it.get("category") == "event":
+                    continue
                 # 階層チェックを優先 (Floor制限があるアイテムのみ)
                 min_f = it.get("min_floor", 1)
                 max_f = it.get("max_floor", 999)

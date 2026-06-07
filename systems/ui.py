@@ -287,6 +287,10 @@ class Dialog:
             self.scroll_y = 0
             game_state["dialog_modal"] = True # デフォルトに戻す
             game_state["dialog_just_closed"] = True # 誤爆防止
+            if getattr(self, "on_close_callback", None):
+                cb = self.on_close_callback
+                self.on_close_callback = None
+                cb()
         else:
             # 開いた瞬間にフラグを立てる (2フレーム分無視)
             self.just_opened_timer = 2
@@ -518,8 +522,10 @@ class ConfirmDialog:
         game_state["confirm_active"] = value
         if value:
             self.cursor_idx = 0 # 開くたびにデフォルトでYesにカーソルを合わせる
+            print(f"[DEBUG-CONFIRM] confirm_dialog OPENED (text={self.text[:30] if self.text else 'EMPTY'})")
         else:
             game_state["dialog_just_closed"] = True # 閉じた瞬間の誤爆防止
+            print(f"[DEBUG-CONFIRM] confirm_dialog CLOSED")
 
     def handle_events(self, events):
         if not self.is_active: return
@@ -1900,13 +1906,23 @@ def draw_vision_overlay(screen, player, dungeon):
     screen.blit(fog, (0, 0))
 
 
-def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, menu_dialog=None, player=None, dungeon=None, shop_dialog=None, stave_selection_dialog=None, guild_dialog=None, warehouse_dialog=None, bank_dialog=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, teleport_dialog=None, cutscene_manager=None, parameter_selection_dialog=None, **kwargs):
+def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, menu_dialog=None, player=None, dungeon=None, shop_dialog=None, stave_selection_dialog=None, guild_dialog=None, warehouse_dialog=None, bank_dialog=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, teleport_dialog=None, cutscene_manager=None, parameter_selection_dialog=None, ore_gift_dialog=None, **kwargs):
     """全てのUIイベントを一括で処理する"""
     
     if cutscene_manager and cutscene_manager.is_active:
         events.clear() # イベントを破棄して操作を受け付けない
         return
         
+    # 鉱石プレゼントダイアログは最優先
+    if ore_gift_dialog and ore_gift_dialog.is_active:
+        from constants import KEY_CONFIRM
+        ore_gift_dialog.handle_events(events)
+        if dialog.is_active and dialog.just_opened_timer <= 0:
+            for event in events:
+                if event.type == pygame.KEYDOWN and event.key in (KEY_CONFIRM, pygame.K_RETURN, pygame.K_z):
+                    dialog.is_active = False
+        return
+
     if dungeon:
         # インベントリなどが常に最新のダンジョンを参照するように更新
         inventory_dialog.dungeon = dungeon
@@ -2154,39 +2170,54 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             return
                                     elif getattr(npc, "role", None) == "guild_receptionist":
                                         if guild_dialog and dungeon:
-                                            # 状況に応じたメッセージを設定
-                                            next_rank_data = dungeon.guild_system.get_next_rank_data(player.guild_rank)
-                                            
-                                            if player.guild_rank == "-":
-                                                has_q = any(q.get("id") == "rank_up_F" for q in player.active_quests)
-                                                if not has_q:
-                                                    dialog.text = Text.NPC.GUILD_WELCOME_UNRANKED
-                                                else:
-                                                    dialog.text = Text.NPC.GUILD_REMIND_UNRANKED
-                                                dialog.is_active = True
-                                            elif next_rank_data and player.guild_point >= next_rank_data["required_gp"]:
-                                                dialog.text = Text.UI.GUILD_MASTER_RANK_UP_READY
-                                                dialog.is_active = True
-                                            elif next_rank_data:
-                                                needed = next_rank_data["required_gp"] - player.guild_point
-                                                dialog.text = Text.UI.GUILD_MASTER_NEXT_RANK.format(gp=player.guild_point, needed=needed)
-                                                dialog.is_active = True
-                                            else:
-                                                dialog.text = Text.UI.GUILD_MASTER_MAX_RANK
-                                                dialog.is_active = True
-                                            
                                             # 未初期化ならクエスト生成
                                             if not dungeon.guild_system.available_quests:
                                                 dungeon.guild_system.generate_quests(player)
+                                            
+                                            guild_dialog.setup(player, dungeon, npc_role="guild_receptionist")
+                                            dialog.text = "ようこそ冒険者ギルドへ！\nご用件をどうぞ。"
+                                            dialog.is_active = True
                                             guild_dialog.is_active = True
-                                            guild_dialog.setup(player, dungeon)
                                             
                                             # 達成済みがある場合はセリフをお祝いにする
-                                            # ただし、エンディング対象だった場合はシーンが切り替わっているので何もしない
                                             from systems.game_state import game_state
                                             if guild_dialog.mode == "AUTO_REPORT" and game_state.get("current_scene") != "ending":
                                                 dialog.text = "おお、見事に依頼を達成しましたね！\nおめでとうございます！"
                                                 dialog.is_active = True
+                                            return
+                                    elif getattr(npc, "role", None) == "guild_rankup":
+                                        if guild_dialog and dungeon:
+                                            # 未初期化ならクエスト生成
+                                            if not dungeon.guild_system.available_quests:
+                                                dungeon.guild_system.generate_quests(player)
+                                            
+                                            guild_dialog.setup(player, dungeon, npc_role="guild_rankup")
+                                            dialog.is_active = True
+                                            guild_dialog.is_active = True
+                                            
+                                            next_rank_data = dungeon.guild_system.get_next_rank_data(player.guild_rank)
+                                            already_active = any(q.get("is_rank_up") for q in player.active_quests)
+                                            is_ready_to_report = guild_dialog._pending_report is not None
+                                            
+                                            if player.guild_rank == "-":
+                                                has_q = any(q.get("id") == "rank_up_F" for q in player.active_quests)
+                                                if is_ready_to_report:
+                                                    dialog.text = "昇給試験担当です。\nおお！無事に証を持ち帰りましたね。さあ、報告を完了させましょう！"
+                                                elif not has_q:
+                                                    dialog.text = "昇給試験担当です。\nまずはギルドへ正式に加入するための試験を受けてくださいね。"
+                                                else:
+                                                    dialog.text = "昇給試験担当です。\nFランク加入の試験クエストは順調ですか？"
+                                            elif is_ready_to_report:
+                                                dialog.text = "昇給試験担当です。\nおお！無事に証を持ち帰りましたね。さあ、報告を完了させましょう！"
+                                            elif already_active:
+                                                dialog.text = "昇給試験担当です。\n試験クエストは順調ですか？対象フロアの最奥で証を見つけてきてくださいね！"
+                                            elif next_rank_data and player.guild_point >= next_rank_data["required_gp"]:
+                                                dialog.text = "昇給試験担当です。\n現在のポイントは十分です！次のランクの試験を受けられますよ。"
+                                            elif next_rank_data:
+                                                needed = next_rank_data["required_gp"] - player.guild_point
+                                                dialog.text = f"昇給試験担当です。\n次の{next_rank_data['rank']}ランクの試験を受けるには、あと {needed} GP 必要です。"
+                                            else:
+                                                dialog.text = "昇給試験担当です。\nあなたは既に最高ランクに到達しています！"
                                             return
                                     elif getattr(npc, "role", None) == "storage":
                                         if warehouse_dialog:
@@ -2327,6 +2358,8 @@ class GuildDialog:
         self._skip_auto_report = False
         self._pending_report = None # 確認待ちの報告クエスト
         self.dungeon_ref = None
+        self.npc_role = "guild_receptionist"
+        self.ore_gift_dialog = None
 
     @property
     def is_active(self): return game_state.get("guild_active", False)
@@ -2336,7 +2369,7 @@ class GuildDialog:
         if v:
             print(f"[UI] Open GuildDialog (Mode: {self.mode})")
             self._skip_auto_report = False
-            self._pending_report = None
+            # _pending_report は setup() でセットされるため、ここでリセットしない
             self.cursor_idx = 0
             if self.mode != "AUTO_REPORT":
                 self.mode = "MENU"
@@ -2344,7 +2377,9 @@ class GuildDialog:
             print(f"[UI] Close GuildDialog")
             game_state["dialog_just_closed"] = True
 
-    def setup(self, player, dungeon):
+    def setup(self, player, dungeon, npc_role=None):
+        if npc_role is not None:
+            self.npc_role = npc_role
         self.dungeon_ref = dungeon
         self.items = []
         
@@ -2356,51 +2391,63 @@ class GuildDialog:
             if not self._skip_auto_report:
                 completed_q = None
                 for q in player.active_quests:
-                    if self._is_reportable(player, q):
-                        completed_q = q
-                        break
+                    reportable = self._is_reportable(player, q)
+                    is_ru = q.get("is_rank_up", False)
+                    if not reportable:
+                        continue
+                    if self.npc_role == "guild_rankup" and not is_ru:
+                        continue
+                    if self.npc_role == "guild_receptionist" and is_ru:
+                        continue
+                    completed_q = q
+                    break
                 
                 if completed_q:
                     # 達成済みがあれば、保留状態にする（自動遷移はしない）
                     self._pending_report = completed_q
-                    # アイテムリストはMENUのまま、通常のメニュー項目を構築する（いいえの場合のため）
                 else:
                     self._pending_report = None
 
-            # 通常メニュー (モードに関わらずMENUなら常に構築する)
-            self.items = [
-                ("mode", "ACCEPT_DAILY", "日常依頼を受注", "ランダムに生成された日常的な依頼を受けます"),
-            ]
-            # 昇格試験の判定
-            next_rank_data = dungeon.guild_system.get_next_rank_data(player.guild_rank)
-            if next_rank_data and player.guild_point >= next_rank_data["required_gp"]:
-                already_active = any(q.get("is_rank_up") for q in player.active_quests)
-                if not already_active:
-                    self.items.append(("mode", "ACCEPT_RANKUP", "昇級試験を受ける", f"{next_rank_data['rank']}ランクへの昇格試験に挑戦します"))
-            
-            # 次のランクまでのギルドポイントを説明する案内項目をメニューに追加
-            if next_rank_data:
-                needed_gp = next_rank_data["required_gp"] - player.guild_point
-                already_active = any(q.get("is_rank_up") for q in player.active_quests)
-                if needed_gp > 0:
-                    info_desc = f"次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です \n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
-                elif already_active:
-                    info_desc = f"次の{next_rank_data['rank']}ランクへの昇級試験を受注しています！\n(クエスト目標を確認して、対象フロア最奥へ向かってください)"
+            if self.npc_role == "guild_rankup":
+                # 昇給試験担当のメニュー
+                next_rank_data = dungeon.guild_system.get_next_rank_data(player.guild_rank)
+                if next_rank_data and player.guild_point >= next_rank_data["required_gp"]:
+                    already_active = any(q.get("is_rank_up") for q in player.active_quests)
+                    if not already_active:
+                        self.items.append(("mode", "ACCEPT_RANKUP", "昇級試験を受ける", f"{next_rank_data['rank']}ランクへの昇格試験に挑戦します"))
+                
+                if next_rank_data:
+                    needed_gp = next_rank_data["required_gp"] - player.guild_point
+                    already_active = any(q.get("is_rank_up") for q in player.active_quests)
+                    if needed_gp > 0:
+                        info_desc = f"次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です \n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
+                    elif already_active:
+                        info_desc = f"次の{next_rank_data['rank']}ランクへの昇級試験を受注しています！\n(クエスト目標を確認して、対象フロア最奥へ向かってください)"
+                    else:
+                        info_desc = f"次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(昇級試験を受けられます)"
                 else:
-                    info_desc = f"次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(昇級試験を受けられます)"
+                    info_desc = "これ以上は昇格できません あなたは最高ランクに達しています！"
+                self.items.append(("info_rank", None, "ランク情報を確認", info_desc))
+                self.items.append(("cancel", None, "ギルドを出る", "ギルドメニューを終了します"))
             else:
-                info_desc = "これ以上は昇格できません あなたは最高ランクに達しています！"
-            self.items.append(("info_rank", None, "ランク情報を確認", info_desc))
-            
-            self.items.append(("mode", "ACCEPT_FIXED", "特別な依頼を見る", "特定の条件で発生する特別な依頼を確認します"))
-            self.items.append(("mode", "ABANDON", "依頼破棄", "現在受けている依頼をキャンセルします"))
-            self.items.append(("mode", "SAVE", "記録する", "現在の進行状況をセーブします"))
-            self.items.append(("cancel", None, "ギルドを出る", "ギルドメニューを終了します"))
+                # 通常受付のメニュー
+                self.items = [
+                    ("mode", "ACCEPT_DAILY", "日常依頼を受注", "ランダムに生成された日常的な依頼を受けます"),
+                    ("mode", "ACCEPT_FIXED", "特別な依頼を見る", "特定の条件で発生する特別な依頼を確認します"),
+                    ("mode", "ABANDON", "依頼破棄", "現在受けている依頼をキャンセルします"),
+                    ("mode", "SAVE", "記録する", "現在の進行状況をセーブします"),
+                    ("cancel", None, "ギルドを出る", "ギルドメニューを終了します")
+                ]
             
         elif self.mode == "REPORT":
             # 条件を満たしているもののみ
             for q in player.active_quests:
                 if self._is_reportable(player, q):
+                    is_ru = q.get("is_rank_up", False)
+                    if self.npc_role == "guild_rankup" and not is_ru:
+                        continue
+                    if self.npc_role == "guild_receptionist" and is_ru:
+                        continue
                     self.items.append(("active", q))
             self.items.append(("back", None, Text.UI.QUIT))
             
@@ -2456,6 +2503,17 @@ class GuildDialog:
         # 保留中の報告があれば確認ダイアログを優先
         if self._pending_report and not confirm_dialog.is_active:
             q = self._pending_report
+            
+            # 昇格クエストの場合、お祝いを受け取るためインベントリの空きをチェック
+            if q.get("is_rank_up"):
+                from constants import MAX_ITEM_SLOTS
+                if len(player.items) >= MAX_ITEM_SLOTS:
+                    dialog.text = "お祝いの品をお渡ししたいのですが、\nバッグがいっぱいのようですね。\n荷物を整理してからもう一度話しかけてください。"
+                    dialog.is_active = True
+                    self._pending_report = None
+                    self.is_active = False
+                    return
+            
             if q.get("type") == "delivery":
                 t_name = q.get('target_name') or q.get('target_key')
                 confirm_dialog.text = Text.UI.GUILD_REPORT_CONFIRM.format(name=t_name)
@@ -2627,8 +2685,11 @@ class GuildDialog:
                 player.guild_rank = q["next_rank"]
                 
                 def on_done():
-                    dialog.text = f"依頼達成ですね \n{player.guild_rank}ランクに昇格です！おめでとうございます！"
+                    dialog.text = f"依頼達成ですね \n{player.guild_rank}ランクに昇格です！おめでとうございます！\n\nランクアップのお祝いとして、\n好きなアイテムを1つ差し上げます！"
                     dialog.is_active = True
+                    if hasattr(self, "ore_gift_dialog") and self.ore_gift_dialog:
+                        self.ore_gift_dialog.setup(player, dialog)
+                        self.ore_gift_dialog.is_active = True
                     
                 if hasattr(self, "cutscene_manager") and self.cutscene_manager:
                     self.cutscene_manager.start_rank_up(callback=on_done)
@@ -3548,7 +3609,7 @@ class ShopDialog(BaseListDialog):
                 inst = None
                 from components.sprites.player import EquipInstance, StaveInstance
                 if itype in ("weapon", "armor", "shield", "accessory"):
-                    inst = EquipInstance(itype, master_key, enhance=0)
+                    inst = EquipInstance(itype, master_key)
                 elif itype == "stave":
                     charges = info.get("charges", 5)
                     inst = StaveInstance(master_key, charges=charges)
@@ -4150,6 +4211,98 @@ class GuildGuideDialog(BaseListDialog):
                 return None
 
 
+class OreGiftDialog:
+    """ランクアップお祝い時に好きなアイテムを1つ選んで受け取るダイアログ"""
+    def __init__(self, screen_width, screen_height):
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        # 標準レイアウト（大サイズ）を適用
+        self.x, self.y, self.width, self.height = get_standard_upper_layout(screen_width, screen_height)
+        from systems.resources import font_medium
+        self.font = font_medium
+        self.cursor_idx = 0
+        self.ores = [] # setupで動的構築
+        self.player_ref = None
+        self.dialog_ref = None
+        self.on_close_callback = None
+
+    def setup(self, player, dialog, on_close=None):
+        self.player_ref = player
+        self.dialog_ref = dialog
+        self.on_close_callback = on_close
+        
+        # constants.RANKUP_GIFTS と CONSUMABLE_DATA から動的にoresリストを作成
+        from constants import RANKUP_GIFTS, CONSUMABLE_DATA
+        self.ores = []
+        for key in RANKUP_GIFTS:
+            name = CONSUMABLE_DATA.get(key, {}).get("name", key)
+            self.ores.append((key, name))
+
+    @property
+    def is_active(self): return game_state.get("ore_gift_active", False)
+    @is_active.setter
+    def is_active(self, v):
+        game_state["ore_gift_active"] = v
+        if v:
+            print("[UI] Open OreGiftDialog")
+            self.cursor_idx = 0
+        else:
+            print("[UI] Close OreGiftDialog")
+            game_state["dialog_just_closed"] = True
+
+    def handle_events(self, events):
+        if not self.is_active: return
+        from systems.audio_manager import play_sfx
+        from constants import SOUND_CURSOR_MOVE, SOUND_SELECT, KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_CONFIRM, KEY_CANCEL
+        
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == KEY_MOVE_UP:
+                    if self.cursor_idx > 0: self.cursor_idx -= 1
+                    else: self.cursor_idx = len(self.ores) - 1
+                    play_sfx(SOUND_CURSOR_MOVE)
+                elif event.key == KEY_MOVE_DOWN:
+                    if self.cursor_idx < len(self.ores) - 1: self.cursor_idx += 1
+                    else: self.cursor_idx = 0
+                    play_sfx(SOUND_CURSOR_MOVE)
+                elif event.key == KEY_CONFIRM:
+                    play_sfx(SOUND_SELECT)
+                    selected_key, selected_name = self.ores[self.cursor_idx]
+                    
+                    # プレイヤーにアイテムを付与
+                    if self.player_ref:
+                        self.player_ref.add_item_to_inventory(selected_key)
+                        
+                    # 取得ダイアログを表示
+                    if self.dialog_ref:
+                        self.dialog_ref.text = f"お祝いとして\n{selected_name} を手に入れた！"
+                        # モーダル（決定待ち）にする
+                        from systems.game_state import game_state
+                        game_state["dialog_modal"] = True
+                        self.dialog_ref.is_active = True
+                        
+                    self.is_active = False
+                    if self.on_close_callback:
+                        self.on_close_callback()
+
+    def draw(self, screen):
+        if not self.is_active: return
+        draw_dialog_frame(screen, self.x, self.y, self.width, self.height, alpha=240)
+
+        title = self.font.render("お祝いアイテムを選んでね！", True, (255, 200, 100))
+        screen.blit(title, (self.x + (self.width - title.get_width()) // 2, self.y + 15))
+
+        for i, (key, name) in enumerate(self.ores):
+            color = (255, 255, 255)
+            if i == self.cursor_idx:
+                color = (255, 255, 100)
+                cursor = self.font.render(">", True, color)
+                screen.blit(cursor, (self.x + self.width // 2 - 130, self.y + 70 + i * 35))
+            
+            text = self.font.render(name, True, color)
+            screen.blit(text, (self.x + self.width // 2 - 100, self.y + 70 + i * 35))
+
+
 def draw_minimap(screen, dungeon, player):
     """
     探索済みのタイルを表示するミニマップ（透過オーバーレイ）を描画する。
@@ -4212,7 +4365,7 @@ def draw_minimap(screen, dungeon, player):
     # 描画
     screen.blit(map_surf, (off_x, off_y))
 
-def draw_all_ui(screen, player, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, shop_dialog, stave_selection_dialog, guild_dialog=None, warehouse_dialog=None, bank_dialog=None, menu_dialog=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, teleport_dialog=None, dungeon=None, events=None, parameter_selection_dialog=None, **kwargs):
+def draw_all_ui(screen, player, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, shop_dialog, stave_selection_dialog, guild_dialog=None, warehouse_dialog=None, bank_dialog=None, menu_dialog=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, teleport_dialog=None, dungeon=None, events=None, parameter_selection_dialog=None, ore_gift_dialog=None, **kwargs):
     """全てのUIダイアログなどをまとめて更新・描画する"""
     inventory_dialog.draw(screen, player)
     if equip_dialog: equip_dialog.draw(screen, player)
@@ -4241,6 +4394,8 @@ def draw_all_ui(screen, player, dialog, confirm_dialog, inventory_dialog, status
     stave_selection_dialog.draw(screen)
     if teleport_dialog:
         teleport_dialog.draw(screen, player)
+    if ore_gift_dialog:
+        ore_gift_dialog.draw(screen)
     
     guild_guide_dialog = kwargs.get("guild_guide_dialog")
     if guild_guide_dialog:

@@ -173,7 +173,8 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
                      guild_guide_dialog=ui_elements.get("guild_guide_dialog"),
                      cutscene_manager=ui_elements.get("cutscene_manager"),
                      parameter_selection_active=game_state.get("parameter_selection_active"),
-                     parameter_selection_dialog=ui_elements.get("parameter_selection_dialog"))
+                     parameter_selection_dialog=ui_elements.get("parameter_selection_dialog"),
+                     ore_gift_dialog=ui_elements.get("ore_gift_dialog"))
     
     screen.fill((0, 0, 0))
     
@@ -220,7 +221,7 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
     screen.fill((0, 0, 0))
     
     # 2-2. ダンジョンの描画
-    new_dungeon.draw(screen, camera_x, camera_y)
+    new_dungeon.draw(screen, camera_x, camera_y, player)
     new_dungeon.update(dialog=ui_elements["dialog"])
     if getattr(new_dungeon, "next_dungeon", None):
         new_dungeon = new_dungeon.next_dungeon
@@ -246,7 +247,8 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
                 guild_guide_dialog=ui_elements.get("guild_guide_dialog"),
                 dungeon=new_dungeon, events=events,
                 cutscene_manager=ui_elements.get("cutscene_manager"),
-                parameter_selection_dialog=ui_elements.get("parameter_selection_dialog"))
+                parameter_selection_dialog=ui_elements.get("parameter_selection_dialog"),
+                ore_gift_dialog=ui_elements.get("ore_gift_dialog"))
     
     # [FIX] ダイアログ誤爆防止フラグのリセット
     if game_state.get("dialog_just_closed"):

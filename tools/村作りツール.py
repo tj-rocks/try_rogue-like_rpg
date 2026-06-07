@@ -146,8 +146,12 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                         data = npcs.get(entity_id)
                         if data:
                             img = data.get("image_path", "")
+                            # image_path が辞書形式（ランク別）の場合は "default" キーを優先して使う
+                            if isinstance(img, dict):
+                                img = img.get("default") or next(iter(img.values()), "")
+                            img = img or ""
                             # Check file naming rules for guide NPCs vs normal NPCs
-                            if os.path.exists(os.path.join(base_dir, img, "0.png")):
+                            if os.path.exists(os.path.join(base_dir, str(img), "0.png")):
                                 image_file = "0.png"
                             else:
                                 image_file = "idel.png"

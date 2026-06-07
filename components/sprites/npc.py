@@ -13,7 +13,7 @@ class NPC(Entity):
         if count > 0:
             print(f"[MEMORY] NPC scaled image cache cleared ({count} items)")
 
-    def __init__(self, name, x, y, sprite_type="villager", dialogue=[], image_path=None, base_image_path=None, role=None, flip=False):
+    def __init__(self, name, x, y, sprite_type="villager", dialogue=[], image_path=None, base_image_path=None, role=None, flip=False, alpha=None):
         # NPCもEntityを継承して移動や描画の基本機能を持たせる
         # とりあえず固定位置にいるので move_speed=0
         super().__init__(x=x, y=y, hp=100, max_hp=100, attack=0, width=64, height=64)
@@ -23,6 +23,7 @@ class NPC(Entity):
         self.move_speed = 0
         self.role = role
         self.flip = flip
+        self.alpha = alpha
         
         # 背景画像（足元の床など）の読み込み
         self.base_image = None
@@ -34,27 +35,39 @@ class NPC(Entity):
                 print(f"[NPC] Failed to load base image {base_image_path}: {e}")
 
         # [NEW] 画像の読み込み（アニメーション対応：idel, 0, 1 構成）
-        self._image_dict = {}
-        if image_path:
-            if os.path.isdir(image_path):
-                try:
-                    # idel.png, 0.png, 1.png を探す
-                    for key in ["idel", "0", "1"]:
-                        fname = f"{key}.png"
-                        full_path = os.path.join(image_path, fname)
-                        if os.path.exists(full_path):
-                            raw = pygame.image.load(full_path).convert_alpha()
-                            scaled = pygame.transform.scale(raw, (self.width, self.height))
-                            self._image_dict[key] = scaled
-                    
-                    # 互換性維持：01.png がある場合
-                    if "idel" not in self._image_dict:
-                        path01 = os.path.join(image_path, "01.png")
-                        if os.path.exists(path01):
-                            raw = pygame.image.load(path01).convert_alpha()
-                            self._image_dict["idel"] = pygame.transform.scale(raw, (self.width, self.height))
-                except Exception as e:
-                    print(f"[NPC] Failed to load animation from {image_path}: {e}")
+        self._image_dicts_by_rank = {}
+        
+        def load_anim_dir(path):
+            img_dict = {}
+            if path and isinstance(path, str):
+                if os.path.isdir(path):
+                    try:
+                        for key in ["idel", "0", "1"]:
+                            fname = f"{key}.png"
+                            full_path = os.path.join(path, fname)
+                            if os.path.exists(full_path):
+                                raw = pygame.image.load(full_path).convert_alpha()
+                                img_dict[key] = pygame.transform.scale(raw, (self.width, self.height))
+                        if "idel" not in img_dict:
+                            path01 = os.path.join(path, "01.png")
+                            if os.path.exists(path01):
+                                raw = pygame.image.load(path01).convert_alpha()
+                                img_dict["idel"] = pygame.transform.scale(raw, (self.width, self.height))
+                    except Exception as e:
+                        print(f"[NPC] Failed to load animation from {path}: {e}")
+                elif os.path.isfile(path):
+                    try:
+                        raw = pygame.image.load(path).convert_alpha()
+                        img_dict["idel"] = pygame.transform.scale(raw, (self.width, self.height))
+                    except Exception as e:
+                        print(f"[NPC] Failed to load image from {path}: {e}")
+            return img_dict
+
+        if isinstance(image_path, dict):
+            for rank, path in image_path.items():
+                self._image_dicts_by_rank[rank] = load_anim_dir(path)
+        else:
+            self._image_dicts_by_rank["default"] = load_anim_dir(image_path)
 
         # 仮の見た目設定（画像がない場合のフォールバック）
         self.color = (50, 200, 100) # デフォルトは緑っぽい
@@ -73,7 +86,7 @@ class NPC(Entity):
         return self.dialogue if self.dialogue else [Text.NPC.GENERIC_FALLBACK.format(name=self.name)]
 
 
-    def draw(self, screen, camera_x, camera_y):
+    def draw(self, screen, camera_x, camera_y, player=None):
         draw_x = self.x - camera_x
         draw_y = self.y - camera_y
         
@@ -82,15 +95,24 @@ class NPC(Entity):
             screen.blit(self.base_image, (draw_x, draw_y))
 
         # 2. アニメーションフレームの決定 (idel -> 0 -> idel -> 1 の 4段階サイクル)
+        rank = player.guild_rank if player else None
+        current_image_dict = {}
+        if rank and rank in self._image_dicts_by_rank:
+            current_image_dict = self._image_dicts_by_rank[rank]
+        elif "default" in self._image_dicts_by_rank:
+            current_image_dict = self._image_dicts_by_rank["default"]
+        elif self._image_dicts_by_rank:
+            current_image_dict = list(self._image_dicts_by_rank.values())[0]
+
         img = None
-        if "idel" in self._image_dict and "0" in self._image_dict and "1" in self._image_dict:
+        if "idel" in current_image_dict and "0" in current_image_dict and "1" in current_image_dict:
             # 60フレーム周期を4分割 (15フレームごと)
             step = (self.idle_anim_timer // 15) % 4
             anim_key = ["idel", "0", "idel", "1"][step]
-            img = self._image_dict.get(anim_key)
-        elif self._image_dict:
+            img = current_image_dict.get(anim_key)
+        elif current_image_dict:
             # idel があれば優先、なければ適当なものを表示
-            img = self._image_dict.get("idel") or list(self._image_dict.values())[0]
+            img = current_image_dict.get("idel") or list(current_image_dict.values())[0]
 
         if not img:
             # 簡易的な描画（画像がない場合のフォールバック）
@@ -101,8 +123,21 @@ class NPC(Entity):
         # 3. 呼吸（スケーリング）の計算（共通メソッドを使用）
         (scale_x, scale_y), phase = self.get_breathing_scale()
         
+        # 4. 透過度（アルファ値）の計算
+        alpha_val = 255
+        if self.alpha is not None:
+            if isinstance(self.alpha, dict):
+                if rank and rank in self.alpha:
+                    alpha_val = self.alpha[rank]
+                elif "default" in self.alpha:
+                    alpha_val = self.alpha["default"]
+                elif self.alpha:
+                    alpha_val = list(self.alpha.values())[0]
+            else:
+                alpha_val = self.alpha
+        
         # --- [OPTIMIZED] NPCのスケーリングキャッシュ利用 ---
-        cache_key = (img, phase, self.flip)
+        cache_key = (img, phase, self.flip, alpha_val)
         cached_img = NPC._npc_scaled_cache.get(cache_key)
         
         if cached_img is None:
@@ -110,8 +145,10 @@ class NPC(Entity):
             scaled_img = pygame.transform.smoothscale(img, (int(w * scale_x), int(h * scale_y)))
             if self.flip:
                 scaled_img = pygame.transform.flip(scaled_img, True, False)
+            if alpha_val != 255:
+                scaled_img = scaled_img.copy()
+                scaled_img.set_alpha(alpha_val)
             cached_img = scaled_img
-            NPC._npc_scaled_cache[cache_key] = cached_img
             NPC._npc_scaled_cache[cache_key] = cached_img
             
         img = cached_img
@@ -122,8 +159,4 @@ class NPC(Entity):
 
         screen.blit(img, (draw_x_scaled, draw_y_scaled))
         
-        # 名前ラベル（共通フォントを使用）
-        from systems.resources import font_small
-        text = font_small.render(self.name, True, (255, 255, 255))
-        screen.blit(text, (draw_x + (self.width - text.get_width())//2, draw_y - 25))
 

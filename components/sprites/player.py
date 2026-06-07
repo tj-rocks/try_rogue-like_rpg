@@ -967,9 +967,12 @@ class Player(Entity):
                 if it["key"] == ik and it["count"] < ms:
                     add = min(count, ms - it["count"]); it["count"] += add; count -= add
                     if count <= 0: return True
-        if data.get("category") == "event": self.event_items.append({"key": ik, "count": count}); return True
+        if data.get("category") == "event": 
+            self.event_items.append({"key": ik, "count": count})
+            return True
         while count > 0:
-            if len(self.items) >= MAX_ITEM_SLOTS: return False
+            if len(self.items) >= MAX_ITEM_SLOTS: 
+                return False
             add = min(count, ms); self.items.append({"key": ik, "count": add}); count -= add
         return True
 
@@ -1078,7 +1081,8 @@ class Player(Entity):
         if not tk: return False
         if q.get("type") == "hunt": return self.quest_tokens.get(tk, 0) >= q.get("amount", 1)
         elif q.get("type") == "delivery":
-            return self._count_owned_items(tk) >= q.get("amount", 1)
+            res = self._count_owned_items(tk) >= q.get("amount", 1)
+            return res
         return False
 
     def is_any_quest_ready(self):
