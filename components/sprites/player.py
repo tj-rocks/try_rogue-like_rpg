@@ -521,7 +521,13 @@ class Player(Entity):
     @condition.setter
     def condition(self, value):
         self._status = value
-        self.status_timer = random.randint(5, 10) if value == "poison" else 0
+        if value == "poison":
+            self.status_timer = random.randint(5, 10)
+        elif value == "darkness":
+            from constants import STATUS_EFFECTS
+            self.status_timer = STATUS_EFFECTS.get("darkness", {}).get("duration", 5)
+        else:
+            self.status_timer = 0
         
     def _init_images(self):
         import os
@@ -1136,6 +1142,14 @@ class Player(Entity):
             if dialog:
                 if dialog.is_active: dialog.text += "\n" + msg
                 else: dialog.text = msg; dialog.is_active = True; game_state["dialog_modal"] = False; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+        elif self.condition == "darkness":
+            self.status_timer -= 1
+            if self.status_timer <= 0:
+                self.condition = "normal"
+                msg = "暗闇が晴れた！"
+                if dialog:
+                    if dialog.is_active: dialog.text += "\n" + msg
+                    else: dialog.text = msg; dialog.is_active = True; game_state["dialog_modal"] = False; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
         elif self.hp < self.max_hp:
             # 燕バフによる自動回復 (毎ターン hp が regen_buff_val 分だけ回復)
             if getattr(self, "regen_buff_turns", 0) > 0:
