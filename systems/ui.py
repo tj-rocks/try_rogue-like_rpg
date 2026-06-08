@@ -1071,6 +1071,35 @@ class BaseListDialog:
             draw_text_wrapped(screen, self.font, "\n".join(lines),
                               sep_x + 30, self.y + 80 + detail_y_offset, self.width // 2 - 60, color=(220, 230, 240))
 
+    def draw_equip_detail_right_panel(self, screen, inst, param_texts, desc, sep_x, detail_y_offset):
+        """装備品の右パネルを2列パラメータ＋説明文で描画する共通メソッド。
+        inst        : EquipInstance / StaveInstance（名前取得用、Noneなら名前行なし）
+        param_texts : [(テキスト文字列, ...)] のリスト
+        desc        : 説明文（str）
+        sep_x       : 左右セパレータのx座標
+        detail_y_offset : 画像の有無による縦オフセット
+        """
+        start_x = sep_x + 30
+        start_y = self.y + 80 + detail_y_offset
+        cw = self.width // 2 - 60
+        line_h = self.font.get_height() + 2
+
+        N = len(param_texts)
+        half = (N + 1) // 2
+
+        max_y = start_y
+        for i, text in enumerate(param_texts):
+            col = 0 if i < half else 1
+            row = i if col == 0 else i - half
+            x = start_x if col == 0 else start_x + cw // 2 + 10
+            y = start_y + row * line_h
+            screen.blit(self.font.render(text, True, (220, 230, 240)), (x, y))
+            max_y = max(max_y, y + line_h)
+
+        if desc:
+            desc_y = max_y + 20
+            draw_text_wrapped(screen, self.font, desc, start_x, desc_y, cw, color=(170, 170, 170))
+
 
 class ParameterSelectionDialog(BaseListDialog):
     """鍛冶屋で装備と鉱石選択後に「どのステータスを強化するか」を選ぶダイアログ
@@ -1375,29 +1404,9 @@ class InventoryDialog(BaseListDialog):
                 val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
                 param_texts.append(f"{mlabel}: {fmt(val_to_use)}%" if is_pct else f"{mlabel}: {fmt(mval)}")
 
-        # 3. パラメータの2列描画 (装備名省略に伴いy座標を上にシフト)
-        start_x = sep_x + 30
-        start_y = self.y + 80 + detail_y_offset
-        cw = self.width // 2 - 60
-        line_h = self.font.get_height() + 2
-        
-        N = len(param_texts)
-        half = (N + 1) // 2
-        
-        max_y = start_y
-        for i, text in enumerate(param_texts):
-            col = 0 if i < half else 1
-            row = i if col == 0 else i - half
-            x = start_x if col == 0 else start_x + cw // 2 + 10
-            y = start_y + row * line_h
-            screen.blit(self.font.render(text, True, (220, 230, 240)), (x, y))
-            max_y = max(max_y, y + line_h)
-
-        # 4. 説明文の描画（最下部1列）
+        # 3 & 4. パラメータ2列＋説明文を共通メソッドで描画
         desc = inst.get_stat("describe", "")
-        if desc:
-            desc_y = max_y + 20
-            draw_text_wrapped(screen, self.font, desc, start_x, desc_y, cw, color=(170, 170, 170))
+        self.draw_equip_detail_right_panel(screen, inst, param_texts, desc, sep_x, detail_y_offset)
 
     def get_title(self): return Text.UI.INVENTORY_TITLE
 
@@ -1871,8 +1880,12 @@ def draw_vision_overlay(screen, player, dungeon):
     import pygame
 
     # 1. 視界半径の計算（ベース視界：半径1、フェード2 ＋ 装備品の合計 lantern_bonus）
-    r_tiles = 1 + getattr(player, "lantern_bonus", 0)
-    f_tiles = 2
+    if getattr(player, "condition", "normal") == "darkness":
+        r_tiles = 1  # 暗闇状態：lantern_bonusを無視して視界1タイルに強制
+        f_tiles = 1
+    else:
+        r_tiles = 1 + getattr(player, "lantern_bonus", 0)
+        f_tiles = 2
     
     # 2. ピクセル単位に変換
     tile_size = getattr(dungeon, "tile_size", 32)
@@ -3598,14 +3611,11 @@ class ShopDialog(BaseListDialog):
                     screen.blit(scaled_img, (sep_x + 30 + (80 - img_w) // 2, self.y + 80 + (80 - img_h) // 2))
                     detail_y_offset = 90
 
-            # --- ステータス詳細行の組み立て ---
-            lines = []
+            # --- ステータス詳細行の組み立て＆描画 ---
             if selected[1] == "cancel":
-                lines.append(Text.UI.QUIT)
-                lines.append("")
-                lines.append("店を出ます")
+                lines = [Text.UI.QUIT, "", "店を出ます"]
+                draw_text_wrapped(screen, self.font, "\n".join(lines), sep_x + 30, self.y + 80 + detail_y_offset, self.width // 2 - 60, color=(220, 230, 240))
             else:
-                # 装備インスタンス（またはダミーの作成）
                 inst = None
                 from components.sprites.player import EquipInstance, StaveInstance
                 if itype in ("weapon", "armor", "shield", "accessory"):
@@ -3615,35 +3625,24 @@ class ShopDialog(BaseListDialog):
                     inst = StaveInstance(master_key, charges=charges)
 
                 if inst:
-                    lines.append(inst.get_name())
-                    lines.append("")
-                    # 基本ステータスの表示
+                    param_texts = []
                     for k, label in EQUIP_STAT_LABEL_MAP.items():
                         val = inst.get_stat(k, 0)
                         if val:
                             is_pct = k in ("crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
                             val_to_use = val * 100 if is_pct and isinstance(val, float) else val
-                            lines.append(f"{label}: {format_stat_value(val_to_use)}%" if is_pct else f"{label}: {format_stat_value(val)}")
-                    # 魔法ボーナスの表示
+                            param_texts.append(f"{label}: {format_stat_value(val_to_use)}%" if is_pct else f"{label}: {format_stat_value(val)}")
                     for mk, mlabel in EQUIP_MAGIC_LABEL_MAP.items():
                         mval = inst.get_stat(mk, 0)
                         if mval:
                             is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
                             val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
-                            lines.append(f"{mlabel}: {format_stat_value(val_to_use)}%" if is_pct else f"{format_stat_value(mval)}")
-                    
+                            param_texts.append(f"{mlabel}: {format_stat_value(val_to_use)}%" if is_pct else f"{mlabel}: {format_stat_value(mval)}")
                     desc = inst.get_stat("describe", "")
-                    if desc:
-                        lines.append("")
-                        lines.append(desc)
+                    self.draw_equip_detail_right_panel(screen, inst, param_texts, desc, sep_x, detail_y_offset)
                 else:
-                    lines.append(f"【{selected[2]}】")
-                    lines.append("")
-                    desc = info.get("describe", "詳細情報はありません")
-                    if desc:
-                        lines.append(desc)
-
-            draw_text_wrapped(screen, self.font, "\n".join(lines), sep_x + 30, self.y + 80 + detail_y_offset, self.width // 2 - 60, color=(220, 230, 240))
+                    lines = [f"【{selected[2]}】", "", info.get("describe", "詳細情報はありません")]
+                    draw_text_wrapped(screen, self.font, "\n".join(lines), sep_x + 30, self.y + 80 + detail_y_offset, self.width // 2 - 60, color=(220, 230, 240))
 
 class WarehouseDialog(BaseListDialog):
     """預かり屋（倉庫）でのアイテム出し入れを行うダイアログ"""

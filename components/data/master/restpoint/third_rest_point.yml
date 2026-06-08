@@ -263,6 +263,9 @@ TILE_MAPPINGS:
     category: obstacle
     id: pot
     positions:
+      - x: 20
+        y: 2
+        flip: false
       - x: 37
         y: 5
         flip: false
@@ -284,6 +287,10 @@ TILE_MAPPINGS:
   stained_armor_stand:
     category: obstacle
     id: stained_armor_stand
+    positions:
+      - x: 18
+        y: 2
+        flip: false
   weapon_shop:
     category: npc
     id: weapon_shop
@@ -411,3 +418,169 @@ TILE_MAPPINGS:
     image_path: components/pictures/dungeon/stairs/stairs_up.png
     bg_color: '#44cc22'
     fg_color: '#fff'
+  story_noname5:
+    category: npc
+    id: story_noname5
+    positions:
+      - x: 10
+        y: 2
+        flip: false
+  story_noname1:
+    category: npc
+    id: story_noname1
+    positions:
+      - x: 18
+        y: 4
+        flip: true
+  story_noname3:
+    category: npc
+    id: story_noname3
+    positions:
+      - x: 20
+        y: 4
+        flip: false
+      - x: 20
+        y: 6
+        flip: true
+  story_noname2:
+    category: npc
+    id: story_noname2
+    positions:
+      - x: 17
+        y: 5
+        flip: false
+  story_noname4:
+    category: npc
+    id: story_noname4
+    positions:
+      - x: 31
+        y: 10
+        flip: false
+  story_camila:
+    category: npc
+    id: story_camila
+    positions:
+      - x: 20
+        y: 14
+        flip: false
+  story_helena:
+    category: npc
+    id: story_helena
+    positions:
+      - x: 13
+        y: 15
+        flip: true
+  story_geisel:
+    category: npc
+    id: story_geisel
+    positions:
+      - x: 16
+        y: 15
+        flip: true
+  story_kaya:
+    category: npc
+    id: story_kaya
+    positions:
+      - x: 18
+        y: 15
+        flip: false
+  story_olivia:
+    category: npc
+    id: story_olivia
+    positions:
+      - x: 13
+        y: 18
+        flip: true
+  story_gareth:
+    category: npc
+    id: story_gareth
+    positions:
+      - x: 15
+        y: 18
+        flip: false
+  story_rain:
+    category: npc
+    id: story_rain
+    positions:
+      - x: 19
+        y: 18
+        flip: true
+  story_yuru:
+    category: npc
+    id: story_yuru
+    positions:
+      - x: 21
+        y: 18
+        flip: false
+  wall_deco_tapestry:
+    category: wall_decoration
+    desc: タペストリー
+    id: wall_decoration_tapestry
+    image_path: components/pictures/dungeon/home/wall_decoration_tapestry.png
+    positions:
+      - x: 41
+        y: 2
+        flip: true
+      - x: 38
+        y: 3
+        flip: false
+      - x: 41
+        y: 3
+        flip: true
+      - x: 38
+        y: 4
+        flip: false
+      - x: 41
+        y: 4
+        flip: true
+      - x: 38
+        y: 5
+        flip: false
+      - x: 41
+        y: 5
+        flip: true
+  wall_deco_wooden_roof:
+    category: wall_decoration
+    desc: 木製の屋根飾り
+    id: wall_decoration_wooden_roof
+    image_path: components/pictures/dungeon/home/wall_decoration_wooden_roof.png
+    positions:
+      - x: 17
+        y: 3
+        flip: false
+      - x: 18
+        y: 3
+        flip: false
+      - x: 19
+        y: 3
+        flip: false
+      - x: 20
+        y: 3
+        flip: false
+      - x: 21
+        y: 3
+        flip: false
+      - x: 28
+        y: 3
+        flip: false
+      - x: 29
+        y: 3
+        flip: false
+      - x: 30
+        y: 3
+        flip: false
+      - x: 31
+        y: 3
+        flip: false
+  wall_deco_shield:
+    category: wall_decoration
+    desc: 壁掛けの盾
+    id: wall_decoration_shield
+    image_path: components/pictures/dungeon/home/wall_decoration_shield.png
+    positions:
+      - x: 18
+        y: 8
+        flip: false
+      - x: 20
+        y: 8
+        flip: false

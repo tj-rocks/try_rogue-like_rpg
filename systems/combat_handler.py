@@ -189,6 +189,8 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                 target.condition = status_to_add
                 if status_to_add == "poison":
                     msg += f"\n{target_name}は毒を受けてしまった"
+                elif status_to_add == "darkness":
+                    msg += f"\n{target_name}は暗闇に包まれた！視界が狭まった！"
 
     # --- 敵の困惑（stupidity）上昇効果 ---
     if not is_miss and damage > 0:
