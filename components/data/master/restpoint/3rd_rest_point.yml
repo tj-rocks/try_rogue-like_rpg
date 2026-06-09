@@ -1,0 +1,586 @@
+CONFIG:
+  map_file: 3rd_rest_point.txt
+  map_dir: components/data/dungeon
+  image_dir: components/pictures/dungeon/home
+TILE_MAPPINGS:
+  floor_lawn:
+    char: .
+    category: floor
+    tile_id: 0
+    desc: 外床 (芝生)
+    image_path: components/pictures/dungeon/home/floor_lawn.png
+    bg_color: '#1c2a1c'
+    fg_color: '#3a5a3a'
+  floor_wooden:
+    char: ','
+    category: floor
+    tile_id: 1
+    desc: 内床 (フローリング)
+    image_path: components/pictures/dungeon/home/floor_wooden.png
+    bg_color: '#2a2a1a'
+    fg_color: '#6a6a2a'
+  floor_purple_stone:
+    char: ':'
+    category: floor
+    tile_id: 3
+    desc: 内床3 (石床赤紫)
+    image_path: components/pictures/dungeon/home/floor_purple_stone.png
+    bg_color: '#2c1c2c'
+    fg_color: '#656'
+  floor_water:
+    char: '~'
+    category: floor
+    tile_id: 5
+    desc: 水
+    image_path: components/pictures/dungeon/home/floor_water.png
+    bg_color: '#1a2a3a'
+    fg_color: '#4a8aaa'
+  floor_dark_stone:
+    char: '*'
+    category: floor
+    tile_id: 7
+    desc: 内床7
+    image_path: components/pictures/dungeon/home/floor_dark_stone.png
+    bg_color: '#3c3c3c'
+    fg_color: '#666'
+  corridor_stone_1:
+    char: K
+    category: corridor
+    desc: 通路 (石タイル)
+    image_path: components/pictures/dungeon/home/corridor.png
+    bg_color: '#2a1a2a'
+    fg_color: '#cc88cc'
+  corridor_stone_2:
+    char: L
+    category: corridor
+    desc: 通路 (石タイル2)
+    image_path: components/pictures/dungeon/home/corridor.png
+    bg_color: '#2a1a2a'
+    fg_color: '#cc88cc'
+
+  wall_pass_wooden_gate:
+    char: '1'
+    category: wall_pass
+    tile_id: 1
+    desc: 扉・ゲート1 (すり抜け可能)
+    image_path: components/pictures/dungeon/home/wall_pass_gate_wooden.png
+    bg_color: '#3a1a1a'
+    fg_color: '#aa5a3a'
+    positions:
+      - x: 9
+        y: 8
+        flip: false
+      - x: 19
+        y: 8
+        flip: false
+      - x: 29
+        y: 8
+        flip: false
+      - x: 37
+        y: 8
+        flip: false
+      - x: 3
+        y: 13
+        flip: false
+      - x: 12
+        y: 13
+        flip: false
+      - x: 41
+        y: 13
+        flip: false
+  wall_pass_iron_gate:
+    char: '2'
+    category: wall_pass
+    tile_id: 2
+    desc: 扉・ゲート2 (すり抜け可能)
+    image_path: components/pictures/dungeon/home/wall_pass_gate_iron.png
+    bg_color: '#3a1a1a'
+    fg_color: '#aa5a3a'
+  wall_pass_stone_gate:
+    char: '3'
+    category: wall_pass
+    tile_id: 3
+    desc: 扉・ゲート3 (すり抜け可能)
+    image_path: components/pictures/dungeon/home/wall_pass_gate_stone.png
+    bg_color: '#3a1a1a'
+    fg_color: '#aa5a3a'
+    positions:
+      - x: 9
+        y: 7
+        flip: false
+      - x: 19
+        y: 7
+        flip: false
+      - x: 29
+        y: 7
+        flip: false
+      - x: 37
+        y: 7
+        flip: false
+      - x: 3
+        y: 12
+        flip: false
+      - x: 12
+        y: 12
+        flip: false
+      - x: 41
+        y: 12
+        flip: false
+  wall_top_wood_classic:
+    char: a
+    category: wall_top
+    tile_id: 0
+    desc: 壁0 (茶木目壁)
+    image_path: components/pictures/dungeon/home/wall_top_wood_classic.png
+    bg_color: '#3a2a1a'
+    fg_color: '#8a6a4a'
+  wall_top_wood_fine:
+    char: b
+    category: wall_top
+    tile_id: 1
+    desc: 壁1
+    image_path: components/pictures/dungeon/home/wall_top_wood_fine.png
+    bg_color: '#3a2a1a'
+    fg_color: '#8a6a4a'
+  wall_top_wood_grand:
+    char: e
+    category: wall_top
+    tile_id: 4
+    desc: 壁4
+    image_path: components/pictures/dungeon/home/wall_top_wood_grand.png
+    bg_color: '#3a2a1a'
+    fg_color: '#8a6a4a'
+  wall_top_wood_shabby:
+    char: f
+    category: wall_top
+    tile_id: 5
+    desc: 壁5
+    image_path: components/pictures/dungeon/home/wall_top_wood_shabby.png
+    bg_color: '#3a2a1a'
+    fg_color: '#8a6a4a'
+  wall_top_wood_stripes:
+    char: d
+    category: wall_top
+    tile_id: 6
+    desc: 壁6
+    image_path: components/pictures/dungeon/home/wall_top_wood_stripes.png
+    bg_color: '#3a2a1a'
+    fg_color: '#8a6a4a'
+  wall_top_wood_block:
+    char: g
+    category: wall_top
+    tile_id: 7
+    desc: 壁7
+    image_path: components/pictures/dungeon/home/wall_top_wood_block.png
+    bg_color: '#3a2a1a'
+    fg_color: '#8a6a4a'
+  wall_top_wood_horizontal:
+    char: h
+    category: wall_top
+    tile_id: 8
+    desc: 壁8
+    image_path: components/pictures/dungeon/home/wall_top_wood_horizontal.png
+    bg_color: '#3a2a1a'
+    fg_color: '#8a6a4a'
+  wall_top_wood_vertical:
+    char: i
+    category: wall_top
+    tile_id: 9
+    desc: 壁9 (薄茶レンガ壁)
+    image_path: components/pictures/dungeon/home/wall_top_wood_vertical.png
+    bg_color: '#3a2a1a'
+    fg_color: '#8a6a4a'
+  wall_top_wood_frame:
+    char: j
+    category: wall_top
+    tile_id: 10
+    desc: 壁10 (赤茶レンガ壁)
+    image_path: components/pictures/dungeon/home/wall_top_wood_frame.png
+    bg_color: '#3a2a1a'
+    fg_color: '#8a6a4a'
+  wall_top_stone_blocks:
+    char: t
+    category: wall_top
+    tile_id: 11
+    desc: 壁11 (石ブロック壁)
+    image_path: components/pictures/dungeon/home/wall_top_stone_blocks.png
+    bg_color: '#2a2a2a'
+    fg_color: '#888'
+  wall_none_0:
+    char: ;
+    category: wall_none
+    tile_id: 0
+    desc: 虚無・暗闇背景
+    bg_color: '#08080c'
+    fg_color: '#333'
+  wall_none_1:
+    char: k
+    category: wall_none
+    tile_id: 1
+    desc: 背景虚無1
+    bg_color: '#08080c'
+    fg_color: '#333'
+  wall_none_2:
+    char: l
+    category: wall_none
+    tile_id: 2
+    desc: 背景虚無2
+    bg_color: '#08080c'
+    fg_color: '#333'
+  wall_none_3:
+    char: w
+    category: wall_none
+    tile_id: 3
+    desc: 背景虚無3
+    bg_color: '#08080c'
+    fg_color: '#333'
+  wood_barrel:
+    category: obstacle
+    id: wood_barrel
+    positions:
+      - x: 29
+        y: 2
+        flip: false
+      - x: 30
+        y: 2
+        flip: false
+      - x: 37
+        y: 3
+        flip: false
+      - x: 42
+        y: 3
+        flip: false
+      - x: 2
+        y: 5
+        flip: false
+      - x: 11
+        y: 17
+        flip: false
+  crate:
+    category: obstacle
+    id: crate
+  pot:
+    category: obstacle
+    id: pot
+    positions:
+      - x: 20
+        y: 2
+        flip: false
+      - x: 37
+        y: 5
+        flip: false
+      - x: 42
+        y: 5
+        flip: false
+  rubble:
+    category: obstacle
+    id: rubble
+  anvil:
+    category: obstacle
+    id: anvil
+  crystal:
+    category: obstacle
+    id: crystal
+  sword_stuck:
+    category: obstacle
+    id: sword_stuck
+  stained_armor_stand:
+    category: obstacle
+    id: stained_armor_stand
+    positions:
+      - x: 18
+        y: 2
+        flip: false
+  weapon_shop:
+    category: npc
+    id: weapon_shop
+    positions:
+      - x: 42
+        y: 4
+        flip: true
+  item_shop:
+    category: npc
+    id: item_shop
+    positions:
+      - x: 42
+        y: 2
+        flip: false
+  merchant:
+    category: npc
+    id: merchant
+    positions:
+      - x: 37
+        y: 4
+        flip: true
+  storage:
+    category: npc
+    id: storage
+    positions:
+      - x: 31
+        y: 2
+        flip: false
+  inn:
+    category: npc
+    id: inn
+    positions:
+      - x: 2
+        y: 6
+        flip: true
+  blacksmith:
+    category: npc
+    id: blacksmith
+  guild_receptionist:
+    category: npc
+    id: guild_receptionist
+    positions:
+      - x: 19
+        y: 2
+        flip: false
+  doctor:
+    category: npc
+    id: doctor
+  bank:
+    category: npc
+    id: bank
+    positions:
+      - x: 28
+        y: 2
+        flip: false
+  pub_master:
+    category: npc
+    id: pub_master
+    positions:
+      - x: 11
+        y: 16
+        flip: true
+  teleport_wizard:
+    category: npc
+    id: teleport_wizard
+  tutorial_woman1:
+    category: npc
+    id: tutorial_woman1
+  table:
+    category: obstacle
+    id: table
+    positions:
+      - x: 17
+        y: 2
+        flip: false
+      - x: 21
+        y: 2
+        flip: false
+      - x: 19
+        y: 4
+        flip: false
+      - x: 17
+        y: 6
+        flip: false
+      - x: 21
+        y: 6
+        flip: false
+      - x: 14
+        y: 15
+        flip: false
+      - x: 17
+        y: 15
+        flip: false
+      - x: 20
+        y: 15
+        flip: false
+      - x: 14
+        y: 18
+        flip: false
+      - x: 17
+        y: 18
+        flip: false
+      - x: 20
+        y: 18
+        flip: false
+  special_P:
+    char: P
+    category: special
+    desc: プレイヤー開始地点
+    image_path: components/pictures/player/walk/down_idel.png
+    bg_image_path: components/pictures/dungeon/home/floor_lawn.png
+    bg_color: '#2244cc'
+    fg_color: '#fff'
+  special_D:
+    char: D
+    category: special
+    desc: ダンジョン入口階段 (Stairs Down)
+    image_path: components/pictures/dungeon/stairs/stairs_down.png
+    bg_color: '#cc2244'
+    fg_color: '#fff'
+  special_U:
+    char: U
+    category: special
+    desc: 街出口階段 (Stairs Up)
+    image_path: components/pictures/dungeon/stairs/stairs_up.png
+    bg_color: '#44cc22'
+    fg_color: '#fff'
+  story_noname5:
+    category: npc
+    id: story_noname5
+    positions:
+      - x: 10
+        y: 2
+        flip: false
+  story_noname1:
+    category: npc
+    id: story_noname1
+    positions:
+      - x: 18
+        y: 4
+        flip: true
+  story_noname3:
+    category: npc
+    id: story_noname3
+    positions:
+      - x: 20
+        y: 4
+        flip: false
+      - x: 20
+        y: 6
+        flip: true
+  story_noname2:
+    category: npc
+    id: story_noname2
+    positions:
+      - x: 17
+        y: 5
+        flip: false
+  story_noname4:
+    category: npc
+    id: story_noname4
+    positions:
+      - x: 31
+        y: 10
+        flip: false
+  story_camila:
+    category: npc
+    id: story_camila
+    positions:
+      - x: 20
+        y: 14
+        flip: false
+  story_helena:
+    category: npc
+    id: story_helena
+    positions:
+      - x: 13
+        y: 15
+        flip: true
+  story_geisel:
+    category: npc
+    id: story_geisel
+    positions:
+      - x: 16
+        y: 15
+        flip: true
+  story_kaya:
+    category: npc
+    id: story_kaya
+    positions:
+      - x: 18
+        y: 15
+        flip: false
+  story_olivia:
+    category: npc
+    id: story_olivia
+    positions:
+      - x: 13
+        y: 18
+        flip: true
+  story_gareth:
+    category: npc
+    id: story_gareth
+    positions:
+      - x: 15
+        y: 18
+        flip: false
+  story_rain:
+    category: npc
+    id: story_rain
+    positions:
+      - x: 19
+        y: 18
+        flip: true
+  story_yuru:
+    category: npc
+    id: story_yuru
+    positions:
+      - x: 21
+        y: 18
+        flip: false
+  wall_deco_tapestry:
+    category: wall_decoration
+    desc: タペストリー
+    id: wall_decoration_tapestry
+    image_path: components/pictures/dungeon/home/wall_decoration_tapestry.png
+    positions:
+      - x: 41
+        y: 2
+        flip: true
+      - x: 38
+        y: 3
+        flip: false
+      - x: 41
+        y: 3
+        flip: true
+      - x: 38
+        y: 4
+        flip: false
+      - x: 41
+        y: 4
+        flip: true
+      - x: 38
+        y: 5
+        flip: false
+      - x: 41
+        y: 5
+        flip: true
+  wall_deco_wooden_roof:
+    category: wall_decoration
+    desc: 木製の屋根飾り
+    id: wall_decoration_wooden_roof
+    image_path: components/pictures/dungeon/home/wall_decoration_wooden_roof.png
+    positions:
+      - x: 17
+        y: 3
+        flip: false
+      - x: 18
+        y: 3
+        flip: false
+      - x: 19
+        y: 3
+        flip: false
+      - x: 20
+        y: 3
+        flip: false
+      - x: 21
+        y: 3
+        flip: false
+      - x: 28
+        y: 3
+        flip: false
+      - x: 29
+        y: 3
+        flip: false
+      - x: 30
+        y: 3
+        flip: false
+      - x: 31
+        y: 3
+        flip: false
+  wall_deco_shield:
+    category: wall_decoration
+    desc: 壁掛けの盾
+    id: wall_decoration_shield
+    image_path: components/pictures/dungeon/home/wall_decoration_shield.png
+    positions:
+      - x: 18
+        y: 8
+        flip: false
+      - x: 20
+        y: 8
+        flip: false
