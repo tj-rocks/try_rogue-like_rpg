@@ -88,13 +88,15 @@ class GuildSystem:
                         # 条件4：出現確率 (chance) をクリアするか（未指定なら 1.0=100%）
                         chance = q_data.get("chance", 1.0)
                         
-                        # ボス討伐クエストの場合、ボスの出現確率設定（spawn_chance / BOSS_NO_QUEST_SPAWN_CHANCE）を使用する
+                        # ボス討伐クエストの場合、明示的な chance 設定があればそれを優先、なければボスの出現確率を使用
                         target_key = q_data.get("target_key")
                         if target_key and target_key in ENEMY_DATA:
                             enemy_info = ENEMY_DATA[target_key]
                             if enemy_info.get("is_boss"):
-                                from constants import BOSS_NO_QUEST_SPAWN_CHANCE
-                                chance = enemy_info.get("spawn_chance", BOSS_NO_QUEST_SPAWN_CHANCE)
+                                # quests.yml で明示的に chance が設定されていればそれを優先（デフォルト100%）
+                                if "chance" not in q_data:
+                                    from constants import BOSS_NO_QUEST_SPAWN_CHANCE
+                                    chance = enemy_info.get("spawn_chance", BOSS_NO_QUEST_SPAWN_CHANCE)
                                 
                         if random.random() < chance:
                             # コピーして追加

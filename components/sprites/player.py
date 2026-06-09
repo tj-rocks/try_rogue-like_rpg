@@ -650,7 +650,10 @@ class Player(Entity):
         inst = self._find_equip_inst(self.weapon_inventory, iid)
         if inst:
             nw = self._get_weapon_instance(inst.key, inst.enhance)
-            if nw: self.equipped_weapon = inst.iid; self.weapon = nw
+            if nw:
+                self.equipped_weapon = inst.iid
+                self.weapon = nw
+                self._clamp_hp_to_max()
 
     def set_facing(self, direction):
         if self.facing != direction: self.facing = direction; self.walk_anim_timer = 0
@@ -693,11 +696,15 @@ class Player(Entity):
 
     def change_armor(self, iid):
         inst = self._find_equip_inst(self.armor_inventory, iid)
-        if inst and inst.key in ARMOR_DATA: self._apply_armor(inst)
+        if inst and inst.key in ARMOR_DATA:
+            self._apply_armor(inst)
+            self._clamp_hp_to_max()
 
     def change_shield(self, iid):
         inst = self._find_equip_inst(self.shield_inventory, iid)
-        if inst: self._apply_shield(inst)
+        if inst:
+            self._apply_shield(inst)
+            self._clamp_hp_to_max()
 
     def _apply_shield(self, inst):
         self.equipped_shield = inst.iid; data = SHIELD_DATA.get(inst.key)
@@ -733,13 +740,31 @@ class Player(Entity):
                 elif d == "right" and "left" in self._armor_images: self._armor_images[d] = pygame.transform.flip(self._armor_images["left"], True, False)
                 elif shared: self._armor_images[d] = shared
 
-    def unequip_weapon(self): self.equipped_weapon = None; self.weapon = None
-    def unequip_armor(self): self.equipped_armor = None; self._armor_images = {}
-    def unequip_shield(self): self.equipped_shield = None; self._shield_images = {}
+    def _clamp_hp_to_max(self):
+        """現在HPが最大HPを超えている場合、最大HPに収める"""
+        if self.hp > self.max_hp:
+            self.hp = self.max_hp
+
+    def unequip_weapon(self):
+        self.equipped_weapon = None
+        self.weapon = None
+        self._clamp_hp_to_max()
+
+    def unequip_armor(self):
+        self.equipped_armor = None
+        self._armor_images = {}
+        self._clamp_hp_to_max()
+
+    def unequip_shield(self):
+        self.equipped_shield = None
+        self._shield_images = {}
+        self._clamp_hp_to_max()
 
     def change_accessory(self, iid):
         inst = self._find_equip_inst(self.accessory_inventory, iid)
-        if inst: self.equipped_accessory = inst.iid
+        if inst:
+            self.equipped_accessory = inst.iid
+            self._clamp_hp_to_max()
 
     def get_aggro_modifier(self):
         mod = 0
@@ -753,7 +778,9 @@ class Player(Entity):
             if inst: mod += inst.get_stat("aggro_mod", 0) + inst.get_enhance_bonus("aggro_mod")
         return mod
 
-    def unequip_accessory(self): self.equipped_accessory = None
+    def unequip_accessory(self):
+        self.equipped_accessory = None
+        self._clamp_hp_to_max()
 
     def reset_status(self): self.is_moving = self.is_attacking = self.is_falling = False
 

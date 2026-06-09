@@ -53,7 +53,7 @@ FIXED_QUESTS:
     repeatable: true
     chance: 1.0
     ending: false
-  # --- 以下、ボス討伐クエスト ---
+
   - id: boss_hunt_sukesuke_skeleton
     min_rank: E
     max_rank: C
@@ -68,7 +68,7 @@ FIXED_QUESTS:
     repeatable: true
     chance: 1.0
     ending: false
-  # --- 以下、ボス討伐クエスト ---
+
   - id: boss_hunt_deka_komori
     min_rank: C
     max_rank: B

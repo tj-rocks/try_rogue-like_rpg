@@ -152,7 +152,7 @@ DUNGEON_IMAGES:
     image: standard
     sound: just_move.mp3
     brightness: 5
-    map: first_rest_point.txt
+    map: 1st_rest_point.txt
     wall_decoration_ratio: 0.3
   '13':
     image: temple
@@ -208,7 +208,7 @@ DUNGEON_IMAGES:
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
-    map: second_rest_point.txt
+    map: 2nd_rest_point.txt
   "23":
     image: wood
     sound: sandstone_floor2.mp3
@@ -258,7 +258,7 @@ DUNGEON_IMAGES:
     sound: turning_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
-    map: third_rest_point.txt
+    map: 3rd_rest_point.txt
   "32":
     image: deep_rock
     sound: middle_1.mp3
@@ -308,37 +308,38 @@ DUNGEON_IMAGES:
 # Bランク 到達可能階層 (41F 〜 55F)
 # ==========================================
   "41":
-    image: temple
-    sound: sandstone_floor.mp3
-    brightness: 1
+    image: water
+    sound: just_move.mp3
+    brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
+    map: 4th_rest_point.txt
   "42":
-    image: temple
+    image: water
     sound: sandstone_floor.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "43":
-    image: temple
+    image: water
     sound: sandstone_floor.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "44":
-    image: temple
+    image: water
     sound: sandstone_floor.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "45":
-    image: temple
+    image: water
     sound: sandstone_floor.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "46":
-    image: temple
+    image: water
     sound: sandstone_floor.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
@@ -403,10 +404,11 @@ DUNGEON_IMAGES:
 # ==========================================
   "56":
     image: deesert_ruin
-    sound: sandstone_floor2.mp3
-    brightness: 1
+    sound: just_move.mp3
+    brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
+    map: 5th_rest_point.txt
   "57":
     image: deesert_ruin
     sound: sandstone_floor2.mp3
@@ -497,10 +499,11 @@ DUNGEON_IMAGES:
 # ==========================================
   "71":
     image: temple
-    sound: sandstone_floor.mp3
-    brightness: 1
+    sound: just_move.mp3
+    brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
+    map: 6th_rest_point.txt
   "72":
     image: temple
     sound: sandstone_floor.mp3
@@ -561,10 +564,11 @@ DUNGEON_IMAGES:
 # ==========================================
   "81":
     image: deesert_ruin
-    sound: sandstone_floor2.mp3
-    brightness: 1
+    sound: just_move.mp3
+    brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
+    map: 7th_rest_point.txt
   "82":
     image: deesert_ruin
     sound: sandstone_floor2.mp3
@@ -622,9 +626,10 @@ DUNGEON_IMAGES:
   "91":
     image: standard
     sound: just_move.mp3
-    brightness: 1
+    brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
+    map: 8th_rest_point.txt
   "92":
     image: standard
     sound: just_move.mp3
