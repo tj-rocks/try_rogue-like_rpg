@@ -76,7 +76,7 @@ ACCESSORY_DATA:
         defense: 0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        lantern_bonus: 3
+        lantern_bonus: 8
         regen: 0
         stupidity: 0
         armor_penetration: 0.0
@@ -84,7 +84,7 @@ ACCESSORY_DATA:
         buff_duration_ratio: 0
       magic:
         fire_damage: 0.0
-        fire_range: 0
+        fire_range: 6
         heal_ratio: 0.0
         knockback_damage: 0.0
         invincible_turns: 0
@@ -95,14 +95,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "光る指輪"
     category: accessory
-    min_rank: D
-    max_rank: B
+    min_rank: F
+    max_rank: SS
     rarity: 4
     price: 600
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 強い光で周囲を照らし出す指輪 防御力も少し上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -137,14 +137,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "力闘の指輪"
     category: accessory
-    min_rank: D
-    max_rank: B
+    min_rank: F
+    max_rank: SS
     rarity: 4
     price: 600
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 装備者の腕力を高める指輪 攻撃力が少し上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -179,14 +179,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "活力の指輪"
     category: accessory
-    min_rank: D
-    max_rank: B
+    min_rank: F
+    max_rank: SS
     rarity: 4
     price: 600
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 装備者の生命力を活性化させる指輪 最大HPが少し上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -221,14 +221,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "必殺の指輪"
     category: accessory
-    min_rank: D
-    max_rank: B
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 600
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 装備者の致命の感覚を鋭くする指輪 会心率が少し上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -263,14 +263,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "隠密の指輪"
     category: accessory
-    min_rank: D
-    max_rank: B
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 600
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 装備者の気配を絶つ魔力が込められた指輪 敵に見つかりにくくなる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -305,14 +305,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "必中の指輪"
     category: accessory
-    min_rank: D
-    max_rank: B
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 600
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 装備者の狙いを正確にする指輪 命中率が少し上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -347,14 +347,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "治癒の指輪"
     category: accessory
-    min_rank: D
-    max_rank: B
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 600
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 聖なる癒やしの力を宿す指輪 回復効果が少し上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -389,14 +389,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "身かわしの指輪"
     category: accessory
-    min_rank: D
-    max_rank: B
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 600
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 装備者の身のこなしを軽くする指輪 回避率が少し上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -431,14 +431,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "貫きの指輪"
     category: accessory
-    min_rank: C
-    max_rank: A
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 800
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 鋭い魔力で敵の鎧を貫く指輪 防御無視率が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -473,14 +473,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "再生の指輪"
     category: accessory
-    min_rank: C
-    max_rank: A
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 700
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 生命力が少しずつ戻る不思議な指輪 自然回復が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -515,14 +515,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "惑乱の指輪"
     category: accessory
-    min_rank: C
-    max_rank: A
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 700
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 敵の思考を狂わせる呪いの指輪 混乱を与えやすくなる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -557,14 +557,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "秘薬師の指輪"
     category: accessory
-    min_rank: B
-    max_rank: S
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 900
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 秘薬の効果を引き出す指輪 秘薬の効果と持続が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -599,14 +599,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "炎の指輪"
     category: accessory
-    min_rank: C
-    max_rank: A
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 800
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 炎の魔力を増幅する指輪 炎魔法のダメージが上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -641,14 +641,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "烈風の指輪"
     category: accessory
-    min_rank: C
-    max_rank: A
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 800
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 突風の魔力を宿す指輪 吹き飛ばしダメージが上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -683,14 +683,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "聖域の指輪"
     category: accessory
-    min_rank: B
-    max_rank: S
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 1000
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 聖なる光で身を守る指輪 無敵時間が延びる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -725,14 +725,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "魔導の指輪"
     category: accessory
-    min_rank: C
-    max_rank: A
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 800
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 杖に込められた魔力を増幅する指輪 杖の使用回数が増える
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -768,7 +768,7 @@ ACCESSORY_DATA:
     name: "[TEST]全加護の指輪"
     category: accessory
     min_rank: F
-    max_rank: S
+    max_rank: SS
     rarity: 1
     price: 1
     image_path: components/pictures/icon/ring.png
@@ -809,14 +809,14 @@ ACCESSORY_DATA:
     quest_targetable: true
     name: "守護の指輪"
     category: accessory
-    min_rank: E
-    max_rank: C
+    min_rank: F
+    max_rank: SS
     rarity: 4
-    price: 400
+    price: 6000
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop_buyable: false
     floor_spawnable: true
     describe: 装備者の身を守る魔力が込められた指輪
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
