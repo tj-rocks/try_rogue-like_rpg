@@ -1546,11 +1546,7 @@ class Dungeon:
         for k, v in SHIELD_DATA.items():
             if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
                 weapon_cands.append({"key": k, "type": "shield", "name": v["name"], "price": v["price"], "count": 1})
-        # アクセサリは村(階層が0)の時のみ総合店に並べる
-        if self.current_floor == 0:
-            for k, v in ACCESSORY_DATA.items():
-                if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
-                    weapon_cands.append({"key": k, "type": "accessory", "name": v["name"], "price": v["price"], "count": 1})
+        # アクセサリはアクセサリ専用店でのみ販売
         
         # 最低在庫保証 (武器・防具・盾・アクセサリ 合計3枠)
         if not weapon_cands:
@@ -1561,9 +1557,6 @@ class Dungeon:
                 if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "armor", v))
             for k, v in SHIELD_DATA.items():
                 if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "shield", v))
-            if self.current_floor == 0:
-                for k, v in ACCESSORY_DATA.items():
-                    if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "accessory", v))
             
             if all_buyable:
                 while len(weapon_cands) < 3:
