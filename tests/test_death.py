@@ -15,7 +15,6 @@ pygame.display.set_mode((1, 1))
 
 from components.sprites.player import Player
 from systems.death_handler import handle_death_sequence
-from constants import DOCTOR_FEE
 
 def test_death_penalty():
     print("--- 死亡ペナルティテスト開始 ---")
@@ -45,10 +44,10 @@ def test_death_penalty():
             handle_death_sequence(player, dungeon, dialog, game_state)
     
     # 検証: 所持金
-    # 総資産 1863 (手持ち 1000 + 預金 500 + 所持品 363) の半分 (931) が没収される。
-    # 預金 500 は維持されるため、手持ち 1000 から 931 が引かれて 69 になる。
-    print(f"所持金検証: 期待値 69, 実際 {player.coin}")
-    assert player.coin == 69
+    # 所持金 1000 の半分 (500) がペナルティとして引かれる。借金にはならない。
+    # 預金 500 はそのまま維持される。
+    print(f"所持金検証: 期待値 500, 実際 {player.coin}")
+    assert player.coin == 500
     print(f"銀行預金検証: 期待値 500, 実際 {player.bank_coin}")
     assert player.bank_coin == 500
     
@@ -71,8 +70,8 @@ def test_death_penalty():
     
     print("[OK] 死亡ペナルティテスト合格！")
 
-def test_death_debt():
-    print("--- 死亡時借金テスト開始 ---")
+def test_death_no_debt():
+    print("--- 死亡時借金なしテスト開始 ---")
     
     player = Player()
     player.coin = 10
@@ -89,13 +88,42 @@ def test_death_debt():
         with patch("components.sprites.player.Player.save_to_file"):
             handle_death_sequence(player, dungeon, dialog, game_state)
             
-    # 検証: 総資産 1110 (手持ち 10 + 預金 1000 + 所持品 100) の半分 (555) が没収される。
-    # 預金 1000 は維持され、手持ち 10 から 555 引かれて -545 (借金) になる。
-    print(f"所持金検証: 期待値 -545, 実際 {player.coin}")
-    assert player.coin == -545
+    # 検証: 所持金 10 の半分 (5) がペナルティ。借金にはならない。
+    # 預金 1000 はそのまま維持される。
+    print(f"所持金検証: 期待値 5, 実際 {player.coin}")
+    assert player.coin == 5
     print(f"銀行預金検証: 期待値 1000, 実際 {player.bank_coin}")
     assert player.bank_coin == 1000
-    print("[OK] 死亡時借金テスト合格！")
+    print("[OK] 死亡時借金なしテスト合格！")
+
+def test_death_quest_failure():
+    print("--- 死亡時クエスト失敗テスト開始 ---")
+    
+    player = Player()
+    player.coin = 100
+    player.hp = 0
+    player.is_dead = True
+    player.active_quests = [
+        {"title": "テストクエスト1", "target_key": "slime", "type": "hunt", "amount": 1, "reward_gold": 100, "reward_gp": 10},
+        {"title": "テストクエスト2", "target_key": "skeleton", "type": "hunt", "amount": 1, "reward_gold": 200, "reward_gp": 20}
+    ]
+    
+    dungeon = MagicMock()
+    dialog = MagicMock()
+    game_state = {"death_sequence_step": 3, "death_timer": 1}
+    
+    with patch("systems.dungeon.warp_to_floor"):
+        with patch("components.sprites.player.Player.save_to_file"):
+            handle_death_sequence(player, dungeon, dialog, game_state)
+    
+    # 検証: クエストがすべて失敗（除去）されていること
+    print(f"クエスト数検証: 期待値 0, 実際 {len(player.active_quests)}")
+    assert len(player.active_quests) == 0
+    # 検証: ダイアログにクエスト失敗メッセージが含まれていること
+    assert "クエスト失敗" in dialog.text
+    assert "テストクエスト1" in dialog.text
+    assert "テストクエスト2" in dialog.text
+    print("[OK] 死亡時クエスト失敗テスト合格！")
 
 def test_respawn_position():
     print("--- 復活位置検証テスト開始 ---")
@@ -304,7 +332,8 @@ def test_comprehensive_curse_system():
 if __name__ == "__main__":
     try:
         test_death_penalty()
-        test_death_debt()
+        test_death_no_debt()
+        test_death_quest_failure()
         test_respawn_position()
         test_poison_death_revival()
         test_comprehensive_curse_system()

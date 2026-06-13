@@ -1,0 +1,470 @@
+{
+  "x": 3008,
+  "y": 3200,
+  "hp": 130,
+  "max_hp": 115,
+  "coin": 21134,
+  "bank_coin": 0,
+  "attack": 2,
+  "defense": 3,
+  "items": [
+    {
+      "key": "antidote_potion",
+      "count": 4
+    },
+    {
+      "key": "hp_potion",
+      "count": 10
+    },
+    {
+      "key": "hp_potion",
+      "count": 10
+    },
+    {
+      "key": "hp_potion",
+      "count": 10
+    },
+    {
+      "key": "sage_potion",
+      "count": 1
+    },
+    {
+      "key": "warrior_potion",
+      "count": 1
+    },
+    {
+      "key": "warrior_potion",
+      "count": 1
+    },
+    {
+      "key": "sage_potion",
+      "count": 2
+    },
+    {
+      "key": "sage_potion",
+      "count": 1
+    },
+    {
+      "key": "pilgrim_potion",
+      "count": 2
+    },
+    {
+      "key": "purple_stone",
+      "count": 2
+    },
+    {
+      "key": "pilgrim_potion",
+      "count": 1
+    },
+    {
+      "key": "blue_stone",
+      "count": 1
+    }
+  ],
+  "weapon_inventory": [
+    {
+      "iid": 445,
+      "type": "weapon",
+      "key": "pilgrims_sword",
+      "enhance": 0,
+      "stats": {}
+    },
+    {
+      "iid": 37368,
+      "type": "weapon",
+      "key": "iron_sword",
+      "enhance": 0,
+      "stats": {}
+    },
+    {
+      "iid": 37475,
+      "type": "weapon",
+      "key": "scount_small_knife",
+      "enhance": 0,
+      "stats": {}
+    }
+  ],
+  "armor_inventory": [
+    {
+      "iid": 481,
+      "type": "armor",
+      "key": "pilgrims_armor",
+      "enhance": 3,
+      "stats": {
+        "magic_heal_ratio": 0,
+        "armor_penetration": 0,
+        "regen_bonus": 0,
+        "hp_bonus": 0,
+        "defense_bonus": 3
+      }
+    },
+    {
+      "iid": 37369,
+      "type": "armor",
+      "key": "iron_breastplate",
+      "enhance": 0,
+      "stats": {}
+    }
+  ],
+  "shield_inventory": [
+    {
+      "iid": 495,
+      "type": "shield",
+      "key": "pilgrimss_round_sheld",
+      "enhance": 0,
+      "stats": {}
+    }
+  ],
+  "equipped_weapon": 445,
+  "equipped_armor": 481,
+  "equipped_shield": 495,
+  "stave_inventory": [
+    {
+      "iid": 314,
+      "key": "heal_stave",
+      "charges": 11
+    },
+    {
+      "iid": 424,
+      "key": "heal_stave",
+      "charges": 4
+    },
+    {
+      "iid": 5476,
+      "key": "knockback_stave",
+      "charges": 10
+    },
+    {
+      "iid": 12657,
+      "key": "barrier_stave",
+      "charges": 6
+    },
+    {
+      "iid": 20032,
+      "key": "knockback_stave",
+      "charges": 8
+    },
+    {
+      "iid": 25489,
+      "key": "knockback_stave",
+      "charges": 5
+    },
+    {
+      "iid": 29958,
+      "key": "light_stave",
+      "charges": 3
+    },
+    {
+      "iid": 31120,
+      "key": "fire_stave",
+      "charges": 0
+    },
+    {
+      "iid": 35558,
+      "key": "fire_stave",
+      "charges": 1
+    }
+  ],
+  "accessory_inventory": [
+    {
+      "iid": 20008,
+      "type": "accessory",
+      "key": "ring_of_vitality",
+      "enhance": 0,
+      "stats": {}
+    },
+    {
+      "iid": 29961,
+      "type": "accessory",
+      "key": "ring_of_surekill",
+      "enhance": 0,
+      "stats": {}
+    }
+  ],
+  "equipped_accessory": 20008,
+  "invincible_turns": 0,
+  "attack_buff_turns": 0,
+  "attack_buff_val": 5,
+  "attack_buff_crit": 10,
+  "attack_buff_armor_pen": 0.2,
+  "regen_buff_turns": 0,
+  "regen_buff_val": 2,
+  "regen_buff_heal_boost": 0.2,
+  "magic_buff_turns": 0,
+  "magic_buff_val": 0.3,
+  "guild_point": 1953,
+  "guild_rank": "D",
+  "active_quests": [
+    {
+      "id": "rank_up_C",
+      "type": "delivery",
+      "is_rank_up": true,
+      "target_key": "guild_cert_c",
+      "target_name": "C級ギルド証",
+      "amount": 1,
+      "reward_gold": 10000,
+      "reward_gp": 0,
+      "next_rank": "C",
+      "title": "Cランクへの昇格",
+      "description": "次のランクへ昇級するための試験です \n対象フロアの最奥に配置される『C級ギルド証』を回収してきてください (対象階層: 30F)"
+    }
+  ],
+  "quest_tokens": {
+    "slime": 3,
+    "suisui_slime": 0,
+    "skeleton_obstacle": 0,
+    "kowai_kusa": 14,
+    "rubble": 3,
+    "bakudan_man": 0,
+    "potaro": 0,
+    "sukesuke_skeleton": 0,
+    "stained_armor_stand": 0,
+    "kuchitanago": 0,
+    "crystal": 0,
+    "gogo_ghost": 0,
+    "broken_pillar": 0
+  },
+  "completed_fixed_quests": [
+    "rank_up_F",
+    "boss_hunt_suisui_slime",
+    "boss_hunt_suisui_slime",
+    "rank_up_E",
+    "boss_hunt_suisui_slime",
+    "rank_up_D",
+    "boss_hunt_sukesuke_skeleton",
+    "boss_hunt_gogo_ghost",
+    "boss_hunt_gogo_ghost",
+    "boss_hunt_sukesuke_skeleton"
+  ],
+  "defeated_once_only": [],
+  "has_seen_ending": false,
+  "warehouse_items": [
+    {
+      "type": "weapon_inst",
+      "data": {
+        "iid": 99,
+        "type": "weapon",
+        "key": "iron_sword",
+        "enhance": 2,
+        "stats": {
+          "accuracy_bonus_close": 1,
+          "attack_bonus": 2,
+          "crit_rate": 1
+        }
+      }
+    },
+    {
+      "type": "weapon_inst",
+      "data": {
+        "iid": 290,
+        "type": "weapon",
+        "key": "fullmetal_sword",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "consumable",
+      "data": "purple_stone"
+    },
+    {
+      "type": "accessory_inst",
+      "data": {
+        "iid": 327,
+        "type": "accessory",
+        "key": "luminous_gem",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "weapon_inst",
+      "data": {
+        "iid": 117,
+        "type": "weapon",
+        "key": "thiefs_knife",
+        "enhance": 3,
+        "stats": {
+          "armor_penetration": 1,
+          "crit_rate": 1,
+          "attack_bonus": 1,
+          "accuracy_bonus_close": 0
+        }
+      }
+    },
+    {
+      "type": "weapon_inst",
+      "data": {
+        "iid": 430,
+        "type": "weapon",
+        "key": "hunters_rapier",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "weapon_inst",
+      "data": {
+        "iid": 421,
+        "type": "weapon",
+        "key": "knight_heavy_axe",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "weapon_inst",
+      "data": {
+        "iid": 468,
+        "type": "weapon",
+        "key": "scount_small_knife",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "armor_inst",
+      "data": {
+        "iid": 249,
+        "type": "armor",
+        "key": "fullmetal_breastplate",
+        "enhance": 4,
+        "stats": {
+          "defense_bonus": 4
+        }
+      }
+    },
+    {
+      "type": "accessory_inst",
+      "data": {
+        "iid": 462,
+        "type": "accessory",
+        "key": "ring_of_accuracy",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "shield_inst",
+      "data": {
+        "iid": 428,
+        "type": "shield",
+        "key": "fighters_sheld",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "armor_inst",
+      "data": {
+        "iid": 466,
+        "type": "armor",
+        "key": "fighters_armor",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "armor_inst",
+      "data": {
+        "iid": 471,
+        "type": "armor",
+        "key": "hunters_armor",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "shield_inst",
+      "data": {
+        "iid": 498,
+        "type": "shield",
+        "key": "knight_heavy_sheld",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "armor_inst",
+      "data": {
+        "iid": 470,
+        "type": "armor",
+        "key": "knight_heavy_armor",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "shield_inst",
+      "data": {
+        "iid": 5472,
+        "type": "shield",
+        "key": "fighters_sheld",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "armor_inst",
+      "data": {
+        "iid": 5483,
+        "type": "armor",
+        "key": "hunters_armor",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "weapon_inst",
+      "data": {
+        "iid": 5475,
+        "type": "weapon",
+        "key": "scount_small_knife",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "armor_inst",
+      "data": {
+        "iid": 5474,
+        "type": "armor",
+        "key": "scount_armor",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "shield_inst",
+      "data": {
+        "iid": 469,
+        "type": "shield",
+        "key": "scount_blackleather_sheld",
+        "enhance": 0,
+        "stats": {}
+      }
+    },
+    {
+      "type": "weapon_inst",
+      "data": {
+        "iid": 12711,
+        "type": "weapon",
+        "key": "fighters_sword",
+        "enhance": 0,
+        "stats": {}
+      }
+    }
+  ],
+  "event_items": [
+    {
+      "key": "fathers_charm",
+      "count": 1
+    }
+  ],
+  "current_floor": 24,
+  "max_reached_floor": 30,
+  "equip_id_counter": 37475,
+  "boss_message_shown": false,
+  "curse_level": 0,
+  "cursed_stats": []
+}
