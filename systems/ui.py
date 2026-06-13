@@ -7,7 +7,7 @@ from systems.resources import (
 )
 from constants import (
     KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_MOVE_LEFT, KEY_MOVE_RIGHT,
-    KEY_CONFIRM, KEY_CANCEL, KEY_INVENTORY, GAME_TITLE,
+    KEY_CONFIRM, KEY_CANCEL, KEY_INVENTORY, GAME_TITLE, GAME_SUBTITLE,
     UI_SETTINGS
 )
 import os
@@ -112,6 +112,10 @@ def draw_title_screen(screen, background_img, selected_idx, has_save):
     # ロゴに輝き効果（リッチ）
     logo_color = (255, 220, 100)
     draw_text_wrapped(screen, font_large, title_text, 0, 150, screen.get_width(), align_h='center', color=logo_color)
+    
+    # サブタイトル
+    subtitle_color = (200, 200, 220)
+    draw_text_wrapped(screen, font_medium, GAME_SUBTITLE, 0, 230, screen.get_width(), align_h='center', color=subtitle_color)
     
     # メニュー
     menu_items = [Text.UI.CONTINUE, Text.UI.NEW_GAME]
