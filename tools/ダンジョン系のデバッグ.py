@@ -288,6 +288,7 @@ def main():
         player.weapon_inventory.append(EquipInstance("weapon", "test_all_bonus_weapon"))
         player.armor_inventory.append(EquipInstance("armor", "test_all_bonus_armor"))
         player.shield_inventory.append(EquipInstance("shield", "test_all_bonus_shield"))
+        player.accessory_inventory.append(EquipInstance("accessory", "test_all_bonus_accessory"))
 
         # 2. ダンジョンの初期化 (1階から開始)
         dungeon = warp_to_floor(1, player)
