@@ -609,6 +609,41 @@ ENEMY_DATA:
     ranged_attack_effect: sonic_wave
     attack_priority: close
     damaged_detect_range: 100
+  dodeka_sukame:
+    quest_targetable: true
+    name: ドデカスカメ
+    min_rank: B
+    max_concurrent: 1
+    is_boss: true
+    spawn_chance: 0.10
+    crit_rate: 0.08
+    detect_range: 15
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/sukasukame
+    encounter_message: "ドデカスカメ に 発見された！\n巨大な甲羅が壁のように立ちはだかる…！"
+    defeat_message: "ドデカスカメ を 討伐した！"
+    status: darkness
+    status_chance: 40
+    drops:
+      normal: [hp_potion, hi_potion]
+      rare: [fullmetal_breastplate, fullmetal_round_shield]
+    normal_drop_rate: 0.25
+    rare_drop_rate: 0.20
+    hp: 160
+    attack: 35
+    defense: 110
+    evasion: 10
+    exp: 120
+    reward_gold: 2500
+    accuracy_close: 90
+    accuracy_ranged: 80
+    attack_range: 2
+    stupidity: 0
+    image_scale: 2.5
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: dark_bolt
+    attack_priority: close
+    damaged_detect_range: 100
   guild_assassin:
     quest_targetable: true
     name: ギルドの刺客

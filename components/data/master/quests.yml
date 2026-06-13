@@ -102,6 +102,22 @@ FIXED_QUESTS:
     repeatable: true
     chance: 1.0
     ending: false
+  - id: boss_hunt_dodeka_sukame
+    min_rank: B
+    max_rank: A
+    type: hunt
+    target_key: dodeka_sukame
+    amount: 1
+    reward_gold: 3500
+    reward_gp: 350
+    title: ドデカスカメの討伐
+    requester: ギルドマスター
+    description: "ダンジョン深層に現れるという、鉄壁の甲羅を持つ巨大な亀を討伐してください (想定階層: 55F)"
+    report_message: "あの硬い甲羅を突破しましたか！\nさすがですね…Bランクの実力は本物です！"
+    repeatable: true
+    chance: 1.0
+    ending: false
+
   # --- 最深部ボス討伐クエスト ---
   - id: boss_hunt_undead_father
     min_rank: B
