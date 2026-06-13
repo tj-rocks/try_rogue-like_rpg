@@ -560,7 +560,7 @@ class Player(Entity):
         turn_consumed = False
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == KEY_ATTACK:
-                if dungeon.current_floor == 0: break
+                if dungeon.current_floor == 0 or dungeon.floor_info.get("no_attack", False): break
                 self.waving_stave_inst = None; self._perform_attack(); turn_consumed = True; break
 
         if not turn_consumed:

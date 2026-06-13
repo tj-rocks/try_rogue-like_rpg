@@ -28,6 +28,7 @@ def test_attack_turn_transition():
     dungeon.map_width = 10
     dungeon.map_height = 10
     dungeon.current_floor = 1 # フロア0以外にする
+    dungeon.floor_info = {}
     # 床(1)で埋める
     dungeon.map_data = [[1 for _ in range(10)] for _ in range(10)]
     dungeon.enemies = []
