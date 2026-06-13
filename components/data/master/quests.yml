@@ -50,6 +50,7 @@ FIXED_QUESTS:
     title: スイスイスライムの討伐
     requester: ギルドマスター
     description: "ダンジョン深層に現れるという、驚異的な回避能力を持つスライムを討伐してください (想定階層: 10F)"
+    report_message: "見事に依頼を達成しましたね！\nあの素早いスライムを仕留めるとは…\nお見事です！"
     repeatable: true
     chance: 1.0
     ending: false
@@ -65,6 +66,7 @@ FIXED_QUESTS:
     title: スケスケスケルトンの討伐
     requester: ギルドマスター
     description: "ダンジョンに現れる姿の薄いスケルトンを討伐し、その脅威を排除してください (想定階層: 20F)"
+    report_message: "お見事です！\nあの不気味な骸骨を倒しましたか…\nこれで冒険者たちも安心ですね"
     repeatable: true
     chance: 1.0
     ending: false
@@ -80,6 +82,7 @@ FIXED_QUESTS:
     title: デカコウモリの討伐
     requester: ギルドマスター
     description: "ダンジョン中層に現れるという、猛毒を持つ巨大なコウモリを討伐してください (想定階層: 35F)"
+    report_message: "あの巨大なコウモリを…！\n毒にやられなかったですか？\n大したものですね！"
     repeatable: true
     chance: 1.0
     ending: false
@@ -95,21 +98,39 @@ FIXED_QUESTS:
     title: ゴーゴーゴーストの討伐
     requester: ギルドマスター
     description: "ダンジョン中層に現れるという、高速で突進してくる亡霊を討伐してください (想定階層: 30F)"
+    report_message: "あの速さの亡霊を捕らえましたか！\nたいした腕前ですね！"
     repeatable: true
     chance: 1.0
     ending: false
+  - id: boss_hunt_dodeka_sukame
+    min_rank: B
+    max_rank: A
+    type: hunt
+    target_key: dodeka_sukame
+    amount: 1
+    reward_gold: 3500
+    reward_gp: 350
+    title: ドデカスカメの討伐
+    requester: ギルドマスター
+    description: "ダンジョン深層に現れるという、鉄壁の甲羅を持つ巨大な亀を討伐してください (想定階層: 55F)"
+    report_message: "あの硬い甲羅を突破しましたか！\nさすがですね…Bランクの実力は本物です！"
+    repeatable: true
+    chance: 1.0
+    ending: false
+
   # --- 最深部ボス討伐クエスト ---
-  # - id: boss_hunt_undead_father
-  #   min_rank: B
-  #   max_rank: SS
-  #   type: hunt
-  #   target_key: undead_father
-  #   amount: 1
-  #   reward_gold: 5000
-  #   reward_gp: 50
-  #   title: 父の亡霊の討伐
-  #   requester: ギルドマスター
-  #   description: 50階に彷徨う強力な亡霊を討伐し、安らかな眠りを与えてください。
-  #   repeatable: false
-  #   chance: 1.0
-  #   ending: true
+  - id: boss_hunt_undead_father
+    min_rank: B
+    max_rank: SS
+    type: hunt
+    target_key: undead_father
+    amount: 1
+    reward_gold: 5000
+    reward_gp: 50
+    title: 魂を失った亡者の討伐
+    requester: ギルドマスター
+    description: "50階に彷徨う強力な亡霊を討伐し、安らかな眠りを与えてください"
+    report_message: "…そうですか。あなたが倒すとは、運命とは皮肉ですね。\n…いえ、何でもありません。\nお疲れ様でした。"
+    repeatable: false
+    chance: 1.0
+    ending: true

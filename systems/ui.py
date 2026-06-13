@@ -2872,7 +2872,8 @@ class GuildDialog:
             else:
                 player.coin += q["reward_gold"]
                 gp_reward = q["reward_gp"]
-                dialog.text = "見事に依頼を達成しましたね！\nおめでとうございます！"
+                report_msg = q.get("report_message") or self._get_fixed_quest_report_message(q)
+                dialog.text = report_msg if report_msg else "見事に依頼を達成しましたね！\nおめでとうございます！"
                 
                 player.guild_point += gp_reward
                 if q.get("id"): player.completed_fixed_quests.append(q["id"])
@@ -2889,6 +2890,16 @@ class GuildDialog:
         else:
             dialog.text = Text.UI.GUILD_QUEST_UNMET
             dialog.is_active = True
+
+    def _get_fixed_quest_report_message(self, q):
+        """セーブデータにreport_messageがない場合、マスターデータから取得する"""
+        if not q.get("id"):
+            return None
+        from constants import FIXED_QUEST_DATA
+        for fq in FIXED_QUEST_DATA:
+            if fq.get("id") == q.get("id"):
+                return fq.get("report_message")
+        return None
 
     def _play_placeholder_complete_sound(self):
         """クエスト達成時の効果音を再生する（constants.pyで定義されたパスを使用）"""
