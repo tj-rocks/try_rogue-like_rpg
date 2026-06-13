@@ -539,13 +539,13 @@ ENEMY_DATA:
       rare: [fullmetal_breastplate]
     normal_drop_rate: 0.15
     rare_drop_rate: 0.05
-    hp: 55
-    attack: 35
-    defense: 100
+    hp: 24
+    attack: 30
+    defense: 86
     evasion: 5
     exp: 25
     reward_gold: 600
-    accuracy_close: 95
+    accuracy_close: 79
     accuracy_ranged: 70
     attack_range: 1
     stupidity: 4
@@ -565,8 +565,8 @@ ENEMY_DATA:
       rare: [fullmetal_sword]
     normal_drop_rate: 0.15
     rare_drop_rate: 0.05
-    hp: 40
-    attack: 40
+    hp: 23
+    attack: 38
     defense: 50
     evasion: 15
     exp: 25
@@ -594,10 +594,10 @@ ENEMY_DATA:
       rare: [fullmetal_round_shield]
     normal_drop_rate: 0.15
     rare_drop_rate: 0.05
-    hp: 50
+    hp: 23
     attack: 30
-    defense: 80
-    evasion: 10
+    defense: 90
+    evasion: 20
     exp: 25
     reward_gold: 600
     accuracy_close: 90
@@ -654,10 +654,10 @@ ENEMY_DATA:
       rare: [fathers_keepsake]
     normal_drop_rate: 0.0
     rare_drop_rate: 1.0
-    hp: 14
-    attack: 4
-    defense: 10
-    evasion: 0
+    hp: 90
+    attack: 30
+    defense: 60
+    evasion: 40
     exp: 12
     reward_gold: 200
     accuracy_close: 90

@@ -274,7 +274,7 @@ ARMOR_DATA:
     price: 1200
     image_dir: components/pictures/armor/hunters_armor
     shop_buyable: true
-    describe: 隠密性に特化した深紺の軽装 防御力は極めて低いが、攻撃の命中率と会心率（10/100）が大きく向上する
+    describe: 隠密性に特化した深紺の軽装 防御力は低いが、命中率と会心率が上がる
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
