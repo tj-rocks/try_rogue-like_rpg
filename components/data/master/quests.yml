@@ -118,7 +118,7 @@ FIXED_QUESTS:
     chance: 1.0
     ending: false
 
-  # --- 最深部ボス討伐クエスト ---
+  # --- 父の亡霊討伐クエスト ---
   - id: boss_hunt_undead_father
     min_rank: B
     max_rank: SS

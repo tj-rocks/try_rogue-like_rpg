@@ -124,7 +124,7 @@ COMBAT:
   # アニメーションフレーム設定 (1/60秒単位)
   ATTACK_TAME_DURATION: 0           # 攻撃の「溜め」時間
   ATTACK_STRIKE_DURATION: 16        # 攻撃の「振り」時間
-  ATTACK_PRE_DELAY_FRAMES: 30       # 敵が攻撃モーションに入るまでの予備動作時間
+  ATTACK_PRE_DELAY_FRAMES: 15       # 敵が攻撃モーションに入るまでの予備動作時間
   HIT_STUN_DURATION: 12             # 攻撃を食らった時ののけぞり時間
   DAMAGE_FLASH_FRAMES: 6            # ダメージ時の点滅時間
   COMBAT_LOG_WAIT_FRAMES: 60        # ログが表示されてから消えるまでの待機時間

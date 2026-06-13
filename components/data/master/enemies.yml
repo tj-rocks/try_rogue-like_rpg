@@ -19,7 +19,7 @@ ENEMY_DATA:
     accuracy_close: 89
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 7
+    stupidity: 4
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus

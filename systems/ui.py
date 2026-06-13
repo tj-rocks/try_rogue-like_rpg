@@ -2501,7 +2501,16 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                         dialog.set_pages(npc.get_dialogue(player))
                                     return
                 elif event.key == KEY_MENU:
-                    if menu_dialog: menu_dialog.is_active = True
+                    # 敵の攻撃モーション中・ダメージフラッシュ中はメニューを開けない
+                    enemies_acting = False
+                    if dungeon:
+                        enemies_acting = any(
+                            e.is_attacking or getattr(e, "attack_pre_delay_timer", 0) > 0
+                            or getattr(e, "damage_flash_timer", 0) > 0
+                            for e in dungeon.enemies if not getattr(e, "is_dead", False)
+                        )
+                    if menu_dialog and not enemies_acting:
+                        menu_dialog.is_active = True
 
 class GuildDialog:
     """冒険者ギルドでの依頼受注・報告を行うダイアログ"""
