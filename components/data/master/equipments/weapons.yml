@@ -414,7 +414,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.2
     shop_buyable: true
-    describe: 急所を突くことに特化した細身の刺突剣 攻撃力は低いが、高い命中率と会心率（15/100）を誇り、鎧を貫通する
+    describe: 急所を突くことに特化した細身の刺突剣 攻撃力は低いが、命中率と会心率が高く、鎧を貫通する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
@@ -540,7 +540,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
     shop_buyable: true
-    describe: 隠密偵察用の小型ナイフ 攻撃力は控えめだが、非常に高い会心率（20/100）と回避率を持つ
+    describe: 隠密偵察用の小型ナイフ 攻撃力は控えめだが、会心率と回避率が高い
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     type: dagger
     floor_spawnable: true

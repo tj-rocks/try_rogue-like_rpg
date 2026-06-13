@@ -105,7 +105,7 @@ ACCESSORY_DATA:
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
-    describe: 強い光で周囲を照らし出す指輪 防御力も少し上がる
+    describe: 強い光で周囲を照らし出す指輪 防御力が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
     type: accessory
     bonus:
@@ -148,7 +148,7 @@ ACCESSORY_DATA:
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
-    describe: 装備者の腕力を高める指輪 攻撃力が少し上がる
+    describe: 装備者の腕力を高める指輪 攻撃力が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
     type: accessory
     bonus:
@@ -191,7 +191,7 @@ ACCESSORY_DATA:
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
-    describe: 装備者の生命力を活性化させる指輪 最大HPが少し上がる
+    describe: 装備者の生命力を活性化させる指輪 最大HPが上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
     type: accessory
     bonus:
@@ -234,7 +234,7 @@ ACCESSORY_DATA:
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
-    describe: 装備者の致命の感覚を鋭くする指輪 会心率が少し上がる
+    describe: 装備者の致命の感覚を鋭くする指輪 会心率が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
     type: accessory
     bonus:
@@ -320,7 +320,7 @@ ACCESSORY_DATA:
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
-    describe: 装備者の狙いを正確にする指輪 命中率が少し上がる
+    describe: 装備者の狙いを正確にする指輪 命中率が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
     type: accessory
     bonus:
@@ -363,7 +363,7 @@ ACCESSORY_DATA:
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
-    describe: 聖なる癒やしの力を宿す指輪 回復効果が少し上がる
+    describe: 聖なる癒やしの力を宿す指輪 回復効果が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
     type: accessory
     bonus:
@@ -406,7 +406,7 @@ ACCESSORY_DATA:
     image_scale: 1.0
     shop_buyable: true
     floor_spawnable: true
-    describe: 装備者の身のこなしを軽くする指輪 回避率が少し上がる
+    describe: 装備者の身のこなしを軽くする指輪 回避率が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
     type: accessory
     bonus:

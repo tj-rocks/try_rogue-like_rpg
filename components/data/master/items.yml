@@ -166,7 +166,7 @@ CONSUMABLE_DATA:
     sound: components/sounds/sfx/drink.wav
     shop_buyable: true
     max_stack: 2
-    describe: 15ターンの間、毎ターンHPを2回復し、回復アイテムの効果を20%上昇させる秘薬。
+    describe: 一定ターンの間、毎ターンHPを回復し、回復アイテムの効果を上昇させる秘薬
     floor_spawnable: true
     color_tint: [100, 255, 100]
   warrior_potion:
@@ -186,7 +186,7 @@ CONSUMABLE_DATA:
     sound: components/sounds/sfx/drink.wav
     shop_buyable: true
     max_stack: 2
-    describe: 10ターンの間、攻撃力を5、防御無視を20%、会心率を10%上昇させる秘薬。
+    describe: 一定ターンの間、攻撃力と防御無視、会心率を上昇させる秘薬
     floor_spawnable: true
     color_tint: [255, 100, 100]
   sage_potion:
@@ -205,7 +205,7 @@ CONSUMABLE_DATA:
     sound: components/sounds/sfx/drink.wav
     shop_buyable: true
     max_stack: 2
-    describe: 15ターンの間、魔法効果を30%上昇させ、さらに所持しているすべての杖の使用回数を3回復する秘薬。
+    describe: 一定ターンの間、魔法効果を上昇させ、さらに所持しているすべての杖の使用回数を回復する秘薬
     floor_spawnable: true
     color_tint: [180, 100, 255]
   magic_crystal:
@@ -473,7 +473,7 @@ STAVE_DATA:
       left: [[-1, -1], [-1, 0], [-1, 1], [-2, -1], [-2, 0], [-2, 1]]
       right: [[1, -1], [1, 0], [1, 1], [2, -1], [2, 0], [2, 1]]
     shop_buyable: true
-    describe: 燃え盛る fire を放つ魔法の杖 自分前方の広範囲（2x3）を焼き尽くし、敵に大ダメージを与える
+    describe: 燃え盛る炎を放つ魔法の杖 自分前方の広範囲を焼き尽くし、敵に大ダメージを与える
     floor_spawnable: true
   heal_stave:
     quest_targetable: true
