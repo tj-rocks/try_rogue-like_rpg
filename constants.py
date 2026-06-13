@@ -312,6 +312,23 @@ def _compute_stat_ranges():
 
 STAT_RANGES = _compute_stat_ranges()
 
+def get_stat_max(stat_key):
+    """指定ステータスの全装備中の最大値を返す（バーのMAX基準）"""
+    r = STAT_RANGES.get(stat_key, {"min": 0, "max": 1})
+    return r["max"]
+
+# プレイヤーの最終ステータス用レンジ（ステータス画面バー表示用）
+# min=基礎値、max=基礎値+全装備中最大ボーナス（複数スロット分加算）
+PLAYER_STAT_RANGES = {
+    "total_attack": {"min": PLAYER_ATTACK, "max": PLAYER_ATTACK + get_stat_max("attack_bonus")},
+    "total_defense": {"min": PLAYER_DEFENSE, "max": PLAYER_DEFENSE + get_stat_max("defense_bonus") * 2},
+    "max_hp": {"min": PLAYER_HP, "max": PLAYER_HP + get_stat_max("hp_bonus") * 2},
+    "block_close": {"min": 0, "max": get_stat_max("block_chance_close") * 2},
+    "block_ranged": {"min": 0, "max": get_stat_max("block_chance_ranged") * 2},
+}
+# PLAYER_STAT_RANGESもSTAT_RANGESに統合してget_stat_rankで使えるようにする
+STAT_RANGES.update(PLAYER_STAT_RANGES)
+
 # ランク判定用の閾値（F〜S の6段階）
 STAT_RANK_COLORS = {
     "F": (150, 150, 150),   # 灰
@@ -334,6 +351,85 @@ def get_stat_rank(value, stat_key):
     # 6段階に分割
     idx = min(int(ratio * len(STAT_RANK_ORDER)), len(STAT_RANK_ORDER) - 1)
     return STAT_RANK_ORDER[idx]
+
+def get_next_rank_threshold(value, stat_key):
+    """次のランクに上がるために必要な値を返す。既にSランクならNoneを返す"""
+    r = STAT_RANGES.get(stat_key, {"min": 0, "max": 1})
+    if r["max"] == r["min"]:
+        return None
+    ratio = (value - r["min"]) / (r["max"] - r["min"])
+    ratio = max(0.0, min(1.0, ratio))
+    current_idx = min(int(ratio * len(STAT_RANK_ORDER)), len(STAT_RANK_ORDER) - 1)
+    if current_idx >= len(STAT_RANK_ORDER) - 1:
+        return None  # 既にSランク
+    # 次のランクの境界ratio
+    next_ratio = (current_idx + 1) / len(STAT_RANK_ORDER)
+    # ratioを値に戻す
+    next_value = r["min"] + next_ratio * (r["max"] - r["min"])
+    return next_value
+
+def get_upgrades_to_next_rank(equip_inst, stat_key):
+    """装備を強化して次のランクに上がるまでに必要な回数を返す。
+    Sランクまたは強化不可ならNoneを返す。
+    """
+    import math
+    base = equip_inst.get_stat(stat_key, 0)
+    if base <= 0:
+        return None
+    
+    # 現在のボーナス込み値
+    current_bonus = equip_inst.get_enhance_bonus(stat_key)
+    current_value = base + current_bonus
+    
+    # 次のランク境界値
+    threshold = get_next_rank_threshold(current_value, stat_key)
+    if threshold is None:
+        return None  # 既にSランク
+    
+    # 1回あたりの上昇幅（per_step）を取得
+    data = {}
+    if equip_inst.equip_type == "weapon": data = WEAPON_DATA.get(equip_inst.key, {})
+    elif equip_inst.equip_type == "armor": data = ARMOR_DATA.get(equip_inst.key, {})
+    elif equip_inst.equip_type == "shield": data = SHIELD_DATA.get(equip_inst.key, {})
+    elif equip_inst.equip_type == "accessory": data = ACCESSORY_DATA.get(equip_inst.key, {})
+    
+    growth = data.get("growth")
+    if not growth:
+        growth = {"bonus_limit": 2, "times_limit": 50, "over_limit_growth_rate": 0.003}
+    
+    times_limit = max(1, growth.get("times_limit", 50))
+    bonus_limit = growth.get("bonus_limit", 2)
+    over_rate = growth.get("over_limit_growth_rate", 0.003)
+    
+    growth_room = base * (bonus_limit - 1)
+    per_step = growth_room / times_limit
+    over_per_step = base * over_rate
+    
+    stat_enhance = equip_inst.stats.get(stat_key, equip_inst.enhance)
+    
+    # 必要なボーナス量
+    needed_bonus = threshold - base
+    if needed_bonus <= current_bonus:
+        return 0  # 既に超えている
+    
+    # 何回で到達するか逆算
+    if per_step <= 0:
+        return None
+    
+    # times_limit以内で到達できるか？
+    max_bonus_at_limit = times_limit * per_step
+    if needed_bonus <= max_bonus_at_limit:
+        needed_steps = math.ceil(needed_bonus / per_step)
+    else:
+        # times_limit超過分をover_per_stepで計算
+        remaining = needed_bonus - max_bonus_at_limit
+        if over_per_step <= 0:
+            return None
+        needed_steps = times_limit + math.ceil(remaining / over_per_step)
+    
+    # 現在のenhance回数を差し引く
+    remaining_steps = needed_steps - stat_enhance
+    return max(0, remaining_steps)
 
 # --- その他のマスタデータ ---
 # Data Source: components/data/master/ (dungeon.json, npcs.json, enemy_attack_effects.json, quests.json)

@@ -1162,7 +1162,8 @@ class BaseListDialog:
                     val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
                     text_items.append(f"{mlabel}: {format_stat_value(val_to_use)}%" if is_pct else f"{mlabel}: {format_stat_value(mval)}")
         
-        # バー描画（左半分: ラベル列、右半分: バー+ランク列）
+        # バー描画（左半分: ラベル列、右半分: バー+ランク列+あとN回）
+        from constants import get_upgrades_to_next_rank
         max_y = start_y
         half_w = cw // 2
         bar_w = half_w - 20  # ランク文字分のマージン
@@ -1175,6 +1176,12 @@ class BaseListDialog:
             # 右半分: バー + ランク文字
             draw_stat_bar(screen, start_x + half_w, y + 2, value, stat_key,
                          bar_width=bar_w, bar_height=12, font=self.font)
+            # あとN回表示
+            if inst and hasattr(inst, "equip_type"):
+                remaining = get_upgrades_to_next_rank(inst, stat_key)
+                if remaining is not None and remaining > 0:
+                    n_text = self.font.render(f"あと{remaining}回", True, (160, 180, 200))
+                    screen.blit(n_text, (start_x + half_w + bar_w + 22, y))
             max_y = y + line_h
         
         # テキスト項目（バーにできないもの）
@@ -1256,6 +1263,13 @@ class ParameterSelectionDialog(BaseListDialog):
         if self._inst_ref:
             lines.append("")
             lines.append(f"強化回数: +{self._inst_ref.enhance + 1}回目")
+            # 次のランクまでの残り回数を表示
+            from constants import get_upgrades_to_next_rank
+            remaining = get_upgrades_to_next_rank(self._inst_ref, stat_key)
+            if remaining is not None and remaining > 0:
+                lines.append(f"次のランクまで あと{remaining}回")
+            elif remaining == 0:
+                lines.append("★ ランクアップ！")
         return lines
 
     def get_item_image_path(self, item, idx, player):
@@ -1895,12 +1909,44 @@ class StatusBar:
             # 枠
             pygame.draw.rect(screen, buff_color, (bbar_x, bbar_y, bbar_w, bbar_h), 1, border_radius=2)
 
-        # 攻撃・防御・盾 (HPの下)
+        # 攻撃・防御バー (HPの下)
         stat_y = bar_y + 24
+        hud_bars_cfg = UI_SETTINGS.get("hud_stat_bars", {})
+        hud_bar_w = hud_bars_cfg.get("bar_width", 80)
+        hud_bar_h = hud_bars_cfg.get("bar_height", 10)
+        
+        atk_cfg = hud_bars_cfg.get("attack", {})
+        atk_color = tuple(atk_cfg.get("color", [255, 120, 80]))
+        atk_bg = tuple(atk_cfg.get("bg_color", [40, 40, 50]))
+        
+        def_cfg = hud_bars_cfg.get("defense", {})
+        def_color = tuple(def_cfg.get("color", [80, 160, 255]))
+        def_bg = tuple(def_cfg.get("bg_color", [40, 40, 50]))
+        
+        from constants import STAT_RANGES
+        
+        # ATKバー
         atk_val = player.total_attack
-        draw_text_shadow(Text.UI.ATK_LABEL.format(atk=atk_val), self.font, COLOR_TEXT, (bar_x, stat_y))
+        atk_range = STAT_RANGES.get("total_attack", {"min": 5, "max": 50})
+        atk_ratio = max(0.05, min(1.0, (atk_val - atk_range["min"]) / max(1, atk_range["max"] - atk_range["min"])))
+        
+        draw_text_shadow("ATK", self.font, COLOR_TEXT, (bar_x, stat_y))
+        atk_bar_x = bar_x + 38
+        pygame.draw.rect(screen, atk_bg, (atk_bar_x, stat_y + 3, hud_bar_w, hud_bar_h), border_radius=3)
+        pygame.draw.rect(screen, atk_color, (atk_bar_x, stat_y + 3, int(hud_bar_w * atk_ratio), hud_bar_h), border_radius=3)
+        pygame.draw.rect(screen, (80, 80, 90), (atk_bar_x, stat_y + 3, hud_bar_w, hud_bar_h), 1, border_radius=3)
+        
+        # DEFバー
         def_val = player.total_defense
-        draw_text_shadow(Text.UI.DEF_LABEL.format(defense=def_val), self.font, COLOR_TEXT, (bar_x + 110, stat_y))
+        def_range = STAT_RANGES.get("total_defense", {"min": 5, "max": 50})
+        def_ratio = max(0.05, min(1.0, (def_val - def_range["min"]) / max(1, def_range["max"] - def_range["min"])))
+        
+        def_start_x = atk_bar_x + hud_bar_w + 15
+        draw_text_shadow("DEF", self.font, COLOR_TEXT, (def_start_x, stat_y))
+        def_bar_x = def_start_x + 38
+        pygame.draw.rect(screen, def_bg, (def_bar_x, stat_y + 3, hud_bar_w, hud_bar_h), border_radius=3)
+        pygame.draw.rect(screen, def_color, (def_bar_x, stat_y + 3, int(hud_bar_w * def_ratio), hud_bar_h), border_radius=3)
+        pygame.draw.rect(screen, (80, 80, 90), (def_bar_x, stat_y + 3, hud_bar_w, hud_bar_h), 1, border_radius=3)
 
 
         # --- 階層 (中央上) ---
@@ -3200,45 +3246,58 @@ class StatusDialog:
                 eva_close_reduction = int(round((orig_close - player.block_chance_close) * 100))
                 eva_ranged_reduction = int(round((orig_ranged - player.block_chance_ranged) * 100))
 
-            # カッコ書き表示テキストの作成
-            hp_str = f"HP  ：{player.hp} / {player.max_hp}"
-            if hp_reduction > 0:
-                hp_str += f" (-{hp_reduction})"
-
-            atk_str = f"攻撃力：{player.total_attack}"
-            if atk_reduction > 0:
-                atk_str += f" (-{atk_reduction})"
-
-            def_str = f"防御力：{player.total_defense}"
-            if def_reduction > 0:
-                def_str += f" (-{def_reduction})"
-
+            # ヘッダー部分
+            header_lines = [
+                f"【基本ステータス】",
+                f"ランク：{player.guild_rank} (GP:{player.guild_point})",
+                f"HP  ：{player.hp} / {player.max_hp}" + (f" (-{hp_reduction})" if hp_reduction > 0 else ""),
+            ]
+            draw_text_wrapped(screen, self.font, "\n".join(header_lines), content_x, content_y, cw)
+            
+            # バー表示（装備画面と同じスタイル）
             eva_close_pct = int(round(player.block_chance_close * 100))
             eva_ranged_pct = int(round(player.block_chance_ranged * 100))
             
-            eva_close_str = f"近接回避：{eva_close_pct}%"
-            if eva_close_reduction > 0:
-                eva_close_str += f" (-{eva_close_reduction}%)"
+            bar_items = [
+                ("攻撃力", player.total_attack, "total_attack"),
+                ("防御力", player.total_defense, "total_defense"),
+                ("最大HP", player.max_hp, "max_hp"),
+                ("近接回避", eva_close_pct, "block_close"),
+                ("射撃回避", eva_ranged_pct, "block_ranged"),
+            ]
+            
+            bar_start_y = content_y + 80
+            line_h = 22
+            half_w = cw // 2
+            bar_w = min(half_w - 20, 90)
+            
+            for i, (label, value, stat_key) in enumerate(bar_items):
+                y = bar_start_y + i * line_h
+                # 呪い表示
+                curse_suffix = ""
+                if stat_key == "total_attack" and atk_reduction > 0:
+                    curse_suffix = f" (-{atk_reduction})"
+                elif stat_key == "total_defense" and def_reduction > 0:
+                    curse_suffix = f" (-{def_reduction})"
+                elif stat_key == "block_close" and eva_close_reduction > 0:
+                    curse_suffix = f" (-{eva_close_reduction}%)"
+                elif stat_key == "block_ranged" and eva_ranged_reduction > 0:
+                    curse_suffix = f" (-{eva_ranged_reduction}%)"
                 
-            eva_ranged_str = f"射撃回避：{eva_ranged_pct}%"
-            if eva_ranged_reduction > 0:
-                eva_ranged_str += f" (-{eva_ranged_reduction}%)"
-
-            lines = [
-                f"【基本ステータス】",
-                f"ランク：{player.guild_rank} (GP:{player.guild_point})",
-                hp_str,
-                atk_str,
-                def_str,
-                eva_close_str,
-                eva_ranged_str,
-                "",
+                lbl_text = label + curse_suffix
+                screen.blit(self.font.render(lbl_text, True, (200, 210, 220)), (content_x, y))
+                draw_stat_bar(screen, content_x + half_w, y + 2, value, stat_key,
+                             bar_width=bar_w, bar_height=12, font=self.font)
+            
+            # 装備中
+            equip_y = bar_start_y + len(bar_items) * line_h + 15
+            equip_lines = [
                 f"【装備中】",
                 f"武器：{weapon_inst.get_name() if weapon_inst else 'なし'}",
                 f"鎧  ：{armor_inst.get_name() if armor_inst else 'なし'}",
                 f"盾  ：{shield_inst.get_name() if shield_inst else 'なし'}",
             ]
-            draw_text_wrapped(screen, self.font, "\n".join(lines), content_x, content_y, cw)
+            draw_text_wrapped(screen, self.font, "\n".join(equip_lines), content_x, equip_y, cw)
         
         elif self.mode == "BONUS":
             weapon_inst = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)
