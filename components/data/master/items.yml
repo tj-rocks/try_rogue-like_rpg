@@ -415,6 +415,21 @@ CONSUMABLE_DATA:
     max_floor: 99
     describe: 父が遺した大切な品 かつての名冒険者だった父の記憶が刻まれている
     floor_spawnable: true
+  fathers_charm:
+    quest_targetable: false
+    name: 父のお守り
+    effect: none
+    price: 0
+    min_rank: G
+    max_rank: SS
+    rarity: 1
+    category: event
+    image_path: components/pictures/icon/item.png
+    shop_buyable: false
+    min_floor: 999
+    max_floor: 999
+    describe: 父がくれたお守り 効果は不明だが何かの力を感じる
+    floor_spawnable: false
 STAVE_DATA:
   knockback_stave:
     quest_targetable: true

@@ -475,7 +475,7 @@ class Player(Entity):
         self.completed_fixed_quests = []
         self.defeated_once_only = []
         self.has_seen_ending = False
-        self.event_items = []
+        self.event_items = [{"key": "fathers_charm", "count": 1}]
         self.warehouse_items = []
         self.warehouse_max = MAX_WAREHOUSE_SLOTS
         self.outbreak_bonus_active = False # アウトブレイククリア後のGP2倍フラグ
