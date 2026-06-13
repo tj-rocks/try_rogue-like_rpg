@@ -386,6 +386,20 @@ class Enemy(Entity):
                     self._log_trace(dungeon, "is trapped in magic_barrier. Skipping turn.")
                     return
 
+        # 拘束状態チェック（移動不可だが隣接時は攻撃可能）
+        if getattr(self, "immobilized_turns", 0) > 0:
+            self.immobilized_turns -= 1
+            if self.immobilized_turns <= 0:
+                self.vulnerable_mult = 1.0  # 弱点化も解除
+            mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
+            px, py = int((player.target_x+player.width/2)//dungeon.tile_size), int((player.target_y+player.height/2)//dungeon.tile_size)
+            dx, dy = px - mx, py - my
+            if abs(dx) + abs(dy) <= 1:
+                self._handle_attack(dx, dy, player, dialog)
+            else:
+                self._log_trace(dungeon, f"immobilized ({self.immobilized_turns} turns left). Cannot move.")
+            return
+
         mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
         px, py = int((player.target_x+player.width/2)//dungeon.tile_size), int((player.target_y+player.height/2)//dungeon.tile_size)
         

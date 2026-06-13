@@ -65,9 +65,10 @@ def use_consumable(item_key, player, dungeon=None):
         # 他の秘薬バフをクリア
         player.attack_buff_turns = 0
         player.regen_buff_turns = 0
-        # 所持しているすべての杖の使用回数を回復する
+        # 所持しているすべての杖の使用回数を回復する（効果切れ時に戻すためスナップショット記録）
         stave_recovery = data.get("stave_recovery", 0)
         recovered_staves = 0
+        player._sage_stave_snapshot = {stave.iid: stave.charges for stave in getattr(player, "stave_inventory", [])}
         for stave in getattr(player, "stave_inventory", []):
             stave.charges += stave_recovery
             recovered_staves += 1

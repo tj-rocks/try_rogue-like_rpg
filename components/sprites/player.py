@@ -597,6 +597,13 @@ class Player(Entity):
             if getattr(self, "magic_buff_turns", 0) > 0:
                 self.magic_buff_turns -= 1
                 if self.magic_buff_turns == 0:
+                    # 杖の回復分を差し引く（スナップショットに基づき元に戻す、0未満にはしない）
+                    snapshot = getattr(self, "_sage_stave_snapshot", {})
+                    if snapshot:
+                        for stave in getattr(self, "stave_inventory", []):
+                            if stave.iid in snapshot:
+                                stave.charges = max(0, min(stave.charges, snapshot[stave.iid]))
+                        self._sage_stave_snapshot = {}
                     messages.append("魔法強化の効果が 切れた！")
             
             if messages and dialog:
