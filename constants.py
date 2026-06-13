@@ -284,6 +284,57 @@ WEAPON_TYPES = WEAPON_CATEGORIES # 後方互換性
 CONSUMABLE_DATA, STAVE_DATA = get_normalized_item_data(RANK_FLOOR_MAP)
 LANTERN_DATA = {}  # 後方互換性のための空の定義
 
+# --- 装備ステータスの全体レンジ（バー表示用） ---
+# 全装備品から各ステータスの min/max を自動算出する
+def _compute_stat_ranges():
+    """全装備データを走査してステータスごとのmin/maxを算出"""
+    stat_keys = [
+        "attack_bonus", "defense_bonus", "hp_bonus",
+        "crit_bonus", "block_chance_close", "block_chance_ranged",
+        "armor_penetration", "aggro_mod", "stupidity",
+    ]
+    # パーセント系のキー（UI表示時に100倍するので、レンジも100倍で格納）
+    pct_keys = {"crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration"}
+    all_equips = list(WEAPON_DATA.values()) + list(ARMOR_DATA.values()) + list(SHIELD_DATA.values()) + list(ACCESSORY_DATA.values())
+    ranges = {}
+    for key in stat_keys:
+        values = [e.get("stats", {}).get(key, 0) for e in all_equips if isinstance(e.get("stats"), dict)]
+        # stats が dict でない場合もトップレベルから取得
+        values += [e.get(key, 0) for e in all_equips if not isinstance(e.get("stats"), dict) and key in e]
+        values = [v for v in values if v != 0]
+        if key in pct_keys:
+            values = [v * 100 for v in values]
+        if values:
+            ranges[key] = {"min": min(values), "max": max(values)}
+        else:
+            ranges[key] = {"min": 0, "max": 1}
+    return ranges
+
+STAT_RANGES = _compute_stat_ranges()
+
+# ランク判定用の閾値（F〜S の6段階）
+STAT_RANK_COLORS = {
+    "F": (150, 150, 150),   # 灰
+    "E": (255, 255, 255),   # 白
+    "D": (100, 220, 100),   # 緑
+    "C": (100, 150, 255),   # 青
+    "B": (180, 100, 255),   # 紫
+    "A": (255, 200, 50),    # 金
+    "S": (255, 80, 80),     # 赤
+}
+STAT_RANK_ORDER = ["F", "E", "D", "C", "B", "A", "S"]
+
+def get_stat_rank(value, stat_key):
+    """ステータス値からランク(F〜S)を判定する"""
+    r = STAT_RANGES.get(stat_key, {"min": 0, "max": 1})
+    if r["max"] == r["min"]:
+        return "S" if value >= r["max"] else "F"
+    ratio = (value - r["min"]) / (r["max"] - r["min"])
+    ratio = max(0.0, min(1.0, ratio))
+    # 6段階に分割
+    idx = min(int(ratio * len(STAT_RANK_ORDER)), len(STAT_RANK_ORDER) - 1)
+    return STAT_RANK_ORDER[idx]
+
 # --- その他のマスタデータ ---
 # Data Source: components/data/master/ (dungeon.json, npcs.json, enemy_attack_effects.json, quests.json)
 _dungeon       = load_master_data("dungeon.json")

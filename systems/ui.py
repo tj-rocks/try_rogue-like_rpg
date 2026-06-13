@@ -44,6 +44,50 @@ def format_stat_value(val):
         val_str = str(round(val, 2))
     return f"+{val_str}" if val > 0 else val_str
 
+def draw_stat_bar(screen, x, y, value, stat_key, bar_width=100, bar_height=10, font=None):
+    """ステータスバーを描画する（長さ＋色＋ランク文字）
+    
+    Args:
+        screen: 描画先サーフェス
+        x, y: 描画位置
+        value: ステータスの実値
+        stat_key: STAT_RANGESのキー
+        bar_width: バーの最大幅(px)
+        bar_height: バーの高さ(px)
+        font: ランク文字描画用フォント（Noneならfont_small）
+    """
+    from constants import STAT_RANGES, STAT_RANK_COLORS, get_stat_rank
+    
+    r = STAT_RANGES.get(stat_key, {"min": 0, "max": 1})
+    # バーの割合を算出（min〜maxで正規化）
+    if r["max"] == r["min"]:
+        ratio = 1.0 if value >= r["max"] else 0.0
+    else:
+        ratio = (value - r["min"]) / (r["max"] - r["min"])
+    ratio = max(0.05, min(1.0, ratio))  # 最低5%は表示する
+    
+    # ランク判定
+    rank = get_stat_rank(value, stat_key)
+    color = STAT_RANK_COLORS.get(rank, (255, 255, 255))
+    
+    # 背景バー（暗い灰色）
+    bg_rect = pygame.Rect(x, y, bar_width, bar_height)
+    pygame.draw.rect(screen, (40, 40, 50), bg_rect, border_radius=3)
+    
+    # 値バー（ランク色）
+    fill_w = int(bar_width * ratio)
+    fill_rect = pygame.Rect(x, y, fill_w, bar_height)
+    pygame.draw.rect(screen, color, fill_rect, border_radius=3)
+    
+    # 枠線
+    pygame.draw.rect(screen, (80, 80, 90), bg_rect, width=1, border_radius=3)
+    
+    # ランク文字
+    f = font or font_small
+    rank_surf = f.render(rank, True, color)
+    screen.blit(rank_surf, (x + bar_width + 4, y - 2))
+
+
 def draw_opening_scene(screen, image, alpha):
     """オープニング画像をフェードインしながら描画する"""
     if not image: return
@@ -1072,32 +1116,75 @@ class BaseListDialog:
                               sep_x + 30, self.y + 80 + detail_y_offset, self.width // 2 - 60, color=(220, 230, 240))
 
     def draw_equip_detail_right_panel(self, screen, inst, param_texts, desc, sep_x, detail_y_offset):
-        """装備品の右パネルを2列パラメータ＋説明文で描画する共通メソッド。
+        """装備品の右パネルをステータスバー＋説明文で描画する共通メソッド。
         inst        : EquipInstance / StaveInstance（名前取得用、Noneなら名前行なし）
-        param_texts : [(テキスト文字列, ...)] のリスト
+        param_texts : [(テキスト文字列, ...)] のリスト（フォールバック用）
         desc        : 説明文（str）
         sep_x       : 左右セパレータのx座標
         detail_y_offset : 画像の有無による縦オフセット
         """
+        from constants import STAT_RANGES
+        
         start_x = sep_x + 30
         start_y = self.y + 80 + detail_y_offset
         cw = self.width // 2 - 60
-        line_h = self.font.get_height() + 2
-
-        N = len(param_texts)
-        half = (N + 1) // 2
-
+        line_h = 22  # バー行の高さ
+        
+        # バーで描画可能なステータスキー
+        bar_stat_keys = {
+            "attack_bonus", "defense_bonus", "hp_bonus",
+            "crit_bonus", "block_chance_close", "block_chance_ranged",
+            "armor_penetration", "aggro_mod", "stupidity",
+        }
+        
+        # instからステータスを取得してバー描画
+        bar_items = []  # (label, value, stat_key)
+        text_items = []  # バーにできない項目（テキスト表示）
+        
+        if inst and hasattr(inst, "get_stat"):
+            for k, label in EQUIP_STAT_LABEL_MAP.items():
+                val = inst.get_stat(k, 0)
+                if val:
+                    if k in bar_stat_keys and k in STAT_RANGES:
+                        # パーセント系は100倍した値を使う
+                        is_pct = k in ("crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
+                        display_val = val * 100 if is_pct and isinstance(val, float) else val
+                        bar_items.append((label, abs(display_val), k))
+                    else:
+                        is_pct = k in ("crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
+                        val_to_use = val * 100 if is_pct and isinstance(val, float) else val
+                        text_items.append(f"{label}: {format_stat_value(val_to_use)}%" if is_pct else f"{label}: {format_stat_value(val)}")
+            # マジックステータス（バー非対応→テキスト表示）
+            for mk, mlabel in EQUIP_MAGIC_LABEL_MAP.items():
+                mval = inst.get_stat(mk, 0)
+                if mval:
+                    is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
+                    val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
+                    text_items.append(f"{mlabel}: {format_stat_value(val_to_use)}%" if is_pct else f"{mlabel}: {format_stat_value(mval)}")
+        
+        # バー描画（左半分: ラベル列、右半分: バー+ランク列）
         max_y = start_y
-        for i, text in enumerate(param_texts):
-            col = 0 if i < half else 1
-            row = i if col == 0 else i - half
-            x = start_x if col == 0 else start_x + cw // 2 + 10
-            y = start_y + row * line_h
-            screen.blit(self.font.render(text, True, (220, 230, 240)), (x, y))
-            max_y = max(max_y, y + line_h)
+        half_w = cw // 2
+        bar_w = half_w - 20  # ランク文字分のマージン
+        bar_w = min(bar_w, 90)
+        
+        for i, (label, value, stat_key) in enumerate(bar_items):
+            y = start_y + i * line_h
+            # 左半分: ラベル
+            screen.blit(self.font.render(label, True, (200, 210, 220)), (start_x, y))
+            # 右半分: バー + ランク文字
+            draw_stat_bar(screen, start_x + half_w, y + 2, value, stat_key,
+                         bar_width=bar_w, bar_height=12, font=self.font)
+            max_y = y + line_h
+        
+        # テキスト項目（バーにできないもの）
+        for i, text in enumerate(text_items):
+            y = max_y + i * (self.font.get_height() + 2)
+            screen.blit(self.font.render(text, True, (220, 230, 240)), (start_x, y))
+            max_y = y + self.font.get_height() + 2
 
         if desc:
-            desc_y = max_y + 20
+            desc_y = max_y + 12
             draw_text_wrapped(screen, self.font, desc, start_x, desc_y, cw, color=(170, 170, 170))
 
 
