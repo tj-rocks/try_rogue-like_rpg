@@ -403,6 +403,8 @@ ENEMY_DATA:
     spawn_chance: 0.20
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/suisui_slime
+    encounter_message: "スイスイスライム に 発見された！\nすばしっこい…気をつけろ！"
+    defeat_message: "スイスイスライム を 討伐した！"
     drops:
       normal: [hp_potion]
       rare: [iron_sword]
@@ -434,6 +436,8 @@ ENEMY_DATA:
     spawn_chance: 0.15
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/skeleton
+    encounter_message: "スケスケスケルトン に 発見された！\n半透明の骨が不気味に揺れている…"
+    defeat_message: "スケスケスケルトン を 討伐した！"
     detect_range: 15
     drops:
       normal: [hp_potion]
@@ -466,6 +470,8 @@ ENEMY_DATA:
     spawn_chance: 0.10
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/gogo_ghost
+    encounter_message: "ゴーゴーゴースト に 発見された！\n猛スピードで突っ込んでくる！"
+    defeat_message: "ゴーゴーゴースト を 討伐した！"
     detect_range: 15
     drops:
       normal: [hp_potion]
@@ -496,6 +502,8 @@ ENEMY_DATA:
     spawn_chance: 0.10
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/deka_komori
+    encounter_message: "デカコウモリ に 発見された！\n巨大な翼が風を巻き起こす…毒に注意！"
+    defeat_message: "デカコウモリ を 討伐した！"
     detect_range: 15
     status: poison
     status_chance: 50
@@ -520,6 +528,87 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 100
 
+  gogogolem:
+    quest_targetable: true
+    name: ゴゴゴーレム
+    min_rank: B
+    image_folder: components/pictures/enemies/gogogolem
+    crit_rate: 0.08
+    drops:
+      normal: [hp_potion, broken_armor]
+      rare: [fullmetal_breastplate]
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.05
+    hp: 55
+    attack: 35
+    defense: 100
+    evasion: 5
+    exp: 25
+    reward_gold: 600
+    accuracy_close: 95
+    accuracy_ranged: 70
+    attack_range: 1
+    stupidity: 4
+    image_scale: 1.0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: explosion
+    attack_priority: close
+    damaged_detect_range: 10
+  magmagro:
+    quest_targetable: true
+    name: マグマグロ
+    min_rank: B
+    image_folder: components/pictures/enemies/magmagro
+    crit_rate: 0.10
+    drops:
+      normal: [hp_potion]
+      rare: [fullmetal_sword]
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.05
+    hp: 40
+    attack: 40
+    defense: 50
+    evasion: 15
+    exp: 25
+    reward_gold: 650
+    accuracy_close: 90
+    accuracy_ranged: 95
+    attack_range: 3
+    stupidity: 2
+    image_scale: 1.0
+    close_attack_effect: explosion
+    ranged_attack_effect: explosion
+    attack_priority: ranged
+    smart_ranged_move: false
+    damaged_detect_range: 10
+  sukasukame:
+    quest_targetable: true
+    name: スカスカメ
+    min_rank: B
+    image_folder: components/pictures/enemies/sukasukame
+    status: darkness
+    status_chance: 35
+    crit_rate: 0.05
+    drops:
+      normal: [hp_potion, broken_shield]
+      rare: [fullmetal_round_shield]
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.05
+    hp: 50
+    attack: 30
+    defense: 80
+    evasion: 10
+    exp: 25
+    reward_gold: 600
+    accuracy_close: 90
+    accuracy_ranged: 85
+    attack_range: 2
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: dark_bolt
+    attack_priority: close
+    damaged_detect_range: 10
   guild_assassin:
     quest_targetable: true
     name: ギルドの刺客
@@ -554,9 +643,12 @@ ENEMY_DATA:
     # max_floor: 50
     max_concurrent: 1
     is_boss: true
+    once_only: true
     spawn_chance: 0.05
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/skeleton
+    encounter_message: "…懐かしい感じがする。\n父さん…父さんだろ…！"
+    defeat_message: "父さん…なんで…\n『これ以上ダンジョンに潜るな。\n母さんをよろしく頼む。\nギルドを信用するな。\n…愛してる。』"
     drops:
       normal: []
       rare: [fathers_keepsake]

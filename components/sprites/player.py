@@ -472,6 +472,7 @@ class Player(Entity):
         self.active_quests = []
         self.quest_tokens = {}
         self.completed_fixed_quests = []
+        self.defeated_once_only = []
         self.has_seen_ending = False
         self.event_items = []
         self.warehouse_items = []
@@ -1212,7 +1213,7 @@ class Player(Entity):
             "magic_buff_turns": getattr(self, "magic_buff_turns", 0),
             "magic_buff_val": getattr(self, "magic_buff_val", 0),
             "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
-            "completed_fixed_quests": self.completed_fixed_quests, "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
+            "completed_fixed_quests": self.completed_fixed_quests, "defeated_once_only": getattr(self, "defeated_once_only", []), "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
             "current_floor": self.current_floor, "max_reached_floor": self.max_reached_floor, "equip_id_counter": globals().get("_equip_id_counter", 0),
             "boss_message_shown": getattr(self, "boss_message_shown", False),
             "curse_level": getattr(self, "curse_level", 0),
@@ -1263,7 +1264,7 @@ class Player(Entity):
         for q in self.active_quests:
             if "reward_gold" not in q: q["reward_gold"] = 1
             if "reward_gp" not in q: q["reward_gp"] = 1
-        self.quest_tokens = data.get("quest_tokens", {}); self.completed_fixed_quests = data.get("completed_fixed_quests", [])
+        self.quest_tokens = data.get("quest_tokens", {}); self.completed_fixed_quests = data.get("completed_fixed_quests", []); self.defeated_once_only = data.get("defeated_once_only", [])
         self.has_seen_ending = data.get("has_seen_ending", False); self.max_reached_floor = data.get("max_reached_floor", 0); self.warehouse_items = data.get("warehouse_items", []); self.event_items = data.get("event_items", [])
         self.current_floor = data.get("current_floor", 0)
         self.boss_message_shown = data.get("boss_message_shown", False)

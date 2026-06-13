@@ -185,7 +185,11 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             if getattr(enemy, "is_boss", False):
                 from systems.ui import show_dialog
                 from constants import SOUND_QUEST_COMPLETE, SOUND_BOSS_VICTORY
+                from systems.magic_handler import FlashEffect
                 import os
+                
+                # 白フラッシュエフェクト（約1秒）
+                dungeon.magic_effects.append(FlashEffect(color=(255, 255, 255), duration=60))
                 
                 # 勝利SEの再生 (自作の boss_victory.wav があれば優先)
                 victory_se = SOUND_BOSS_VICTORY if os.path.exists(SOUND_BOSS_VICTORY) else SOUND_QUEST_COMPLETE
@@ -194,7 +198,20 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                     pygame.mixer.Sound(victory_se).play()
                 
                 # 撃破メッセージを表示 (モーダル表示：入力を待つ)
-                show_dialog(dialog, f"{enemy.name} を 討伐した！", modal=True, auto_close=0)
+                # enemies.yml の defeat_message があればそれを使う
+                enemy_type = getattr(enemy, "type", None)
+                defeat_msg = ENEMY_DATA.get(enemy_type, {}).get("defeat_message")
+                if defeat_msg:
+                    show_dialog(dialog, defeat_msg, modal=True, auto_close=0)
+                else:
+                    show_dialog(dialog, f"{enemy.name} を 討伐した！", modal=True, auto_close=0)
+                
+                # once_only 敵の撃破記録
+                if enemy_type and ENEMY_DATA.get(enemy_type, {}).get("once_only"):
+                    if not hasattr(player, "defeated_once_only"):
+                        player.defeated_once_only = []
+                    if enemy_type not in player.defeated_once_only:
+                        player.defeated_once_only.append(enemy_type)
 
             enemy._log_trace(dungeon, f"[DEATH-DEBUG] removing enemy from dungeon.enemies (len before: {len(dungeon.enemies)})")
             dungeon.enemies.remove(enemy)
@@ -367,11 +384,20 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             target_bgm = getattr(active_boss, "bgm", None) or BGM_BOSS
             play_bgm(target_bgm)
             
-            # [NEW] ボス遭遇メッセージ (モーダル表示：入力を待つ)
-            if not getattr(player, "boss_message_shown", False):
+            # ボス遭遇メッセージ (モーダル表示：入力を待つ)
+            # 各ボスごとに1回だけ表示する
+            shown_bosses = getattr(player, "_shown_boss_messages", set())
+            boss_type = getattr(active_boss, "type", None)
+            if boss_type not in shown_bosses:
                 from systems.ui import show_dialog
-                show_dialog(dialog, f"{active_boss.name} に 発見された！", modal=True, auto_close=0)
-                player.boss_message_shown = True
+                # enemies.yml の encounter_message があればそれを使う
+                encounter_msg = ENEMY_DATA.get(boss_type, {}).get("encounter_message")
+                if encounter_msg:
+                    show_dialog(dialog, encounter_msg, modal=True, auto_close=0)
+                else:
+                    show_dialog(dialog, f"{active_boss.name} に 発見された！", modal=True, auto_close=0)
+                shown_bosses.add(boss_type)
+                player._shown_boss_messages = shown_bosses
             
             print(f"[SOUND] Boss encountered! Switching to: {target_bgm}")
     else:

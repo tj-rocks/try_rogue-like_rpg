@@ -2188,7 +2188,14 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                 dungeon.guild_system.generate_quests(player)
                                             
                                             guild_dialog.setup(player, dungeon, npc_role="guild_receptionist")
-                                            dialog.text = "ようこそ冒険者ギルドへ！\nご用件をどうぞ。"
+                                            
+                                            # 次のランクアップ情報を共通メソッドで取得
+                                            rank_title, rank_info = dungeon.guild_system.get_next_rank_info(player)
+                                            
+                                            # テキストを3行に収める（visible=3対策）
+                                            short_info = rank_info.replace("\n", " ").replace("  ", " ")
+                                            full_text = f"ようこそ冒険者ギルドへ！\nご用件をどうぞ。\n{short_info}"
+                                            dialog.text = full_text
                                             dialog.is_active = True
                                             guild_dialog.is_active = True
                                             
@@ -2429,17 +2436,13 @@ class GuildDialog:
                     if not already_active:
                         self.items.append(("mode", "ACCEPT_RANKUP", "昇級試験を受ける", f"{next_rank_data['rank']}ランクへの昇格試験に挑戦します"))
                 
-                if next_rank_data:
-                    needed_gp = next_rank_data["required_gp"] - player.guild_point
+                # ランク情報を共通メソッドで取得
+                _, info_desc = dungeon.guild_system.get_next_rank_info(player)
+                # 昇級試験受注中の場合は追加メッセージ
+                if next_rank_data and player.guild_point >= next_rank_data["required_gp"]:
                     already_active = any(q.get("is_rank_up") for q in player.active_quests)
-                    if needed_gp > 0:
-                        info_desc = f"次の{next_rank_data['rank']}ランクになるには、あと {needed_gp} GP 必要です \n(現在のGP: {player.guild_point} / 目標: {next_rank_data['required_gp']} GP)"
-                    elif already_active:
-                        info_desc = f"次の{next_rank_data['rank']}ランクへの昇級試験を受注しています！\n(クエスト目標を確認して、対象フロア最奥へ向かってください)"
-                    else:
-                        info_desc = f"次の{next_rank_data['rank']}ランクへの昇格基準を満たしています！\n(昇級試験を受けられます)"
-                else:
-                    info_desc = "これ以上は昇格できません あなたは最高ランクに達しています！"
+                    if already_active:
+                        info_desc += "\n(昇級試験を受注中です。対象フロア最奥へ向かってください)"
                 self.items.append(("info_rank", None, "ランク情報を確認", info_desc))
                 self.items.append(("cancel", None, "ギルドを出る", "ギルドメニューを終了します"))
             else:

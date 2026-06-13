@@ -58,6 +58,28 @@ class GuildSystem:
         if p_idx == 0 and r_idx == 1: return True
         return p_idx >= r_idx
 
+    def get_next_rank_info(self, player):
+        """次のランクアップ情報を取得する (title, descriptionの形式)
+        
+        Returns:
+            tuple: (title: str, description: str) - タイトルと詳細説明
+        """
+        next_rank_data = self.get_next_rank_data(player.guild_rank)
+        if not next_rank_data:
+            return "最高ランク", "あなたは最高ランクに到達しています！"
+        
+        needed = next_rank_data["required_gp"] - player.guild_point
+        next_rank = next_rank_data["rank"]
+        
+        if needed > 0:
+            title = f"次の{next_rank}ランクまで"
+            desc = f"あと {needed} GP 必要です\n(現在: {player.guild_point} GP / 目標: {next_rank_data['required_gp']} GP)"
+        else:
+            title = f"次の{next_rank}ランクへの昇格基準を満たしています！"
+            desc = "昇給試験担当にお声がけください。"
+        
+        return title, desc
+
     def generate_quests(self, player):
         """プレイヤーのランクに応じたクエストを生成する"""
         self.available_quests = []
