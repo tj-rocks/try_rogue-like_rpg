@@ -154,6 +154,7 @@ DUNGEON_IMAGES:
     brightness: 5
     map: 1st_rest_point.txt
     wall_decoration_ratio: 0.3
+    no_attack: true
   '13':
     image: temple
     sound: sandstone_floor.mp3
@@ -209,6 +210,7 @@ DUNGEON_IMAGES:
     brightness: 5
     wall_decoration_ratio: 0.3
     map: 2nd_rest_point.txt
+    no_attack: true
   "23":
     image: wood
     sound: sandstone_floor2.mp3
@@ -259,6 +261,7 @@ DUNGEON_IMAGES:
     brightness: 5
     wall_decoration_ratio: 0.3
     map: 3rd_rest_point.txt
+    no_attack: true
   "32":
     image: deep_rock
     sound: middle_1.mp3
@@ -314,6 +317,7 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
     map: 4th_rest_point.txt
+    no_attack: true
   "42":
     image: old_city
     sound: deep_floors2.mp3
@@ -409,6 +413,7 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
     map: 5th_rest_point.txt
+    no_attack: true
   "57":
     image: deesert_ruin
     sound: sandstone_floor2.mp3
@@ -504,6 +509,7 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
     map: 6th_rest_point.txt
+    no_attack: true
   "72":
     image: temple
     sound: sandstone_floor.mp3
@@ -569,6 +575,7 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
     map: 7th_rest_point.txt
+    no_attack: true
   "82":
     image: deesert_ruin
     sound: sandstone_floor2.mp3
@@ -630,6 +637,7 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
     map: 8th_rest_point.txt
+    no_attack: true
   "92":
     image: standard
     sound: just_move.mp3
