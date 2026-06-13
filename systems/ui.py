@@ -2160,8 +2160,10 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
             if event.type == pygame.KEYDOWN and event.key == KEY_INVENTORY:
                 inventory_dialog._close_back(); return
         inventory_dialog.handle_events(events)
+        return
     elif status_dialog.is_active:
         status_dialog.handle_events(events, player)
+        return
     elif enhance_dialog.is_active:
         enhance_dialog.handle_events(events, player)
         # メッセージが出ていれば決定キーで閉じる
