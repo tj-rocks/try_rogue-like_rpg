@@ -36,9 +36,10 @@ ORE_STAT_CATEGORIES = {
         "block_chance_close", "block_chance_ranged", "regen_bonus", "lantern_bonus", "aggro_mod", "stupidity"
     },
     "purple_stone": {
-        "magic_stave_bonus", "magic_light_stave_bonus", "magic_heal_ratio",
-        "magic_fire_damage", "magic_fire_range", "magic_knockback_damage",
-        "magic_invincible_turns"
+        "magic_stave_bonus", "magic_light_stave_bonus"
+        # 以下は現在未使用（メイジ職廃止のため）。復活する場合はセットに追加するだけでOK:
+        # "magic_fire_damage", "magic_fire_range", "magic_heal_ratio",
+        # "magic_knockback_damage", "magic_invincible_turns"
     }
 }
 
@@ -472,6 +473,7 @@ class Player(Entity):
         self.active_quests = []
         self.quest_tokens = {}
         self.completed_fixed_quests = []
+        self.defeated_once_only = []
         self.has_seen_ending = False
         self.event_items = []
         self.warehouse_items = []
@@ -595,6 +597,13 @@ class Player(Entity):
             if getattr(self, "magic_buff_turns", 0) > 0:
                 self.magic_buff_turns -= 1
                 if self.magic_buff_turns == 0:
+                    # 杖の回復分を差し引く（スナップショットに基づき元に戻す、0未満にはしない）
+                    snapshot = getattr(self, "_sage_stave_snapshot", {})
+                    if snapshot:
+                        for stave in getattr(self, "stave_inventory", []):
+                            if stave.iid in snapshot:
+                                stave.charges = max(0, min(stave.charges, snapshot[stave.iid]))
+                        self._sage_stave_snapshot = {}
                     messages.append("魔法強化の効果が 切れた！")
             
             if messages and dialog:
@@ -1212,7 +1221,7 @@ class Player(Entity):
             "magic_buff_turns": getattr(self, "magic_buff_turns", 0),
             "magic_buff_val": getattr(self, "magic_buff_val", 0),
             "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
-            "completed_fixed_quests": self.completed_fixed_quests, "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
+            "completed_fixed_quests": self.completed_fixed_quests, "defeated_once_only": getattr(self, "defeated_once_only", []), "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
             "current_floor": self.current_floor, "max_reached_floor": self.max_reached_floor, "equip_id_counter": globals().get("_equip_id_counter", 0),
             "boss_message_shown": getattr(self, "boss_message_shown", False),
             "curse_level": getattr(self, "curse_level", 0),
@@ -1263,7 +1272,7 @@ class Player(Entity):
         for q in self.active_quests:
             if "reward_gold" not in q: q["reward_gold"] = 1
             if "reward_gp" not in q: q["reward_gp"] = 1
-        self.quest_tokens = data.get("quest_tokens", {}); self.completed_fixed_quests = data.get("completed_fixed_quests", [])
+        self.quest_tokens = data.get("quest_tokens", {}); self.completed_fixed_quests = data.get("completed_fixed_quests", []); self.defeated_once_only = data.get("defeated_once_only", [])
         self.has_seen_ending = data.get("has_seen_ending", False); self.max_reached_floor = data.get("max_reached_floor", 0); self.warehouse_items = data.get("warehouse_items", []); self.event_items = data.get("event_items", [])
         self.current_floor = data.get("current_floor", 0)
         self.boss_message_shown = data.get("boss_message_shown", False)

@@ -148,6 +148,11 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     final_damage = hardcore_round(rounded_damage, is_hp=True)
     final_damage = max(1, final_damage)
     
+    # 被ダメ倍率（拘束等による弱点化）
+    vulnerable_mult = getattr(target, "vulnerable_mult", None)
+    if isinstance(vulnerable_mult, (int, float)) and vulnerable_mult != 1.0:
+        final_damage = max(1, int(final_damage * vulnerable_mult))
+    
     return final_damage, is_critical, False
 
 

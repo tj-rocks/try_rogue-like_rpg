@@ -386,6 +386,20 @@ class Enemy(Entity):
                     self._log_trace(dungeon, "is trapped in magic_barrier. Skipping turn.")
                     return
 
+        # 拘束状態チェック（移動不可だが隣接時は攻撃可能）
+        if getattr(self, "immobilized_turns", 0) > 0:
+            self.immobilized_turns -= 1
+            if self.immobilized_turns <= 0:
+                self.vulnerable_mult = 1.0  # 弱点化も解除
+            mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
+            px, py = int((player.target_x+player.width/2)//dungeon.tile_size), int((player.target_y+player.height/2)//dungeon.tile_size)
+            dx, dy = px - mx, py - my
+            if abs(dx) + abs(dy) <= 1:
+                self._handle_attack(dx, dy, player, dialog)
+            else:
+                self._log_trace(dungeon, f"immobilized ({self.immobilized_turns} turns left). Cannot move.")
+            return
+
         mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
         px, py = int((player.target_x+player.width/2)//dungeon.tile_size), int((player.target_y+player.height/2)//dungeon.tile_size)
         
@@ -544,6 +558,9 @@ class Enemy(Entity):
         # 1. 階層ボス(is_boss)の確定配置
         # その階層がボスの出現開始階層(min_floor)であれば、最優先で1体配置する
         boss_types = [t for t in mt if ENEMY_DATA[t].get("is_boss") and ENEMY_DATA[t].get("min_floor") == floor]
+        # once_only かつ撃破済みのボスは除外する
+        defeated_once = getattr(player, "defeated_once_only", []) if player else []
+        boss_types = [t for t in boss_types if not (ENEMY_DATA[t].get("once_only") and t in defeated_once)]
         for b_type in boss_types:
             has_quest = False
             is_promo_exam = False

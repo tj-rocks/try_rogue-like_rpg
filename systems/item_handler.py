@@ -65,9 +65,10 @@ def use_consumable(item_key, player, dungeon=None):
         # 他の秘薬バフをクリア
         player.attack_buff_turns = 0
         player.regen_buff_turns = 0
-        # 所持しているすべての杖の使用回数を回復する
+        # 所持しているすべての杖の使用回数を回復する（効果切れ時に戻すためスナップショット記録）
         stave_recovery = data.get("stave_recovery", 0)
         recovered_staves = 0
+        player._sage_stave_snapshot = {stave.iid: stave.charges for stave in getattr(player, "stave_inventory", [])}
         for stave in getattr(player, "stave_inventory", []):
             stave.charges += stave_recovery
             recovered_staves += 1
@@ -373,13 +374,16 @@ def make_discard_item_callback(player, dialog, inventory_dialog, game_state):
     アイテム破棄（捨てる）のコールバック生成
     """
     def discard(item_type, item_key_or_iid):
-        inventory_dialog.is_active = False
-        
+        from constants import COMBAT_LOG_WAIT_FRAMES
         msg, success = discard_item(player, item_type, item_key_or_iid)
         
         dialog.text = msg
-        game_state["dialog_modal"] = True
+        game_state["dialog_modal"] = False
         dialog.is_active = True
+        dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+        
+        # 捨てた後もインベントリを開いたままにする
+        inventory_dialog.is_active = True
         
     return discard
 
@@ -416,11 +420,15 @@ def make_unequip_item_callback(player, dialog, inventory_dialog, game_state):
     装備解除のコールバック生成
     """
     def unequip(item_type, iid):
-        inventory_dialog.is_active = False
+        from constants import COMBAT_LOG_WAIT_FRAMES
         msg = unequip_item(player, item_type, iid)
         dialog.text = msg
-        game_state["dialog_modal"] = True
+        game_state["dialog_modal"] = False
         dialog.is_active = True
+        dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+        
+        # 解除後もインベントリを開いたままにする
+        inventory_dialog.is_active = True
         
     return unequip
 

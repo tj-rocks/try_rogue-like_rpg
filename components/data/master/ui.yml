@@ -38,3 +38,14 @@ message_window:
 hud:
   bg_color: [0, 0, 0, 150]
   text_color: [255, 255, 255]
+
+# --- HUD Stat Bars (攻撃力・防御力のバー色) ---
+hud_stat_bars:
+  attack:
+    color: [255, 120, 80]       # オレンジ系
+    bg_color: [40, 40, 50]
+  defense:
+    color: [80, 160, 255]       # ブルー系
+    bg_color: [40, 40, 50]
+  bar_width: 80
+  bar_height: 10

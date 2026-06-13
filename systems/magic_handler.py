@@ -210,6 +210,17 @@ class DirectionalFlashEffect(MagicEffect):
             pygame.draw.circle(s, c_flash, (radius, radius), radius)
             screen.blit(s, (draw_x - radius, draw_y - radius))
 
+def _is_fighters_full_set(player):
+    """戦士シリーズフルセット装備中かどうかを判定"""
+    w_inst = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)
+    a_inst = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
+    s_inst = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
+    return (
+        w_inst and w_inst.key == "fighters_sword"
+        and a_inst and a_inst.key == "fighters_armor"
+        and s_inst and s_inst.key == "fighters_sheld"
+    )
+
 def execute_stave(player, stave, dungeon, dialog):
     """杖を振った際の効果を発動させるメイン関数"""
     from constants import STAVE_DATA
@@ -228,6 +239,14 @@ def execute_stave(player, stave, dungeon, dialog):
     effect_type = settings.get("effect_type")
     print(f"[MAGIC] Execute Stave: {stave.name} (Key: {stave.key}, Effect: {effect_type})")
 
+    # 戦士フルセット + 賢者秘薬バフ中 → 杖強化
+    is_enhanced = (
+        getattr(player, "magic_buff_turns", 0) > 0
+        and _is_fighters_full_set(player)
+    )
+    if is_enhanced:
+        print(f"[MAGIC] Enhanced mode active! (Fighters Full Set + Sage Buff)")
+
     # 効果音再生
     sound_path = settings.get("sound")
     if sound_path:
@@ -239,24 +258,24 @@ def execute_stave(player, stave, dungeon, dialog):
         msg = f"{player.name} は {stave.name} を振った！（魔力が共鳴し回数を消費しなかった！）\n"
     
     if effect_type == "knockback":
-        msg += _effect_knockback(player, settings, dungeon, dialog)
+        msg += _effect_knockback(player, settings, dungeon, dialog, is_enhanced)
     elif effect_type == "fire":
-        msg += _effect_fire(player, settings, dungeon, dialog)
+        msg += _effect_fire(player, settings, dungeon, dialog, is_enhanced)
     elif effect_type == "heal":
-        msg += _effect_heal(player, settings, dungeon, dialog)
+        msg += _effect_heal(player, settings, dungeon, dialog, is_enhanced)
     elif effect_type == "invincible":
-        msg += _effect_invincible(player, settings, dungeon, dialog)
+        msg += _effect_invincible(player, settings, dungeon, dialog, is_enhanced)
     elif effect_type == "light_all":
-        msg += _effect_light_all(player, settings, dungeon, dialog, stave)
+        msg += _effect_light_all(player, settings, dungeon, dialog, stave, is_enhanced)
     elif effect_type == "barrier":
-        msg += _effect_barrier(player, settings, dungeon, dialog, stave)
+        msg += _effect_barrier(player, settings, dungeon, dialog, stave, is_enhanced)
     else:
         msg += "しかし 何もおきなかった！"
 
     return msg
 
-def _effect_knockback(player, settings, dungeon, dialog):
-    """正面の敵を吹き飛ばす"""
+def _effect_knockback(player, settings, dungeon, dialog, is_enhanced=False):
+    """正面の敵を吹き飛ばす（強化時: 貫通して2体吹き飛ばす）"""
     # プレイヤーの向きから対象タイルを特定
     gx = int((player.x + player.width / 2) // dungeon.tile_size)
     gy = int((player.y + player.height / 2) // dungeon.tile_size)
@@ -305,6 +324,26 @@ def _effect_knockback(player, settings, dungeon, dialog):
 
     if not target_enemy:
         return "まばゆい衝撃波を 放った！"
+
+    # 強化時: 貫通して2体目も探索
+    second_enemy = None
+    if is_enhanced and target_enemy:
+        # 1体目の先を探索
+        scan_gx, scan_gy = target_gx + dx, target_gy + dy
+        while 0 <= scan_gx < dungeon.map_width and 0 <= scan_gy < dungeon.map_height:
+            if dungeon.map_data[scan_gy][scan_gx] == 0:
+                break
+            for e in dungeon.enemies:
+                if e != target_enemy and not getattr(e, "is_dead", False):
+                    egx = int((e.x + e.width / 2) // dungeon.tile_size)
+                    egy = int((e.y + e.height / 2) // dungeon.tile_size)
+                    if egx == scan_gx and egy == scan_gy:
+                        second_enemy = e
+                        break
+            if second_enemy:
+                break
+            scan_gx += dx
+            scan_gy += dy
 
     # 吹き飛ばしロジック
     max_dist = settings.get("max_distance", 10)
@@ -365,16 +404,48 @@ def _effect_knockback(player, settings, dungeon, dialog):
     
     if target_enemy.is_dead:
         msg += f"\n{target_enemy.name} を 倒した！"
-        
+
+    # 強化貫通: 2体目も吹き飛ばす
+    if is_enhanced and second_enemy and not second_enemy.is_dead:
+        s_gx = int((second_enemy.x + second_enemy.width / 2) // dungeon.tile_size)
+        s_gy = int((second_enemy.y + second_enemy.height / 2) // dungeon.tile_size)
+        s_final_gx, s_final_gy = s_gx, s_gy
+        for _ in range(max_dist):
+            next_gx, next_gy = s_final_gx + dx, s_final_gy + dy
+            if not (0 <= next_gx < dungeon.map_width and 0 <= next_gy < dungeon.map_height) or \
+               dungeon.map_data[next_gy][next_gx] == 0:
+                break
+            collision = False
+            for e in dungeon.enemies:
+                if e != second_enemy and e != target_enemy and not getattr(e, "is_dead", False):
+                    egx = int((e.x + e.width / 2) // dungeon.tile_size)
+                    egy = int((e.y + e.height / 2) // dungeon.tile_size)
+                    if egx == next_gx and egy == next_gy:
+                        collision = True
+                        break
+            if collision:
+                break
+            s_final_gx, s_final_gy = next_gx, next_gy
+        second_enemy.move_speed = 1200
+        second_enemy.target_x = s_final_gx * dungeon.tile_size
+        second_enemy.target_y = s_final_gy * dungeon.tile_size
+        second_enemy.is_moving = True
+        msg_dmg2, damage2, _, _ = deal_damage(player, second_enemy, is_magic=True, damage_mult=base_mult + bonus_mult)
+        msg += f"\n貫通！{second_enemy.name} も 吹き飛ばした！\n" + msg_dmg2
+        if second_enemy.is_dead:
+            msg += f"\n{second_enemy.name} を 倒した！"
+
     return msg
 
-def _effect_fire(player, settings, dungeon, dialog):
-    """範囲攻撃（炎）"""
+def _effect_fire(player, settings, dungeon, dialog, is_enhanced=False):
+    """範囲攻撃（炎）（強化時: 範囲+1）"""
     gx = int((player.x + player.width / 2) // dungeon.tile_size)
     gy = int((player.y + player.height / 2) // dungeon.tile_size)
 
-    # 装備ボーナス: 奥方向に何列伸ばすか
+    # 装備ボーナス: 奥方向に何列伸ばすか（強化時+1）
     range_ext = int(getattr(player, "get_magic_bonus", lambda k: 0)("fire_range"))
+    if is_enhanced:
+        range_ext += 1
 
     # ターゲットとエフェクト追加
     if settings.get("is_surround"):
@@ -423,9 +494,16 @@ def _effect_fire(player, settings, dungeon, dialog):
 
     return f"炎が 湧き上がった！\n{len(targets)}体 の 敵 に ダメージ！"
 
-def _effect_heal(player, settings, dungeon, dialog):
-    """自己回復"""
-    # 装備ボーナス: 回復割合加算
+def _effect_heal(player, settings, dungeon, dialog, is_enhanced=False):
+    """自己回復（強化時: HP100%回復）"""
+    if is_enhanced:
+        # 強化版: HP全回復
+        old_hp = player.hp
+        player.hp = player.max_hp
+        healed = player.hp - old_hp
+        dungeon.magic_effects.append(FlashEffect(color=(200, 255, 200)))
+        return f"強大な癒しの力が 溢れ出す！\nHP が 完全に 回復した！（+{healed}）"
+    # 通常版
     ratio = settings.get("heal_ratio", 0.5) + getattr(player, "get_magic_bonus", lambda k: 0)("heal_ratio")
     amount = int(player.max_hp * ratio)
     old_hp = player.hp
@@ -434,15 +512,17 @@ def _effect_heal(player, settings, dungeon, dialog):
     dungeon.magic_effects.append(FlashEffect(color=settings.get("effect_color", [100, 255, 100])))
     return f"体が光に包まれた！\nHP が {healed} 回復した！"
 
-def _effect_invincible(player, settings, dungeon, dialog):
-    """無敵付与"""
+def _effect_invincible(player, settings, dungeon, dialog, is_enhanced=False):
+    """無敵付与（強化時: ターン数2倍）"""
     # 装備ボーナス: 無敵ターン数加算
     turns = settings.get("duration_turns", 3) + int(getattr(player, "get_magic_bonus", lambda k: 0)("invincible_turns"))
+    if is_enhanced:
+        turns *= 2
     player.invincible_turns = turns
     dungeon.magic_effects.append(FlashEffect(color=settings.get("effect_color", [255, 255, 150])))
     return f"聖なる光が 守ってくれる！\n{turns}ターンの間 ダメージを受けない！"
 
-def _effect_light_all(player, settings, dungeon, dialog, stave=None):
+def _effect_light_all(player, settings, dungeon, dialog, stave=None, is_enhanced=False):
     """フロア全体を明るく照らす"""
     if dungeon:
         # プレイヤーの目の前に光の演出を出す
@@ -472,12 +552,22 @@ def _effect_light_all(player, settings, dungeon, dialog, stave=None):
                     affected += 1
             if affected > 0:
                 msg += f"\n強烈な光で {affected}体の敵の 感知能力が 低下した！"
+        
+        # 強化版: 敵のstupidity+1（混乱しやすくなる）
+        if is_enhanced:
+            stupidity_affected = 0
+            for e in dungeon.enemies:
+                if not getattr(e, "is_dead", False) and not getattr(e, "is_static", False):
+                    e.stupidity = getattr(e, "stupidity", 0) + 1
+                    stupidity_affected += 1
+            if stupidity_affected > 0:
+                msg += f"\n眩い光が {stupidity_affected}体の敵を 混乱させた！"
                 
         return msg
     return "しかし 何も 起こらなかった"
 
-def _effect_barrier(player, settings, dungeon, dialog, stave=None):
-    """正面1マスに敵の侵入を防ぐ魔法の防壁（障害物）を配置する"""
+def _effect_barrier(player, settings, dungeon, dialog, stave=None, is_enhanced=False):
+    """正面1マスに敵の侵入を防ぐ魔法の防壁（障害物）を配置する（強化時: 隣接敵を拘束+弱点化）"""
     gx = int((player.x + player.width / 2) // dungeon.tile_size)
     gy = int((player.y + player.height / 2) // dungeon.tile_size)
     
@@ -536,4 +626,24 @@ def _effect_barrier(player, settings, dungeon, dialog, stave=None):
     ty = target_gy * tile_size
     dungeon.magic_effects.append(DirectionalFlashEffect(tx, ty, size=tile_size, color=(200, 100, 255)))
     
-    return f"正面の床に 魔法の防壁 が出現した！（持続: {barrier.lifetime_turns}ターン）"
+    msg = f"正面の床に 魔法の防壁 が出現した！（持続: {barrier.lifetime_turns}ターン）"
+    
+    # 強化版: 障壁の隣接敵を拘束（移動不可）＋弱点化（被ダメ1.5倍）
+    if is_enhanced:
+        adjacent_offsets = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        immobilized_count = 0
+        for aox, aoy in adjacent_offsets:
+            adj_gx, adj_gy = target_gx + aox, target_gy + aoy
+            for e in dungeon.enemies:
+                if e == barrier or getattr(e, "is_dead", False) or getattr(e, "is_static", False):
+                    continue
+                egx = int((e.x + e.width / 2) // tile_size)
+                egy = int((e.y + e.height / 2) // tile_size)
+                if egx == adj_gx and egy == adj_gy:
+                    e.immobilized_turns = getattr(e, "immobilized_turns", 0) + barrier.lifetime_turns
+                    e.vulnerable_mult = 1.5
+                    immobilized_count += 1
+        if immobilized_count > 0:
+            msg += f"\n防壁の魔力が {immobilized_count}体の敵を 拘束した！\n拘束中の敵には 1.5倍のダメージ！"
+    
+    return msg

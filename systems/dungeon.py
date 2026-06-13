@@ -54,6 +54,11 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
     player.prev_floor = floor_level
     player.reset_status()
     player.boss_message_shown = False # 階層移動時に表示済みフラグをリセット
+    player._shown_boss_messages = set() # ボスごとの遭遇メッセージ表示済みセットをリセット
+    
+    # ボス戦状態をリセット（次の階でBGMが正しく再生されるように）
+    from systems.game_state import game_state
+    game_state["is_boss_battle"] = False
     
     # 敵・アイテムを初期配置（村や固定マップ階層以外）
     if floor_level > 0 and not new_dungeon.floor_info.get("map"):

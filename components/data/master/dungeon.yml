@@ -308,93 +308,93 @@ DUNGEON_IMAGES:
 # Bランク 到達可能階層 (41F 〜 55F)
 # ==========================================
   "41":
-    image: water
+    image: old_city
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
     map: 4th_rest_point.txt
   "42":
-    image: water
-    sound: sandstone_floor.mp3
+    image: old_city
+    sound: deep_floors2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "43":
-    image: water
-    sound: sandstone_floor.mp3
+    image: old_city
+    sound: deep_floors2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "44":
-    image: water
-    sound: sandstone_floor.mp3
+    image: old_city
+    sound: deep_floors2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "45":
-    image: water
-    sound: sandstone_floor.mp3
+    image: old_city
+    sound: deep_floors2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "46":
-    image: water
-    sound: sandstone_floor.mp3
+    image: old_city
+    sound: deep_floors2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "47":
-    image: temple
-    sound: sandstone_floor.mp3
+    image: old_city
+    sound: deep_floors2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "48":
-    image: temple
-    sound: sandstone_floor.mp3
+    image: old_city
+    sound: deep_floors2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "49":
-    image: temple
-    sound: sandstone_floor.mp3
+    image: old_city
+    sound: deep_floors2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "50":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: evil_castle
+    sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "51":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: evil_castle
+    sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "52":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: evil_castle
+    sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "53":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: evil_castle
+    sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "54":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: evil_castle
+    sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "55":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: evil_castle
+    sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
