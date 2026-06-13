@@ -36,9 +36,10 @@ ORE_STAT_CATEGORIES = {
         "block_chance_close", "block_chance_ranged", "regen_bonus", "lantern_bonus", "aggro_mod", "stupidity"
     },
     "purple_stone": {
-        "magic_stave_bonus", "magic_light_stave_bonus", "magic_heal_ratio",
-        "magic_fire_damage", "magic_fire_range", "magic_knockback_damage",
-        "magic_invincible_turns"
+        "magic_stave_bonus", "magic_light_stave_bonus"
+        # 以下は現在未使用（メイジ職廃止のため）。復活する場合はセットに追加するだけでOK:
+        # "magic_fire_damage", "magic_fire_range", "magic_heal_ratio",
+        # "magic_knockback_damage", "magic_invincible_turns"
     }
 }
 
