@@ -265,20 +265,20 @@ CONSUMABLE_DATA:
     shop_buyable: false
     describe: "加護が宿る石 鍛冶屋で回避や回復、特殊効果などのパラメータを1つ選択して強化できる"
     floor_spawnable: true
-  purple_stone:
-    quest_targetable: true
-    name: "紫の鉱石"
-    effect: material
-    enhance_bonus: 1
-    price: 8000
-    min_rank: F
-    max_rank: SS
-    rarity: 4
-    image_path: components/pictures/icon/purple_stone.png
-    max_stack: 3
-    shop_buyable: false
-    describe: "加護が宿る石 鍛冶屋で杖関連のパラメータを1つ選択して強化できる"
-    floor_spawnable: true
+  # purple_stone:
+  #   quest_targetable: true
+  #   name: "紫の鉱石"
+  #   effect: material
+  #   enhance_bonus: 1
+  #   price: 8000
+  #   min_rank: F
+  #   max_rank: SS
+  #   rarity: 4
+  #   image_path: components/pictures/icon/purple_stone.png
+  #   max_stack: 3
+  #   shop_buyable: false
+  #   describe: "加護が宿る石 鍛冶屋で杖関連のパラメータを1つ選択して強化できる"
+  #   floor_spawnable: true
 
   guild_cert_e:
     quest_targetable: true
