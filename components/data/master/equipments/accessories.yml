@@ -60,7 +60,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/basic_lantern.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 周囲を微かに照らすカンテラ
     growth: {bonus_limit: 1, times_limit: 10, over_limit_growth_rate: 0.001}
@@ -103,7 +106,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 強い光で周囲を照らし出す指輪 防御力が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -146,7 +152,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 装備者の腕力を高める指輪 攻撃力が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -189,7 +198,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 装備者の生命力を活性化させる指輪 最大HPが上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -232,7 +244,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 装備者の致命の感覚を鋭くする指輪 会心率が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -275,7 +290,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 装備者の気配を絶つ魔力が込められた指輪 敵に見つかりにくくなる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -318,7 +336,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 装備者の狙いを正確にする指輪 命中率が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -361,7 +382,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 聖なる癒やしの力を宿す指輪 回復効果が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -404,7 +428,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 装備者の身のこなしを軽くする指輪 回避率が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -447,7 +474,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 鋭い魔力で敵の鎧を貫く指輪 防御無視率が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -490,7 +520,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 生命力が少しずつ戻る不思議な指輪 自然回復が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -533,7 +566,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 敵の思考を狂わせる呪いの指輪 混乱を与えやすくなる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -576,7 +612,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 秘薬の効果を引き出す指輪 秘薬の効果と持続が上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -619,7 +658,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 炎の魔力を増幅する指輪 炎魔法のダメージが上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -662,7 +704,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 突風の魔力を宿す指輪 吹き飛ばしダメージが上がる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -705,7 +750,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 聖なる光で身を守る指輪 無敵時間が延びる
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -748,7 +796,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 杖に込められた魔力を増幅する指輪 杖の使用回数が増える
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}
@@ -790,7 +841,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: false
+    shop:
+      buyable: false
+      usually_buyable: false
+      special_buyable: false
     floor_spawnable: false
     describe: テスト用。全ボーナスが乗っているアクセサリ
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
@@ -833,7 +887,10 @@ ACCESSORY_DATA:
     image_path: components/pictures/icon/ring.png
     sound: components/sounds/sfx/equip.wav
     image_scale: 1.0
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     floor_spawnable: true
     describe: 装備者の身を守る魔力が込められた指輪
     growth: {bonus_limit: 5, times_limit: 50, over_limit_growth_rate: 0.005}

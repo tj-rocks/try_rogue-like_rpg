@@ -483,6 +483,7 @@ class Player(Entity):
         self.boss_message_shown = False # ボス発見メッセージ表示済みフラグ
         self.curse_level = 0
         self.cursed_stats = []
+        self.shop_bonus_refresh = False  # ミッション達成後にショップ品揃え拡張
 
         if PLAYER_ARMOR and PLAYER_ARMOR in ARMOR_DATA:
             inst = EquipInstance("armor", PLAYER_ARMOR); self.armor_inventory.append(inst); self._apply_armor(inst)
