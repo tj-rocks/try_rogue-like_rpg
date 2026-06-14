@@ -1143,7 +1143,10 @@ class Dungeon:
                 px, py = gx * self.tile_size, gy * self.tile_size
                 
                 item = None
-                if chosen_type == "weapon": item = DroppedWeapon(px, py, chosen_key, chosen_data)
+                if chosen_type == "weapon":
+                    # 強化済み装備ドロップの判定
+                    enhance, stats = self._generate_enhanced_drop(floor)
+                    item = DroppedWeapon(px, py, chosen_key, chosen_data, enhance=enhance, stats=stats)
                 elif chosen_type == "consumable": item = DroppedConsumable(px, py, chosen_key, chosen_data)
                 elif chosen_type == "armor": item = DroppedArmor(px, py, chosen_key, chosen_data)
                 elif chosen_type == "shield": item = DroppedShield(px, py, chosen_key, chosen_data)
@@ -1240,6 +1243,42 @@ class Dungeon:
                     item = DroppedConsumable(px, py, e_key, e_data)
                     self.dropped_items.append(item)
                     print(f"[Dungeon] Forced spawn of event item: {e_key} at {spawn_pos} (furthest room)")
+
+    def _generate_enhanced_drop(self, floor):
+        """強化済み装備ドロップの判定とステータス生成
+        
+        Returns:
+            tuple: (enhance_count, stats_dict) - 強化回数とステータス辞書
+        """
+        import random
+        from constants import (
+            ENHANCED_DROP_MIN_FLOOR, ENHANCED_DROP_CHANCE,
+            ENHANCED_DROP_MIN_ENHANCE, ENHANCED_DROP_MAX_ENHANCE
+        )
+        
+        # Cランク以上のフロアで確率判定
+        if floor < ENHANCED_DROP_MIN_FLOOR:
+            return 0, {}
+        
+        if random.random() > ENHANCED_DROP_CHANCE:
+            return 0, {}
+        
+        # 強化回数を決定（3〜10）
+        enhance = random.randint(ENHANCED_DROP_MIN_ENHANCE, ENHANCED_DROP_MAX_ENHANCE)
+        
+        # ランダムにステータスを分配
+        stats = {}
+        upgradeable_stats = [
+            "attack", "accuracy_close", "accuracy_range", "crit_rate",
+            "hp", "defense", "block_chance_close", "block_chance_ranged",
+            "regen", "armor_penetration"
+        ]
+        
+        for _ in range(enhance):
+            stat = random.choice(upgradeable_stats)
+            stats[stat] = stats.get(stat, 0) + 1
+        
+        return enhance, stats
 
     def create_corridor(self, x1, x2, y1, y2, width=1):
         for x in range(min(x1, x2), max(x1, x2) + 1):

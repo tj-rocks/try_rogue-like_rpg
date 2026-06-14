@@ -682,9 +682,13 @@ class Player(Entity):
     def set_facing(self, direction):
         if self.facing != direction: self.facing = direction; self.walk_anim_timer = 0
 
-    def equip_weapon_by_key(self, wk):
+    def equip_weapon_by_key(self, wk, enhance=0, stats=None):
         if wk not in WEAPON_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
         inst = EquipInstance("weapon", wk)
+        if enhance > 0:
+            inst.enhance = enhance
+        if stats:
+            inst.stats = stats.copy()
         self.weapon_inventory.append(inst)
         return inst
 

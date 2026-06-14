@@ -102,6 +102,14 @@ CURSE_REDUCTION_RATE = _curse.get("reduction_rate", 0.10)
 CURSE_RECOVERY_COST_GP_PER_LEVEL = _curse.get("recovery_cost_gp_per_level", 50)
 CURSE_RECOVERY_COST_GOLD_MULTIPLIER = _curse.get("recovery_cost_gold_multiplier", 10)
 
+# --- 強化済み装備ドロップ設定 (Enhanced Drop) ---
+_enh_drop = _balance.get("ENHANCED_DROP_CONFIG", {})
+ENHANCED_DROP_MIN_FLOOR = _enh_drop.get("min_floor", 21)
+ENHANCED_DROP_CHANCE = _enh_drop.get("occurrence_chance", 0.10)
+ENHANCED_DROP_MIN_ENHANCE = _enh_drop.get("min_enhance", 3)
+ENHANCED_DROP_MAX_ENHANCE = _enh_drop.get("max_enhance", 10)
+ENHANCED_DROP_STAT_ALLOCATION = _enh_drop.get("stat_allocation", "random")
+
 PLAYER_WEAPON   = "old_sword"
 PLAYER_ARMOR    = "adventurers_clothes"
 PLAYER_SHIELD   = None

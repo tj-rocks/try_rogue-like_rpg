@@ -86,10 +86,15 @@ class Coin(Item):
 
 class DroppedWeapon(Item):
     """地面に落ちた武器アイテム。"""
-    def __init__(self, x, y, weapon_key, weapon_data):
-        super().__init__(x, y, weapon_data.get("name", weapon_key), "weapon")
+    def __init__(self, x, y, weapon_key, weapon_data, enhance=0, stats=None):
+        name = weapon_data.get("name", weapon_key)
+        if enhance > 0:
+            name = f"{name}+{enhance}"
+        super().__init__(x, y, name, "weapon")
         self.weapon_key = weapon_key
         self.weapon_data = weapon_data
+        self.enhance = enhance
+        self.stats = stats or {}
         # 共通画像を使用
         from constants import COMMON_ITEM_IMAGES
         self._image = self._load_item_image({"image_path": COMMON_ITEM_IMAGES["weapon"]})
@@ -113,7 +118,7 @@ class DroppedWeapon(Item):
         
         self.is_collected = True
         if hasattr(player, "equip_weapon_by_key"):
-            player.equip_weapon_by_key(self.weapon_key)
+            player.equip_weapon_by_key(self.weapon_key, enhance=self.enhance, stats=self.stats)
         from wordings import Text
         return Text.Items.GET.format(name=self.name)
 
