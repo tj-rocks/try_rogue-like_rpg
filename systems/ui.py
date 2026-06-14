@@ -856,7 +856,14 @@ class OreSelectionDialog:
                             player = self.player_ref
                             item_type, iid = self.target_item_data
                             psd.update_from_selection(player, item_type, iid, ore_key)
-                            psd.is_active = True
+                            if psd.max_limit_reached:
+                                from systems.game_state import game_state
+                                dialog = game_state.get("dialog")
+                                if dialog:
+                                    dialog.text = "この装備はこれ以上鍛えられないよ。\n十分に仕上がっている。"
+                                    dialog.is_active = True
+                            else:
+                                psd.is_active = True
 
     def draw(self, screen):
         if not self.is_active: return
@@ -1184,7 +1191,10 @@ class BaseListDialog:
             if inst and hasattr(inst, "equip_type"):
                 remaining = get_upgrades_to_next_rank(inst, stat_key)
                 if remaining is not None and remaining > 0:
-                    n_text = self.font.render(f"あと{remaining}回", True, (160, 180, 200))
+                    if remaining > 100:
+                        n_text = self.font.render("Max Limit", True, (100, 100, 120))
+                    else:
+                        n_text = self.font.render(f"あと{remaining}回", True, (160, 180, 200))
                     screen.blit(n_text, (start_x + half_w + bar_w + 22, y))
             max_y = y + line_h
         
@@ -1231,12 +1241,14 @@ class ParameterSelectionDialog(BaseListDialog):
     def get_item_label(self, item, idx):
         if item == "cancel":
             return Text.UI.QUIT
-        stat_key, label, before, after, is_pct = item
+        stat_key, label, before, after, is_pct, *rest = item
         return label
 
     def get_item_color(self, item, idx, is_selected):
         if item == "cancel":
             return (255, 255, 100) if is_selected else (200, 200, 200)
+        if isinstance(item, tuple) and item[0] == "max_limit":
+            return (80, 80, 100)
         return (255, 255, 100) if is_selected else (255, 255, 255)
 
     def get_detail_lines(self, player):
@@ -1246,11 +1258,16 @@ class ParameterSelectionDialog(BaseListDialog):
         item = self.available_params[self.cursor_idx]
         if item == "cancel":
             return []
-        stat_key, label, before, after, is_pct = item
+        stat_key, label, before, after, is_pct, *rest = item
+        if stat_key == "max_limit":
+            return [label, "", "これ以上は鍛えられない。"]
+        is_int_pct = rest[0] if rest else False
         if is_pct:
             before_val = before * 100 if isinstance(before, float) else before
             after_val  = after  * 100 if isinstance(after,  float) else after
             unit = "%"
+        elif is_int_pct:
+            before_val, after_val, unit = before, after, "%"
         else:
             before_val, after_val, unit = before, after, ""
 
@@ -1271,7 +1288,10 @@ class ParameterSelectionDialog(BaseListDialog):
             from constants import get_upgrades_to_next_rank
             remaining = get_upgrades_to_next_rank(self._inst_ref, stat_key)
             if remaining is not None and remaining > 0:
-                lines.append(f"次のランクまで あと{remaining}回")
+                if remaining > 100:
+                    lines.append("Max Limit")
+                else:
+                    lines.append(f"次のランクまで あと{remaining}回")
             elif remaining == 0:
                 lines.append("★ ランクアップ！")
         return lines
@@ -1334,19 +1354,29 @@ class ParameterSelectionDialog(BaseListDialog):
             "accuracy_bonus_close": "命中率",
             "accuracy_bonus": "命中率",
         }
-        # %として表示するステータス（値が0〜1の float で格納されているもの、または命中率などの%表記パラメータ）
+        # %として表示するステータス（値が0〜1の float で格納、表示時に*100）
         PCT_KEYS = {
             "crit_bonus", "crit_rate",
             "block_chance_close", "block_chance_ranged", "armor_penetration",
             "magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage",
-            "accuracy_bonus_close",
         }
+        # 整数パーセント値（そのまま%付きで表示、*100しない）
+        INT_PCT_KEYS = {"accuracy_bonus_close", "accuracy_bonus", "accuracy_bonus_ranged"}
 
         orig_enhance = inst.enhance
         orig_stats   = inst.stats.copy()
 
+        from constants import get_upgrades_to_next_rank
+
         self.available_params = []
         for k in target_stats:
+            # Max Limit チェック: 残り100回超えなら鍛えられない（グレーアウト表示）
+            remaining = get_upgrades_to_next_rank(inst, k)
+            if remaining is not None and remaining > 100:
+                label = ALL_LABEL_MAP.get(k, k)
+                self.available_params.append(("max_limit", f"{label} (Max Limit)", 0, 0, False, False))
+                continue
+
             # before
             inst.enhance = orig_enhance
             inst.stats   = orig_stats.copy()
@@ -1363,13 +1393,18 @@ class ParameterSelectionDialog(BaseListDialog):
 
             label   = ALL_LABEL_MAP.get(k, k)
             is_pct  = k in PCT_KEYS
-            self.available_params.append((k, label, before, after, is_pct))
+            is_int_pct = k in INT_PCT_KEYS
+            self.available_params.append((k, label, before, after, is_pct, is_int_pct))
 
         # 元に戻す
         inst.enhance = orig_enhance
         inst.stats   = orig_stats
 
         self.available_params.append("cancel")
+
+        # 全パラメータがMax Limitの場合（通常選択可能な項目がゼロ）
+        selectable = [p for p in self.available_params if p != "cancel" and not (isinstance(p, tuple) and p[0] == "max_limit")]
+        self.max_limit_reached = len(selectable) == 0
 
         # BaseListDialog.items にラベルを同期（描画で使用）
         self.items = self.available_params
@@ -1392,11 +1427,16 @@ class ParameterSelectionDialog(BaseListDialog):
                 return
             if item is None:
                 return
+            # Max Limit項目は選択不可
+            if isinstance(item, tuple) and item[0] == "max_limit":
+                play_sfx(SOUND_CANCEL)
+                return
 
             play_sfx(SOUND_SELECT)
             self.is_active = False
 
-            stat_key, label, before, after, is_pct = item
+            stat_key, label, before, after, is_pct, *rest = item
+            is_int_pct = rest[0] if rest else False
             cd = self.confirm_dialog
             player = self.player_ref
             if cd and player and self.target_item_data and self._inst_ref:
@@ -1405,6 +1445,8 @@ class ParameterSelectionDialog(BaseListDialog):
                     bv = before * 100 if isinstance(before, float) else before
                     av = after  * 100 if isinstance(after,  float) else after
                     unit = "%"
+                elif is_int_pct:
+                    bv, av, unit = before, after, "%"
                 else:
                     bv, av, unit = before, after, ""
 
@@ -2887,6 +2929,9 @@ class GuildDialog:
                 player.guild_point += gp_reward
                 if q.get("id"): player.completed_fixed_quests.append(q["id"])
                 dialog.is_active = True
+
+            # ミッション達成→次回ショップ品揃え拡張
+            player.shop_bonus_refresh = True
 
             # 報告完了画面（フラッシュ）のためにモードとアイテムをセット
             self.mode = "AUTO_REPORT"

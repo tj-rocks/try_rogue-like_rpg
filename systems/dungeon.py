@@ -886,7 +886,12 @@ class Dungeon:
                             self.map_data[r][c] = 0
                 if not self.rooms: self.rooms = [self.start_pos]
                 else: self.rooms = [self.start_pos] # 固定マップでは開始地点を優先
-                self.refresh_shop_stock(player_rank=getattr(self.player, "guild_rank", "-"))
+                # 村(0F)はプレイヤーランク、休憩所はフロアに対応するランクで在庫決定
+                if self.current_floor == 0:
+                    shop_rank = getattr(self.player, "guild_rank", "-")
+                else:
+                    shop_rank = self.guild_system.get_required_rank_for_floor(self.current_floor) if self.guild_system else "F"
+                self.refresh_shop_stock(player_rank=shop_rank)
                 self.enemies = [e for e in self.enemies if getattr(e, "is_static", False)]
                 
                 # --- [NEW] 外部化されたエンティティ座標データ (positions) からキャラ/障害物を配置 ---
@@ -1522,8 +1527,16 @@ class Dungeon:
         return textures
 
     def refresh_shop_stock(self, player_rank="-"):
-        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, ACCESSORY_DATA, CONSUMABLE_DATA, STAVE_DATA, ITEM_DROP_RATES
-        
+        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, ACCESSORY_DATA, CONSUMABLE_DATA, STAVE_DATA, ITEM_DROP_RATES, RANK_ORDER
+
+        # ミッション達成ボーナスフラグ
+        bonus_mode = getattr(self.player, "shop_bonus_refresh", False) if self.player else False
+        if bonus_mode and self.player:
+            self.player.shop_bonus_refresh = False
+
+        SHOP_LIMIT_NORMAL = 10
+        SHOP_LIMIT_BONUS = 30
+
         # 出現率をレアリティから算出（ドロップ率の5倍をショップ出現率とする）
         def get_shop_rate(v):
             rarity = v.get("rarity", 1)
@@ -1535,83 +1548,77 @@ class Dungeon:
             req_rank = v.get("min_rank") or v.get("rank") or "F"
             return self.guild_system.is_rank_at_least(player_rank, req_rank)
 
-        # --- 1. 武器屋 (武器・防具・盾・アクセサリ) ---
-        weapon_cands = []
-        for k, v in WEAPON_DATA.items():
-            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
-                weapon_cands.append({"key": k, "type": "weapon", "name": v["name"], "price": v["price"], "count": 1})
-        for k, v in ARMOR_DATA.items():
-            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
-                weapon_cands.append({"key": k, "type": "armor", "name": v["name"], "price": v["price"], "count": 1})
-        for k, v in SHIELD_DATA.items():
-            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
-                weapon_cands.append({"key": k, "type": "shield", "name": v["name"], "price": v["price"], "count": 1})
-        # アクセサリはアクセサリ専用店でのみ販売
-        
-        # 最低在庫保証 (武器・防具・盾・アクセサリ 合計3枠)
-        if not weapon_cands:
-            all_buyable = []
-            for k, v in WEAPON_DATA.items():
-                if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "weapon", v))
-            for k, v in ARMOR_DATA.items():
-                if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "armor", v))
-            for k, v in SHIELD_DATA.items():
-                if v.get("shop_buyable", True) and is_rank_ok(v): all_buyable.append((k, "shield", v))
-            
-            if all_buyable:
-                while len(weapon_cands) < 3:
-                    k, t, v = random.choice(all_buyable)
-                    weapon_cands.append({"key": k, "type": t, "name": v["name"], "price": v["price"], "count": 1})
-        
-        self.weapon_shop_stock = weapon_cands[:10]
+        # 通常時: usually_buyable かつ min_rank がプレイヤーランク以下で最も高いもの
+        def get_fixed_items(data_dict, item_type):
+            """通常時: usually_buyable品のうち、min_rankがプレイヤーランク以下で最も高いものを返す"""
+            p_idx = RANK_ORDER.index(player_rank) if player_rank in RANK_ORDER else 0
+            best_rank_idx = -1
+            items = []
+            for k, v in data_dict.items():
+                shop = v.get("shop", {})
+                if not shop.get("usually_buyable", False): continue
+                min_rank = v.get("min_rank", "F")
+                if min_rank not in RANK_ORDER: continue
+                f_idx = RANK_ORDER.index(min_rank)
+                if f_idx <= p_idx:
+                    if f_idx > best_rank_idx:
+                        best_rank_idx = f_idx
+                        items = [(k, v)]
+                    elif f_idx == best_rank_idx:
+                        items.append((k, v))
+            return [{"key": k, "type": item_type, "name": v["name"], "price": v["price"], "count": 1} for k, v in items]
+
+        # ボーナスモード: special_buyable かつランクOKの全品
+        def get_bonus_items(data_dict, item_type):
+            """ミッション後: special_buyable品を全部並べる"""
+            result = []
+            for k, v in data_dict.items():
+                shop = v.get("shop", {})
+                if shop.get("special_buyable", False) and is_rank_ok(v):
+                    result.append({"key": k, "type": item_type, "name": v["name"], "price": v["price"], "count": 1})
+            return result
+
+        # --- 1. 武器屋 (武器・防具・盾) ---
+        if bonus_mode:
+            weapon_cands = get_bonus_items(WEAPON_DATA, "weapon") + get_bonus_items(ARMOR_DATA, "armor") + get_bonus_items(SHIELD_DATA, "shield")
+        else:
+            weapon_cands = get_fixed_items(WEAPON_DATA, "weapon") + get_fixed_items(ARMOR_DATA, "armor") + get_fixed_items(SHIELD_DATA, "shield")
+        self.weapon_shop_stock = weapon_cands[:SHOP_LIMIT_BONUS if bonus_mode else SHOP_LIMIT_NORMAL]
 
         # --- 1.2 武器専用屋 (武器のみ) ---
-        d_weapon_cands = []
-        for k, v in WEAPON_DATA.items():
-            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
-                d_weapon_cands.append({"key": k, "type": "weapon", "name": v["name"], "price": v["price"], "count": 1})
-        if not d_weapon_cands:
-            all_weapons = [(k, v) for k, v in WEAPON_DATA.items() if v.get("shop_buyable", True) and is_rank_ok(v)]
-            if all_weapons:
-                while len(d_weapon_cands) < 3:
-                    k, v = random.choice(all_weapons)
-                    d_weapon_cands.append({"key": k, "type": "weapon", "name": v["name"], "price": v["price"], "count": 1})
-        self.dedicated_weapon_shop_stock = d_weapon_cands[:10]
+        if bonus_mode:
+            d_weapon_cands = get_bonus_items(WEAPON_DATA, "weapon")
+        else:
+            d_weapon_cands = get_fixed_items(WEAPON_DATA, "weapon")
+        self.dedicated_weapon_shop_stock = d_weapon_cands[:SHOP_LIMIT_BONUS if bonus_mode else SHOP_LIMIT_NORMAL]
 
         # --- 1.3 防具専用屋 (防具・盾のみ) ---
-        d_armor_cands = []
-        for k, v in ARMOR_DATA.items():
-            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
-                d_armor_cands.append({"key": k, "type": "armor", "name": v["name"], "price": v["price"], "count": 1})
-        for k, v in SHIELD_DATA.items():
-            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
-                d_armor_cands.append({"key": k, "type": "shield", "name": v["name"], "price": v["price"], "count": 1})
-        if not d_armor_cands:
-            all_armors = []
-            for k, v in ARMOR_DATA.items():
-                if v.get("shop_buyable", True) and is_rank_ok(v): all_armors.append((k, "armor", v))
-            for k, v in SHIELD_DATA.items():
-                if v.get("shop_buyable", True) and is_rank_ok(v): all_armors.append((k, "shield", v))
-            if all_armors:
-                while len(d_armor_cands) < 3:
-                    k, t, v = random.choice(all_armors)
-                    d_armor_cands.append({"key": k, "type": t, "name": v["name"], "price": v["price"], "count": 1})
-        self.dedicated_armor_shop_stock = d_armor_cands[:10]
+        if bonus_mode:
+            d_armor_cands = get_bonus_items(ARMOR_DATA, "armor") + get_bonus_items(SHIELD_DATA, "shield")
+        else:
+            d_armor_cands = get_fixed_items(ARMOR_DATA, "armor") + get_fixed_items(SHIELD_DATA, "shield")
+        self.dedicated_armor_shop_stock = d_armor_cands[:SHOP_LIMIT_BONUS if bonus_mode else SHOP_LIMIT_NORMAL]
 
         # --- 1.4 アクセサリ専用屋 (アクセサリのみ) ---
-        d_acc_cands = []
-        for k, v in ACCESSORY_DATA.items():
-            if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
-                d_acc_cands.append({"key": k, "type": "accessory", "name": v["name"], "price": v["price"], "count": 1})
-        if not d_acc_cands:
-            all_accs = [(k, v) for k, v in ACCESSORY_DATA.items() if v.get("shop_buyable", True) and is_rank_ok(v)]
-            if all_accs:
-                while len(d_acc_cands) < 3:
-                    k, v = random.choice(all_accs)
-                    d_acc_cands.append({"key": k, "type": "accessory", "name": v["name"], "price": v["price"], "count": 1})
-        self.dedicated_accessory_shop_stock = d_acc_cands[:10]
+        if bonus_mode:
+            d_acc_cands = get_bonus_items(ACCESSORY_DATA, "accessory")
+        else:
+            d_acc_cands = get_fixed_items(ACCESSORY_DATA, "accessory")
+            # アクセサリにfixed品がない場合、ランダムで補充
+            if not d_acc_cands:
+                for k, v in ACCESSORY_DATA.items():
+                    shop = v.get("shop", {})
+                    if shop.get("special_buyable", False) and is_rank_ok(v) and random.random() < get_shop_rate(v):
+                        d_acc_cands.append({"key": k, "type": "accessory", "name": v["name"], "price": v["price"], "count": 1})
+                if not d_acc_cands:
+                    all_accs = [(k, v) for k, v in ACCESSORY_DATA.items() if v.get("shop", {}).get("special_buyable", False) and is_rank_ok(v)]
+                    if all_accs:
+                        while len(d_acc_cands) < 3:
+                            k, v = random.choice(all_accs)
+                            d_acc_cands.append({"key": k, "type": "accessory", "name": v["name"], "price": v["price"], "count": 1})
+        self.dedicated_accessory_shop_stock = d_acc_cands[:SHOP_LIMIT_BONUS if bonus_mode else SHOP_LIMIT_NORMAL]
 
-        # --- 2. 道具屋 (消耗品) ---
+        # --- 2. 道具屋 (消耗品) --- ※従来通りランダム
         item_cands = []
         for k, v in CONSUMABLE_DATA.items():
             if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
@@ -1624,9 +1631,9 @@ class Dungeon:
                 while len(item_cands) < 3:
                     k, v = random.choice(all_items)
                     item_cands.append({"key": k, "type": "consumable", "name": v["name"], "price": v["price"], "count": random.randint(1, 5)})
-        self.item_shop_stock = item_cands[:10]
+        self.item_shop_stock = item_cands[:SHOP_LIMIT_NORMAL]
 
-        # --- 3. 魔法屋 (杖) ---
+        # --- 3. 魔法屋 (杖) --- ※従来通りランダム
         magic_cands = []
         for k, v in STAVE_DATA.items():
             if v.get("shop_buyable", True) and is_rank_ok(v) and random.random() < get_shop_rate(v):
@@ -1639,7 +1646,7 @@ class Dungeon:
                 while len(magic_cands) < 2:
                     k, v = random.choice(all_staves)
                     magic_cands.append({"key": k, "type": "stave", "name": v["name"], "price": v["price"], "count": 1})
-        self.magic_shop_stock = magic_cands[:10]
+        self.magic_shop_stock = magic_cands[:SHOP_LIMIT_NORMAL]
 
     def spawn_traps(self, player):
         from constants import TRAP_SPAWN_MIN, TRAP_SPAWN_MAX, TRAP_SPAWN_SCALE_EVERY, TRAP_SPAWN_SCALE_ADD, TRAP_SPAWN_SCALE_LIMIT, TRAP_DATA

@@ -42,7 +42,10 @@ SHIELD_DATA:
     rarity: 2
     price: 100
     image_dir: components/pictures/shield/broken_shield
-    shop_buyable: false
+    shop:
+      buyable: false
+      usually_buyable: false
+      special_buyable: false
     describe: 大きくひび割れた盾. 気休め程度にはなる.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
@@ -82,7 +85,10 @@ SHIELD_DATA:
     rarity: 1
     price: 50
     image_dir: components/pictures/shield/wooden_round_shield
-    shop_buyable: true
+    shop:
+      buyable: false
+      usually_buyable: false
+      special_buyable: false
     describe: 木板を張り合わせただけの簡素な盾. 初心者向け.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
@@ -122,7 +128,10 @@ SHIELD_DATA:
     rarity: 2
     price: 200
     image_dir: components/pictures/shield/leather_round_shield
-    shop_buyable: true
+    shop:
+      buyable: false
+      usually_buyable: false
+      special_buyable: false
     describe: 丈夫な皮を張った円盾.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
@@ -162,7 +171,10 @@ SHIELD_DATA:
     rarity: 2
     price: 300
     image_dir: components/pictures/shield/iron_round_shield
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: true
+      special_buyable: true
     describe: 鉄で作られた頑丈な盾.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
@@ -202,7 +214,10 @@ SHIELD_DATA:
     rarity: 3
     price: 500
     image_dir: components/pictures/shield/fullmetal_round_shield
-    shop_buyable: false
+    shop:
+      buyable: true
+      usually_buyable: true
+      special_buyable: true
     describe: 硬い鋼の盾. 近接攻撃を弾きやすい.
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
@@ -242,7 +257,10 @@ SHIELD_DATA:
     rarity: 3
     price: 2000
     image_dir: components/pictures/shield/fighters_sheld
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: true
+      special_buyable: true
     describe: 標準的な戦士の盾。特別な補正はなく、扱いやすい。
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
@@ -282,7 +300,10 @@ SHIELD_DATA:
     rarity: 3
     price: 1200
     image_dir: components/pictures/shield/hunters_wood_sheild
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     describe: 隠密性と回避力を高めるため、極限まで軽量化された木製の盾
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
@@ -322,7 +343,10 @@ SHIELD_DATA:
     rarity: 4
     price: 4000
     image_dir: components/pictures/shield/knight_heavy_sheld
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     describe: 圧倒的なガード率を誇る重厚な盾 その大きさゆえに身動きが鈍くなり、敵に狙われやすい
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
@@ -362,7 +386,10 @@ SHIELD_DATA:
     rarity: 4
     price: 3200
     image_dir: components/pictures/shield/pilgrimss_round_sheld
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     describe: 聖なる加護を受けた巡礼者の盾 所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
@@ -402,7 +429,10 @@ SHIELD_DATA:
     rarity: 3
     price: 2600
     image_dir: components/pictures/shield/scount_blackleather_sheld
-    shop_buyable: true
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
     describe: 黒く染められた軽量の革盾 敵に見つかりにくくなり、高い回避率と会心率を誇る
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
     image_scale: 1.0
@@ -443,7 +473,10 @@ SHIELD_DATA:
     rarity: 1
     price: 1
     image_dir: components/pictures/shield/test_all_bonus_shield
-    shop_buyable: false
+    shop:
+      buyable: false
+      usually_buyable: false
+      special_buyable: false
     floor_spawnable: false
     describe: テスト用。全ボーナスが乗っている盾
     growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
