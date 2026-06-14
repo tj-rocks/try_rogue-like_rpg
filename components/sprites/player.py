@@ -122,23 +122,37 @@ class EquipInstance:
         growth = data.get("growth")
         if not growth:
             # デフォルト成長設定
-            growth = {"bonus_limit": 2, "times_limit": 50, "over_limit_growth_rate": 0.003}
+            growth = {"bonus_limit": 2, "times_limit": 30, "over_limit_growth_rate": 0.003}
 
         stat_enhance = self.stats.get(stat_key, self.enhance)
         if stat_enhance == 0:
             return 0
 
-        bonus_limit = growth.get("bonus_limit", 2)
-        times_limit = max(1, growth.get("times_limit", 50))
+        times_limit = max(1, growth.get("times_limit", 30))
         over_rate   = growth.get("over_limit_growth_rate", 0.003)
 
-        growth_room   = base * (bonus_limit - 1)
-        per_step      = growth_room / times_limit
-        over_per_step = base * over_rate
-
-        if stat_enhance <= times_limit:
-            bonus = stat_enhance * per_step
+        # 固定上限方式：基本値に関係なく一律+10（整数系）または+10%（%系）
+        is_pct_stat = base < 0.1  # 0.1未満は%系とみなす
+        if is_pct_stat:
+            growth_room = 0.10  # +10%固定
         else:
+            growth_room = 10    # +10固定
+        
+        per_step      = growth_room / times_limit
+        over_per_step = growth_room * over_rate
+
+        # 減衰カーブ方式：最初に大きく上がり、後半は微増
+        if stat_enhance <= 10:
+            # 1-10回：50%の成長（+5相当）
+            bonus = stat_enhance * (growth_room * 0.5 / 10)
+        elif stat_enhance <= 20:
+            # 11-20回：30%の成長（+3相当）
+            bonus = (growth_room * 0.5) + (stat_enhance - 10) * (growth_room * 0.3 / 10)
+        elif stat_enhance <= times_limit:
+            # 21-30回：20%の成長（+2相当）
+            bonus = (growth_room * 0.8) + (stat_enhance - 20) * (growth_room * 0.2 / 10)
+        else:
+            # 限界超え：微増のみ
             bonus = growth_room + (stat_enhance - times_limit) * over_per_step
             
         # aggro_mod の場合は、計算された正のボーナスに -1 を掛けて負のボーナスとして返す
