@@ -158,8 +158,8 @@ def setup_gungeon_mode(dungeon, player):
                 # 強化済みドロップ判定（Cランク以上で確率）
                 if floor >= ENHANCED_DROP_MIN_FLOOR and random.random() <= ENHANCED_DROP_CHANCE:
                     enhance = random.randint(ENHANCED_DROP_MIN_ENHANCE, ENHANCED_DROP_MAX_ENHANCE)
-                    # ランダムステータス分配
-                    upgradeable = ["attack", "defense", "hp", "crit_rate", "block_chance_close", "block_chance_ranged", "accuracy_close", "accuracy_range"]
+                    # ランダムステータス分配（get_enhance_bonusと一致する_key名）
+                    upgradeable = ["attack_bonus", "defense_bonus", "hp_bonus", "crit_rate", "block_chance_close", "block_chance_ranged", "accuracy_bonus_close", "accuracy_bonus_range"]
                     stats = {}
                     for _ in range(enhance):
                         stat = random.choice(upgradeable)
@@ -309,6 +309,16 @@ def main():
         player.armor_inventory.append(EquipInstance("armor", "test_all_bonus_armor"))
         player.shield_inventory.append(EquipInstance("shield", "test_all_bonus_shield"))
         player.accessory_inventory.append(EquipInstance("accessory", "test_all_bonus_accessory"))
+        
+        # 【テスト用】皮の鎧と皮の鎧+10を追加
+        leather_armor_base = EquipInstance("armor", "leather_breastplate")
+        player.armor_inventory.append(leather_armor_base)
+        
+        leather_armor_plus10 = EquipInstance("armor", "leather_breastplate")
+        leather_armor_plus10.enhance = 10
+        # defense_bonusに全振り
+        leather_armor_plus10.stats = {"defense_bonus": 10}
+        player.armor_inventory.append(leather_armor_plus10)
 
         # 2. ダンジョンの初期化 (1階から開始)
         dungeon = warp_to_floor(1, player)

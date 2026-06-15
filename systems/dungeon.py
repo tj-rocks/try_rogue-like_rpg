@@ -1267,12 +1267,12 @@ class Dungeon:
         # 強化回数を決定（3〜10）
         enhance = random.randint(ENHANCED_DROP_MIN_ENHANCE, ENHANCED_DROP_MAX_ENHANCE)
         
-        # ランダムにステータスを分配
+        # ランダムにステータスを分配（get_enhance_bonusと一致する_key名）
         stats = {}
         upgradeable_stats = [
-            "attack", "accuracy_close", "accuracy_range", "crit_rate",
-            "hp", "defense", "block_chance_close", "block_chance_ranged",
-            "regen", "armor_penetration"
+            "attack_bonus", "accuracy_bonus_close", "accuracy_bonus_range", "crit_rate",
+            "hp_bonus", "defense_bonus", "block_chance_close", "block_chance_ranged",
+            "regen_bonus", "armor_penetration"
         ]
         
         for _ in range(enhance):

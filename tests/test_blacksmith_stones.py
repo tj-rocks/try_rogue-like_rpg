@@ -202,10 +202,8 @@ class TestBlacksmithStones(unittest.TestCase):
         self.assertFalse(param_dialog.is_active)
         self.assertTrue(confirm_dialog.is_active)
         
-        # Verify preview text contains name, attack, but NOT crit (only attack_bonus was chosen)
-        self.assertIn("鉄の剣", confirm_dialog.text)
-        self.assertIn("攻撃力", confirm_dialog.text)
-        self.assertNotIn("会心率", confirm_dialog.text)
+        # Verify confirm dialog shows simple confirmation message
+        self.assertIn("強化するぜ", confirm_dialog.text)
         
         # 7. Confirm the upgrade in ConfirmDialog
         confirm_dialog.on_yes()

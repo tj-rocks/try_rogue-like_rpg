@@ -12,7 +12,8 @@ from constants import (
     PLAYER_SHIELD, SHIELD_DATA, SHIELD_COLORS, PLAYER_ORE, ACCESSORY_DATA,
     MAX_ITEM_SLOTS, MAX_EQUIP_SLOTS, MAX_STAVE_SLOTS, MAX_WAREHOUSE_SLOTS,
     STAVE_DATA, HIT_STUN_DURATION, SOUND_ATTACK_HIT, SOUND_ATTACK_MISS,
-    ENABLE_DEBUG_LOGGING, PLAYER_MOVE_SPEED, STATUS_EFFECTS
+    ENABLE_DEBUG_LOGGING, PLAYER_MOVE_SPEED, STATUS_EFFECTS,
+    PCT_STAT_KEYS
 )
 
 # 装備品インスタンス管理用カウンター（ゲーム全体でユニークなID）
@@ -124,7 +125,7 @@ class EquipInstance:
             # デフォルト成長設定
             growth = {"bonus_limit": 2, "times_limit": 30, "over_limit_growth_rate": 0.003}
 
-        stat_enhance = self.stats.get(stat_key, self.enhance)
+        stat_enhance = self.stats.get(stat_key, 0)  # 該当statがない場合は0
         if stat_enhance == 0:
             return 0
 
@@ -132,7 +133,7 @@ class EquipInstance:
         over_rate   = growth.get("over_limit_growth_rate", 0.003)
 
         # 固定上限方式：基本値に関係なく一律+10（整数系）または+10%（%系）
-        is_pct_stat = base < 0.1  # 0.1未満は%系とみなす
+        is_pct_stat = stat_key in PCT_STAT_KEYS
         if is_pct_stat:
             growth_room = 0.10  # +10%固定
         else:
