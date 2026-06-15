@@ -106,9 +106,11 @@ CURSE_RECOVERY_COST_GOLD_MULTIPLIER = _curse.get("recovery_cost_gold_multiplier"
 _enh_drop = _balance.get("ENHANCED_DROP_CONFIG", {})
 ENHANCED_DROP_MIN_FLOOR = _enh_drop.get("min_floor", 21)
 ENHANCED_DROP_CHANCE = _enh_drop.get("occurrence_chance", 0.10)
-ENHANCED_DROP_MIN_ENHANCE = _enh_drop.get("min_enhance", 3)
-ENHANCED_DROP_MAX_ENHANCE = _enh_drop.get("max_enhance", 10)
 ENHANCED_DROP_STAT_ALLOCATION = _enh_drop.get("stat_allocation", "random")
+ENHANCED_DROP_RANK_RANGE = _enh_drop.get("rank_enhance_range", {
+    "F": [0, 0], "E": [0, 0], "D": [0, 0],
+    "C": [1, 5], "B": [3, 7], "A": [4, 8], "S": [5, 9], "SS": [5, 12]
+})
 
 PLAYER_WEAPON   = "old_sword"
 PLAYER_ARMOR    = "adventurers_clothes"

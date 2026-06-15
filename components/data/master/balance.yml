@@ -239,8 +239,14 @@ CURSE_SYSTEM:
 # ENHANCED_DROP_CONFIG (強化済み装備ドロップ設定)
 # ------------------------------------------------------------------------------
 ENHANCED_DROP_CONFIG:
-  min_floor: 21             # 発生開始階層 (Cランク相当)
-  occurrence_chance: 1.0   # 発生確率 (10%)
-  min_enhance: 3            # 最小強化回数
-  max_enhance: 10           # 最大強化回数
+  occurrence_chance: 1.0    # 発生確率
   stat_allocation: random   # ステータス分配方式 (random: ランダム)
+  rank_enhance_range:       # ランク別 強化回数範囲 [min, max] (0,0=強化なし)
+    F:  [0, 0]
+    E:  [0, 0]
+    D:  [0, 0]
+    C:  [1, 5]
+    B:  [3, 7]
+    A:  [4, 8]
+    S:  [5, 9]
+    SS: [5, 12]

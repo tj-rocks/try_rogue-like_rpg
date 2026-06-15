@@ -1144,7 +1144,7 @@ class Dungeon:
                 
                 item = None
                 # 強化済み装備ドロップの判定（全装備タイプに適用）
-                enhance, stats = self._generate_enhanced_drop(floor)
+                enhance, stats = self._generate_enhanced_drop(player)
                 
                 if chosen_type == "weapon":
                     item = DroppedWeapon(px, py, chosen_key, chosen_data, enhance=enhance, stats=stats)
@@ -1245,36 +1245,35 @@ class Dungeon:
                     self.dropped_items.append(item)
                     print(f"[Dungeon] Forced spawn of event item: {e_key} at {spawn_pos} (furthest room)")
 
-    def _generate_enhanced_drop(self, floor):
-        """強化済み装備ドロップの判定とステータス生成
+    def _generate_enhanced_drop(self, player):
+        """強化済み装備ドロップの判定とステータス生成（ギルドランク別強化範囲対応）
         
         Returns:
             tuple: (enhance_count, stats_dict) - 強化回数とステータス辞書
         """
         import random
-        from constants import (
-            ENHANCED_DROP_MIN_FLOOR, ENHANCED_DROP_CHANCE,
-            ENHANCED_DROP_MIN_ENHANCE, ENHANCED_DROP_MAX_ENHANCE
-        )
-        
-        # Cランク以上のフロアで確率判定
-        if floor < ENHANCED_DROP_MIN_FLOOR:
-            return 0, {}
+        from constants import ENHANCED_DROP_CHANCE, ENHANCED_DROP_RANK_RANGE
         
         if random.random() > ENHANCED_DROP_CHANCE:
             return 0, {}
         
-        # 強化回数を決定（3〜10）
-        enhance = random.randint(ENHANCED_DROP_MIN_ENHANCE, ENHANCED_DROP_MAX_ENHANCE)
+        # プレイヤーのギルドランクで判定
+        rank = getattr(player, "guild_rank", "F")
         
-        # ランダムにステータスを分配（get_enhance_bonusと一致する_key名）
+        # ランク別の強化範囲を取得
+        enh_range = ENHANCED_DROP_RANK_RANGE.get(rank, [0, 0])
+        min_e, max_e = enh_range[0], enh_range[1]
+        if max_e == 0:
+            return 0, {}
+        
+        enhance = random.randint(min_e, max_e)
+        
         stats = {}
         upgradeable_stats = [
             "attack_bonus", "accuracy_bonus_close", "accuracy_bonus_range", "crit_rate",
             "hp_bonus", "defense_bonus", "block_chance_close", "block_chance_ranged",
             "regen_bonus", "armor_penetration"
         ]
-        
         for _ in range(enhance):
             stat = random.choice(upgradeable_stats)
             stats[stat] = stats.get(stat, 0) + 1

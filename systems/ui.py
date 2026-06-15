@@ -2018,6 +2018,10 @@ class StatusBar:
         hp_text = f"HP {player.hp}/{player.max_hp}"
         hp_text_w = self.font.size(hp_text)[0]
         draw_text_shadow(hp_text, self.font, COLOR_TEXT, (bar_x + bar_w + 12, bar_y - 4))
+        
+        # ランク (HPバーの下)
+        rank_name = player.guild_rank
+        draw_text_shadow(f"Rank: {rank_name}", self.font, (241, 196, 15), (bar_x, bar_y + bar_h + 6))
 
         # --- 秘薬バフバー (HPテキストの右横・インライン) ---
         buff_turns = 0
@@ -2055,46 +2059,6 @@ class StatusBar:
             # 枠
             pygame.draw.rect(screen, buff_color, (bbar_x, bbar_y, bbar_w, bbar_h), 1, border_radius=2)
 
-        # 攻撃・防御バー (HPの下)
-        stat_y = bar_y + 24
-        hud_bars_cfg = UI_SETTINGS.get("hud_stat_bars", {})
-        hud_bar_w = hud_bars_cfg.get("bar_width", 80)
-        hud_bar_h = hud_bars_cfg.get("bar_height", 10)
-        
-        atk_cfg = hud_bars_cfg.get("attack", {})
-        atk_color = tuple(atk_cfg.get("color", [255, 120, 80]))
-        atk_bg = tuple(atk_cfg.get("bg_color", [40, 40, 50]))
-        
-        def_cfg = hud_bars_cfg.get("defense", {})
-        def_color = tuple(def_cfg.get("color", [80, 160, 255]))
-        def_bg = tuple(def_cfg.get("bg_color", [40, 40, 50]))
-        
-        from constants import STAT_RANGES
-        
-        # ATKバー
-        atk_val = player.total_attack
-        atk_range = STAT_RANGES.get("total_attack", {"min": 5, "max": 50})
-        atk_ratio = max(0.05, min(1.0, (atk_val - atk_range["min"]) / max(1, atk_range["max"] - atk_range["min"])))
-        
-        draw_text_shadow("ATK", self.font, COLOR_TEXT, (bar_x, stat_y))
-        atk_bar_x = bar_x + 38
-        pygame.draw.rect(screen, atk_bg, (atk_bar_x, stat_y + 3, hud_bar_w, hud_bar_h), border_radius=3)
-        pygame.draw.rect(screen, atk_color, (atk_bar_x, stat_y + 3, int(hud_bar_w * atk_ratio), hud_bar_h), border_radius=3)
-        pygame.draw.rect(screen, (80, 80, 90), (atk_bar_x, stat_y + 3, hud_bar_w, hud_bar_h), 1, border_radius=3)
-        
-        # DEFバー
-        def_val = player.total_defense
-        def_range = STAT_RANGES.get("total_defense", {"min": 5, "max": 50})
-        def_ratio = max(0.05, min(1.0, (def_val - def_range["min"]) / max(1, def_range["max"] - def_range["min"])))
-        
-        def_start_x = atk_bar_x + hud_bar_w + 15
-        draw_text_shadow("DEF", self.font, COLOR_TEXT, (def_start_x, stat_y))
-        def_bar_x = def_start_x + 38
-        pygame.draw.rect(screen, def_bg, (def_bar_x, stat_y + 3, hud_bar_w, hud_bar_h), border_radius=3)
-        pygame.draw.rect(screen, def_color, (def_bar_x, stat_y + 3, int(hud_bar_w * def_ratio), hud_bar_h), border_radius=3)
-        pygame.draw.rect(screen, (80, 80, 90), (def_bar_x, stat_y + 3, hud_bar_w, hud_bar_h), 1, border_radius=3)
-
-
         # --- 階層 (中央上) ---
         floor_str = Text.UI.VILLAGE if floor_level == 0 else Text.UI.FLOOR.format(level=floor_level)
         floor_surf = font_medium.render(floor_str, True, COLOR_FLOOR)
@@ -2106,17 +2070,11 @@ class StatusBar:
         screen.blit(f_shadow, (fx + 2, fy + 2))
         screen.blit(floor_surf, (fx, fy))
 
-        # --- 所持金 & ランク (右上・縦並び) ---
+        # --- 所持金 (右上) ---
         rx = self.screen_width - 180
         ry = 15
-        # ゴールド
-        draw_text_shadow(f"{player.coin} G", self.font, COLOR_TEXT, (rx, ry))
-        # ランク & GP (GPはデバッグ時のみ表示)
-        rank_name = player.guild_rank
-        draw_text_shadow(f"Rank: {rank_name}", self.font, (241, 196, 15), (rx, ry + 23))
-        
-        if getattr(player, "is_debug", False):
-            draw_text_shadow(f"GP: {player.guild_point}", self.font, COLOR_TEXT, (rx, ry + 46))
+        draw_text_shadow(f"Gold: {player.coin}", self.font, COLOR_TEXT, (rx, ry))
+        draw_text_shadow(f"GP: {player.guild_point}", self.font, (174, 214, 241), (rx, ry + 23))
 
         # (バフ表示はHPバー右横に移動済み・ここには何も描画しない)
 
