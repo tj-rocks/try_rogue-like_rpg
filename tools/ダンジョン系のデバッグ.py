@@ -137,20 +137,22 @@ def setup_gungeon_mode(dungeon, player):
         
         print(f"[Debug] Found {len(candidates)} spawnable items for Floor {dungeon.current_floor}")
 
-        # アイテムの配置
         dungeon.dropped_items = []
+        
         for i, cand in enumerate(candidates):
             if i >= len(floor_tiles): break
             tx, ty = floor_tiles[i]
             ctype, ckey = cand
             try:
                 it = None
-                if ctype == "weapon": it = DroppedWeapon(tx * ts, ty * ts, ckey, WEAPON_DATA[ckey])
-                elif ctype == "armor": it = DroppedArmor(tx * ts, ty * ts, ckey, ARMOR_DATA[ckey])
-                elif ctype == "shield": it = DroppedShield(tx * ts, ty * ts, ckey, SHIELD_DATA[ckey])
+                enhance, stats = dungeon._generate_enhanced_drop(player)
+                
+                if ctype == "weapon": it = DroppedWeapon(tx * ts, ty * ts, ckey, WEAPON_DATA[ckey], enhance=enhance, stats=stats)
+                elif ctype == "armor": it = DroppedArmor(tx * ts, ty * ts, ckey, ARMOR_DATA[ckey], enhance=enhance, stats=stats)
+                elif ctype == "shield": it = DroppedShield(tx * ts, ty * ts, ckey, SHIELD_DATA[ckey], enhance=enhance, stats=stats)
                 elif ctype == "item": it = DroppedConsumable(tx * ts, ty * ts, ckey, CONSUMABLE_DATA[ckey])
                 elif ctype == "stave": it = DroppedStave(tx * ts, ty * ts, ckey, STAVE_DATA[ckey])
-                elif ctype == "accessory": it = DroppedAccessory(tx * ts, ty * ts, ckey, ACCESSORY_DATA[ckey])
+                elif ctype == "accessory": it = DroppedAccessory(tx * ts, ty * ts, ckey, ACCESSORY_DATA[ckey], enhance=enhance, stats=stats)
                 if it:
                     dungeon.dropped_items.append(it)
                     print(f"  [Debug Spawn] Item {i+1}: {it.name} ({ckey}) at ({tx}, {ty})")
@@ -289,6 +291,16 @@ def main():
         player.armor_inventory.append(EquipInstance("armor", "test_all_bonus_armor"))
         player.shield_inventory.append(EquipInstance("shield", "test_all_bonus_shield"))
         player.accessory_inventory.append(EquipInstance("accessory", "test_all_bonus_accessory"))
+        
+        # 【テスト用】皮の鎧と皮の鎧+10を追加
+        leather_armor_base = EquipInstance("armor", "leather_breastplate")
+        player.armor_inventory.append(leather_armor_base)
+        
+        leather_armor_plus10 = EquipInstance("armor", "leather_breastplate")
+        leather_armor_plus10.enhance = 10
+        # defense_bonusに全振り
+        leather_armor_plus10.stats = {"defense_bonus": 10}
+        player.armor_inventory.append(leather_armor_plus10)
 
         # 2. ダンジョンの初期化 (1階から開始)
         dungeon = warp_to_floor(1, player)

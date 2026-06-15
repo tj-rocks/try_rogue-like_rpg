@@ -156,18 +156,19 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                     if occupied:
                         return False
                         
+                    enhance, stats = dungeon._generate_enhanced_drop(player)
                     if item_key in WEAPON_DATA:
-                        dungeon.dropped_items.append(DroppedWeapon(grid_x, grid_y, item_key, WEAPON_DATA[item_key]))
+                        dungeon.dropped_items.append(DroppedWeapon(grid_x, grid_y, item_key, WEAPON_DATA[item_key], enhance=enhance, stats=stats))
                     elif item_key in ARMOR_DATA:
-                        dungeon.dropped_items.append(DroppedArmor(grid_x, grid_y, item_key, ARMOR_DATA[item_key]))
+                        dungeon.dropped_items.append(DroppedArmor(grid_x, grid_y, item_key, ARMOR_DATA[item_key], enhance=enhance, stats=stats))
                     elif item_key in SHIELD_DATA:
-                        dungeon.dropped_items.append(DroppedShield(grid_x, grid_y, item_key, SHIELD_DATA[item_key]))
+                        dungeon.dropped_items.append(DroppedShield(grid_x, grid_y, item_key, SHIELD_DATA[item_key], enhance=enhance, stats=stats))
                     elif item_key in CONSUMABLE_DATA:
                         dungeon.dropped_items.append(DroppedConsumable(grid_x, grid_y, item_key, CONSUMABLE_DATA[item_key]))
                     elif item_key in STAVE_DATA:
                         dungeon.dropped_items.append(DroppedStave(grid_x, grid_y, item_key, STAVE_DATA[item_key]))
                     elif item_key in ACCESSORY_DATA:
-                        dungeon.dropped_items.append(DroppedAccessory(grid_x, grid_y, item_key, ACCESSORY_DATA[item_key]))
+                        dungeon.dropped_items.append(DroppedAccessory(grid_x, grid_y, item_key, ACCESSORY_DATA[item_key], enhance=enhance, stats=stats))
                     return True
                 
                 # A. レアドロップ判定
@@ -202,6 +203,8 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                 enemy_type = getattr(enemy, "type", None)
                 defeat_msg = ENEMY_DATA.get(enemy_type, {}).get("defeat_message")
                 if defeat_msg:
+                    if isinstance(defeat_msg, list):
+                        defeat_msg = "\n".join(defeat_msg)
                     show_dialog(dialog, defeat_msg, modal=True, auto_close=0)
                 else:
                     show_dialog(dialog, f"{enemy.name} を 討伐した！", modal=True, auto_close=0)
@@ -393,6 +396,8 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                 # enemies.yml の encounter_message があればそれを使う
                 encounter_msg = ENEMY_DATA.get(boss_type, {}).get("encounter_message")
                 if encounter_msg:
+                    if isinstance(encounter_msg, list):
+                        encounter_msg = "\n".join(encounter_msg)
                     show_dialog(dialog, encounter_msg, modal=True, auto_close=0)
                 else:
                     show_dialog(dialog, f"{active_boss.name} に 発見された！", modal=True, auto_close=0)

@@ -224,17 +224,17 @@ TILE_MAPPINGS:
       - x: 41
         y: 10
         flip: false
+      - x: 3
+        y: 11
+        flip: false
       - x: 41
         y: 12
         flip: false
-      - x: 22
-        y: 15
+      - x: 3
+        y: 13
         flip: false
-      - x: 23
+      - x: 3
         y: 15
-        flip: false
-      - x: 23
-        y: 16
         flip: false
   crate:
     category: obstacle
@@ -246,25 +246,9 @@ TILE_MAPPINGS:
       - x: 27
         y: 3
         flip: false
-      - x: 22
-        y: 14
-        flip: false
-      - x: 21
-        y: 15
-        flip: false
-      - x: 24
-        y: 15
-        flip: false
-      - x: 22
-        y: 16
-        flip: false
   pot:
     category: obstacle
     id: pot
-    positions:
-      - x: 23
-        y: 14
-        flip: false
   rubble:
     category: obstacle
     id: rubble
@@ -378,22 +362,22 @@ TILE_MAPPINGS:
     category: npc
     id: weapon_shop
     positions:
-      - x: 21
-        y: 14
-        flip: true
+      - x: 3
+        y: 12
+        flip: false
   item_shop:
     category: npc
     id: item_shop
     positions:
-      - x: 21
-        y: 16
-        flip: false
+      - x: 3
+        y: 14
+        flip: true
   merchant:
     category: npc
     id: merchant
     positions:
-      - x: 24
-        y: 14
+      - x: 3
+        y: 16
         flip: true
   storage:
     category: npc
@@ -455,8 +439,8 @@ TILE_MAPPINGS:
     category: npc
     id: wizard
     positions:
-      - x: 24
-        y: 16
+      - x: 3
+        y: 10
         flip: false
   teleport_wizard:
     category: npc
@@ -531,42 +515,52 @@ TILE_MAPPINGS:
       - x: 20
         y: 2
         flip: false
+      - x: 18
+        y: 8
+        flip: false
   wall_deco_weapon_shop:
     category: wall_decoration
     desc: 武器屋の看板
     id: wall_decoration_weapon_shop
     image_path: components/pictures/dungeon/home/wall_decoration_weapon_shop.png
+    positions:
+      - x: 4
+        y: 9
+        flip: false
   wall_deco_tapestry:
     category: wall_decoration
     desc: タペストリー
     id: wall_decoration_tapestry
     image_path: components/pictures/dungeon/home/wall_decoration_tapestry.png
     positions:
+      - x: 4
+        y: 10
+        flip: false
       - x: 40
         y: 10
         flip: true
+      - x: 4
+        y: 11
+        flip: false
       - x: 40
         y: 11
         flip: true
+      - x: 4
+        y: 12
+        flip: false
       - x: 40
         y: 12
         flip: true
-      - x: 20
-        y: 14
-        flip: true
-      - x: 25
+      - x: 4
+        y: 13
+        flip: false
+      - x: 4
         y: 14
         flip: false
-      - x: 20
-        y: 15
-        flip: true
-      - x: 25
+      - x: 4
         y: 15
         flip: false
-      - x: 20
-        y: 16
-        flip: true
-      - x: 25
+      - x: 4
         y: 16
         flip: false
   wall_deco_window:
@@ -579,18 +573,30 @@ TILE_MAPPINGS:
     desc: 魔法屋のシンボル
     id: wall_decoration_masic_shop
     image_path: components/pictures/icon/stave.png
+    positions:
+      - x: 5
+        y: 9
+        flip: false
   wall_deco_item_shop:
     category: wall_decoration
     desc: アイテム屋のシンボル
     id: wall_decoration_item_shop
     image_path: components/pictures/icon/hp_potion.png
 
+    positions:
+      - x: 6
+        y: 9
+        flip: false
   wall_deco_bank:
     category: wall_decoration
     desc: 銀行の看板
     id: wall_decoration_bank
     image_path: components/pictures/dungeon/home/wall_decoration_bank.png
 
+    positions:
+      - x: 14
+        y: 8
+        flip: false
   wall_decoration_pub:
     category: wall_decoration
     desc: パブの看板
@@ -652,6 +658,12 @@ TILE_MAPPINGS:
         flip: false
       - x: 32
         y: 13
+        flip: false
+      - x: 21
+        y: 15
+        flip: false
+      - x: 25
+        y: 15
         flip: false
       - x: 28
         y: 16

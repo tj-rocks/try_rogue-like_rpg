@@ -12,7 +12,8 @@ from constants import (
     PLAYER_SHIELD, SHIELD_DATA, SHIELD_COLORS, PLAYER_ORE, ACCESSORY_DATA,
     MAX_ITEM_SLOTS, MAX_EQUIP_SLOTS, MAX_STAVE_SLOTS, MAX_WAREHOUSE_SLOTS,
     STAVE_DATA, HIT_STUN_DURATION, SOUND_ATTACK_HIT, SOUND_ATTACK_MISS,
-    ENABLE_DEBUG_LOGGING, PLAYER_MOVE_SPEED, STATUS_EFFECTS
+    ENABLE_DEBUG_LOGGING, PLAYER_MOVE_SPEED, STATUS_EFFECTS,
+    PCT_STAT_KEYS
 )
 
 # 装備品インスタンス管理用カウンター（ゲーム全体でユニークなID）
@@ -122,23 +123,37 @@ class EquipInstance:
         growth = data.get("growth")
         if not growth:
             # デフォルト成長設定
-            growth = {"bonus_limit": 2, "times_limit": 50, "over_limit_growth_rate": 0.003}
+            growth = {"bonus_limit": 2, "times_limit": 30, "over_limit_growth_rate": 0.003}
 
-        stat_enhance = self.stats.get(stat_key, self.enhance)
+        stat_enhance = self.stats.get(stat_key, 0)  # 該当statがない場合は0
         if stat_enhance == 0:
             return 0
 
-        bonus_limit = growth.get("bonus_limit", 2)
-        times_limit = max(1, growth.get("times_limit", 50))
+        times_limit = max(1, growth.get("times_limit", 30))
         over_rate   = growth.get("over_limit_growth_rate", 0.003)
 
-        growth_room   = base * (bonus_limit - 1)
-        per_step      = growth_room / times_limit
-        over_per_step = base * over_rate
-
-        if stat_enhance <= times_limit:
-            bonus = stat_enhance * per_step
+        # 固定上限方式：基本値に関係なく一律+10（整数系）または+10%（%系）
+        is_pct_stat = stat_key in PCT_STAT_KEYS
+        if is_pct_stat:
+            growth_room = 0.10  # +10%固定
         else:
+            growth_room = 10    # +10固定
+        
+        per_step      = growth_room / times_limit
+        over_per_step = growth_room * over_rate
+
+        # 減衰カーブ方式：最初に大きく上がり、後半は微増
+        if stat_enhance <= 10:
+            # 1-10回：50%の成長（+5相当）
+            bonus = stat_enhance * (growth_room * 0.5 / 10)
+        elif stat_enhance <= 20:
+            # 11-20回：30%の成長（+3相当）
+            bonus = (growth_room * 0.5) + (stat_enhance - 10) * (growth_room * 0.3 / 10)
+        elif stat_enhance <= times_limit:
+            # 21-30回：20%の成長（+2相当）
+            bonus = (growth_room * 0.8) + (stat_enhance - 20) * (growth_room * 0.2 / 10)
+        else:
+            # 限界超え：微増のみ
             bonus = growth_room + (stat_enhance - times_limit) * over_per_step
             
         # aggro_mod の場合は、計算された正のボーナスに -1 を掛けて負のボーナスとして返す
@@ -668,28 +683,44 @@ class Player(Entity):
     def set_facing(self, direction):
         if self.facing != direction: self.facing = direction; self.walk_anim_timer = 0
 
-    def equip_weapon_by_key(self, wk):
+    def equip_weapon_by_key(self, wk, enhance=0, stats=None):
         if wk not in WEAPON_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
         inst = EquipInstance("weapon", wk)
+        if enhance > 0:
+            inst.enhance = enhance
+        if stats:
+            inst.stats = stats.copy()
         self.weapon_inventory.append(inst)
         return inst
 
-    def equip_armor_by_key(self, ak):
+    def equip_armor_by_key(self, ak, enhance=0, stats=None):
         if ak not in ARMOR_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
         inst = EquipInstance("armor", ak)
+        if enhance > 0:
+            inst.enhance = enhance
+        if stats:
+            inst.stats = stats.copy()
         self.armor_inventory.append(inst)
         return inst
 
-    def equip_shield_by_key(self, sk):
+    def equip_shield_by_key(self, sk, enhance=0, stats=None):
         if sk not in SHIELD_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
         inst = EquipInstance("shield", sk)
+        if enhance > 0:
+            inst.enhance = enhance
+        if stats:
+            inst.stats = stats.copy()
         self.shield_inventory.append(inst)
         return inst
 
-    def equip_accessory_by_key(self, lk):
+    def equip_accessory_by_key(self, lk, enhance=0, stats=None):
         from constants import ACCESSORY_DATA
         if lk not in ACCESSORY_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
         inst = EquipInstance("accessory", lk)
+        if enhance > 0:
+            inst.enhance = enhance
+        if stats:
+            inst.stats = stats.copy()
         self.accessory_inventory.append(inst)
         return inst
 

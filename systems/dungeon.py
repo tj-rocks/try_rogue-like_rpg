@@ -1143,12 +1143,16 @@ class Dungeon:
                 px, py = gx * self.tile_size, gy * self.tile_size
                 
                 item = None
-                if chosen_type == "weapon": item = DroppedWeapon(px, py, chosen_key, chosen_data)
+                # 強化済み装備ドロップの判定（全装備タイプに適用）
+                enhance, stats = self._generate_enhanced_drop(player)
+                
+                if chosen_type == "weapon":
+                    item = DroppedWeapon(px, py, chosen_key, chosen_data, enhance=enhance, stats=stats)
                 elif chosen_type == "consumable": item = DroppedConsumable(px, py, chosen_key, chosen_data)
-                elif chosen_type == "armor": item = DroppedArmor(px, py, chosen_key, chosen_data)
-                elif chosen_type == "shield": item = DroppedShield(px, py, chosen_key, chosen_data)
+                elif chosen_type == "armor": item = DroppedArmor(px, py, chosen_key, chosen_data, enhance=enhance, stats=stats)
+                elif chosen_type == "shield": item = DroppedShield(px, py, chosen_key, chosen_data, enhance=enhance, stats=stats)
                 elif chosen_type == "stave": item = DroppedStave(px, py, chosen_key, chosen_data)
-                elif chosen_type == "accessory": item = DroppedAccessory(px, py, chosen_key, chosen_data)
+                elif chosen_type == "accessory": item = DroppedAccessory(px, py, chosen_key, chosen_data, enhance=enhance, stats=stats)
                 else: continue
                 
                 self.dropped_items.append(item)
@@ -1240,6 +1244,41 @@ class Dungeon:
                     item = DroppedConsumable(px, py, e_key, e_data)
                     self.dropped_items.append(item)
                     print(f"[Dungeon] Forced spawn of event item: {e_key} at {spawn_pos} (furthest room)")
+
+    def _generate_enhanced_drop(self, player):
+        """強化済み装備ドロップの判定とステータス生成（ギルドランク別強化範囲対応）
+        
+        Returns:
+            tuple: (enhance_count, stats_dict) - 強化回数とステータス辞書
+        """
+        import random
+        from constants import ENHANCED_DROP_CHANCE, ENHANCED_DROP_RANK_RANGE
+        
+        if random.random() > ENHANCED_DROP_CHANCE:
+            return 0, {}
+        
+        # プレイヤーのギルドランクで判定
+        rank = getattr(player, "guild_rank", "F")
+        
+        # ランク別の強化範囲を取得
+        enh_range = ENHANCED_DROP_RANK_RANGE.get(rank, [0, 0])
+        min_e, max_e = enh_range[0], enh_range[1]
+        if max_e == 0:
+            return 0, {}
+        
+        enhance = random.randint(min_e, max_e)
+        
+        stats = {}
+        upgradeable_stats = [
+            "attack_bonus", "accuracy_bonus_close", "accuracy_bonus_range", "crit_rate",
+            "hp_bonus", "defense_bonus", "block_chance_close", "block_chance_ranged",
+            "regen_bonus", "armor_penetration"
+        ]
+        for _ in range(enhance):
+            stat = random.choice(upgradeable_stats)
+            stats[stat] = stats.get(stat, 0) + 1
+        
+        return enhance, stats
 
     def create_corridor(self, x1, x2, y1, y2, width=1):
         for x in range(min(x1, x2), max(x1, x2) + 1):
@@ -1885,8 +1924,8 @@ class Dungeon:
         # もし部屋の中にいるなら、その部屋全体を探索済みにする
         for rx, ry, rw, rh in self.room_rects:
             if rx <= center_x < rx + rw and ry <= center_y < ry + rh:
-                for row in range(ry, ry + rh):
-                    for col in range(rx, rx + rw):
+                for row in range(ry, min(ry + rh, self.map_height)):
+                    for col in range(rx, min(rx + rw, self.map_width)):
                         self.revealed_tiles[row][col] = True
 
     def reveal_all_tiles(self):

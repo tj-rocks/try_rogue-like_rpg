@@ -102,6 +102,16 @@ CURSE_REDUCTION_RATE = _curse.get("reduction_rate", 0.10)
 CURSE_RECOVERY_COST_GP_PER_LEVEL = _curse.get("recovery_cost_gp_per_level", 50)
 CURSE_RECOVERY_COST_GOLD_MULTIPLIER = _curse.get("recovery_cost_gold_multiplier", 10)
 
+# --- 強化済み装備ドロップ設定 (Enhanced Drop) ---
+_enh_drop = _balance.get("ENHANCED_DROP_CONFIG", {})
+ENHANCED_DROP_MIN_FLOOR = _enh_drop.get("min_floor", 21)
+ENHANCED_DROP_CHANCE = _enh_drop.get("occurrence_chance", 0.10)
+ENHANCED_DROP_STAT_ALLOCATION = _enh_drop.get("stat_allocation", "random")
+ENHANCED_DROP_RANK_RANGE = _enh_drop.get("rank_enhance_range", {
+    "F": [0, 0], "E": [0, 0], "D": [0, 0],
+    "C": [1, 5], "B": [3, 7], "A": [4, 8], "S": [5, 9], "SS": [5, 12]
+})
+
 PLAYER_WEAPON   = "old_sword"
 PLAYER_ARMOR    = "adventurers_clothes"
 PLAYER_SHIELD   = None
@@ -283,6 +293,14 @@ ENEMY_DATA = get_normalized_enemy_data(RANK_FLOOR_MAP)
 WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, ACCESSORY_DATA, WEAPON_CATEGORIES, ARMOR_CATEGORIES, SHIELD_CATEGORIES, ACCESSORY_CATEGORIES = get_normalized_equipment_data(RANK_FLOOR_MAP)
 WEAPON_TYPES = WEAPON_CATEGORIES # 後方互換性
 CONSUMABLE_DATA, STAVE_DATA = get_normalized_item_data(RANK_FLOOR_MAP)
+
+# --- パーセント系ステータスのキー（強化ボーナス計算・UI表示で使用） ---
+PCT_STAT_KEYS = frozenset([
+    "crit_bonus",
+    "block_chance_close",
+    "block_chance_ranged",
+    "armor_penetration",
+])
 LANTERN_DATA = {}  # 後方互換性のための空の定義
 
 # --- 装備ステータスの全体レンジ（バー表示用） ---
@@ -370,66 +388,48 @@ def get_next_rank_threshold(value, stat_key):
     return next_value
 
 def get_upgrades_to_next_rank(equip_inst, stat_key):
-    """装備を強化して次のランクに上がるまでに必要な回数を返す。
-    Sランクまたは強化不可ならNoneを返す。
+    """強化限界（+10または+10%）までの残り回数を返す。
+    既に限界に達している場合は0、強化不可ならNoneを返す。
     """
     import math
-    base = equip_inst.get_stat(stat_key, 0)
-    if base <= 0:
-        return None
     
-    # 現在のボーナス込み値
+    # 現在の強化回数とボーナスを取得
+    stat_enhance = equip_inst.stats.get(stat_key, 0)
     current_bonus = equip_inst.get_enhance_bonus(stat_key)
-    current_value = base + current_bonus
     
-    # 次のランク境界値
-    threshold = get_next_rank_threshold(current_value, stat_key)
-    if threshold is None:
-        return None  # 既にSランク
+    # %系か整数系か判定
+    is_pct_stat = current_bonus < 0.1 or isinstance(current_bonus, float) and current_bonus < 0.1
     
-    # 1回あたりの上昇幅（per_step）を取得
-    data = {}
-    if equip_inst.equip_type == "weapon": data = WEAPON_DATA.get(equip_inst.key, {})
-    elif equip_inst.equip_type == "armor": data = ARMOR_DATA.get(equip_inst.key, {})
-    elif equip_inst.equip_type == "shield": data = SHIELD_DATA.get(equip_inst.key, {})
-    elif equip_inst.equip_type == "accessory": data = ACCESSORY_DATA.get(equip_inst.key, {})
-    
-    growth = data.get("growth")
-    if not growth:
-        growth = {"bonus_limit": 2, "times_limit": 50, "over_limit_growth_rate": 0.003}
-    
-    times_limit = max(1, growth.get("times_limit", 50))
-    bonus_limit = growth.get("bonus_limit", 2)
-    over_rate = growth.get("over_limit_growth_rate", 0.003)
-    
-    growth_room = base * (bonus_limit - 1)
-    per_step = growth_room / times_limit
-    over_per_step = base * over_rate
-    
-    stat_enhance = equip_inst.stats.get(stat_key, equip_inst.enhance)
-    
-    # 必要なボーナス量
-    needed_bonus = threshold - base
-    if needed_bonus <= current_bonus:
-        return 0  # 既に超えている
-    
-    # 何回で到達するか逆算
-    if per_step <= 0:
-        return None
-    
-    # times_limit以内で到達できるか？
-    max_bonus_at_limit = times_limit * per_step
-    if needed_bonus <= max_bonus_at_limit:
-        needed_steps = math.ceil(needed_bonus / per_step)
+    # 限界値（固定+10または+10%）
+    if is_pct_stat:
+        growth_room = 0.10  # +10%
     else:
-        # times_limit超過分をover_per_stepで計算
-        remaining = needed_bonus - max_bonus_at_limit
-        if over_per_step <= 0:
-            return None
-        needed_steps = times_limit + math.ceil(remaining / over_per_step)
+        growth_room = 10    # +10
     
-    # 現在のenhance回数を差し引く
-    remaining_steps = needed_steps - stat_enhance
+    # 既に限界に達しているか
+    if current_bonus >= growth_room * 0.999:  # 誤差許容
+        return 0
+    
+    # 残りのボーナス必要量
+    remaining_bonus = growth_room - current_bonus
+    
+    # 減衰カーブに基づいて残り回数を計算
+    # 1-10回: +0.5, 11-20回: +0.3, 21-30回: +0.2
+    remaining_steps = 0
+    temp_enhance = stat_enhance
+    temp_bonus = remaining_bonus
+    
+    while temp_bonus > 0.001 and temp_enhance < 30:
+        temp_enhance += 1
+        if temp_enhance <= 10:
+            step_bonus = growth_room * 0.05  # 0.5
+        elif temp_enhance <= 20:
+            step_bonus = growth_room * 0.03  # 0.3
+        else:
+            step_bonus = growth_room * 0.02  # 0.2
+        temp_bonus -= step_bonus
+        remaining_steps += 1
+    
     return max(0, remaining_steps)
 
 # --- その他のマスタデータ ---

@@ -8,7 +8,7 @@ from systems.resources import (
 from constants import (
     KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_MOVE_LEFT, KEY_MOVE_RIGHT,
     KEY_CONFIRM, KEY_CANCEL, KEY_INVENTORY, GAME_TITLE, GAME_SUBTITLE,
-    UI_SETTINGS
+    UI_SETTINGS, PCT_STAT_KEYS
 )
 import os
 from wordings import Text
@@ -44,48 +44,75 @@ def format_stat_value(val):
         val_str = str(round(val, 2))
     return f"+{val_str}" if val > 0 else val_str
 
-def draw_stat_bar(screen, x, y, value, stat_key, bar_width=100, bar_height=10, font=None):
+def draw_stat_bar(screen, x, y, value, stat_key, bar_width=100, bar_height=10, font=None, ratio=None):
     """ステータスバーを描画する（長さ＋色＋ランク文字）
     
     Args:
         screen: 描画先サーフェス
         x, y: 描画位置
-        value: ステータスの実値
+        value: ステータスの実値（表示用）
         stat_key: STAT_RANGESのキー
         bar_width: バーの最大幅(px)
         bar_height: バーの高さ(px)
         font: ランク文字描画用フォント（Noneならfont_small）
+        ratio: バーの割合を直接指定（0.0-1.0）。指定時はvalueは表示専用
     """
     from constants import STAT_RANGES, STAT_RANK_COLORS, get_stat_rank
     
-    r = STAT_RANGES.get(stat_key, {"min": 0, "max": 1})
-    # バーの割合を算出（min〜maxで正規化）
-    if r["max"] == r["min"]:
-        ratio = 1.0 if value >= r["max"] else 0.0
+    # マイナス値の場合は特殊表示
+    if value < 0:
+        ratio = 0.0  # バーは空
+        rank = "-"
+        color = (100, 100, 110)  # グレー
+    elif ratio is not None:
+        # 百分率モード：ratioが直接指定された場合
+        ratio = max(0.0, min(1.0, ratio))
+        # 百分率を8等分してF-SSランク付け（100/8=12.5%刻み）
+        percent = ratio * 100
+        if percent >= 87.5:
+            rank = "SS"
+        elif percent >= 75:
+            rank = "S"
+        elif percent >= 62.5:
+            rank = "A"
+        elif percent >= 50:
+            rank = "B"
+        elif percent >= 37.5:
+            rank = "C"
+        elif percent >= 25:
+            rank = "D"
+        elif percent >= 12.5:
+            rank = "E"
+        else:
+            rank = "F"
+        color = STAT_RANK_COLORS.get(rank, (255, 255, 255))
     else:
-        ratio = (value - r["min"]) / (r["max"] - r["min"])
-    ratio = max(0.05, min(1.0, ratio))  # 最低5%は表示する
-    
-    # ランク判定
-    rank = get_stat_rank(value, stat_key)
-    color = STAT_RANK_COLORS.get(rank, (255, 255, 255))
+        r = STAT_RANGES.get(stat_key, {"min": 0, "max": 1})
+        # バーの割合を算出（min〜maxで正規化）
+        if r["max"] == r["min"]:
+            ratio = 1.0 if value >= r["max"] else 0.0
+        else:
+            ratio = (value - r["min"]) / (r["max"] - r["min"])
+        ratio = max(0.05, min(1.0, ratio))  # 最低5%は表示する
+        
+        # ランク判定
+        rank = get_stat_rank(value, stat_key)
+        color = STAT_RANK_COLORS.get(rank, (255, 255, 255))
     
     # 背景バー（暗い灰色）
     bg_rect = pygame.Rect(x, y, bar_width, bar_height)
     pygame.draw.rect(screen, (40, 40, 50), bg_rect, border_radius=3)
     
-    # 値バー（ランク色）
-    fill_w = int(bar_width * ratio)
-    fill_rect = pygame.Rect(x, y, fill_w, bar_height)
-    pygame.draw.rect(screen, color, fill_rect, border_radius=3)
+    # 値バー（ランク色）- マイナス値の場合は塗らない
+    if ratio > 0:
+        fill_w = int(bar_width * ratio)
+        fill_rect = pygame.Rect(x, y, fill_w, bar_height)
+        pygame.draw.rect(screen, color, fill_rect, border_radius=3)
     
     # 枠線
     pygame.draw.rect(screen, (80, 80, 90), bg_rect, width=1, border_radius=3)
     
-    # ランク文字
-    f = font or font_small
-    rank_surf = f.render(rank, True, color)
-    screen.blit(rank_surf, (x + bar_width + 4, y - 2))
+    return rank  # 呼び出し側で使用するためランクを返す
 
 
 def draw_opening_scene(screen, image, alpha):
@@ -867,29 +894,62 @@ class OreSelectionDialog:
 
     def draw(self, screen):
         if not self.is_active: return
+        from systems.resources import font_small, font_small_bold
+        from constants import CONSUMABLE_DATA
+        
         draw_dialog_frame(screen, self.x, self.y, self.width, self.height, alpha=240)
-
-        title = font_small.render(Text.UI.USE_WHICH_ORE, True, (255, 200, 100))
-        # タイトルも中央に
-        screen.blit(title, (self.x + (self.width - title.get_width()) // 2, self.y + 15))
-
+        
+        # タイトル
+        screen.blit(font_small_bold.render(Text.UI.USE_WHICH_ORE, True, (255, 200, 100)), (self.x + 30, self.y + 18))
+        
+        # 区切り線
+        sep_x = self.x + self.width // 2
+        pygame.draw.line(screen, (80, 100, 120), (sep_x, self.y + 40), (sep_x, self.y + self.height - 40), 2)
+        
         if not self.available_ores:
-            msg = self.font.render(Text.UI.NO_ORE, True, (200, 100, 100))
-            screen.blit(msg, (self.x + (self.width - msg.get_width()) // 2, self.y + 100))
+            msg = font_small.render(Text.UI.NO_ORE, True, (200, 100, 100))
+            screen.blit(msg, (self.x + 50, self.y + 100))
             return
-
+        
+        # 左パネル：鉱石リスト
         for i, (key, name, bonus) in enumerate(self.available_ores):
-            color = (255, 255, 255)
-            if i == self.cursor_idx:
-                color = (255, 255, 100)
-                cursor = self.font.render(">", True, color)
-                screen.blit(cursor, (self.x + self.width // 2 - 120, self.y + 70 + i * 40))
-            
+            y_pos = self.y + 70 + i * 38
+            is_sel = (i == self.cursor_idx)
+            color = (255, 255, 100) if is_sel else (255, 255, 255)
             if key == "cancel":
-                text = self.font.render(name, True, color)
-            else:
-                text = self.font.render(f"{name} (+{bonus})", True, color)
-            screen.blit(text, (self.x + self.width // 2 - 80, self.y + 70 + i * 40))
+                color = (255, 255, 100) if is_sel else (200, 200, 200)
+            if is_sel:
+                pygame.draw.rect(screen, (60, 70, 90), (self.x + 20, y_pos - 5, sep_x - self.x - 40, 34), border_radius=5)
+                screen.blit(font_small.render(">", True, color), (self.x + 35, y_pos))
+            label = name if key == "cancel" else f"{name}  (+{bonus})"
+            screen.blit(font_small.render(label, True, color), (self.x + 60, y_pos))
+        
+        # 右パネル：選択中鉱石の画像 + 解説
+        if 0 <= self.cursor_idx < len(self.available_ores):
+            ore_key, ore_name, ore_bonus = self.available_ores[self.cursor_idx]
+            if ore_key != "cancel":
+                data = CONSUMABLE_DATA.get(ore_key, {})
+                rx = sep_x + 30
+                ry = self.y + 55
+                
+                # 画像
+                img_path = data.get("image_path")
+                if img_path:
+                    from systems.resources import load_image, scale_image_aspect
+                    img = load_image(img_path)
+                    if img:
+                        scaled = scale_image_aspect(img, 72, 72)
+                        screen.blit(scaled, (rx, ry))
+                        ry += 72 + 12
+                
+                # 鉱石名
+                screen.blit(font_small_bold.render(ore_name, True, (255, 255, 200)), (rx, ry))
+                ry += font_small_bold.get_height() + 8
+                
+                # 解説テキスト
+                describe = data.get("describe", "")
+                if describe:
+                    draw_text_wrapped(screen, font_small, describe, rx, ry, self.width // 2 - 50, color=(180, 190, 200))
 
 
 class StaveSelectionDialog:
@@ -1155,14 +1215,24 @@ class BaseListDialog:
         if inst and hasattr(inst, "get_stat"):
             for k, label in EQUIP_STAT_LABEL_MAP.items():
                 val = inst.get_stat(k, 0)
+                # 強化ボーナスを加算
+                if inst.enhance > 0:
+                    val += inst.get_enhance_bonus(k)
                 if val:
                     if k in bar_stat_keys and k in STAT_RANGES:
-                        # パーセント系は100倍した値を使う
-                        is_pct = k in ("crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
-                        display_val = val * 100 if is_pct and isinstance(val, float) else val
-                        bar_items.append((label, abs(display_val), k))
+                        # 百分率バー計算：基本値+最大ボーナスを100%とする
+                        is_pct = k in PCT_STAT_KEYS
+                        max_bonus = 0.10 if is_pct else 10
+                        base_val = inst.get_stat(k, 0)  # 基本値（強化前）
+                        max_val = base_val + max_bonus
+                        if max_val > 0:
+                            percent_ratio = val / max_val  # 0.0-1.0
+                        else:
+                            percent_ratio = 0.0
+                        # bar_items: (label, 表示値, バー割合, stat_key)
+                        bar_items.append((label, val, percent_ratio, k))
                     else:
-                        is_pct = k in ("crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
+                        is_pct = k in PCT_STAT_KEYS
                         val_to_use = val * 100 if is_pct and isinstance(val, float) else val
                         text_items.append(f"{label}: {format_stat_value(val_to_use)}%" if is_pct else f"{label}: {format_stat_value(val)}")
             # マジックステータス（バー非対応→テキスト表示）
@@ -1173,29 +1243,22 @@ class BaseListDialog:
                     val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
                     text_items.append(f"{mlabel}: {format_stat_value(val_to_use)}%" if is_pct else f"{mlabel}: {format_stat_value(mval)}")
         
-        # バー描画（左半分: ラベル列、右半分: バー+ランク列+あとN回）
-        from constants import get_upgrades_to_next_rank
+        # バー描画（左半分: ラベル列、右半分: バー+ランク列+値）
         max_y = start_y
         half_w = cw // 2
         bar_w = half_w - 20  # ランク文字分のマージン
         bar_w = min(bar_w, 90)
         
-        for i, (label, value, stat_key) in enumerate(bar_items):
+        for i, (label, display_val, ratio, stat_key) in enumerate(bar_items):
             y = start_y + i * line_h
             # 左半分: ラベル
             screen.blit(self.font.render(label, True, (200, 210, 220)), (start_x, y))
-            # 右半分: バー + ランク文字
-            draw_stat_bar(screen, start_x + half_w, y + 2, value, stat_key,
-                         bar_width=bar_w, bar_height=12, font=self.font)
-            # あとN回表示
-            if inst and hasattr(inst, "equip_type"):
-                remaining = get_upgrades_to_next_rank(inst, stat_key)
-                if remaining is not None and remaining > 0:
-                    if remaining > 100:
-                        n_text = self.font.render("Max Limit", True, (100, 100, 120))
-                    else:
-                        n_text = self.font.render(f"あと{remaining}回", True, (160, 180, 200))
-                    screen.blit(n_text, (start_x + half_w + bar_w + 22, y))
+            # 右半分: バー + ランク文字（百分率モードでratioを渡す）
+            rank = draw_stat_bar(screen, start_x + half_w, y + 2, display_val, stat_key,
+                         bar_width=bar_w, bar_height=12, font=self.font, ratio=ratio)
+            # ランク表示（F-SS）- ボーナス値の代わりに百分率ランクを表示
+            rank_text = self.font.render(rank, True, (200, 210, 220))
+            screen.blit(rank_text, (start_x + half_w + bar_w + 22, y))
             max_y = y + line_h
         
         # テキスト項目（バーにできないもの）
@@ -1252,65 +1315,105 @@ class ParameterSelectionDialog(BaseListDialog):
         return (255, 255, 100) if is_selected else (255, 255, 255)
 
     def get_detail_lines(self, player):
-        """右パネル: 選択中パラメータの before → after プレビュー"""
-        if not self.available_params or self.cursor_idx >= len(self.available_params):
-            return []
-        item = self.available_params[self.cursor_idx]
-        if item == "cancel":
-            return []
-        stat_key, label, before, after, is_pct, *rest = item
-        if stat_key == "max_limit":
-            return [label, "", "これ以上は鍛えられない。"]
-        is_int_pct = rest[0] if rest else False
-        if is_pct:
-            before_val = before * 100 if isinstance(before, float) else before
-            after_val  = after  * 100 if isinstance(after,  float) else after
-            unit = "%"
-        elif is_int_pct:
-            before_val, after_val, unit = before, after, "%"
-        else:
-            before_val, after_val, unit = before, after, ""
-
-        def fmt(v):
-            return str(int(v)) if v % 1 == 0 else str(round(v, 2))
-
-        # 装備名（右パネル上部）
-        lines = []
-        if self._inst_ref:
-            lines.append(self._inst_ref.get_name())
-            lines.append("")
-        lines.append(f"{label}")
-        lines.append(f"  {fmt(before_val)}{unit}  →  {fmt(after_val)}{unit}")
-        if self._inst_ref:
-            lines.append("")
-            lines.append(f"強化回数: +{self._inst_ref.enhance + 1}回目")
-            # 次のランクまでの残り回数を表示
-            from constants import get_upgrades_to_next_rank
-            remaining = get_upgrades_to_next_rank(self._inst_ref, stat_key)
-            if remaining is not None and remaining > 0:
-                if remaining > 100:
-                    lines.append("Max Limit")
-                else:
-                    lines.append(f"次のランクまで あと{remaining}回")
-            elif remaining == 0:
-                lines.append("★ ランクアップ！")
-        return lines
+        """右パネル: テキスト表示は行わない（drawメソッドでバー表示するため）"""
+        return []
 
     def get_item_image_path(self, item, idx, player):
-        """右パネル上部に装備画像を表示"""
-        if not self._inst_ref or not player:
-            return None
-        if not self.target_item_data:
-            return None
-        item_type, iid = self.target_item_data
-        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA
-        if item_type == "weapon":
-            data = WEAPON_DATA.get(self._inst_ref.key, {})
-        elif item_type == "armor":
-            data = ARMOR_DATA.get(self._inst_ref.key, {})
+        return None  # drawメソッドで直接描画するため無効化
+
+    def draw(self, screen, player=None):
+        """親の描画 + 右パネルに百分率バー（before → after）を描画"""
+        # 親の描画（リスト部分）
+        super().draw(screen, player)
+        if not self.is_active or not self.available_params:
+            return
+        
+        # 右パネルを完全にクリア（親の描画内容を上書き）
+        sep_x = self.x + self.width // 2
+        right_rect = pygame.Rect(sep_x + 2, self.y + 45, self.width // 2 - 10, self.height - 55)
+        pygame.draw.rect(screen, (18, 22, 30), right_rect)
+        
+        # 選択中のパラメータを取得
+        if self.cursor_idx >= len(self.available_params):
+            return
+        item = self.available_params[self.cursor_idx]
+        if item == "cancel" or item[0] == "max_limit":
+            return
+        
+        stat_key, label, before, after, is_pct, *rest = item
+        if stat_key == "max_limit":
+            return
+        
+        # 百分率計算
+        is_pct_stat = stat_key in PCT_STAT_KEYS
+        max_bonus = 0.10 if is_pct_stat else 10
+        base_val = self._inst_ref.get_stat(stat_key, 0) if self._inst_ref else 0
+        max_val = base_val + max_bonus
+        
+        if max_val > 0:
+            before_ratio = before / max_val if max_val > 0 else 0
+            after_ratio = after / max_val if max_val > 0 else 0
         else:
-            data = SHIELD_DATA.get(self._inst_ref.key, {})
-        return data.get("image_path")
+            before_ratio = after_ratio = 0
+        
+        # バーの変化を誇張表示（差分を3倍に拡大）
+        diff = after_ratio - before_ratio
+        exaggerated_after = min(1.0, before_ratio + diff * 3)
+        
+        from systems.resources import font_small, font_small_bold
+        fh = font_small.get_height()  # フォント高さ（約14px）
+        
+        sep_x = self.x + self.width // 2
+        bar_x = sep_x + 30
+        bar_w = 210
+        
+        y = self.y + 55  # 開始Y
+        
+        # 装備名
+        if self._inst_ref:
+            name_surf = font_small_bold.render(self._inst_ref.get_name(), True, (255, 255, 200))
+            screen.blit(name_surf, (bar_x, y))
+            y += fh + fh  # 1行開ける
+        
+        # 装備画像
+        if self._inst_ref and self.target_item_data:
+            from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA
+            item_type, _ = self.target_item_data
+            if item_type == "weapon":   data = WEAPON_DATA.get(self._inst_ref.key, {})
+            elif item_type == "armor":  data = ARMOR_DATA.get(self._inst_ref.key, {})
+            else:                       data = SHIELD_DATA.get(self._inst_ref.key, {})
+            # タイプ別の画像パス取得
+            img_dir = data.get("image_dir")
+            if item_type == "weapon":
+                img_path = data.get("image_path")
+            elif item_type == "armor":
+                img_path = f"{img_dir}/down.png" if img_dir else None
+            else:  # shield
+                img_path = f"{img_dir}/shield.png" if img_dir else None
+            if img_path:
+                from systems.resources import load_image, scale_image_aspect
+                img = load_image(img_path)
+                if img:
+                    scaled = scale_image_aspect(img, 80, 80)
+                    screen.blit(scaled, (bar_x, y))
+                    y += 80 + fh  # 画像高さ + 1行開ける
+        
+        # 強化前ラベル + バー（1/4行 = fh//4 空ける）
+        screen.blit(font_small.render("強化前", True, (180, 180, 200)), (bar_x, y))
+        y += fh + fh // 4
+        before_rank = draw_stat_bar(screen, bar_x, y, before, stat_key,
+                                   bar_width=bar_w, bar_height=16, font=font_small, ratio=before_ratio)
+        rank_surf = font_small.render(before_rank, True, (200, 210, 220))
+        screen.blit(rank_surf, (bar_x + bar_w + 10, y - 1))
+        y += 16 + fh  # バー高さ + 1行開ける
+        
+        # 強化後ラベル + バー（1/4行 = fh//4 空ける）
+        screen.blit(font_small.render("強化後", True, (255, 200, 100)), (bar_x, y))
+        y += fh + fh // 4
+        after_rank = draw_stat_bar(screen, bar_x, y, after, stat_key,
+                                  bar_width=bar_w, bar_height=16, font=font_small, ratio=exaggerated_after)
+        rank_surf = font_small.render(after_rank, True, (255, 220, 100))
+        screen.blit(rank_surf, (bar_x + bar_w + 10, y - 1))
 
     # --- データ更新 ---
     def update_from_selection(self, player, item_type, iid, ore_key):
@@ -1435,29 +1538,11 @@ class ParameterSelectionDialog(BaseListDialog):
             play_sfx(SOUND_SELECT)
             self.is_active = False
 
-            stat_key, label, before, after, is_pct, *rest = item
-            is_int_pct = rest[0] if rest else False
+            stat_key = item[0]
             cd = self.confirm_dialog
             player = self.player_ref
             if cd and player and self.target_item_data and self._inst_ref:
-                inst = self._inst_ref
-                if is_pct:
-                    bv = before * 100 if isinstance(before, float) else before
-                    av = after  * 100 if isinstance(after,  float) else after
-                    unit = "%"
-                elif is_int_pct:
-                    bv, av, unit = before, after, "%"
-                else:
-                    bv, av, unit = before, after, ""
-
-                def fmt(v):
-                    return str(int(v)) if v % 1 == 0 else str(round(v, 2))
-
-                cd.text = "\n".join([
-                    inst.get_name(),
-                    f"{label}: {fmt(bv)}{unit} → {fmt(av)}{unit}",
-                    f"強化回数: +{inst.enhance + 1}回目 (+1)",
-                ])
+                cd.text = "強化するぜ。間違いないな？"
 
                 s_type, s_iid = self.target_item_data
                 s_ore, s_stat = self.selected_ore_key, stat_key
@@ -1469,8 +1554,13 @@ class ParameterSelectionDialog(BaseListDialog):
                     else:
                         self.on_confirm(s_type, s_iid, s_ore, s_stat)
 
+                psd = self
+                def do_cancel():
+                    from systems.game_state import game_state as gs
+                    gs["dialog_just_closed"] = False
+                    psd.is_active = True
                 cd.on_yes = do_enhance
-                cd.on_no  = None
+                cd.on_no  = do_cancel
                 cd.is_active = True
 
 
@@ -1646,6 +1736,16 @@ class InventoryDialog(BaseListDialog):
             inst = player._find_equip_inst(inv, key)
             if not inst: return []
             lines.append(inst.get_name())
+            # デバッグログ（1回のみ）
+            if getattr(self, '_last_debug_name', None) != inst.get_name():
+                debug_stats = inst.stats
+                debug_enhance = inst.enhance
+                # defense_bonusの計算結果も確認
+                def_bonus = inst.get_enhance_bonus("defense_bonus")
+                base_def = inst.get_stat("defense_bonus", 0)
+                print(f"[DEBUG] {inst.get_name()}: enhance={debug_enhance}, stats={debug_stats}")
+                print(f"[DEBUG]   defense_bonus: base={base_def}, enhance_bonus={def_bonus}, total={base_def + def_bonus}")
+                self._last_debug_name = inst.get_name()
             for k, label in EQUIP_STAT_LABEL_MAP.items():
                 val = inst.get_stat(k, 0)
                 if inst.enhance > 0:
@@ -1918,6 +2018,10 @@ class StatusBar:
         hp_text = f"HP {player.hp}/{player.max_hp}"
         hp_text_w = self.font.size(hp_text)[0]
         draw_text_shadow(hp_text, self.font, COLOR_TEXT, (bar_x + bar_w + 12, bar_y - 4))
+        
+        # ランク (HPバーの下)
+        rank_name = player.guild_rank
+        draw_text_shadow(f"Rank: {rank_name}", self.font, (241, 196, 15), (bar_x, bar_y + bar_h + 6))
 
         # --- 秘薬バフバー (HPテキストの右横・インライン) ---
         buff_turns = 0
@@ -1955,46 +2059,6 @@ class StatusBar:
             # 枠
             pygame.draw.rect(screen, buff_color, (bbar_x, bbar_y, bbar_w, bbar_h), 1, border_radius=2)
 
-        # 攻撃・防御バー (HPの下)
-        stat_y = bar_y + 24
-        hud_bars_cfg = UI_SETTINGS.get("hud_stat_bars", {})
-        hud_bar_w = hud_bars_cfg.get("bar_width", 80)
-        hud_bar_h = hud_bars_cfg.get("bar_height", 10)
-        
-        atk_cfg = hud_bars_cfg.get("attack", {})
-        atk_color = tuple(atk_cfg.get("color", [255, 120, 80]))
-        atk_bg = tuple(atk_cfg.get("bg_color", [40, 40, 50]))
-        
-        def_cfg = hud_bars_cfg.get("defense", {})
-        def_color = tuple(def_cfg.get("color", [80, 160, 255]))
-        def_bg = tuple(def_cfg.get("bg_color", [40, 40, 50]))
-        
-        from constants import STAT_RANGES
-        
-        # ATKバー
-        atk_val = player.total_attack
-        atk_range = STAT_RANGES.get("total_attack", {"min": 5, "max": 50})
-        atk_ratio = max(0.05, min(1.0, (atk_val - atk_range["min"]) / max(1, atk_range["max"] - atk_range["min"])))
-        
-        draw_text_shadow("ATK", self.font, COLOR_TEXT, (bar_x, stat_y))
-        atk_bar_x = bar_x + 38
-        pygame.draw.rect(screen, atk_bg, (atk_bar_x, stat_y + 3, hud_bar_w, hud_bar_h), border_radius=3)
-        pygame.draw.rect(screen, atk_color, (atk_bar_x, stat_y + 3, int(hud_bar_w * atk_ratio), hud_bar_h), border_radius=3)
-        pygame.draw.rect(screen, (80, 80, 90), (atk_bar_x, stat_y + 3, hud_bar_w, hud_bar_h), 1, border_radius=3)
-        
-        # DEFバー
-        def_val = player.total_defense
-        def_range = STAT_RANGES.get("total_defense", {"min": 5, "max": 50})
-        def_ratio = max(0.05, min(1.0, (def_val - def_range["min"]) / max(1, def_range["max"] - def_range["min"])))
-        
-        def_start_x = atk_bar_x + hud_bar_w + 15
-        draw_text_shadow("DEF", self.font, COLOR_TEXT, (def_start_x, stat_y))
-        def_bar_x = def_start_x + 38
-        pygame.draw.rect(screen, def_bg, (def_bar_x, stat_y + 3, hud_bar_w, hud_bar_h), border_radius=3)
-        pygame.draw.rect(screen, def_color, (def_bar_x, stat_y + 3, int(hud_bar_w * def_ratio), hud_bar_h), border_radius=3)
-        pygame.draw.rect(screen, (80, 80, 90), (def_bar_x, stat_y + 3, hud_bar_w, hud_bar_h), 1, border_radius=3)
-
-
         # --- 階層 (中央上) ---
         floor_str = Text.UI.VILLAGE if floor_level == 0 else Text.UI.FLOOR.format(level=floor_level)
         floor_surf = font_medium.render(floor_str, True, COLOR_FLOOR)
@@ -2006,17 +2070,11 @@ class StatusBar:
         screen.blit(f_shadow, (fx + 2, fy + 2))
         screen.blit(floor_surf, (fx, fy))
 
-        # --- 所持金 & ランク (右上・縦並び) ---
+        # --- 所持金 (右上) ---
         rx = self.screen_width - 180
         ry = 15
-        # ゴールド
-        draw_text_shadow(f"{player.coin} G", self.font, COLOR_TEXT, (rx, ry))
-        # ランク & GP (GPはデバッグ時のみ表示)
-        rank_name = player.guild_rank
-        draw_text_shadow(f"Rank: {rank_name}", self.font, (241, 196, 15), (rx, ry + 23))
-        
-        if getattr(player, "is_debug", False):
-            draw_text_shadow(f"GP: {player.guild_point}", self.font, COLOR_TEXT, (rx, ry + 46))
+        draw_text_shadow(f"Gold: {player.coin}", self.font, COLOR_TEXT, (rx, ry))
+        draw_text_shadow(f"GP: {player.guild_point}", self.font, (174, 214, 241), (rx, ry + 23))
 
         # (バフ表示はHPバー右横に移動済み・ここには何も描画しない)
 
@@ -3236,6 +3294,86 @@ class StatusDialog:
                     if event.key in (KEY_CANCEL, KEY_CONFIRM, KEY_MENU):
                         self._close_back()
 
+    def _draw_enhance_progress(self, screen, x, y, player, stat_key, bar_width, font):
+        """装備の強化進捗バーを描画（+10をMAXとした進捗）"""
+        # stat_keyに対応する装備とステータスキーを特定
+        equip_inst = None
+        enhance_stat_key = None
+        
+        if stat_key == "total_attack":
+            equip_inst = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)
+            enhance_stat_key = "attack_bonus"
+        elif stat_key == "total_defense":
+            # 鎧と盾の defense_bonus を合算
+            armor = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
+            shield = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
+            total_enhance = 0
+            for inst in [armor, shield]:
+                if inst:
+                    total_enhance += inst.get_enhance_bonus("defense_bonus")
+            if total_enhance > 0:
+                ratio = min(total_enhance / 10, 1.0)
+                self._draw_small_bar(screen, x, y, ratio, bar_width, (180, 140, 60), font, f"+{total_enhance:.1f}")
+            return
+        elif stat_key == "max_hp":
+            armor = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
+            shield = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
+            total_enhance = 0
+            for inst in [armor, shield]:
+                if inst:
+                    total_enhance += inst.get_enhance_bonus("hp_bonus")
+            if total_enhance > 0:
+                ratio = min(total_enhance / 10, 1.0)
+                self._draw_small_bar(screen, x, y, ratio, bar_width, (60, 140, 180), font, f"+{total_enhance:.1f}")
+            return
+        elif stat_key == "block_close":
+            weapon = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)
+            armor = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
+            shield = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
+            total_enhance = 0
+            for inst in [weapon, armor, shield]:
+                if inst:
+                    total_enhance += inst.get_enhance_bonus("block_chance_close") * 100
+            if total_enhance > 0:
+                ratio = min(total_enhance / 10, 1.0)
+                self._draw_small_bar(screen, x, y, ratio, bar_width, (140, 180, 60), font, f"+{total_enhance:.1f}%")
+            return
+        elif stat_key == "block_ranged":
+            weapon = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)
+            armor = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
+            shield = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
+            total_enhance = 0
+            for inst in [weapon, armor, shield]:
+                if inst:
+                    total_enhance += inst.get_enhance_bonus("block_chance_ranged") * 100
+            if total_enhance > 0:
+                ratio = min(total_enhance / 10, 1.0)
+                self._draw_small_bar(screen, x, y, ratio, bar_width, (140, 180, 60), font, f"+{total_enhance:.1f}%")
+            return
+        
+        if equip_inst and enhance_stat_key:
+            enhance_bonus = equip_inst.get_enhance_bonus(enhance_stat_key)
+            if enhance_bonus > 0:
+                ratio = min(enhance_bonus / 10, 1.0)
+                color = (180, 140, 60) if stat_key == "total_attack" else (100, 100, 120)
+                self._draw_small_bar(screen, x, y, ratio, bar_width, color, font, f"+{enhance_bonus:.1f}")
+
+    def _draw_small_bar(self, screen, x, y, ratio, bar_width, color, font, label):
+        """小さな進捗バーを描画"""
+        bar_height = 6
+        # 背景
+        bg_rect = pygame.Rect(x, y, bar_width, bar_height)
+        pygame.draw.rect(screen, (50, 50, 60), bg_rect, border_radius=2)
+        # 進捗
+        fill_w = int(bar_width * ratio)
+        fill_rect = pygame.Rect(x, y, fill_w, bar_height)
+        pygame.draw.rect(screen, color, fill_rect, border_radius=2)
+        # 枠線
+        pygame.draw.rect(screen, (80, 80, 90), bg_rect, width=1, border_radius=2)
+        # ラベル
+        label_surf = font.render(label, True, (200, 200, 200))
+        screen.blit(label_surf, (x + bar_width + 4, y - 2))
+
     def draw(self, screen, player):
         if not self.is_active: return
         draw_dialog_frame(screen, self.x, self.y, self.width, self.height)
@@ -3359,6 +3497,10 @@ class StatusDialog:
                 screen.blit(self.font.render(lbl_text, True, (200, 210, 220)), (content_x, y))
                 draw_stat_bar(screen, content_x + half_w, y + 2, value, stat_key,
                              bar_width=bar_w, bar_height=12, font=self.font)
+                
+                # 強化進捗バー（小さく下に表示）
+                self._draw_enhance_progress(screen, content_x + half_w, y + 16, 
+                                           player, stat_key, bar_w, self.font)
             
             # 装備中
             equip_y = bar_start_y + len(bar_items) * line_h + 15
