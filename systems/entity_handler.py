@@ -203,6 +203,8 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                 enemy_type = getattr(enemy, "type", None)
                 defeat_msg = ENEMY_DATA.get(enemy_type, {}).get("defeat_message")
                 if defeat_msg:
+                    if isinstance(defeat_msg, list):
+                        defeat_msg = "\n".join(defeat_msg)
                     show_dialog(dialog, defeat_msg, modal=True, auto_close=0)
                 else:
                     show_dialog(dialog, f"{enemy.name} を 討伐した！", modal=True, auto_close=0)
@@ -394,6 +396,8 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                 # enemies.yml の encounter_message があればそれを使う
                 encounter_msg = ENEMY_DATA.get(boss_type, {}).get("encounter_message")
                 if encounter_msg:
+                    if isinstance(encounter_msg, list):
+                        encounter_msg = "\n".join(encounter_msg)
                     show_dialog(dialog, encounter_msg, modal=True, auto_close=0)
                 else:
                     show_dialog(dialog, f"{active_boss.name} に 発見された！", modal=True, auto_close=0)

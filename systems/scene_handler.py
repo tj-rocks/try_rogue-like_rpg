@@ -250,6 +250,21 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
                 parameter_selection_dialog=ui_elements.get("parameter_selection_dialog"),
                 ore_gift_dialog=ui_elements.get("ore_gift_dialog"))
     
+    # 死亡演出: 暗転オーバーレイ＋「力尽きた…」テキスト
+    fade_alpha = game_state.get("death_fade_alpha", 0)
+    death_step = game_state.get("death_sequence_step", 0)
+    if fade_alpha > 0 or death_step in (1, 2):
+        import pygame
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, min(fade_alpha, 255)))
+        screen.blit(overlay, (0, 0))
+        if death_step == 2:
+            from systems.resources import font_medium
+            text_surf = font_medium.render("力尽きた…", True, (200, 180, 180))
+            tx = (SCREEN_WIDTH - text_surf.get_width()) // 2
+            ty = (SCREEN_HEIGHT - text_surf.get_height()) // 2
+            screen.blit(text_surf, (tx, ty))
+
     # [FIX] ダイアログ誤爆防止フラグのリセット
     if game_state.get("dialog_just_closed"):
         game_state["dialog_just_closed"] = False

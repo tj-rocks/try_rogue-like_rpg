@@ -137,14 +137,7 @@ def setup_gungeon_mode(dungeon, player):
         
         print(f"[Debug] Found {len(candidates)} spawnable items for Floor {dungeon.current_floor}")
 
-        # アイテムの配置（強化済みドロップ対応）
-        from constants import (
-            ENHANCED_DROP_MIN_FLOOR, ENHANCED_DROP_CHANCE,
-            ENHANCED_DROP_MIN_ENHANCE, ENHANCED_DROP_MAX_ENHANCE
-        )
-        
         dungeon.dropped_items = []
-        floor = dungeon.current_floor
         
         for i, cand in enumerate(candidates):
             if i >= len(floor_tiles): break
@@ -152,18 +145,7 @@ def setup_gungeon_mode(dungeon, player):
             ctype, ckey = cand
             try:
                 it = None
-                enhance = 0
-                stats = {}
-                
-                # 強化済みドロップ判定（Cランク以上で確率）
-                if floor >= ENHANCED_DROP_MIN_FLOOR and random.random() <= ENHANCED_DROP_CHANCE:
-                    enhance = random.randint(ENHANCED_DROP_MIN_ENHANCE, ENHANCED_DROP_MAX_ENHANCE)
-                    # ランダムステータス分配（get_enhance_bonusと一致する_key名）
-                    upgradeable = ["attack_bonus", "defense_bonus", "hp_bonus", "crit_rate", "block_chance_close", "block_chance_ranged", "accuracy_bonus_close", "accuracy_bonus_range"]
-                    stats = {}
-                    for _ in range(enhance):
-                        stat = random.choice(upgradeable)
-                        stats[stat] = stats.get(stat, 0) + 1
+                enhance, stats = dungeon._generate_enhanced_drop(player)
                 
                 if ctype == "weapon": it = DroppedWeapon(tx * ts, ty * ts, ckey, WEAPON_DATA[ckey], enhance=enhance, stats=stats)
                 elif ctype == "armor": it = DroppedArmor(tx * ts, ty * ts, ckey, ARMOR_DATA[ckey], enhance=enhance, stats=stats)

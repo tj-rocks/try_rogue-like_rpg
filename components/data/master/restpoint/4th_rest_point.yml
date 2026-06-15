@@ -449,12 +449,9 @@ TILE_MAPPINGS:
     category: npc
     id: story_noname3
     positions:
-      - x: 20
-        y: 4
-        flip: false
-      - x: 20
+      - x: 18
         y: 6
-        flip: true
+        flip: false
   story_noname2:
     category: npc
     id: story_noname2
@@ -466,8 +463,8 @@ TILE_MAPPINGS:
     category: npc
     id: story_noname4
     positions:
-      - x: 31
-        y: 10
+      - x: 10
+        y: 6
         flip: false
   story_camila:
     category: npc
@@ -487,9 +484,9 @@ TILE_MAPPINGS:
     category: npc
     id: story_geisel
     positions:
-      - x: 16
-        y: 15
-        flip: true
+      - x: 42
+        y: 11
+        flip: false
   story_kaya:
     category: npc
     id: story_kaya

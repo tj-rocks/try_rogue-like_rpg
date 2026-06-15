@@ -681,13 +681,22 @@ ENEMY_DATA:
     max_spawns: 1
     is_boss: true
     once_only: true
-    spawn_chance: 1.0
+    spawn_chance: 0.0
     crit_rate: 0.10
     detect_range: 15
-    bgm: components/sounds/bgm/get_hornor.mp3
+    bgm: components/sounds/bgm/fight_against_destiny.mp3
     image_folder: components/pictures/enemies/father
-    encounter_message: "…懐かしい感じがする。\n父さん…父さんだろ…！"
-    defeat_message: "父さん…なんで…\n『これ以上ダンジョンに潜るな。\n母さんをよろしく頼む。\nギルドを信用するな。\n…愛してる』"
+    encounter_message:
+      - "…懐かしい感じがする。"
+      - "父さん…父さんだろ…!"
+      - "父さん…何でだ何でだよ!"
+    defeat_message:
+      - "父さん…なんで…"
+      - "父: これ以上ダンジョンに潜るな。"
+      - "父: できれば故郷に戻って母さんを大切にしてやってほしい"
+      - "父: もっと下層に行けば真実を知れるかもしれない"
+      - "父: お前の道はお前が決めるんだ"
+      - "父: …愛してる"
     drops:
       normal: []
       rare: [fathers_keepsake]
