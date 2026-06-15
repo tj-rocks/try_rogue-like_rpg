@@ -3236,6 +3236,86 @@ class StatusDialog:
                     if event.key in (KEY_CANCEL, KEY_CONFIRM, KEY_MENU):
                         self._close_back()
 
+    def _draw_enhance_progress(self, screen, x, y, player, stat_key, bar_width, font):
+        """装備の強化進捗バーを描画（+10をMAXとした進捗）"""
+        # stat_keyに対応する装備とステータスキーを特定
+        equip_inst = None
+        enhance_stat_key = None
+        
+        if stat_key == "total_attack":
+            equip_inst = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)
+            enhance_stat_key = "attack_bonus"
+        elif stat_key == "total_defense":
+            # 鎧と盾の defense_bonus を合算
+            armor = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
+            shield = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
+            total_enhance = 0
+            for inst in [armor, shield]:
+                if inst:
+                    total_enhance += inst.get_enhance_bonus("defense_bonus")
+            if total_enhance > 0:
+                ratio = min(total_enhance / 10, 1.0)
+                self._draw_small_bar(screen, x, y, ratio, bar_width, (180, 140, 60), font, f"+{total_enhance:.1f}")
+            return
+        elif stat_key == "max_hp":
+            armor = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
+            shield = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
+            total_enhance = 0
+            for inst in [armor, shield]:
+                if inst:
+                    total_enhance += inst.get_enhance_bonus("hp_bonus")
+            if total_enhance > 0:
+                ratio = min(total_enhance / 10, 1.0)
+                self._draw_small_bar(screen, x, y, ratio, bar_width, (60, 140, 180), font, f"+{total_enhance:.1f}")
+            return
+        elif stat_key == "block_close":
+            weapon = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)
+            armor = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
+            shield = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
+            total_enhance = 0
+            for inst in [weapon, armor, shield]:
+                if inst:
+                    total_enhance += inst.get_enhance_bonus("block_chance_close") * 100
+            if total_enhance > 0:
+                ratio = min(total_enhance / 10, 1.0)
+                self._draw_small_bar(screen, x, y, ratio, bar_width, (140, 180, 60), font, f"+{total_enhance:.1f}%")
+            return
+        elif stat_key == "block_ranged":
+            weapon = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)
+            armor = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
+            shield = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
+            total_enhance = 0
+            for inst in [weapon, armor, shield]:
+                if inst:
+                    total_enhance += inst.get_enhance_bonus("block_chance_ranged") * 100
+            if total_enhance > 0:
+                ratio = min(total_enhance / 10, 1.0)
+                self._draw_small_bar(screen, x, y, ratio, bar_width, (140, 180, 60), font, f"+{total_enhance:.1f}%")
+            return
+        
+        if equip_inst and enhance_stat_key:
+            enhance_bonus = equip_inst.get_enhance_bonus(enhance_stat_key)
+            if enhance_bonus > 0:
+                ratio = min(enhance_bonus / 10, 1.0)
+                color = (180, 140, 60) if stat_key == "total_attack" else (100, 100, 120)
+                self._draw_small_bar(screen, x, y, ratio, bar_width, color, font, f"+{enhance_bonus:.1f}")
+
+    def _draw_small_bar(self, screen, x, y, ratio, bar_width, color, font, label):
+        """小さな進捗バーを描画"""
+        bar_height = 6
+        # 背景
+        bg_rect = pygame.Rect(x, y, bar_width, bar_height)
+        pygame.draw.rect(screen, (50, 50, 60), bg_rect, border_radius=2)
+        # 進捗
+        fill_w = int(bar_width * ratio)
+        fill_rect = pygame.Rect(x, y, fill_w, bar_height)
+        pygame.draw.rect(screen, color, fill_rect, border_radius=2)
+        # 枠線
+        pygame.draw.rect(screen, (80, 80, 90), bg_rect, width=1, border_radius=2)
+        # ラベル
+        label_surf = font.render(label, True, (200, 200, 200))
+        screen.blit(label_surf, (x + bar_width + 4, y - 2))
+
     def draw(self, screen, player):
         if not self.is_active: return
         draw_dialog_frame(screen, self.x, self.y, self.width, self.height)
@@ -3359,6 +3439,10 @@ class StatusDialog:
                 screen.blit(self.font.render(lbl_text, True, (200, 210, 220)), (content_x, y))
                 draw_stat_bar(screen, content_x + half_w, y + 2, value, stat_key,
                              bar_width=bar_w, bar_height=12, font=self.font)
+                
+                # 強化進捗バー（小さく下に表示）
+                self._draw_enhance_progress(screen, content_x + half_w, y + 16, 
+                                           player, stat_key, bar_w, self.font)
             
             # 装備中
             equip_y = bar_start_y + len(bar_items) * line_h + 15

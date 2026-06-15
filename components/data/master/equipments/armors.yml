@@ -444,7 +444,7 @@ ARMOR_DATA:
       magic:
         fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.1
+        heal_ratio: 0
         knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
@@ -526,10 +526,10 @@ ARMOR_DATA:
         buff_value_ratio: 0
         buff_duration_ratio: 0
       magic:
-        fire_damage: 0.10
+        fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.15
-        knockback_damage: 0.10
+        heal_ratio: 0
+        knockback_damage: 0
         invincible_turns: 0
-        stave_bonus: 8
+        stave_bonus: 0
         light_stave_bonus: 0

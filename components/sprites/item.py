@@ -176,10 +176,15 @@ class DroppedConsumable(Item):
 
 class DroppedArmor(Item):
     """地面に落ちたよろい。踏んで拾うとインベントリに入る。"""
-    def __init__(self, x, y, armor_key, armor_data):
-        super().__init__(x, y, armor_data.get("name", armor_key), "armor")
+    def __init__(self, x, y, armor_key, armor_data, enhance=0, stats=None):
+        name = armor_data.get("name", armor_key)
+        if enhance > 0:
+            name = f"{name}+{enhance}"
+        super().__init__(x, y, name, "armor")
         self.armor_key = armor_key
         self.armor_data = armor_data
+        self.enhance = enhance
+        self.stats = stats or {}
         # 共通画像を使用
         from constants import COMMON_ITEM_IMAGES
         self._image = self._load_item_image({"image_path": COMMON_ITEM_IMAGES["armor"]})
@@ -211,17 +216,22 @@ class DroppedArmor(Item):
             
         self.is_collected = True
         if hasattr(player, "equip_armor_by_key"):
-            player.equip_armor_by_key(self.armor_key)
+            player.equip_armor_by_key(self.armor_key, enhance=self.enhance, stats=self.stats)
         from wordings import Text
         return Text.Items.GET.format(name=self.name)
 
 
 class DroppedShield(Item):
     """地面に落ちた盾。踏んで拾うとインベントリーに入る。"""
-    def __init__(self, x, y, shield_key, shield_data):
-        super().__init__(x, y, shield_data.get("name", shield_key), "shield")
+    def __init__(self, x, y, shield_key, shield_data, enhance=0, stats=None):
+        name = shield_data.get("name", shield_key)
+        if enhance > 0:
+            name = f"{name}+{enhance}"
+        super().__init__(x, y, name, "shield")
         self.shield_key = shield_key
         self.shield_data = shield_data
+        self.enhance = enhance
+        self.stats = stats or {}
         # 共通画像を使用
         from constants import COMMON_ITEM_IMAGES
         self._image = self._load_item_image({"image_path": COMMON_ITEM_IMAGES["shield"]})
@@ -251,17 +261,22 @@ class DroppedShield(Item):
             
         self.is_collected = True
         if hasattr(player, "equip_shield_by_key"):
-            player.equip_shield_by_key(self.shield_key)
+            player.equip_shield_by_key(self.shield_key, enhance=self.enhance, stats=self.stats)
         from wordings import Text
         return Text.Items.GET.format(name=self.name)
 
 
 class DroppedAccessory(Item):
     """地面に落ちたアクセサリ。踏んで拾うとインベントリに入る。"""
-    def __init__(self, x, y, accessory_key, accessory_data):
-        super().__init__(x, y, accessory_data.get("name", accessory_key), "accessory")
+    def __init__(self, x, y, accessory_key, accessory_data, enhance=0, stats=None):
+        name = accessory_data.get("name", accessory_key)
+        if enhance > 0:
+            name = f"{name}+{enhance}"
+        super().__init__(x, y, name, "accessory")
         self.accessory_key = accessory_key
         self.accessory_data = accessory_data
+        self.enhance = enhance
+        self.stats = stats or {}
         
         # 個別画像の設定があればそれをロード、なければ共通アイコンを使用
         if accessory_data.get("image_path") or accessory_data.get("image_dir"):
@@ -289,7 +304,7 @@ class DroppedAccessory(Item):
             
         self.is_collected = True
         if hasattr(player, "equip_accessory_by_key"):
-            player.equip_accessory_by_key(self.accessory_key)
+            player.equip_accessory_by_key(self.accessory_key, enhance=self.enhance, stats=self.stats)
         from wordings import Text
         return Text.Items.GET.format(name=self.name)
 

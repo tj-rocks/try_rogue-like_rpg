@@ -240,7 +240,7 @@ CURSE_SYSTEM:
 # ------------------------------------------------------------------------------
 ENHANCED_DROP_CONFIG:
   min_floor: 21             # 発生開始階層 (Cランク相当)
-  occurrence_chance: 0.10   # 発生確率 (10%)
+  occurrence_chance: 1.0   # 発生確率 (10%)
   min_enhance: 3            # 最小強化回数
   max_enhance: 10           # 最大強化回数
   stat_allocation: random   # ステータス分配方式 (random: ランダム)

@@ -1143,15 +1143,16 @@ class Dungeon:
                 px, py = gx * self.tile_size, gy * self.tile_size
                 
                 item = None
+                # 強化済み装備ドロップの判定（全装備タイプに適用）
+                enhance, stats = self._generate_enhanced_drop(floor)
+                
                 if chosen_type == "weapon":
-                    # 強化済み装備ドロップの判定
-                    enhance, stats = self._generate_enhanced_drop(floor)
                     item = DroppedWeapon(px, py, chosen_key, chosen_data, enhance=enhance, stats=stats)
                 elif chosen_type == "consumable": item = DroppedConsumable(px, py, chosen_key, chosen_data)
-                elif chosen_type == "armor": item = DroppedArmor(px, py, chosen_key, chosen_data)
-                elif chosen_type == "shield": item = DroppedShield(px, py, chosen_key, chosen_data)
+                elif chosen_type == "armor": item = DroppedArmor(px, py, chosen_key, chosen_data, enhance=enhance, stats=stats)
+                elif chosen_type == "shield": item = DroppedShield(px, py, chosen_key, chosen_data, enhance=enhance, stats=stats)
                 elif chosen_type == "stave": item = DroppedStave(px, py, chosen_key, chosen_data)
-                elif chosen_type == "accessory": item = DroppedAccessory(px, py, chosen_key, chosen_data)
+                elif chosen_type == "accessory": item = DroppedAccessory(px, py, chosen_key, chosen_data, enhance=enhance, stats=stats)
                 else: continue
                 
                 self.dropped_items.append(item)
@@ -1924,8 +1925,8 @@ class Dungeon:
         # もし部屋の中にいるなら、その部屋全体を探索済みにする
         for rx, ry, rw, rh in self.room_rects:
             if rx <= center_x < rx + rw and ry <= center_y < ry + rh:
-                for row in range(ry, ry + rh):
-                    for col in range(rx, rx + rw):
+                for row in range(ry, min(ry + rh, self.map_height)):
+                    for col in range(rx, min(rx + rw, self.map_width)):
                         self.revealed_tiles[row][col] = True
 
     def reveal_all_tiles(self):

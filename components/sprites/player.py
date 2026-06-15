@@ -692,22 +692,34 @@ class Player(Entity):
         self.weapon_inventory.append(inst)
         return inst
 
-    def equip_armor_by_key(self, ak):
+    def equip_armor_by_key(self, ak, enhance=0, stats=None):
         if ak not in ARMOR_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
         inst = EquipInstance("armor", ak)
+        if enhance > 0:
+            inst.enhance = enhance
+        if stats:
+            inst.stats = stats.copy()
         self.armor_inventory.append(inst)
         return inst
 
-    def equip_shield_by_key(self, sk):
+    def equip_shield_by_key(self, sk, enhance=0, stats=None):
         if sk not in SHIELD_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
         inst = EquipInstance("shield", sk)
+        if enhance > 0:
+            inst.enhance = enhance
+        if stats:
+            inst.stats = stats.copy()
         self.shield_inventory.append(inst)
         return inst
 
-    def equip_accessory_by_key(self, lk):
+    def equip_accessory_by_key(self, lk, enhance=0, stats=None):
         from constants import ACCESSORY_DATA
         if lk not in ACCESSORY_DATA or self.get_equipment_count() >= MAX_EQUIP_SLOTS: return None
         inst = EquipInstance("accessory", lk)
+        if enhance > 0:
+            inst.enhance = enhance
+        if stats:
+            inst.stats = stats.copy()
         self.accessory_inventory.append(inst)
         return inst
 
