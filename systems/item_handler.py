@@ -238,16 +238,21 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
             inst = player._find_equip_inst(player.accessory_inventory, item_key_or_iid)
             dialog.text = Text.Items.EQUIPPED.format(name=inst.get_name() if inst else "アクセサリ")
         elif item_type == "stave":
+            print(f"[STAVE-DEBUG] Stave selection: item_key_or_iid={item_key_or_iid}")
             inst = player._find_stave_inst(item_key_or_iid)
             if inst:
+                print(f"[STAVE-DEBUG] Found stave instance: {inst}, charges={inst.charges}")
                 if inst.charges <= 0:
+                    print("[STAVE-DEBUG] Stave has no charges")
                     dialog.text = Text.Items.STAVE_NO_POWER
                 else:
+                    print(f"[STAVE-DEBUG] Performing wave with stave: {inst}")
                     # メッセージを表示状態にしてから、エフェクトを発動
                     dialog.is_active = True
                     player._perform_wave(inst, current_dungeon, dialog)
                     return
             else:
+                print(f"[STAVE-DEBUG] Stave instance not found: {item_key_or_iid}")
                 dialog.text = Text.Items.STAVE_NOT_FOUND
         else:
             # 消耗品

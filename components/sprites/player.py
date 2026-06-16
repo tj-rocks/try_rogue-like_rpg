@@ -1011,11 +1011,21 @@ class Player(Entity):
             new_prog = (ATTACK_ANIMATION_FRAMES - self.attack_timer) / ATTACK_ANIMATION_FRAMES
             if prev_prog < 0.1 <= new_prog:
                 if self.waving_stave_inst:
+                    print(f"[STAVE-DEBUG] Executing stave at animation time: {self.waving_stave_inst}")
                     from systems.magic_handler import execute_stave
-                    msg = execute_stave(self, self.waving_stave_inst, dungeon, dialog)
-                    if dialog:
-                        if dialog.is_active: dialog.text += "\n" + msg
-                        else: dialog.text = msg; dialog.is_active = True
+                    try:
+                        msg = execute_stave(self, self.waving_stave_inst, dungeon, dialog)
+                        print(f"[STAVE-DEBUG] Stave execution result: {msg}")
+                        if dialog:
+                            if dialog.is_active: dialog.text += "\n" + msg
+                            else: dialog.text = msg; dialog.is_active = True
+                    except Exception as e:
+                        print(f"[STAVE-DEBUG] Exception in execute_stave: {e}")
+                        import traceback
+                        traceback.print_exc()
+                        if dialog:
+                            if dialog.is_active: dialog.text += "\n杖の使用でエラーが発生しました！"
+                            else: dialog.text = "杖の使用でエラーが発生しました！"; dialog.is_active = True
                 else:
                     self._execute_strike(dungeon, dialog)
 
