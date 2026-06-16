@@ -3253,14 +3253,16 @@ class StatusDialog:
             if self.mode not in ("STATUS", "QUESTS", "BONUS", "MENU"):
                 self.mode = "STATUS"
             
-            if self.mode in ("MENU", "STATUS", "BONUS"):
+            if self.mode in ("MENU", "STATUS", "BONUS", "CURSE"):
                 # カテゴリ一覧から選ぶメニュー表示
-                self.categories = [("STATUS", "基本ステータス"), ("BONUS", "装備の加護"), ("QUIT", Text.UI.QUIT)]
+                self.categories = [("STATUS", "基本ステータス"), ("BONUS", "装備の加護"), ("CURSE", "呪い進行度"), ("QUIT", Text.UI.QUIT)]
                 if self.mode == "MENU" or self.mode == "STATUS":
                     self.mode = "STATUS"
                     self.cursor_idx = 0
                 elif self.mode == "BONUS":
                     self.cursor_idx = 1
+                elif self.mode == "CURSE":
+                    self.cursor_idx = 2
             else:
                 # クエストなど詳細画面へ直行（左列は「もどる」のみ）
                 self.categories = [("QUIT", Text.UI.QUIT)]
@@ -3487,7 +3489,7 @@ class StatusDialog:
                 ("射撃回避", eva_ranged_pct, "block_ranged"),
             ]
             
-            bar_start_y = content_y + 80
+            bar_start_y = content_y + 120
             line_h = 22
             half_w = cw // 2
             bar_w = min(half_w - 20, 90)
@@ -3506,12 +3508,16 @@ class StatusDialog:
                     curse_suffix = f" (-{eva_ranged_reduction}%)"
                 
                 lbl_text = label + curse_suffix
-                screen.blit(self.font.render(lbl_text, True, (200, 210, 220)), (content_x, y))
-                draw_stat_bar(screen, content_x + half_w, y + 2, value, stat_key,
+                # 視覚的中心線を揃える: フォントのベースラインとバーの中心を合わせる
+                # フォント高27pxの視覚中心は約13px、バー高12pxの中心は6px → 差7pxを調整
+                font_y = y - 3  # フォントを少し上に
+                bar_y = y + 5   # バーの中心がフォントのベースラインと揃う位置
+                screen.blit(self.font.render(lbl_text, True, (200, 210, 220)), (content_x, font_y))
+                draw_stat_bar(screen, content_x + half_w, bar_y, value, stat_key,
                              bar_width=bar_w, bar_height=12, font=self.font)
                 
                 # 強化進捗バー（小さく下に表示）
-                self._draw_enhance_progress(screen, content_x + half_w, y + 16, 
+                self._draw_enhance_progress(screen, content_x + half_w, bar_y + 14, 
                                            player, stat_key, bar_w, self.font)
             
             # 装備中
@@ -3523,6 +3529,39 @@ class StatusDialog:
                 f"盾  ：{shield_inst.get_name() if shield_inst else 'なし'}",
             ]
             draw_text_wrapped(screen, self.font, "\n".join(equip_lines), content_x, equip_y, cw)
+        
+        elif self.mode == "CURSE":
+            # --- 呪い進行度 ---
+            curse_level = getattr(player, "curse_level", 0)
+            cursed_stats = getattr(player, "cursed_stats", [])
+            
+            lines = ["【呪い進行度】"]
+            
+            if curse_level == 0:
+                lines.append("呪いはかかっていません")
+                lines.append("")
+                lines.append("死亡するたびに呪いの段階が進み")
+                lines.append("最大5段階まで深刻化します")
+            else:
+                lines.append(f"段階: {curse_level} / 5")
+                lines.append("")
+                
+                # 呪いの影響を表示
+                if "hp" in cursed_stats:
+                    reduction_pct = curse_level * 10
+                    lines.append(f"最大HP: -{reduction_pct}%")
+                if "attack" in cursed_stats:
+                    lines.append("攻撃力: 低下中")
+                if "defense" in cursed_stats:
+                    lines.append("防御力: 低下中")
+                if "evasion" in cursed_stats:
+                    lines.append("回避率: 低下中")
+                
+                lines.append("")
+                lines.append("【解除方法】")
+                lines.append("ギルドの神官にGPとゴールドで解除依頼")
+            
+            draw_text_wrapped(screen, self.font, "\n".join(lines), content_x, content_y, cw)
         
         elif self.mode == "BONUS":
             weapon_inst = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)

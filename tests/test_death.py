@@ -36,7 +36,7 @@ def test_death_penalty():
     dungeon.tile_size = 64
     dialog = MagicMock()
     dialog.is_active = False
-    game_state = {"death_sequence_step": 3, "death_timer": 1} # ステップ3(ペナルティ適用直前)から開始
+    game_state = {"death_sequence_step": 2, "death_timer": 1} # ステップ2のタイマー満了時にペナルティ・復活処理が走る
     
     # warp_to_floor をモックして副作用（ファイルのロード等）を防ぐ
     with patch("systems.dungeon.warp_to_floor") as mock_warp:
@@ -81,7 +81,7 @@ def test_death_no_debt():
     
     dungeon = MagicMock()
     dialog = MagicMock()
-    game_state = {"death_sequence_step": 3, "death_timer": 1}
+    game_state = {"death_sequence_step": 2, "death_timer": 1}
     
     # warp_to_floor をモック
     with patch("systems.dungeon.warp_to_floor"):
@@ -110,7 +110,7 @@ def test_death_quest_failure():
     
     dungeon = MagicMock()
     dialog = MagicMock()
-    game_state = {"death_sequence_step": 3, "death_timer": 1}
+    game_state = {"death_sequence_step": 2, "death_timer": 1}
     
     with patch("systems.dungeon.warp_to_floor"):
         with patch("components.sprites.player.Player.save_to_file"):
@@ -165,7 +165,7 @@ def test_poison_death_revival():
     dungeon.clinic_pos = (10, 20)
     
     dialog = MagicMock()
-    game_state = {"death_sequence_step": 3, "death_timer": 1}
+    game_state = {"death_sequence_step": 2, "death_timer": 1}
     
     # patchを使って実際にwarp_to_floorが呼ばれた際の処理をシミュレート
     with patch("systems.dungeon.warp_to_floor") as mock_warp:
@@ -231,7 +231,7 @@ def test_comprehensive_curse_system():
     dungeon = MagicMock()
     dungeon.tile_size = 64
     dialog = MagicMock()
-    game_state = {"death_sequence_step": 3, "death_timer": 1}
+    game_state = {"death_sequence_step": 2, "death_timer": 1}
     
     # 1回目の死亡
     player.hp = 0
@@ -267,7 +267,7 @@ def test_comprehensive_curse_system():
     for death_idx in range(2, 6):
         player.hp = 0
         player.is_dead = True
-        game_state = {"death_sequence_step": 3, "death_timer": 1}
+        game_state = {"death_sequence_step": 2, "death_timer": 1}
         with patch("systems.dungeon.warp_to_floor"):
             with patch("components.sprites.player.Player.save_to_file"):
                 handle_death_sequence(player, dungeon, dialog, game_state)
@@ -286,7 +286,7 @@ def test_comprehensive_curse_system():
     # 6回目の死亡（5段階上限でそれ以上進行しないことを検証）
     player.hp = 0
     player.is_dead = True
-    game_state = {"death_sequence_step": 3, "death_timer": 1}
+    game_state = {"death_sequence_step": 2, "death_timer": 1}
     with patch("systems.dungeon.warp_to_floor"):
         with patch("components.sprites.player.Player.save_to_file"):
             handle_death_sequence(player, dungeon, dialog, game_state)

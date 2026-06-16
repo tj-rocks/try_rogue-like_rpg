@@ -82,7 +82,7 @@ WEAPON_DATA:
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.2
     describe: 刃がボロボロで、今にも折れそうな剣
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: false
     bonus:
@@ -127,7 +127,7 @@ WEAPON_DATA:
       usually_buyable: true
       special_buyable: true
     describe: 鉄製の標準的な剣 丈夫で扱いやすい
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
     bonus:
@@ -172,7 +172,7 @@ WEAPON_DATA:
       usually_buyable: false
       special_buyable: false
     describe: 長年放置され、刃がこぼれた古い剣 戦うには心もとない
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
     bonus:
@@ -217,7 +217,7 @@ WEAPON_DATA:
       usually_buyable: false
       special_buyable: false
     describe: その辺の木を削って作った鈍器 不恰好だが威力はそれなり？
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: axe
     floor_spawnable: true
     bonus:
@@ -262,7 +262,7 @@ WEAPON_DATA:
       usually_buyable: true
       special_buyable: true
     describe: 鉄を鍛え上げて打った剣 鉄より鋭く重い
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
     bonus:
@@ -303,7 +303,7 @@ WEAPON_DATA:
   #   image_scale: 1.2
   #   shop_buyable: false
   #   describe: 職人が鉄を何層にも重ねて打った剣。波打つような文様が特徴。
-  #   growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+  #   growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
   #   type: onehanded_sword
   #   floor_spawnable: true
   #   bonus:
@@ -346,7 +346,7 @@ WEAPON_DATA:
       usually_buyable: false
       special_buyable: true
     describe: 音もなく獲物を屠るための特殊な刀 装備するとモンスターに気づかれにくくなる
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: dagger
     floor_spawnable: true
     bonus:
@@ -391,7 +391,7 @@ WEAPON_DATA:
       usually_buyable: true
       special_buyable: true
     describe: 余計な特殊効果はないが、圧倒的な基礎火力を誇る無骨な鉄剣。秘薬の効果をさらに高める。
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
     bonus:
@@ -436,7 +436,7 @@ WEAPON_DATA:
       usually_buyable: false
       special_buyable: true
     describe: 急所を突くことに特化した細身の刺突剣 攻撃力は低いが、命中率と会心率が高く、鎧を貫通する
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
     bonus:
@@ -481,7 +481,7 @@ WEAPON_DATA:
       usually_buyable: false
       special_buyable: true
     describe: 強大な破壊力を持つ騎士の巨大な斧 攻撃力は凄まじいが、重量ゆえに回避率や命中率が低下し、敵に感知されやすくなる
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: axe
     floor_spawnable: true
     bonus:
@@ -526,7 +526,7 @@ WEAPON_DATA:
       usually_buyable: false
       special_buyable: true
     describe: 聖なる加護を受けた剣 所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
     bonus:
@@ -549,7 +549,7 @@ WEAPON_DATA:
       magic:
         fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.1
+        heal_ratio: 0
         knockback_damage: 0
         invincible_turns: 0
         stave_bonus: 0
@@ -571,7 +571,7 @@ WEAPON_DATA:
       usually_buyable: false
       special_buyable: true
     describe: 隠密偵察用の小型ナイフ 攻撃力は控えめだが、会心率と回避率が高い
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: dagger
     floor_spawnable: true
     bonus:
@@ -617,7 +617,7 @@ WEAPON_DATA:
       special_buyable: false
     floor_spawnable: false
     describe: テスト用。全ボーナスが乗っている装備
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     bonus:
       common:
