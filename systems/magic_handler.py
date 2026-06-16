@@ -223,9 +223,14 @@ def _is_fighters_full_set(player):
 
 def execute_stave(player, stave, dungeon, dialog):
     """杖を振った際の効果を発動させるメイン関数"""
+    print(f"[STAVE-DEBUG] execute_stave called with stave={stave}, key={getattr(stave, 'key', None)}, charges={getattr(stave, 'charges', None)}")
+    
     from constants import STAVE_DATA
     settings = STAVE_DATA.get(stave.key, {})
+    print(f"[STAVE-DEBUG] STAVE_DATA lookup: key={stave.key}, settings={settings}")
+    
     if stave.charges <= 0:
+        print("[STAVE-DEBUG] No charges left")
         return "回数が足りない！"
 
     import random

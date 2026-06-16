@@ -1215,8 +1215,8 @@ class BaseListDialog:
         if inst and hasattr(inst, "get_stat"):
             for k, label in EQUIP_STAT_LABEL_MAP.items():
                 val = inst.get_stat(k, 0)
-                # 強化ボーナスを加算
-                if inst.enhance > 0:
+                # 強化ボーナスを加算（StaveInstanceの場合はenhanceがあってもget_enhance_bonusがない）
+                if hasattr(inst, 'enhance') and inst.enhance > 0 and hasattr(inst, 'get_enhance_bonus'):
                     val += inst.get_enhance_bonus(k)
                 if val:
                     if k in bar_stat_keys and k in STAT_RANGES:
@@ -1627,7 +1627,7 @@ class InventoryDialog(BaseListDialog):
         param_texts = []
         for k, label in S_MAP.items():
             val = inst.get_stat(k, 0)
-            if inst.enhance > 0:
+            if hasattr(inst, 'enhance') and inst.enhance > 0 and hasattr(inst, 'get_enhance_bonus'):
                 val += inst.get_enhance_bonus(k)
             if val:
                 is_pct = k in ("crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration", "accuracy_bonus_close")
@@ -1738,18 +1738,26 @@ class InventoryDialog(BaseListDialog):
             lines.append(inst.get_name())
             # デバッグログ（1回のみ）
             if getattr(self, '_last_debug_name', None) != inst.get_name():
-                debug_stats = inst.stats
-                debug_enhance = inst.enhance
-                # defense_bonusの計算結果も確認
-                def_bonus = inst.get_enhance_bonus("defense_bonus")
+                # StaveInstanceにはstats属性がないためチェック
+                if hasattr(inst, 'stats'):
+                    debug_stats = inst.stats
+                else:
+                    debug_stats = "N/A (Stave)"
+                debug_enhance = getattr(inst, 'enhance', 0)
+                # defense_bonusの計算結果も確認（StaveInstanceの場合は0）
+                def_bonus = inst.get_enhance_bonus("defense_bonus") if hasattr(inst, 'get_enhance_bonus') else 0
                 base_def = inst.get_stat("defense_bonus", 0)
                 print(f"[DEBUG] {inst.get_name()}: enhance={debug_enhance}, stats={debug_stats}")
                 print(f"[DEBUG]   defense_bonus: base={base_def}, enhance_bonus={def_bonus}, total={base_def + def_bonus}")
                 self._last_debug_name = inst.get_name()
             for k, label in EQUIP_STAT_LABEL_MAP.items():
-                val = inst.get_stat(k, 0)
-                if inst.enhance > 0:
-                    val += inst.get_enhance_bonus(k)
+                # StaveInstanceの場合はenhanceとget_enhance_bonusがないため、基本ステータスのみ表示
+                if itype == "stave":
+                    val = inst.get_stat(k, 0)
+                else:
+                    val = inst.get_stat(k, 0)
+                    if inst.enhance > 0:
+                        val += inst.get_enhance_bonus(k)
                 if val:
                     is_pct = k in ("crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration")
                     val_to_use = val * 100 if is_pct and isinstance(val, float) else val
@@ -1837,13 +1845,17 @@ class StaveInventoryDialog(InventoryDialog):
     """杖専用管理画面"""
     STATE_KEY = "stave_inventory_active"
 
-    def get_title(self): return Text.UI.STAVE_TITLE
+    def get_title(self): 
+        print(f"[STAVE-DEBUG] StaveInventoryDialog.get_title() called")
+        return Text.UI.STAVE_TITLE
 
     def update_items_from_player(self, player):
+        print(f"[STAVE-DEBUG] update_items_from_player called, stave_inventory={getattr(player, 'stave_inventory', None)}")
         labels, data = [], []
         staves = list(player.stave_inventory)
         staves.sort(key=lambda x: x.get_name().lower())
         for inst in staves:
+            print(f"[STAVE-DEBUG] Adding stave: {inst.get_name_with_charges()} (iid={inst.iid})")
             labels.append(inst.get_name_with_charges()); data.append(("stave", inst.iid))
         labels.append(Text.UI.QUIT); data.append(("cancel", None))
         self.items, self.item_data = labels, data
