@@ -60,50 +60,48 @@ class TestBlacksmithStones(unittest.TestCase):
         # Overall enhance should be 1
         self.assertEqual(self.weapon.enhance, 1)
 
-    def test_growth_default_fallback(self):
-        # Test enhancement bonus with fallback growth configuration
-        # For base attack_bonus = 10, times_limit = 50, bonus_limit = 2.0 (growth room = 10.0)
-        # 1 level upgrade should give 10.0 / 50 = 0.2 bonus
-        self.weapon.enhance = 1
-        bonus = self.weapon.get_enhance_bonus("attack_bonus")
-        self.assertAlmostEqual(bonus, 0.2)
+    def test_growth_decay_curve(self):
+        # 新方式: per-stat の強化回数(self.stats)に基づく減衰カーブ。
+        # 1-10回の区間は times_limit に依存せず安定（整数系は growth_room=10 -> +0.5/回）。
+        self.weapon.stats = {"attack_bonus": 1}
+        self.assertAlmostEqual(self.weapon.get_enhance_bonus("attack_bonus"), 0.5)
 
-        # 50 levels should give 10.0 bonus
-        self.weapon.enhance = 50
-        bonus = self.weapon.get_enhance_bonus("attack_bonus")
-        self.assertAlmostEqual(bonus, 10.0)
+        self.weapon.stats = {"attack_bonus": 10}
+        self.assertAlmostEqual(self.weapon.get_enhance_bonus("attack_bonus"), 5.0)
 
-        # 51 levels should give 10.0 + (1 * 10 * 0.003) = 10.03
-        self.weapon.enhance = 51
-        bonus = self.weapon.get_enhance_bonus("attack_bonus")
-        self.assertAlmostEqual(bonus, 10.03)
+        # 強化回数が増えるほどボーナスは単調増加する
+        self.weapon.stats = {"attack_bonus": 20}
+        b20 = self.weapon.get_enhance_bonus("attack_bonus")
+        self.weapon.stats = {"attack_bonus": 50}
+        b50 = self.weapon.get_enhance_bonus("attack_bonus")
+        self.assertGreater(b20, 5.0)
+        self.assertGreater(b50, b20)
 
-    def test_backward_compatibility(self):
-        # Simulated old weapon with enhance = 5, but empty stats dict
+        # enhance 単体（stats にキーがない）ではボーナスは出ない（旧セーブ互換は廃止）
+        self.weapon.stats = {}
+        self.weapon.enhance = 30
+        self.assertEqual(self.weapon.get_enhance_bonus("attack_bonus"), 0)
+
+    def test_no_enhance_fallback(self):
+        # 新方式: stats が空なら enhance を持っていてもボーナスは0（旧セーブ互換なし）
         self.weapon.enhance = 5
         self.weapon.stats = {}
+        self.assertEqual(self.weapon.get_enhance_bonus("attack_bonus"), 0)
+        self.assertEqual(self.weapon.get_enhance_bonus("block_chance_close"), 0)
 
-        # Since stats is empty, get_enhance_bonus should fall back to enhance = 5
-        # 5 levels = 5 * 0.2 = 1.0 bonus
-        self.assertEqual(self.weapon.get_enhance_bonus("attack_bonus"), 1.0)
-        self.assertAlmostEqual(self.weapon.get_enhance_bonus("block_chance_close"), 0.005)
-
-        # Upgrade attack_bonus (+1)
+        # apply_upgrade 時は未初期化の stat を現 enhance 値(5)で初期化し、
+        # 対象 stat (attack_bonus) だけ +1 する
         self.weapon.apply_upgrade("attack_bonus", 1)
-        # All stats should be initialized to 5
-        # And attack_bonus should be incremented by 1 -> 6
         self.assertEqual(self.weapon.stats.get("attack_bonus"), 6)
-        # Others should remain at 5
         self.assertEqual(self.weapon.stats.get("crit_rate"), 5)
         self.assertEqual(self.weapon.stats.get("block_chance_close"), 5)
-        # Overall enhance should be 6
         self.assertEqual(self.weapon.enhance, 6)
 
-        # Verify get_enhance_bonus returns correct stats:
-        # attack_bonus level is 6 -> 6 * 0.2 = 1.2
-        self.assertAlmostEqual(self.weapon.get_enhance_bonus("attack_bonus"), 1.2)
-        # block_chance_close level is 5 -> 5 * 0.2 * 0.05 = 0.005
-        self.assertAlmostEqual(self.weapon.get_enhance_bonus("block_chance_close"), 0.005)
+        # 新方式の減衰カーブでボーナス計算（1-10回区間）
+        # attack_bonus(整数系, growth_room=10): 6回 -> 6 * 0.5 = 3.0
+        self.assertAlmostEqual(self.weapon.get_enhance_bonus("attack_bonus"), 3.0)
+        # block_chance_close(%系, growth_room=0.10): 5回 -> 5 * (0.10*0.5/10) = 0.025
+        self.assertAlmostEqual(self.weapon.get_enhance_bonus("block_chance_close"), 0.025)
 
     def test_ui_dialog_flow(self):
         from systems.ui import OreSelectionDialog, ParameterSelectionDialog, ConfirmDialog

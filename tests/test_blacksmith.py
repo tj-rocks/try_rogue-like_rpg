@@ -34,15 +34,15 @@ def test_enhancement_stats():
     atk_base = player.total_attack
     print(f"武器初期状態: {inst_w.get_name()}, 総攻撃力: {atk_base}")
     
-    # 強化実行 (+10)
-    inst_w.enhance = 10
+    # 強化実行 (攻撃力を+10回): 新方式は per-stat の stats を埋める必要がある
+    inst_w.apply_upgrade("attack_bonus", 10)
     atk_plus_10 = player.total_attack
     print(f"武器強化後 (+10): {inst_w.get_name()}, 総攻撃力: {atk_plus_10}")
     
     assert atk_plus_10 > atk_base, "強化後に攻撃力が上昇していません"
     
     # 2. 防具の強化テスト
-    armor_key = "leather_armor"
+    armor_key = "leather_breastplate"
     if armor_key not in ARMOR_DATA:
         print(f"[SKIP] {armor_key} がデータにありません")
     else:
@@ -53,8 +53,8 @@ def test_enhancement_stats():
         def_base = player.total_defense
         print(f"防具初期状態: {inst_a.get_name()}, 総防御力: {def_base}")
         
-        # 強化実行 (+10)
-        inst_a.enhance = 10
+        # 強化実行 (防御力を+10回)
+        inst_a.apply_upgrade("defense_bonus", 10)
         player.update_equipment_stats() # ステータス再計算をトリガー
         def_plus_10 = player.total_defense
         print(f"防具強化後 (+10): {inst_a.get_name()}, 総防御力: {def_plus_10}")
@@ -69,15 +69,16 @@ def test_enhancement_stats():
         times_limit = growth.get("times_limit", 50)
         print(f"強化限界設定を発見: times_limit={times_limit}")
         
-        inst_w.enhance = times_limit
+        # 新方式: per-stat の強化回数(stats)でボーナスが決まる
+        inst_w.stats["attack_bonus"] = times_limit
         atk_at_limit = player.total_attack
         
-        inst_w.enhance = times_limit + 1
+        inst_w.stats["attack_bonus"] = times_limit + 1
         atk_over_limit = player.total_attack
         
         diff = atk_over_limit - atk_at_limit
         print(f"限界突破時の上昇量: {diff}")
-        # 通常は整数切り捨てのため、1回では変わらないか、非常に小さくなる設計
+        # 限界近傍では上昇が鈕化する設計（減衰カーブ）
     
     print("[OK] 鍛冶・強化ステータステスト合格！")
 

@@ -44,7 +44,7 @@ ARMOR_DATA:
       usually_buyable: false
       special_buyable: false
     describe: 継ぎ接ぎだらけで、ほとんど防具の体をなしていない
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: false
     bonus:
       common:
@@ -86,7 +86,7 @@ ARMOR_DATA:
       usually_buyable: false
       special_buyable: false
     describe: 丈夫な布で作られた一般的な服.
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
@@ -128,7 +128,7 @@ ARMOR_DATA:
       usually_buyable: true
       special_buyable: true
     describe: なめし革を重ねて作られた防具.
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
@@ -170,7 +170,7 @@ ARMOR_DATA:
       usually_buyable: false
       special_buyable: false
     describe: 鉄板を胸部に当てた実戦的な防具.
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
@@ -212,7 +212,7 @@ ARMOR_DATA:
       usually_buyable: false
       special_buyable: false
     describe: 硬い鋼で作られた胸当て.
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
@@ -254,7 +254,7 @@ ARMOR_DATA:
       usually_buyable: true
       special_buyable: true
     describe: なめし革を重ねて作られた防具.
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
@@ -296,7 +296,7 @@ ARMOR_DATA:
       usually_buyable: false
       special_buyable: true
     describe: 隠密性に特化した深紺の軽装 防御力は低いが、命中率と会心率が上がる
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
@@ -338,7 +338,7 @@ ARMOR_DATA:
       usually_buyable: true
       special_buyable: true
     describe: 標準的な戦士の鎧。装備すると秘薬の持続時間が延長される。
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
@@ -380,7 +380,7 @@ ARMOR_DATA:
       usually_buyable: false
       special_buyable: true
     describe: 鉄板を重ねた非常に強固な鎧 重さゆえに敵に気づかれやすく、回避や命中、視野が低下する
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
@@ -422,7 +422,7 @@ ARMOR_DATA:
       usually_buyable: false
       special_buyable: true
     describe: 聖なる加護を受けた巡礼者の軽防具 最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
@@ -464,7 +464,7 @@ ARMOR_DATA:
       usually_buyable: false
       special_buyable: true
     describe: 隠密性に特化した偵察用の軽装鎧 敵に見つかりにくくなり、回避率と会心率が高まる
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
@@ -507,7 +507,7 @@ ARMOR_DATA:
       special_buyable: false
     floor_spawnable: false
     describe: テスト用。全ボーナスが乗っている鎧
-    growth: {bonus_limit: 2, times_limit: 50, over_limit_growth_rate: 0.003}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     bonus:
       common:
         attack: 5

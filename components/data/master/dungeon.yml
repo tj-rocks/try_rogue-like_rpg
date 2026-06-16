@@ -257,24 +257,24 @@ DUNGEON_IMAGES:
 # ==========================================
   "31":
     image: deep_rock
-    sound: turning_point.mp3
+    sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     map: 3rd_rest_point.txt
     no_attack: true
   "32":
     image: deep_rock
-    sound: middle_1.mp3
+    sound: deep_floors.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "33":
     image: deep_rock
-    sound: middle_1.mp3
+    sound: deep_floors.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "34":
     image: deep_rock
-    sound: middle_1.mp3
+    sound: deep_floors.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "35":

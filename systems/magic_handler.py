@@ -4,10 +4,6 @@ import pygame
 from constants import STAVE_DATA, COMBAT_LOG_WAIT_FRAMES
 from systems.combat_handler import deal_damage
 
-# 魔法の設定をロード
-from constants import load_master_data
-MAGIC_SETTINGS = load_master_data("magic_settings.yml")
-
 # ============================================================
 # 演出用エフェクトクラス
 # ============================================================
