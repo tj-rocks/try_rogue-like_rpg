@@ -43,9 +43,9 @@ DUNGEON:
   DUNGEON_ROOM_INCREASE_INTERVAL: 3 # 何階ごとに部屋数を増やすか (5階ごと)
   
   # 指数成長とハードキャップ設定
-  DUNGEON_ROOM_MAX_CAP: 20          # 最大部屋数の絶対上限 (深層でもこれを超えない)
-  DUNGEON_ROOM_MIN_CAP: 10          # 最小部屋数の増加上限 (深層での最低部屋数)
-  DUNGEON_ROOM_GROWTH_LIMIT_FLOOR: 70 # 成長がストップする階層
+  DUNGEON_ROOM_MAX_CAP: 15          # 最大部屋数の絶対上限 (深層でもこれを超えない)
+  DUNGEON_ROOM_MIN_CAP: 8          # 最小部屋数の増加上限 (深層での最低部屋数)
+  DUNGEON_ROOM_GROWTH_LIMIT_FLOOR: 100 # 成長がストップする階層
   
   # --- 部屋数の成長ロジック解説 ---
   # 式: 現在数 = 初期値 * ( (上限値 / 初期値) ^ 進捗率 )
@@ -53,7 +53,7 @@ DUNGEON:
   # 特徴: 指数関数（掛け算）で増えるため、最初はゆっくり、後半で一気に広くなります。
   
   DUNGEON_MIN_ROOM_DISTANCE: 4      # 部屋同士の最小距離（近いと密集する）
-  DUNGEON_ROOM_DISTANCE_GROWTH: 0.3 # 階層が進むごとに部屋の距離をどれだけ広げるか
+  DUNGEON_ROOM_DISTANCE_GROWTH: 0.15 # 階層が進むごとに部屋の距離をどれだけ広げるか
   DUNGEON_CORRIDOR_W2_CHANCE: 0.1   # 通路が「2マス幅」になる確率 (0.0〜1.0)
   DUNGEON_STAIRS_FLOOR_RADIUS: 1    # 階段の周囲に確保する歩行可能タイルの半径
   DUNGEON_MIN_ROOM_SIZE: 2          # 部屋の最小サイズの初期値
