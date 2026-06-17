@@ -1,0 +1,26 @@
+ランク,敵キー,敵名,ドロップ通常,ドロップレア,ボス,通常率,レア率
+F,slime,スライム,hp_potion rotten_potion expired_potion,hi_potion,,0.15,0.05
+F,mawaru_kame,まわるがめ,expired_potion expired_potion,red_stone blue_stone green_stone,,0.15,0.05
+F,normal_tako,ふつうたこ,expired_potion expired_potion,pilgrim_potion warrior_potion sage_potion,,0.15,0.05
+E,slime_red,あかいスライム,expired_potion expired_potion,pilgrim_potion warrior_potion sage_potion,,0.15,0.05
+E,kowai_kusa,こわいくさ,hi_potion hp_potion,pilgrim_potion warrior_potion sage_potion,,0.15,0.05
+E,bakudan_man,バクダンマン,hi_potion hp_potion,red_stone blue_stone green_stone,,0.15,0.05
+E,doku_kame,どくがめ,expired_potion expired_potion,pilgrim_potion warrior_potion sage_potion,,0.15,0.05
+D,skeleton,スケルトン,broken_shield broken_sword broken_armor,fullmetal_sword fullmetal_round_shield fullmetal_breastplate,,0.15,0.05
+D,kuchitanago,クチタナゴ,broken_shield broken_sword broken_armor,fullmetal_sword fullmetal_round_shield fullmetal_breastplate,,0.15,0.05
+D,mushigumo,ムシグモ,expired_potion expired_potion,red_stone blue_stone green_stone,,0.15,0.05
+D,potaro,ポタロウ,expired_potion expired_potion,pilgrim_potion warrior_potion sage_potion,,0.15,0.05
+C,mini_dragon,ミニドラゴン,expired_potion expired_potion,red_stone blue_stone green_stone,,0.15,0.05
+C,ohst,オースト,hi_potion hp_potion,red_stone blue_stone green_stone,,0.15,0.05
+C,skelton_sword,スケルトン剣士,,fighters_sword hunters_rapier knights_heavy_axe pilgrims_sword scouts_dagger knight_heavy_sheld pilgrimss_round_sheld scount_blackleather_sheld,,0.15,0.05
+C,skelton_sword_armor,アーマースケルトン,,hunters_armor fighters_armor knights_heavy_armor pilgrims_clothes scouts_armor fighters_sheld hunters_wood_sheild knight_heavy_sheld pilgrimss_round_sheld scount_blackleather_sheld,,0.15,0.05
+C,doku_doku_tako,毒々たこ,expired_potion expired_potion,pilgrim_potion warrior_potion sage_potion,,0.15,0.05
+B,gogogolem,ゴゴゴーレム,red_stone blue_stone green_stone,red_stone blue_stone green_stone,,0.15,0.05
+B,gray_golem,グレイゴーレム,red_stone blue_stone green_stone,red_stone blue_stone green_stone,,0.15,0.05
+B,magmagro,マグマグロ,hi_potion hp_potion,red_stone blue_stone green_stone,,0.15,0.05
+B,sukasukame,スカスカメ,expired_potion expired_potion,red_stone blue_stone green_stone,,0.15,0.05
+C,suisui_slime,スイスイスライム,red_stone blue_stone green_stone,red_stone blue_stone green_stone,BOSS,0.25,0.15
+C,sukesuke_skeleton,スケスケスケルトン,red_stone blue_stone green_stone,red_stone blue_stone green_stone,BOSS,0.25,0.15
+B,gogo_ghost,ゴーゴーゴースト,red_stone blue_stone green_stone,red_stone blue_stone green_stone,BOSS,0.25,0.15
+B,deka_komori,デカコウモリ,red_stone blue_stone green_stone,red_stone blue_stone green_stone,BOSS,0.25,0.2
+A,meyon,メヨーン,red_stone blue_stone green_stone,red_stone blue_stone green_stone,BOSS,0.25,0.2

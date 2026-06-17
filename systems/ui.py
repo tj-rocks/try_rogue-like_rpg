@@ -1845,17 +1845,29 @@ class StaveInventoryDialog(InventoryDialog):
     """杖専用管理画面"""
     STATE_KEY = "stave_inventory_active"
 
+    def __init__(self, screen_width, screen_height):
+        super().__init__(screen_width, screen_height)
+        self._last_stave_iids = None  # 前回のインベントリ状態
+
     def get_title(self): 
-        print(f"[STAVE-DEBUG] StaveInventoryDialog.get_title() called")
         return Text.UI.STAVE_TITLE
 
     def update_items_from_player(self, player):
-        print(f"[STAVE-DEBUG] update_items_from_player called, stave_inventory={getattr(player, 'stave_inventory', None)}")
         labels, data = [], []
         staves = list(player.stave_inventory)
         staves.sort(key=lambda x: x.get_name().lower())
+        
+        # 現在のインベントリ状態（iidリスト）
+        current_iids = tuple(inst.iid for inst in staves)
+        
+        # 変更があった時だけデバッグログを出力
+        if current_iids != self._last_stave_iids:
+            print(f"[STAVE-DEBUG] update_items_from_player called, stave_inventory={getattr(player, 'stave_inventory', None)}")
+            for inst in staves:
+                print(f"[STAVE-DEBUG] Adding stave: {inst.get_name_with_charges()} (iid={inst.iid})")
+            self._last_stave_iids = current_iids
+        
         for inst in staves:
-            print(f"[STAVE-DEBUG] Adding stave: {inst.get_name_with_charges()} (iid={inst.iid})")
             labels.append(inst.get_name_with_charges()); data.append(("stave", inst.iid))
         labels.append(Text.UI.QUIT); data.append(("cancel", None))
         self.items, self.item_data = labels, data
