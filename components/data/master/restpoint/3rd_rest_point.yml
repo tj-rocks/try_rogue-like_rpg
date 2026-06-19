@@ -43,6 +43,14 @@ TILE_MAPPINGS:
     image_path: components/pictures/dungeon/home/floor_dark_stone.png
     bg_color: '#3c3c3c'
     fg_color: '#666'
+  floor_rock:
+    char: '"'
+    category: floor
+    tile_id: 9
+    desc: 内床 (岩床)
+    image_path: components/pictures/dungeon/deep_rock/floor_0.png
+    bg_color: '#2a2a2a'
+    fg_color: '#555'
   corridor_stone_1:
     char: K
     category: corridor
