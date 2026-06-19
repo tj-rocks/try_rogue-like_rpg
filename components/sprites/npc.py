@@ -4,12 +4,14 @@ from wordings import Text
 
 class NPC(Entity):
     _npc_scaled_cache = {} # {(img_obj, phase): surface}
+    _anim_dir_cache = {} # {(path, width, height): img_dict} — パスベースの画像ロードキャッシュ
 
     @classmethod
     def clear_cache(cls):
         """蓄積されたNPC画像キャッシュをクリアする"""
         count = len(cls._npc_scaled_cache)
         cls._npc_scaled_cache = {}
+        cls._anim_dir_cache = {}
         if count > 0:
             print(f"[MEMORY] NPC scaled image cache cleared ({count} items)")
 
@@ -28,39 +30,50 @@ class NPC(Entity):
         # 背景画像（足元の床など）の読み込み
         self.base_image = None
         if base_image_path and os.path.exists(base_image_path):
-            try:
-                raw_base = pygame.image.load(base_image_path).convert_alpha()
-                self.base_image = pygame.transform.scale(raw_base, (self.width, self.height))
-            except Exception as e:
-                print(f"[NPC] Failed to load base image {base_image_path}: {e}")
+            base_cache_key = (base_image_path, self.width, self.height)
+            if base_cache_key in NPC._anim_dir_cache:
+                self.base_image = NPC._anim_dir_cache[base_cache_key].get("idel")
+            else:
+                try:
+                    raw_base = pygame.image.load(base_image_path).convert_alpha()
+                    scaled = pygame.transform.scale(raw_base, (self.width, self.height))
+                    NPC._anim_dir_cache[base_cache_key] = {"idel": scaled}
+                    self.base_image = scaled
+                except Exception as e:
+                    print(f"[NPC] Failed to load base image {base_image_path}: {e}")
 
         # [NEW] 画像の読み込み（アニメーション対応：idel, 0, 1 構成）
         self._image_dicts_by_rank = {}
         
         def load_anim_dir(path):
+            if not path or not isinstance(path, str):
+                return {}
+            cache_key = (path, self.width, self.height)
+            if cache_key in NPC._anim_dir_cache:
+                return NPC._anim_dir_cache[cache_key]
             img_dict = {}
-            if path and isinstance(path, str):
-                if os.path.isdir(path):
-                    try:
-                        for key in ["idel", "0", "1"]:
-                            fname = f"{key}.png"
-                            full_path = os.path.join(path, fname)
-                            if os.path.exists(full_path):
-                                raw = pygame.image.load(full_path).convert_alpha()
-                                img_dict[key] = pygame.transform.scale(raw, (self.width, self.height))
-                        if "idel" not in img_dict:
-                            path01 = os.path.join(path, "01.png")
-                            if os.path.exists(path01):
-                                raw = pygame.image.load(path01).convert_alpha()
-                                img_dict["idel"] = pygame.transform.scale(raw, (self.width, self.height))
-                    except Exception as e:
-                        print(f"[NPC] Failed to load animation from {path}: {e}")
-                elif os.path.isfile(path):
-                    try:
-                        raw = pygame.image.load(path).convert_alpha()
-                        img_dict["idel"] = pygame.transform.scale(raw, (self.width, self.height))
-                    except Exception as e:
-                        print(f"[NPC] Failed to load image from {path}: {e}")
+            if os.path.isdir(path):
+                try:
+                    for key in ["idel", "0", "1"]:
+                        fname = f"{key}.png"
+                        full_path = os.path.join(path, fname)
+                        if os.path.exists(full_path):
+                            raw = pygame.image.load(full_path).convert_alpha()
+                            img_dict[key] = pygame.transform.scale(raw, (self.width, self.height))
+                    if "idel" not in img_dict:
+                        path01 = os.path.join(path, "01.png")
+                        if os.path.exists(path01):
+                            raw = pygame.image.load(path01).convert_alpha()
+                            img_dict["idel"] = pygame.transform.scale(raw, (self.width, self.height))
+                except Exception as e:
+                    print(f"[NPC] Failed to load animation from {path}: {e}")
+            elif os.path.isfile(path):
+                try:
+                    raw = pygame.image.load(path).convert_alpha()
+                    img_dict["idel"] = pygame.transform.scale(raw, (self.width, self.height))
+                except Exception as e:
+                    print(f"[NPC] Failed to load image from {path}: {e}")
+            NPC._anim_dir_cache[cache_key] = img_dict
             return img_dict
 
         if isinstance(image_path, dict):
