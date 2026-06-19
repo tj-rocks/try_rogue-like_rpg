@@ -519,15 +519,17 @@ class Dungeon:
         self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
         
         import re
-        def build_weight_list(variants):
+        def build_weight_list(variants, uniform=False):
             if not variants: return []
+            if uniform:
+                return [1.0] * len(variants)
             weights = []
             for v in variants:
                 m = re.search(r'(\d+)$', v)
                 weights.append(0.5 ** int(m.group(1)) if m else 1.0)
             return weights
 
-        self._floor_weights = build_weight_list(self.available_floor_variants)
+        self._floor_weights = build_weight_list(self.available_floor_variants, uniform=True)
         self._wall_weights = build_weight_list(self.available_wall_variants)
         self._top_weights = build_weight_list(self.available_wall_top_variants)
         self._none_weights = build_weight_list(self.available_wall_none_variants)
