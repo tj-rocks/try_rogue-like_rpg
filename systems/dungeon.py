@@ -193,7 +193,6 @@ class Dungeon:
         self.map_height = max(30, calculated_side)
 
         # --- 各種データコンテナの初期化 (他のメソッドから参照されるため、ロジック実行前に初期化) ---
-        self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
         self.rooms = []
         self.room_info = []
         self.room_rects = []
@@ -411,11 +410,8 @@ class Dungeon:
         # 決定論的なバリアント選択用シード（フロアごとに固定）
         self._variant_seed = random.randint(0, 0xFFFF)
 
-        # wall_variantsのみ2D配列（_spawn_wall_obstaclesで書き込みあり）
-        def get_rand_wall():
-            if not self.available_wall_variants: return "wall_single"
-            return random.choices(self.available_wall_variants, weights=self._wall_weights, k=1)[0]
-        self.wall_variants = [[get_rand_wall() for _ in range(self.map_width)] for _ in range(self.map_height)]
+        # wall_variants: 障害物として配置されたマスのみ保持するdict {(x,y): variant_key}
+        self.wall_variants = {}
         self.wall_decoration_variants = [["" for _ in range(self.map_width)] for _ in range(self.map_height)]
         self.wall_decoration_flips = [[False for _ in range(self.map_width)] for _ in range(self.map_height)]
         
@@ -438,17 +434,7 @@ class Dungeon:
             self.generate_fixed_map(map_file)
         else:
             self.generate_dungeon()
-            self._remove_lone_walls()
-            self._convert_inner_walls_to_floors()
-            self._remove_thin_walls()
-            
-            # 全ての配置が終わった後に最終クリーニングを行う（障害物が挟まっていた場合も床にする）
-            self._convert_sandwiched_walls()
-        
-        # 描画前の最終調整（外部からマップデータを整える）
-        self._adjust_wall_rendering_logic()
-        # [NEW] 3方向置換で新たに発生した孤立壁を最終クリーニング
-        self._remove_lone_walls()
+            self._clean_map_single_pass()
         
         # 壁の装飾を配置 (ランダムダンジョンのみ)
         if not map_file:
@@ -1119,7 +1105,10 @@ class Dungeon:
         try:
             print(f"[Dungeon] Floor {floor} | Item Candidates: {len(candidates)} | Spawning: {count}")
             player_gx, player_gy = int((player.x + self.tile_size / 2) // self.tile_size), int((player.y + self.tile_size / 2) // self.tile_size)
-            floor_tiles = [(c, r) for r in range(self.map_height) for c in range(self.map_width) if self.map_data[r][c] == 1 and (abs(c - player_gx) > 1 or abs(r - player_gy) > 1)]
+            if hasattr(self, 'valid_floor_coords') and self.valid_floor_coords:
+                floor_tiles = [(c, r) for (c, r) in self.valid_floor_coords if self.map_data[r][c] == 1 and (abs(c - player_gx) > 1 or abs(r - player_gy) > 1)]
+            else:
+                floor_tiles = [(c, r) for r in range(self.map_height) for c in range(self.map_width) if self.map_data[r][c] == 1 and (abs(c - player_gx) > 1 or abs(r - player_gy) > 1)]
             random.shuffle(floor_tiles)
             placed = 0
             
@@ -1391,9 +1380,79 @@ class Dungeon:
             if abs(tx - px) <= 1 and abs(ty - py) <= 1: continue
             self.map_data[ty][tx] = 0
             if self.available_wall_variants:
-                self.wall_variants[ty][tx] = random.choice(self.available_wall_variants)
+                self.wall_variants[(tx, ty)] = random.choice(self.available_wall_variants)
             placed += 1
         print(f"[Dungeon] Spawned {placed} wall obstacles (Floor {self.current_floor})")
+
+    def _clean_map_single_pass(self):
+        """ランダムダンジョン生成後のクリーニングを1収束ループで行う。
+        旧: _remove_lone_walls + _convert_inner_walls_to_floors + _remove_thin_walls
+            + _convert_sandwiched_walls + _adjust_wall_rendering_logic + _remove_lone_walls(2回目)
+        を統合して全マスループを最小化する。
+        """
+        def is_vis(tx, ty):
+            if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): return False
+            return self.map_data[ty][tx] > 0 or self.is_nw(tx, ty)
+
+        def is_void(tx, ty):
+            if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): return True
+            return self.map_data[ty][tx] == 0 and not self.is_nw(tx, ty)
+
+        changed = True
+        while changed:
+            changed = False
+            for y in range(1, self.map_height - 1):
+                for x in range(1, self.map_width - 1):
+                    if self.map_data[y][x] != 0:
+                        continue
+                    n = self.map_data[y-1][x]
+                    s = self.map_data[y+1][x]
+                    w = self.map_data[y][x-1]
+                    e = self.map_data[y][x+1]
+                    f_u, f_d, f_l, f_r = n > 0, s > 0, w > 0, e > 0
+
+                    # 孤立壁（4方向すべて床）→ 床
+                    if f_u and f_d and f_l and f_r:
+                        self.map_data[y][x] = 1
+                        if hasattr(self, 'valid_floor_coords'):
+                            self.valid_floor_coords.add((x, y))
+                        changed = True
+                        continue
+
+                    # 挟まれた壁（上下が床）→ 床
+                    if f_u and f_d:
+                        self.map_data[y][x] = 1
+                        if hasattr(self, 'valid_floor_coords'):
+                            self.valid_floor_coords.add((x, y))
+                        changed = True
+                        continue
+
+                    # 内側壁（4方向すべて可視）→ 床
+                    if all(is_vis(x+dx, y+dy) for dx, dy in [(-1,0),(1,0),(0,-1),(0,1)]):
+                        self.map_data[y][x] = 1
+                        if hasattr(self, 'valid_floor_coords'):
+                            self.valid_floor_coords.add((x, y))
+                        changed = True
+                        continue
+
+                    # 細い壁（3方向以上がVoid）→ 床
+                    if self.is_nw(x, y):
+                        void_count = sum(1 for dx, dy in [(-1,0),(1,0),(0,-1),(0,1)] if is_void(x+dx, y+dy))
+                        if void_count >= 3:
+                            self.map_data[y][x] = 1
+                            if hasattr(self, 'valid_floor_coords'):
+                                self.valid_floor_coords.add((x, y))
+                            changed = True
+                            continue
+
+                    # 3方向が床の壁 → 床（ただし上だけ壁・他3方向床はwall_topなので残す）
+                    if self.current_floor != 0:
+                        floor_count = sum([f_u, f_d, f_l, f_r])
+                        if floor_count == 3 and not (not f_u and f_d and f_l and f_r):
+                            self.map_data[y][x] = 1
+                            if hasattr(self, 'valid_floor_coords'):
+                                self.valid_floor_coords.add((x, y))
+                            changed = True
 
     def _remove_lone_walls(self):
         """上下左右がすべて床（または通路）である孤立した壁を床に置き換える。"""
@@ -1843,7 +1902,7 @@ class Dungeon:
                     if wall_type == "wall_top":
                         fk = self._pick_variant(self.available_wall_top_variants, self._top_weights, x, y, 2) or "wall_top"
                     elif wall_type == "wall_single":
-                        fk = self.wall_variants[y][x]
+                        fk = self.wall_variants.get((x, y)) or self._pick_variant(self.available_wall_variants, self._wall_weights, x, y, 4) or "wall_single"
                     else:
                         fk = self._pick_variant(self.available_wall_none_variants, self._none_weights, x, y, 3) or "wall_none"
                 
