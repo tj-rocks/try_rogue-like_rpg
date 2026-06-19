@@ -82,6 +82,10 @@ def start_new_game(ui_elements, game_state):
     """
     新しいゲームセッションを開始する。
     """
+    import pygame
+    from systems.dungeon import Dungeon
+    screen = pygame.display.get_surface()
+    Dungeon.preload_all_themes(screen)
     player = Player()
     dungeon = warp_to_floor(0, player, spawn_reason="new_game")
     
@@ -96,6 +100,10 @@ def continue_game(ui_elements, game_state, player):
     1. 中断セーブ(SAVE_SUSPEND_PATH)があれば優先してロードし、ロード後に削除する。
     2. なければ永続セーブ(SAVE_OFFICIAL_PATH)をロードする。
     """
+    import pygame
+    from systems.dungeon import Dungeon
+    screen = pygame.display.get_surface()
+    Dungeon.preload_all_themes(screen)
     from systems.data_loader import SAVE_OFFICIAL_PATH, SAVE_SUSPEND_PATH
     import os
     

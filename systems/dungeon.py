@@ -105,6 +105,130 @@ class Dungeon:
     _variant_lists = {} # {theme_folder: {category: [keys]}}
 
     @classmethod
+    def preload_all_themes(cls, screen=None):
+        """起動時に全テーマ画像をキャッシュに一括ロードする。
+        以降の階層移動では常にキャッシュヒットするため、プレイ中のロードが消える。
+        """
+        from constants import DUNGEON_IMAGES, TILE_SIZE
+        main_path = DUNGEON_IMAGES.get("path", "components/pictures/dungeon")
+        folders = set()
+        for k, v in DUNGEON_IMAGES.items():
+            if k in ("path",): continue
+            if isinstance(v, dict):
+                img = v.get("image")
+                if img: folders.add(img)
+            elif isinstance(v, str):
+                folders.add(v)
+
+        loaded = 0
+        total = len(folders)
+        for folder in sorted(folders):
+            if folder in cls._texture_cache:
+                continue
+            img_dir = f"{main_path}/{folder}"
+            if not os.path.exists(img_dir):
+                continue
+
+            if screen:
+                from systems.ui import show_loading_screen
+                show_loading_screen(screen, f"Now Loading... ({loaded+1}/{total})")
+                pygame.display.flip()
+
+            textures = {}
+            available_floor_variants = []
+            available_wall_variants = []
+            available_wall_top_variants = []
+            available_wall_none_variants = []
+            available_wall_decoration_variants = []
+            overhead_base_map = {}
+            short_to_full_key = {}
+
+            def load_and_scale(path):
+                img = pygame.image.load(path).convert_alpha()
+                if img.get_size() != (TILE_SIZE, TILE_SIZE):
+                    return pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
+                return img
+
+            keys_to_load = ["floor", "wall_top", "wall_bottom", "wall_side", "wall_none",
+                            "wall_corner", "corridor", "wall_single", "wall_base", "wall_pass"]
+            for key in keys_to_load:
+                p = f"{img_dir}/{key}.png"
+                if os.path.exists(p):
+                    textures[key] = load_and_scale(p)
+
+            for f in os.listdir(img_dir):
+                if not f.endswith(".png"): continue
+                key = f[:-4]
+                path = f"{img_dir}/{f}"
+                if f.startswith("floor"):
+                    textures[key] = load_and_scale(path)
+                    available_floor_variants.append(key)
+                elif f.startswith("wall_single"):
+                    textures[key] = load_and_scale(path)
+                    available_wall_variants.append(key)
+                elif f.startswith("wall_top"):
+                    textures[key] = load_and_scale(path)
+                    available_wall_top_variants.append(key)
+                elif f.startswith("wall_none"):
+                    textures[key] = load_and_scale(path)
+                    available_wall_none_variants.append(key)
+                elif f.startswith("corridor"):
+                    textures[key] = load_and_scale(path)
+                elif f.startswith("wall_decoration"):
+                    textures[key] = load_and_scale(path)
+                    available_wall_decoration_variants.append(key)
+                elif f.startswith("wall_pass"):
+                    textures[key] = load_and_scale(path)
+                    available_wall_top_variants.append(key)
+
+            for base_key, variant_list in [("floor", available_floor_variants),
+                                           ("wall_top", available_wall_top_variants),
+                                           ("wall_none", available_wall_none_variants)]:
+                has_real = os.path.exists(f"{img_dir}/{base_key}.png")
+                if not has_real and variant_list:
+                    textures[base_key] = textures[variant_list[0]]
+                    if base_key not in variant_list: variant_list.append(base_key)
+                elif has_real and base_key not in variant_list:
+                    variant_list.append(base_key)
+
+            stairs_dir = f"{main_path}/stairs"
+            for key in ["stairs_up", "stairs_down"]:
+                p = f"{stairs_dir}/{key}.png"
+                if os.path.exists(p):
+                    textures[key] = load_and_scale(p)
+
+            if "corridor" in textures:
+                textures["corridor_h"] = pygame.transform.rotate(textures["corridor"], -90)
+
+            for k in textures.keys():
+                if "-" in k:
+                    parts = k.split("-")
+                    if len(parts) >= 2:
+                        short = parts[0]
+                        overhead_base_map[short] = parts[1]
+                        short_to_full_key[short] = k
+                else:
+                    short_to_full_key[k] = k
+
+            cls._texture_cache[folder] = textures
+            cls._variant_lists[folder] = {
+                "floor": available_floor_variants,
+                "wall": available_wall_variants,
+                "wall_top": available_wall_top_variants,
+                "wall_none": available_wall_none_variants,
+                "wall_decoration": available_wall_decoration_variants,
+            }
+            cls._overhead_base_map_cache = getattr(cls, "_overhead_base_map_cache", {})
+            cls._overhead_base_map_cache[folder] = overhead_base_map
+            cls._short_to_full_key_cache = getattr(cls, "_short_to_full_key_cache", {})
+            cls._short_to_full_key_cache[folder] = short_to_full_key
+
+            loaded += 1
+            print(f"[PRELOAD] Theme '{folder}' cached. ({loaded}/{total})")
+
+        print(f"[PRELOAD] All themes preloaded. ({loaded} themes)")
+
+    @classmethod
     def clear_cache(cls):
         """蓄積されたダンジョンテクスチャのキャッシュを解放する"""
         count = len(cls._texture_cache)
