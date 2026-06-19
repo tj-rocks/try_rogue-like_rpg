@@ -1112,8 +1112,9 @@ class Dungeon:
                             self._wall_top_override[(c, r)] = fk
                             print(f"[DEBUG-NPC]   Successfully placed wall_pass '{ent_id}' (fk={fk}) at grid coordinate ({c}, {r})")
                 
-                # --- [NEW] 固定マップでも障害物を配置可能にする ---
-                if self.player and self.current_floor > 0:
+                # --- [NEW] 固定マップでも障害物を配置可能にする (no_attack フロアは除く) ---
+                _no_attack = self.floor_info.get("no_attack", False) if isinstance(self.floor_info, dict) else False
+                if self.player and self.current_floor > 0 and not _no_attack:
                     self._spawn_wall_obstacles(self.player)
                     
                 return
