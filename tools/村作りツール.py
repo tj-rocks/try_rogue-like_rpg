@@ -284,7 +284,25 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 # positionsを各定義に注入
                 mappings = village_yml_data.get("TILE_MAPPINGS", {})
                 is_new_file = (load_path != save_path)
-                
+
+                # restpoint YMLが既に存在する場合、village.ymlにないカスタム定義を保持する
+                if is_new_file and os.path.exists(save_path):
+                    try:
+                        if has_ruamel:
+                            yaml_r = YAML()
+                            yaml_r.preserve_quotes = True
+                            with open(save_path, "r", encoding="utf-8") as f:
+                                existing_data = yaml_r.load(f)
+                        else:
+                            with open(save_path, "r", encoding="utf-8") as f:
+                                existing_data = pyyaml.safe_load(f) or {}
+                        existing_mappings = existing_data.get("TILE_MAPPINGS", {}) if existing_data else {}
+                        for ek, ev in existing_mappings.items():
+                            if ek not in mappings and isinstance(ev, dict):
+                                mappings[ek] = ev
+                    except Exception:
+                        pass
+
                 for k, v in mappings.items():
                     if not isinstance(v, dict):
                         continue
