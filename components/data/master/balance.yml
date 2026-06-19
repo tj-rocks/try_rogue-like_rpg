@@ -200,6 +200,13 @@ GUILD_QUEST:
   BOUNTY_BASE_MULTIPLIER: 5     # 討伐報酬の計算係数 (HP+ATK) * この値
   ITEM_PRICE_RATIO: 0.33        # 納品報酬の基準価格比率 (購入価格 * この値)
   DELIVERY_REWARD_BONUS: 1.2    # 納品報酬のボーナス倍率 (基準価格 * この値)
+
+  # 納品クエストの必要個数の重み (個数: 重み)。ほとんど1個、たまに2〜3個
+  # ※未設定の場合はランクの amount_range からランダムに決定される
+  DELIVERY_AMOUNT_WEIGHTS:
+    1: 70    # 1個納品 (70%)
+    2: 20    # 2個納品 (20%)
+    3: 10    # 3個納品 (10%)
   
 
 # GLOBAL_SCALING (ランクによる自動スケーリング倍率)
@@ -239,7 +246,7 @@ CURSE_SYSTEM:
 # ENHANCED_DROP_CONFIG (強化済み装備ドロップ設定)
 # ------------------------------------------------------------------------------
 ENHANCED_DROP_CONFIG:
-  occurrence_chance: 1.0    # 発生確率
+  occurrence_chance: 0.3    # 発生確率
   stat_allocation: random   # ステータス分配方式 (random: ランダム)
   rank_enhance_range:       # ランク別 強化回数範囲 [min, max] (0,0=強化なし)
     F:  [0, 0]

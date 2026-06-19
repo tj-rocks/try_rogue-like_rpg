@@ -6,7 +6,7 @@ import yaml
 # プロジェクトのルートをパスに追加
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-MASTER_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../components/data/master"))
+MASTER_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../components/data/master/equipments"))
 
 # モードごとに参照するYMLファイルを定義
 MODE_FILE = {
@@ -276,16 +276,26 @@ def run_viewer():
                     
                 elif mode == "SHIELD":
                     img_dir = os.path.join(os.path.dirname(__file__), "..", prev_item_data["image_dir"])
+                    # ゲーム内と同じフォールバック順序: down.png -> d_str_1.png -> shield.png
                     img_path = f"{img_dir}/{d_str}.png"
-                    if not os.path.exists(img_path): img_path = f"{img_dir}/{d_str}_1.png"
-                    s_img = pygame.image.load(img_path).convert_alpha()
-                    img_scale = shield_cats[cur_cat_key].get("image_scale", 1.0)
-                    s_img = pygame.transform.scale(s_img, (int(s_img.get_width()*scale*img_scale), int(s_img.get_height()*scale*img_scale)))
-                    off = cur_pos["offsets"][d_str]
-                    rect = s_img.get_rect(center=(center[0] + off[0]*scale, center[1] + off[1]*scale))
-                    preview_surf.blit(s_img, rect)
+                    if not os.path.exists(img_path):
+                        img_path = f"{img_dir}/{d_str}_1.png"
+                    if not os.path.exists(img_path):
+                        img_path = f"{img_dir}/shield.png"
+                    if not os.path.exists(img_path):
+                        print(f"[SHIELD-ERROR] Image not found: tried {img_dir}/{{{d_str}.png,{d_str}_1.png,shield.png}}")
+                    else:
+                        s_img = pygame.image.load(img_path).convert_alpha()
+                        img_scale = shield_cats[cur_cat_key].get("image_scale", 1.0)
+                        s_img = pygame.transform.scale(s_img, (int(s_img.get_width()*scale*img_scale), int(s_img.get_height()*scale*img_scale)))
+                        off = cur_pos["offsets"][d_str]
+                        rect = s_img.get_rect(center=(center[0] + off[0]*scale, center[1] + off[1]*scale))
+                        preview_surf.blit(s_img, rect)
+                        print(f"[SHIELD-DRAW] {prev_item_key} at {d_str} (used: {os.path.basename(img_path)}), off={off}, scale={img_scale}")
             except Exception as e:
-                pass
+                print(f"[SHIELD-ERROR] {e}")
+                import traceback
+                traceback.print_exc()
 
         screen.blit(preview_surf, (50, 100))
         

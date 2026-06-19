@@ -2768,6 +2768,23 @@ class GuildDialog:
     def _is_reportable(self, player, q):
         return player.is_quest_reportable(q)
 
+    def _calc_reward(self, player, q):
+        """クエストの実際の報酬(gold, gp)を計算して返す。
+        格下ボス（クエストの min_rank が主人公の現在ランク未満）の場合は報酬を1/4に減額する。
+        （ランクが上がった後に休憩所手前の格下ボスを倒して稼ぐのを防ぐ）
+        表示・受け取りの両方でこのメソッドを使うことで、金額のズレを防ぐ。
+        """
+        reward_gold = q.get("reward_gold", 0)
+        reward_gp = q.get("reward_gp", 0)
+        q_min_rank = q.get("min_rank")
+        if q_min_rank:
+            from constants import RANK_ORDER
+            if q_min_rank in RANK_ORDER and player.guild_rank in RANK_ORDER:
+                if RANK_ORDER.index(player.guild_rank) > RANK_ORDER.index(q_min_rank):
+                    reward_gold = max(1, reward_gold // 4)
+                    reward_gp = max(1, reward_gp // 4)
+        return reward_gold, reward_gp
+
     def _create_rank_up_quest(self, next_rank_data):
         from constants import CONSUMABLE_DATA
         cert_data = CONSUMABLE_DATA.get(next_rank_data["rank_up_item"], {})
@@ -3003,8 +3020,9 @@ class GuildDialog:
                 return
 
             else:
-                player.coin += q["reward_gold"]
-                gp_reward = q["reward_gp"]
+                reward_gold, gp_reward = self._calc_reward(player, q)
+
+                player.coin += reward_gold
                 report_msg = q.get("report_message") or self._get_fixed_quest_report_message(q)
                 dialog.text = report_msg if report_msg else "見事に依頼を達成しましたね！\nおめでとうございます！"
                 
@@ -3087,7 +3105,8 @@ class GuildDialog:
             if q.get("is_rank_up"):
                 reward_str = Text.UI.GUILD_REPORT_RANK_UP.format(rank=q['next_rank'])
             else:
-                reward_str = Text.UI.GUILD_REPORT_REWARD.format(gold=q['reward_gold'], gp=q['reward_gp'])
+                _rg, _gp = self._calc_reward(player, q)
+                reward_str = Text.UI.GUILD_REPORT_REWARD.format(gold=_rg, gp=_gp)
             reward_text = self.font.render(reward_str, True, (180, 255, 180))
             screen.blit(reward_text, (self.x + self.width // 2 - reward_text.get_width() // 2, self.y + 220))
             
@@ -3237,8 +3256,7 @@ class GuildDialog:
                 elif t == "delivery":
                     desc_text += f"【内容】\n{target} を {amount} 個納品する"
                 
-                reward_gold = q.get("reward_gold", 0)
-                reward_gp = q.get("reward_gp", 0)
+                reward_gold, reward_gp = self._calc_reward(player, q)
                 desc_text += f"\n\n【報酬】\n{reward_gold} G / {reward_gp} GP"
 
             draw_text_wrapped(screen, self.font, desc_text, desc_x, desc_y, desc_width, color=(220, 230, 240))

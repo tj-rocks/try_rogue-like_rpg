@@ -2,15 +2,39 @@ WEAPON_CATEGORIES:
   onehanded_sword:
     position:
       hand_offsets:
-        down: [[-17, -1], [-8, 31]]
-        left: [[-22, -2], [-28, 24]]
-        right: [[-7, -4], [25, 24]]
-        up: [[17, -4], [36, 13]]
+        down:
+        - - -17
+          - -1
+        - - -8
+          - 31
+        left:
+        - - -22
+          - -2
+        - - -28
+          - 24
+        right:
+        - - -7
+          - -4
+        - - 25
+          - 24
+        up:
+        - - 17
+          - -4
+        - - 36
+          - 13
       weapon_angles:
-        down: [0, 210]
-        left: [-343, 106]
-        right: [26, -111]
-        up: [0, -81]
+        down:
+        - 0
+        - 210
+        left:
+        - -343
+        - 106
+        right:
+        - 26
+        - -111
+        up:
+        - 0
+        - -81
       draw_over_player:
         down: true
         left: false
@@ -19,15 +43,39 @@ WEAPON_CATEGORIES:
   axe:
     position:
       hand_offsets:
-        down: [[-19, -4], [-8, 31]]
-        left: [[-22, -2], [-28, 24]]
-        right: [[-7, -4], [25, 24]]
-        up: [[17, -4], [36, 13]]
+        down:
+        - - -18
+          - -4
+        - - -8
+          - 31
+        left:
+        - - -22
+          - -2
+        - - -28
+          - 24
+        right:
+        - - -7
+          - -4
+        - - 25
+          - 24
+        up:
+        - - 17
+          - -4
+        - - 36
+          - 13
       weapon_angles:
-        down: [0, 210]
-        left: [-343, 106]
-        right: [26, -111]
-        up: [0, -81]
+        down:
+        - 0
+        - 210
+        left:
+        - -343
+        - 106
+        right:
+        - 26
+        - -111
+        up:
+        - 0
+        - -81
       draw_over_player:
         down: true
         left: false
@@ -36,15 +84,39 @@ WEAPON_CATEGORIES:
   dagger:
     position:
       hand_offsets:
-        down: [[-19, -3], [-8, 31]]
-        left: [[-22, -2], [-28, 24]]
-        right: [[-7, -4], [25, 24]]
-        up: [[17, -4], [36, 13]]
+        down:
+        - - -19
+          - -3
+        - - -8
+          - 31
+        left:
+        - - -22
+          - -2
+        - - -28
+          - 24
+        right:
+        - - -7
+          - -4
+        - - 25
+          - 24
+        up:
+        - - 17
+          - -4
+        - - 36
+          - 13
       weapon_angles:
-        down: [0, 210]
-        left: [-343, 106]
-        right: [26, -111]
-        up: [0, -81]
+        down:
+        - 0
+        - 210
+        left:
+        - -343
+        - 106
+        right:
+        - 26
+        - -111
+        up:
+        - 0
+        - -81
       draw_over_player:
         down: true
         left: false
@@ -53,15 +125,39 @@ WEAPON_CATEGORIES:
   greatsword:
     position:
       hand_offsets:
-        down: [[-19, -3], [-8, 31]]
-        left: [[-22, -2], [-28, 24]]
-        right: [[-7, -4], [25, 24]]
-        up: [[17, -4], [36, 13]]
+        down:
+        - - -19
+          - -3
+        - - -8
+          - 31
+        left:
+        - - -22
+          - -2
+        - - -28
+          - 24
+        right:
+        - - -7
+          - -4
+        - - 25
+          - 24
+        up:
+        - - 17
+          - -4
+        - - 36
+          - 13
       weapon_angles:
-        down: [0, 210]
-        left: [-343, 106]
-        right: [26, -111]
-        up: [0, -81]
+        down:
+        - 0
+        - 210
+        left:
+        - -343
+        - 106
+        right:
+        - 26
+        - -111
+        up:
+        - 0
+        - -81
       draw_over_player:
         down: true
         left: false

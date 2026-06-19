@@ -112,15 +112,25 @@ class DroppedWeapon(Item):
             pygame.draw.rect(screen, (120, 70, 20), (draw_x, draw_y, self.width, self.height), 2)
 
     def collect(self, player):
+        print(f"[WEAPON-COLLECT-START] {self.weapon_key} ({self.name})")
         from constants import MAX_EQUIP_SLOTS
         if player.get_equipment_count() >= MAX_EQUIP_SLOTS:
+            print(f"[WEAPON-COLLECT-FAILED] Equipment slots full")
             return "装備がいっぱいで 拾えない！"
-        
-        self.is_collected = True
-        if hasattr(player, "equip_weapon_by_key"):
-            player.equip_weapon_by_key(self.weapon_key, enhance=self.enhance, stats=self.stats)
-        from wordings import Text
-        return Text.Items.GET.format(name=self.name)
+
+        try:
+            self.is_collected = True
+            if hasattr(player, "equip_weapon_by_key"):
+                print(f"[WEAPON-COLLECT] Calling equip_weapon_by_key")
+                player.equip_weapon_by_key(self.weapon_key, enhance=self.enhance, stats=self.stats)
+                print(f"[WEAPON-COLLECT-SUCCESS] {self.weapon_key}")
+            from wordings import Text
+            return Text.Items.GET.format(name=self.name)
+        except Exception as e:
+            print(f"[ERROR] Weapon collect failed: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
 
 class DroppedConsumable(Item):
     """地面に落ちた消費アイテム。拾うとインベントリに入る。"""
@@ -158,19 +168,37 @@ class DroppedConsumable(Item):
 
     def collect(self, player):
         # effect == "lantern" was deprecated
+        print(f"[ITEM-COLLECT-START] {self.item_key} ({self.name})")
 
         if hasattr(player, "add_item_to_inventory"):
-            success = player.add_item_to_inventory(self.item_key, count=1)
-            if success:
-                self.is_collected = True
-                from wordings import Text
-                msg = Text.Items.GET.format(name=self.name)
-                # クエスト達成チェック
-                if hasattr(player, "check_quest_completion"):
-                    msg += player.check_quest_completion(self.item_key)
-                return msg
-            else:
-                return "バッグがいっぱいで 拾えない！"
+            try:
+                success = player.add_item_to_inventory(self.item_key, count=1)
+                print(f"[ITEM-COLLECT] add_item_to_inventory returned: {success}")
+                if success:
+                    self.is_collected = True
+                    from wordings import Text
+                    msg = Text.Items.GET.format(name=self.name)
+                    # クエスト達成チェック
+                    if hasattr(player, "check_quest_completion"):
+                        try:
+                            quest_msg = player.check_quest_completion(self.item_key)
+                            msg += quest_msg
+                            print(f"[ITEM-COLLECT] Quest check completed")
+                        except Exception as e:
+                            print(f"[ERROR] Quest check failed: {e}")
+                            import traceback
+                            traceback.print_exc()
+                    print(f"[ITEM-COLLECT-SUCCESS] {self.item_key}")
+                    return msg
+                else:
+                    print(f"[ITEM-COLLECT-FAILED] {self.item_key} - inventory full")
+                    return "バッグがいっぱいで 拾えない！"
+            except Exception as e:
+                print(f"[ERROR] add_item_to_inventory exception: {e}")
+                import traceback
+                traceback.print_exc()
+                raise
+        print(f"[ITEM-COLLECT-NO-METHOD] player has no add_item_to_inventory")
         return "拾えなかった！"
 
 

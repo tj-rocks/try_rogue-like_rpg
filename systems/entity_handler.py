@@ -330,6 +330,10 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                 
                 if hasattr(item, "collect"):
                     try:
+                        item_type = type(item).__name__
+                        item_key = getattr(item, 'item_key', 'unknown')
+                        print(f"[ITEM-PICKUP-START] type={item_type}, key={item_key}, pos=({px},{py})")
+
                         msg = item.collect(player)
                         print(f"[DUNGEON] Collected Item: {msg}")
                         if dialog:
@@ -337,16 +341,23 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
                             dialog.text = msg
                             game_state["dialog_modal"] = True
                             dialog.is_active = True
-                        
+
                         # 実際に取得できた場合のみ、リストから削除する
                         if getattr(item, "is_collected", False):
                             dungeon.dropped_items.remove(item)
                             player.last_item_warned_pos = None
+                            print(f"[ITEM-PICKUP-SUCCESS] Removed {item_key} from dropped_items")
                         else:
                             # 拾えなかった場合、位置を記録
                             player.last_item_warned_pos = (px, py)
+                            print(f"[ITEM-PICKUP-FAILED] {item_key} not collected (inventory full?)")
                     except Exception as e:
-                        print(f"[Error] Failed to collect item: {e}")
+                        import traceback
+                        print(f"[ERROR] Failed to collect item: {e}")
+                        print(f"[ERROR] Item type: {type(item).__name__}")
+                        print(f"[ERROR] Item key: {getattr(item, 'item_key', 'unknown')}")
+                        print(f"[ERROR] Traceback:\n{traceback.format_exc()}")
+                        traceback.print_exc()
                 break
                 
     if not has_uncollected_item_at_player:
