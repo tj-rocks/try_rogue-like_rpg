@@ -808,15 +808,10 @@ class Dungeon:
                 self.map_height = len(lines)
                 self.map_width = max(len(line) for line in lines)
                 self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
-                f_list = self.available_floor_variants
-                w_list = self.available_wall_variants
-                self.floor_variants = [[(random.choice(f_list) if f_list else "floor") for _ in range(self.map_width)] for _ in range(self.map_height)]
-                self.wall_variants = [[(random.choice(w_list) if w_list else "wall_single") for _ in range(self.map_width)] for _ in range(self.map_height)]
-                wt_list = self.available_wall_top_variants
-                self.wall_top_variants = [[(random.choice(wt_list) if wt_list else "wall_top") for _ in range(self.map_width)] for _ in range(self.map_height)]
-                wn_list = self.available_wall_none_variants
-                self.wall_none_variants = [[(random.choice(wn_list) if wn_list else "wall_none") for _ in range(self.map_width)] for _ in range(self.map_height)]
-                self.base_floor_variants = [[(random.choice(f_list) if f_list else "floor") for _ in range(self.map_width)] for _ in range(self.map_height)]
+                # 固定マップ用: タイル別のバリアント上書き dict {(x,y): key}
+                self._floor_override = {}
+                self._wall_top_override = {}
+                self._wall_none_override = {}
                 self.wall_decoration_variants = [["" for _ in range(self.map_width)] for _ in range(self.map_height)]
                 self.wall_decoration_flips = [[False for _ in range(self.map_width)] for _ in range(self.map_height)]
                 self.npcs = []
@@ -908,8 +903,8 @@ class Dungeon:
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
                             else:
                                 fk = f"wall_pass_{tile_mappings[char].get('tile_id', 0)}"
-                            self.wall_top_variants[r][c] = fk
-                            self.floor_variants[r][c] = "floor_lawn"
+                            self._wall_top_override[(c, r)] = fk
+                            self._floor_override[(c, r)] = "floor_lawn"
                             
                         # 2. 壁・天井
                         elif char in tile_mappings and tile_mappings[char].get("category") == "wall_top":
@@ -920,7 +915,7 @@ class Dungeon:
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
                             else:
                                 fk = f"wall_top_{tile_mappings[char].get('tile_id', 0)}"
-                            self.wall_top_variants[r][c] = fk
+                            self._wall_top_override[(c, r)] = fk
                             
                         # 4. 背景・虚無
                         elif char in tile_mappings and tile_mappings[char].get("category") == "wall_none":
@@ -931,7 +926,7 @@ class Dungeon:
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
                             else:
                                 fk = f"wall_none_{tile_mappings[char].get('tile_id', 0)}"
-                            self.wall_none_variants[r][c] = fk
+                            self._wall_none_override[(c, r)] = fk
                             
                         # 5. 床・地面
                         elif char in tile_mappings and tile_mappings[char].get("category") == "floor":
@@ -942,7 +937,7 @@ class Dungeon:
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
                             else:
                                 fk = f"floor_{tile_mappings[char].get('tile_id', 0)}"
-                            self.floor_variants[r][c] = fk
+                            self._floor_override[(c, r)] = fk
 
                         # 6. 通路
                         elif char in tile_mappings and tile_mappings[char].get("category") == "corridor":
@@ -953,12 +948,12 @@ class Dungeon:
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
                             else:
                                 fk = "corridor"
-                            self.floor_variants[r][c] = fk
+                            self._floor_override[(c, r)] = fk
                         # 6. 特別・特殊タイル (P, D, U)
                         elif char == "P":
                             self.start_pos = (c, r)
                             self.map_data[r][c] = 1
-                            self.floor_variants[r][c] = "floor_lawn"
+                            self._floor_override[(c, r)] = "floor_lawn"
 
                         elif char == "D":
                             self.map_data[r][c] = 3
@@ -969,16 +964,16 @@ class Dungeon:
                         # 7. 互換性のためのフォールバック
                         elif char == "X":
                             self.map_data[r][c] = 0
-                            self.wall_variants[r][c] = "wall_single_1"
+                            self.wall_variants[(c, r)] = "wall_single_1"
                         elif char == "Y":
                             self.map_data[r][c] = 0
-                            self.wall_variants[r][c] = "wall_single_2"
+                            self.wall_variants[(c, r)] = "wall_single_2"
                         elif char == "Z":
                             self.map_data[r][c] = 0
-                            self.wall_variants[r][c] = "wall_single_3"
+                            self.wall_variants[(c, r)] = "wall_single_3"
                         elif char == "O":
                             self.map_data[r][c] = 0
-                            self.wall_variants[r][c] = "wall_single"
+                            self.wall_variants[(c, r)] = "wall_single"
                         elif char in "KLkl": # 通路
                             self.map_data[r][c] = 4
                         else: 
@@ -1114,7 +1109,7 @@ class Dungeon:
                             else:
                                 tile_id = tile_info.get("tile_id", 0)
                                 fk = f"wall_pass_{tile_id}"
-                            self.wall_top_variants[r][c] = fk
+                            self._wall_top_override[(c, r)] = fk
                             print(f"[DEBUG-NPC]   Successfully placed wall_pass '{ent_id}' (fk={fk}) at grid coordinate ({c}, {r})")
                 
                 # --- [NEW] 固定マップでも障害物を配置可能にする ---
@@ -2001,12 +1996,12 @@ class Dungeon:
                 
                 # [NEW] ゲート（頭上）はここでは地面だけ描画する
                 if tile == TILE_GATE:
-                    ov_key = self._pick_variant(self.available_wall_top_variants, self._top_weights, x, y, 2)
+                    ov_key = getattr(self, '_wall_top_override', {}).get((x, y)) or self._pick_variant(self.available_wall_top_variants, self._top_weights, x, y, 2)
                     # 短縮名（wall_pass_0）を使って地面を取得
                     if ov_key in self.overhead_base_map:
                         fk = self.overhead_base_map[ov_key]
                     else:
-                        fk = self._pick_variant(self.available_floor_variants, self._floor_weights, x, y, 0) or "floor"
+                        fk = getattr(self, '_floor_override', {}).get((x, y)) or self._pick_variant(self.available_floor_variants, self._floor_weights, x, y, 0) or "floor"
                 else:
                     fk = "wall_none"
                 
@@ -2019,16 +2014,16 @@ class Dungeon:
                         # すでに fk が設定されている（命名規則によるもの）場合はそのまま
                         pass
                     else: 
-                        fk = self._pick_variant(self.available_floor_variants, self._floor_weights, x, y, 0) or "floor"
+                        fk = getattr(self, '_floor_override', {}).get((x, y)) or self._pick_variant(self.available_floor_variants, self._floor_weights, x, y, 0) or "floor"
                 else:
                     # 壁(ID 0)
                     wall_type = self._get_wall_texture_key(x, y)
                     if wall_type == "wall_top":
-                        fk = self._pick_variant(self.available_wall_top_variants, self._top_weights, x, y, 2) or "wall_top"
+                        fk = getattr(self, '_wall_top_override', {}).get((x, y)) or self._pick_variant(self.available_wall_top_variants, self._top_weights, x, y, 2) or "wall_top"
                     elif wall_type == "wall_single":
                         fk = self.wall_variants.get((x, y)) or self._pick_variant(self.available_wall_variants, self._wall_weights, x, y, 4) or "wall_single"
                     else:
-                        fk = self._pick_variant(self.available_wall_none_variants, self._none_weights, x, y, 3) or "wall_none"
+                        fk = getattr(self, '_wall_none_override', {}).get((x, y)) or self._pick_variant(self.available_wall_none_variants, self._none_weights, x, y, 3) or "wall_none"
                 
                 img = self.textures.get(fk, self.textures.get("wall_none"))
                 if img:
@@ -2037,8 +2032,8 @@ class Dungeon:
                     is_obstacle = (tile == 0 and wall_type == "wall_single")
                     
                     if is_floor_type or is_obstacle:
-                        # ベース床をハッシュから決定論的に取得（seed_offset=1で floor_variants と別パターン）
-                        base_fk = self._pick_variant(self.available_floor_variants, self._floor_weights, x, y, 1) or "floor"
+                        # ベース床: overrideがあればそれを、なければハッシュから取得
+                        base_fk = getattr(self, '_floor_override', {}).get((x, y)) or self._pick_variant(self.available_floor_variants, self._floor_weights, x, y, 1) or "floor"
                         base_img = self.textures.get(base_fk)
                         # 今描画しようとしているタイル自体が「床系(available_floor_variants)」でない場合のみ、
                         # 背景としてベース床を敷く（これで模様の混ざりを防ぐ）
@@ -2252,7 +2247,7 @@ class Dungeon:
             for x in range(sx, ex):
                 if self.map_data[y][x] == TILE_GATE:
                     dx, dy = (x * self.tile_size) - camera_x, (y * self.tile_size) - camera_y
-                    ov_key = self._pick_variant(self.available_wall_top_variants, self._top_weights, x, y, 2) or "wall_top"
+                    ov_key = getattr(self, '_wall_top_override', {}).get((x, y)) or self._pick_variant(self.available_wall_top_variants, self._top_weights, x, y, 2) or "wall_top"
                     # フルキーを取得して描画
                     full_key = self.short_to_full_key.get(ov_key, ov_key)
                     if full_key in self.textures:
