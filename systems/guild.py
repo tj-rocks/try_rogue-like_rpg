@@ -232,7 +232,16 @@ class GuildSystem:
             return None
             
         target_key, target_data = random.choice(candidates)
-        amount = random.randint(min_amt, max_amt)
+
+        # 納品個数: balance.yml の DELIVERY_AMOUNT_WEIGHTS があれば重み付きで決定（ほとんど1個）
+        from constants import _balance as _bal_amt
+        _weights = _bal_amt.get("GUILD_QUEST", {}).get("DELIVERY_AMOUNT_WEIGHTS")
+        if _weights:
+            _amounts = [int(k) for k in _weights.keys()]
+            _ws = [float(v) for v in _weights.values()]
+            amount = random.choices(_amounts, weights=_ws, k=1)[0]
+        else:
+            amount = random.randint(min_amt, max_amt)
         
         # 売値の1.2倍 * 数量 * 倍率（ランクによる追加）
         if "selling_price" in target_data:

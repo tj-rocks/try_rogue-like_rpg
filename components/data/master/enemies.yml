@@ -233,6 +233,7 @@ ENEMY_DATA:
       - broken_shield
       - broken_sword
       - broken_armor
+      - revive_amulet
       rare:
       - fullmetal_sword
       - fullmetal_round_shield
@@ -413,7 +414,7 @@ ENEMY_DATA:
     min_rank: C
     image_folder: components/pictures/enemies/skelton_sword
     drops:
-      normal: []
+      normal: [revive_amulet]
       rare:
       - fighters_sword
       - hunters_rapier
@@ -446,7 +447,7 @@ ENEMY_DATA:
     min_rank: C
     image_folder: components/pictures/enemies/skelton_sword_armor
     drops:
-      normal: []
+      normal: [revive_amulet]
       rare:
       - hunters_armor
       - fighters_armor

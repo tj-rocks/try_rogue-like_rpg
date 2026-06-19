@@ -2,34 +2,82 @@ SHIELD_CATEGORIES:
   round_shield:
     position:
       offsets:
-        down: [22, 7]
-        up: [-15, 13]
-        left: [0, 16]
-        right: [15, 12]
+        down:
+        - 16
+        - 12
+        up:
+        - -15
+        - 13
+        left:
+        - 0
+        - 16
+        right:
+        - 15
+        - 12
       hand_offsets:
-        down: [[0, 0], [0, 0]]
-        up: [[0, 0], [0, 0]]
-        left: [[0, 0], [0, 0]]
-        right: [[0, 0], [0, 0]]
+        down:
+        - - 0
+          - 0
+        - - 0
+          - 0
+        up:
+        - - 0
+          - 0
+        - - 0
+          - 0
+        left:
+        - - 0
+          - 0
+        - - 0
+          - 0
+        right:
+        - - 0
+          - 0
+        - - 0
+          - 0
       weapon_angles:
-        down: [0, 0]
-        up: [0, 0]
-        left: [0, 0]
-        right: [0, 0]
+        down:
+        - 0
+        - 0
+        up:
+        - 0
+        - 0
+        left:
+        - 0
+        - 0
+        right:
+        - 0
+        - 0
   kite_shield:
     position:
       offsets:
-        down: [22, 15]
-        up: [-15, 13]
-        left: [0, 16]
-        right: [15, 12]
+        down:
+        - 16
+        - 15
+        up:
+        - -15
+        - 13
+        left:
+        - 0
+        - 16
+        right:
+        - 15
+        - 12
   large_shield:
     position:
       offsets:
-        down: [19, 14]
-        up: [-11, 10]
-        left: [9, 17]
-        right: [11, 10]
+        down:
+        - 19
+        - 14
+        up:
+        - -11
+        - 10
+        left:
+        - 9
+        - 17
+        right:
+        - 11
+        - 10
 
 SHIELD_DATA:
   broken_shield:

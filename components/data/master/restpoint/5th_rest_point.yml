@@ -584,3 +584,10 @@ TILE_MAPPINGS:
       - x: 20
         y: 8
         flip: false
+  wizard:
+    category: npc
+    id: wizard
+    positions:
+      - x: 37
+        y: 2
+        flip: false

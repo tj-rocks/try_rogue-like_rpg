@@ -85,6 +85,9 @@ TILE_MAPPINGS:
       - x: 12
         y: 13
         flip: false
+      - x: 28
+        y: 13
+        flip: false
       - x: 41
         y: 13
         flip: false
@@ -121,6 +124,9 @@ TILE_MAPPINGS:
         y: 12
         flip: false
       - x: 12
+        y: 12
+        flip: false
+      - x: 28
         y: 12
         flip: false
       - x: 41
@@ -278,12 +284,23 @@ TILE_MAPPINGS:
   anvil:
     category: obstacle
     id: anvil
+    positions:
+      - x: 32
+        y: 15
+        flip: false
   crystal:
     category: obstacle
     id: crystal
   sword_stuck:
     category: obstacle
     id: sword_stuck
+    positions:
+      - x: 31
+        y: 18
+        flip: false
+      - x: 32
+        y: 18
+        flip: false
   stained_armor_stand:
     category: obstacle
     id: stained_armor_stand
@@ -329,6 +346,10 @@ TILE_MAPPINGS:
   blacksmith:
     category: npc
     id: blacksmith
+    positions:
+      - x: 32
+        y: 14
+        flip: false
   guild_receptionist:
     category: npc
     id: guild_receptionist
@@ -356,6 +377,10 @@ TILE_MAPPINGS:
   teleport_wizard:
     category: npc
     id: teleport_wizard
+    positions:
+      - x: 27
+        y: 5
+        flip: true
   tutorial_woman1:
     category: npc
     id: tutorial_woman1
@@ -518,6 +543,9 @@ TILE_MAPPINGS:
     id: wall_decoration_tapestry
     image_path: components/pictures/dungeon/home/wall_decoration_tapestry.png
     positions:
+      - x: 38
+        y: 2
+        flip: false
       - x: 41
         y: 2
         flip: true
@@ -582,5 +610,48 @@ TILE_MAPPINGS:
         y: 8
         flip: false
       - x: 20
+        y: 8
+        flip: false
+  wizard:
+    category: npc
+    id: wizard
+    positions:
+      - x: 37
+        y: 2
+        flip: false
+  wall_deco_bank:
+    category: wall_decoration
+    desc: 銀行の看板
+    id: wall_decoration_bank
+    image_path: components/pictures/dungeon/home/wall_decoration_bank.png
+    positions:
+      - x: 28
+        y: 8
+        flip: false
+  wall_deco_masic_shop:
+    category: wall_decoration
+    desc: 魔法屋のシンボル
+    id: wall_decoration_masic_shop
+    image_path: components/pictures/icon/stave.png
+    positions:
+      - x: 38
+        y: 8
+        flip: false
+  wall_deco_item_shop:
+    category: wall_decoration
+    desc: アイテム屋のシンボル
+    id: wall_decoration_item_shop
+    image_path: components/pictures/icon/hp_potion.png
+    positions:
+      - x: 39
+        y: 8
+        flip: false
+  wall_deco_weapon_shop:
+    category: wall_decoration
+    desc: 武器屋の看板
+    id: wall_decoration_weapon_shop
+    image_path: components/pictures/dungeon/home/wall_decoration_weapon_shop.png
+    positions:
+      - x: 40
         y: 8
         flip: false
