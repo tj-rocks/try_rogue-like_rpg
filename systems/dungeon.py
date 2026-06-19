@@ -1973,9 +1973,11 @@ class Dungeon:
             return None
         if len(variants) == 1:
             return variants[0]
-        h = (self._variant_seed + seed_offset + x * 2053 + y * 9319) & 0xFFFFFF
+        h = self._variant_seed ^ (seed_offset * 0x9E3779B9) ^ (x * 0x6C62272E) ^ (y * 0xC2B2AE35)
+        h = (h ^ (h >> 16)) * 0x45D9F3B
+        h = (h ^ (h >> 16)) & 0xFFFFFFFF
         total = sum(weights)
-        r = (h / 0xFFFFFF) * total
+        r = (h / 0xFFFFFFFF) * total
         cumulative = 0.0
         for v, w in zip(variants, weights):
             cumulative += w
