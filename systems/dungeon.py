@@ -395,38 +395,27 @@ class Dungeon:
 
         self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
         
+        import re
         def build_weight_list(variants):
             if not variants: return []
-            import re
             weights = []
             for v in variants:
                 m = re.search(r'(\d+)$', v)
                 weights.append(0.5 ** int(m.group(1)) if m else 1.0)
             return weights
 
-        floor_weights = build_weight_list(self.available_floor_variants)
-        wall_weights = build_weight_list(self.available_wall_variants)
-        top_weights = build_weight_list(self.available_wall_top_variants)
-        none_weights = build_weight_list(self.available_wall_none_variants)
+        self._floor_weights = build_weight_list(self.available_floor_variants)
+        self._wall_weights = build_weight_list(self.available_wall_variants)
+        self._top_weights = build_weight_list(self.available_wall_top_variants)
+        self._none_weights = build_weight_list(self.available_wall_none_variants)
+        # 決定論的なバリアント選択用シード（フロアごとに固定）
+        self._variant_seed = random.randint(0, 0xFFFF)
 
-        def get_rand_floor():
-            if not self.available_floor_variants: return "floor"
-            return random.choices(self.available_floor_variants, weights=floor_weights, k=1)[0]
+        # wall_variantsのみ2D配列（_spawn_wall_obstaclesで書き込みあり）
         def get_rand_wall():
             if not self.available_wall_variants: return "wall_single"
-            return random.choices(self.available_wall_variants, weights=wall_weights, k=1)[0]
-        def get_rand_wall_top():
-            if not self.available_wall_top_variants: return "wall_top"
-            return random.choices(self.available_wall_top_variants, weights=top_weights, k=1)[0]
-        def get_rand_wall_none():
-            if not self.available_wall_none_variants: return "wall_none"
-            return random.choices(self.available_wall_none_variants, weights=none_weights, k=1)[0]
-        
-        self.floor_variants = [[get_rand_floor() for _ in range(self.map_width)] for _ in range(self.map_height)]
-        self.base_floor_variants = [[get_rand_floor() for _ in range(self.map_width)] for _ in range(self.map_height)]
+            return random.choices(self.available_wall_variants, weights=self._wall_weights, k=1)[0]
         self.wall_variants = [[get_rand_wall() for _ in range(self.map_width)] for _ in range(self.map_height)]
-        self.wall_top_variants = [[get_rand_wall_top() for _ in range(self.map_width)] for _ in range(self.map_height)]
-        self.wall_none_variants = [[get_rand_wall_none() for _ in range(self.map_width)] for _ in range(self.map_height)]
         self.wall_decoration_variants = [["" for _ in range(self.map_width)] for _ in range(self.map_height)]
         self.wall_decoration_flips = [[False for _ in range(self.map_width)] for _ in range(self.map_height)]
         
@@ -1797,6 +1786,22 @@ class Dungeon:
                     pass 
         return self
 
+    def _pick_variant(self, variants, weights, x, y, seed_offset=0):
+        """(x, y)座標と固定シードから決定論的にバリアントを選ぶ（2D配列不要）"""
+        if not variants:
+            return None
+        if len(variants) == 1:
+            return variants[0]
+        h = (self._variant_seed + seed_offset + x * 2053 + y * 9319) & 0xFFFFFF
+        total = sum(weights)
+        r = (h / 0xFFFFFF) * total
+        cumulative = 0.0
+        for v, w in zip(variants, weights):
+            cumulative += w
+            if r <= cumulative:
+                return v
+        return variants[-1]
+
     def draw(self, screen, camera_x, camera_y, player=None):
         # [SAFETY] クリーンアップ済みのダンジョンの場合は描画をスキップ
         if self.map_data is None:
@@ -1813,12 +1818,12 @@ class Dungeon:
                 
                 # [NEW] ゲート（頭上）はここでは地面だけ描画する
                 if tile == TILE_GATE:
-                    ov_key = self.wall_top_variants[y][x]
+                    ov_key = self._pick_variant(self.available_wall_top_variants, self._top_weights, x, y, 2)
                     # 短縮名（wall_pass_0）を使って地面を取得
                     if ov_key in self.overhead_base_map:
                         fk = self.overhead_base_map[ov_key]
                     else:
-                        fk = self.floor_variants[y][x]
+                        fk = self._pick_variant(self.available_floor_variants, self._floor_weights, x, y, 0) or "floor"
                 else:
                     fk = "wall_none"
                 
@@ -1831,16 +1836,16 @@ class Dungeon:
                         # すでに fk が設定されている（命名規則によるもの）場合はそのまま
                         pass
                     else: 
-                        fk = self.floor_variants[y][x]
+                        fk = self._pick_variant(self.available_floor_variants, self._floor_weights, x, y, 0) or "floor"
                 else:
                     # 壁(ID 0)
                     wall_type = self._get_wall_texture_key(x, y)
                     if wall_type == "wall_top":
-                        fk = self.wall_top_variants[y][x]
+                        fk = self._pick_variant(self.available_wall_top_variants, self._top_weights, x, y, 2) or "wall_top"
                     elif wall_type == "wall_single":
                         fk = self.wall_variants[y][x]
                     else:
-                        fk = self.wall_none_variants[y][x]
+                        fk = self._pick_variant(self.available_wall_none_variants, self._none_weights, x, y, 3) or "wall_none"
                 
                 img = self.textures.get(fk, self.textures.get("wall_none"))
                 if img:
@@ -1849,8 +1854,8 @@ class Dungeon:
                     is_obstacle = (tile == 0 and wall_type == "wall_single")
                     
                     if is_floor_type or is_obstacle:
-                        # 階層生成時にランダム決定したベース床を描画
-                        base_fk = self.base_floor_variants[y][x]
+                        # ベース床をハッシュから決定論的に取得（seed_offset=1で floor_variants と別パターン）
+                        base_fk = self._pick_variant(self.available_floor_variants, self._floor_weights, x, y, 1) or "floor"
                         base_img = self.textures.get(base_fk)
                         # 今描画しようとしているタイル自体が「床系(available_floor_variants)」でない場合のみ、
                         # 背景としてベース床を敷く（これで模様の混ざりを防ぐ）
@@ -2064,7 +2069,7 @@ class Dungeon:
             for x in range(sx, ex):
                 if self.map_data[y][x] == TILE_GATE:
                     dx, dy = (x * self.tile_size) - camera_x, (y * self.tile_size) - camera_y
-                    ov_key = self.wall_top_variants[y][x]
+                    ov_key = self._pick_variant(self.available_wall_top_variants, self._top_weights, x, y, 2) or "wall_top"
                     # フルキーを取得して描画
                     full_key = self.short_to_full_key.get(ov_key, ov_key)
                     if full_key in self.textures:
