@@ -415,86 +415,86 @@ DUNGEON_IMAGES:
     map: 5th_rest_point.txt
     no_attack: true
   "57":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: cave
+    sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "58":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: cave
+    sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "59":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: cave
+    sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "60":
-    image: standard
-    sound: just_move.mp3
+    image: cave
+    sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "61":
-    image: standard
-    sound: just_move.mp3
+    image: cave
+    sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "62":
-    image: standard
-    sound: just_move.mp3
+    image: cave
+    sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "63":
-    image: standard
-    sound: just_move.mp3
+    image: cave
+    sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "64":
-    image: standard
-    sound: just_move.mp3
+    image: shell
+    sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "65":
-    image: standard
-    sound: just_move.mp3
+    image: shell
+    sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "66":
-    image: standard
-    sound: just_move.mp3
+    image: shell
+    sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "67":
-    image: standard
-    sound: just_move.mp3
+    image: shell
+    sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "68":
-    image: standard
-    sound: just_move.mp3
+    image: shell
+    sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "69":
-    image: standard
-    sound: just_move.mp3
+    image: shell
+    sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "70":
-    image: temple
-    sound: sandstone_floor.mp3
+    image: shell
+    sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
@@ -512,55 +512,55 @@ DUNGEON_IMAGES:
     no_attack: true
   "72":
     image: temple
-    sound: sandstone_floor.mp3
+    sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "73":
     image: temple
-    sound: sandstone_floor.mp3
+    sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "74":
     image: temple
-    sound: sandstone_floor.mp3
+    sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "75":
     image: temple
-    sound: sandstone_floor.mp3
+    sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "76":
     image: temple
-    sound: sandstone_floor.mp3
+    sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "77":
     image: temple
-    sound: sandstone_floor.mp3
+    sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "78":
     image: temple
-    sound: sandstone_floor.mp3
+    sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "79":
     image: temple
-    sound: sandstone_floor.mp3
+    sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "80":
     image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3

@@ -39,12 +39,12 @@ PLAYER:
 # ------------------------------------------------------------------------------
 DUNGEON:
   DUNGEON_MIN_ROOMS: 4              # 1階層あたりの初期最小部屋数
-  DUNGEON_MAX_ROOMS: 8              # 1階層あたりの初期最大部屋数
+  DUNGEON_MAX_ROOMS: 10             # 1階層あたりの初期最大部屋数
   DUNGEON_ROOM_INCREASE_INTERVAL: 3 # 何階ごとに部屋数を増やすか (5階ごと)
   
   # 指数成長とハードキャップ設定
-  DUNGEON_ROOM_MAX_CAP: 15          # 最大部屋数の絶対上限 (深層でもこれを超えない)
-  DUNGEON_ROOM_MIN_CAP: 8          # 最小部屋数の増加上限 (深層での最低部屋数)
+  DUNGEON_ROOM_MAX_CAP: 25          # 最大部屋数の絶対上限 (深層でもこれを超えない)
+  DUNGEON_ROOM_MIN_CAP: 12         # 最小部屋数の増加上限 (深層での最低部屋数)
   DUNGEON_ROOM_GROWTH_LIMIT_FLOOR: 100 # 成長がストップする階層
   
   # --- 部屋数の成長ロジック解説 ---
@@ -52,15 +52,15 @@ DUNGEON:
   # 進捗率: (現在の階層 - 1) / (成長止まり階層 - 1)  ※5階ごとのステップ処理あり
   # 特徴: 指数関数（掛け算）で増えるため、最初はゆっくり、後半で一気に広くなります。
   
-  DUNGEON_MIN_ROOM_DISTANCE: 4      # 部屋同士の最小距離（近いと密集する）
-  DUNGEON_ROOM_DISTANCE_GROWTH: 0.15 # 階層が進むごとに部屋の距離をどれだけ広げるか
+  DUNGEON_MIN_ROOM_DISTANCE: 3      # 部屋同士の最小距離（近いと密集する）
+  DUNGEON_ROOM_DISTANCE_GROWTH: 0.04 # 階層が進むごとに部屋の距離をどれだけ広げるか
   DUNGEON_CORRIDOR_W2_CHANCE: 0.1   # 通路が「2マス幅」になる確率 (0.0〜1.0)
   DUNGEON_STAIRS_FLOOR_RADIUS: 1    # 階段の周囲に確保する歩行可能タイルの半径
   DUNGEON_MIN_ROOM_SIZE: 2          # 部屋の最小サイズの初期値
   DUNGEON_MAX_ROOM_SIZE: 5          # 部屋の最大サイズの初期値
   DUNGEON_ROOM_SIZE_GROWTH: 0.05    # 1階層進むごとに部屋サイズを何%ずつ増やすか
   DUNGEON_ROOM_MIN_SIZE_CAP: 3      # 最小サイズの成長上限
-  DUNGEON_ROOM_MAX_SIZE_CAP: 20     # 最大サイズの成長上限
+  DUNGEON_ROOM_MAX_SIZE_CAP: 15     # 最大サイズの成長上限
 
 # ENEMY_AI (敵の行動・スポーン・難易度)
 # ------------------------------------------------------------------------------

@@ -737,8 +737,8 @@ class ItemActionDialog:
                             effect = data.get("effect")
                             if not effect or effect == "material":
                                 from systems.audio_manager import play_sfx
-                                from constants import SOUND_ERROR
-                                play_sfx(SOUND_ERROR)
+                                from constants import SOUND_CANCEL
+                                play_sfx(SOUND_CANCEL)
                                 self.is_active = True # 閉じない
                                 return
                         

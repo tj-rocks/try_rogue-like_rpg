@@ -519,15 +519,17 @@ class Dungeon:
         self.map_data = [[0 for _ in range(self.map_width)] for _ in range(self.map_height)]
         
         import re
-        def build_weight_list(variants):
+        def build_weight_list(variants, uniform=False):
             if not variants: return []
+            if uniform:
+                return [1.0] * len(variants)
             weights = []
             for v in variants:
                 m = re.search(r'(\d+)$', v)
                 weights.append(0.5 ** int(m.group(1)) if m else 1.0)
             return weights
 
-        self._floor_weights = build_weight_list(self.available_floor_variants)
+        self._floor_weights = build_weight_list(self.available_floor_variants, uniform=True)
         self._wall_weights = build_weight_list(self.available_wall_variants)
         self._top_weights = build_weight_list(self.available_wall_top_variants)
         self._none_weights = build_weight_list(self.available_wall_none_variants)
@@ -1971,9 +1973,11 @@ class Dungeon:
             return None
         if len(variants) == 1:
             return variants[0]
-        h = (self._variant_seed + seed_offset + x * 2053 + y * 9319) & 0xFFFFFF
+        h = self._variant_seed ^ (seed_offset * 0x9E3779B9) ^ (x * 0x6C62272E) ^ (y * 0xC2B2AE35)
+        h = (h ^ (h >> 16)) * 0x45D9F3B
+        h = (h ^ (h >> 16)) & 0xFFFFFFFF
         total = sum(weights)
-        r = (h / 0xFFFFFF) * total
+        r = (h / 0xFFFFFFFF) * total
         cumulative = 0.0
         for v, w in zip(variants, weights):
             cumulative += w

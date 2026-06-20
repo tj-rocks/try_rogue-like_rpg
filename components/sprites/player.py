@@ -1350,7 +1350,7 @@ class Player(Entity):
         with open(filepath, "w", encoding="utf-8") as f: json.dump(self.to_dict(), f, ensure_ascii=False, indent=2)
 
     def load_from_file(self, filepath=None):
-        if filepath is None: from constants import SAVE_DATA_PATH; filepath = SAVE_DATA_PATH
+        if filepath is None: from systems.data_loader import SAVE_DATA_PATH; filepath = SAVE_DATA_PATH
         import json, os
         if os.path.exists(filepath):
             with open(filepath, "r", encoding="utf-8") as f: data = json.load(f); self.load_dict(data); return True
