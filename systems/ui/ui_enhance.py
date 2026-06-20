@@ -7,14 +7,15 @@ from constants import (
 from wordings import Text
 from systems.ui.ui_base import (
     get_standard_upper_layout, draw_dialog_frame, draw_text_wrapped,
-    draw_stat_bar, BaseListDialog,
+    draw_stat_bar, BaseListDialog, StateKeyMixin,
     EQUIP_STAT_LABEL_MAP, EQUIP_MAGIC_LABEL_MAP, format_stat_value
 )
 from systems.ui.ui_inventory import InventoryDialog
 
 
-class OreSelectionDialog:
+class OreSelectionDialog(StateKeyMixin):
     """鍛冶屋で装備選択後に「どの鉱石を使うか」を選ぶダイアログ"""
+    STATE_KEY = "ore_selection_active"
     def __init__(self, screen_width, screen_height):
         self.x, self.y, self.width, self.height = get_standard_upper_layout(screen_width, screen_height)
         self.font = font_medium
@@ -32,18 +33,6 @@ class OreSelectionDialog:
         self.confirm_dialog = confirm_dialog
         self.player_ref = player
         self.cutscene_manager = cutscene_manager
-
-    @property
-    def is_active(self): return game_state["ore_selection_active"]
-    @is_active.setter
-    def is_active(self, v):
-        game_state["ore_selection_active"] = v
-        if v:
-            print(f"[UI] Open OreSelectionDialog")
-            self.cursor_idx = 0
-        else:
-            print(f"[UI] Close OreSelectionDialog")
-            game_state["dialog_just_closed"] = True
 
     def update_from_player(self, player):
         from constants import CONSUMABLE_DATA
@@ -153,8 +142,9 @@ class OreSelectionDialog:
                     draw_text_wrapped(screen, font_small, describe, rx, ry, self.width // 2 - 50, color=(180, 190, 200))
 
 
-class StaveSelectionDialog:
+class StaveSelectionDialog(StateKeyMixin):
     """どの杖の使用回数を回復するかを選ぶダイアログ"""
+    STATE_KEY = "stave_selection_active"
     def __init__(self, screen_width, screen_height):
         self.x, self.y, self.width, self.height = get_standard_upper_layout(screen_width, screen_height)
         self.font = font_medium
@@ -166,14 +156,6 @@ class StaveSelectionDialog:
     def setup(self, player, dialog):
         from systems.item_handler import make_recharge_callback
         self.on_confirm = make_recharge_callback(player, dialog, self)
-
-    @property
-    def is_active(self): return game_state["stave_selection_active"]
-    @is_active.setter
-    def is_active(self, v):
-        game_state["stave_selection_active"] = v
-        if v: self.cursor_idx = 0
-        else: game_state["dialog_just_closed"] = True
 
     def update_from_player(self, player):
         self.available_staves = list(player.stave_inventory)
@@ -495,14 +477,6 @@ class EnhanceDialog(InventoryDialog):
     def __init__(self, screen_width, screen_height):
         super().__init__(screen_width, screen_height)
         self.selection_dialog = None
-
-    @property
-    def is_active(self): return game_state["enhance_active"]
-    @is_active.setter
-    def is_active(self, v):
-        game_state["enhance_active"] = v
-        if v: self.cursor_idx = 0
-        else: game_state["dialog_just_closed"] = True
 
     def handle_events(self, events, player=None):
         if not self.is_active: return

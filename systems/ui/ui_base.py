@@ -303,7 +303,38 @@ def show_dialog(dialog, text, modal=False, auto_close=None):
     dialog.auto_close_timer = auto_close if auto_close is not None else COMBAT_LOG_WAIT_FRAMES
 
 
-class BaseListDialog:
+class StateKeyMixin:
+    """STATE_KEY を持つダイアログ共通の is_active プロパティを提供する Mixin。
+    STATE_KEY クラス変数を定義し、必要に応じて _on_open() / _on_close() をオーバーライドする。
+    """
+    STATE_KEY = ""
+
+    @property
+    def is_active(self):
+        return game_state.get(self.STATE_KEY, False)
+
+    @is_active.setter
+    def is_active(self, v):
+        game_state[self.STATE_KEY] = v
+        if v:
+            print(f"[UI] Open {self.__class__.__name__}")
+            self._on_open()
+        else:
+            print(f"[UI] Close {self.__class__.__name__}")
+            game_state["dialog_just_closed"] = True
+            self._on_close()
+
+    def _on_open(self):
+        """open 時フック。サブクラスでオーバーライド可。"""
+        if hasattr(self, "cursor_idx"):
+            self.cursor_idx = 0
+
+    def _on_close(self):
+        """close 時フック。サブクラスでオーバーライド可。"""
+        pass
+
+
+class BaseListDialog(StateKeyMixin):
     """NPCサービスダイアログの共通基底クラス。
     2カラムレイアウト（左リスト ＋ 右詳細パネル）と
     カーソルナビゲーションを提供する。
@@ -320,18 +351,10 @@ class BaseListDialog:
         self.items = []
         self._back_dialog = None
 
-    # --- is_active プロパティ ---
-    @property
-    def is_active(self): return game_state.get(self.STATE_KEY, False)
-    @is_active.setter
-    def is_active(self, v):
-        game_state[self.STATE_KEY] = v
-        if v:
-            print(f"[UI] Open {self.__class__.__name__} ({self.get_title()})")
-            self.cursor_idx = 0; self.on_activated()
-        else:
-            print(f"[UI] Close {self.__class__.__name__}")
-            game_state["dialog_just_closed"] = True
+    def _on_open(self):
+        print(f"[UI] Open {self.__class__.__name__} ({self.get_title()})")
+        self.cursor_idx = 0
+        self.on_activated()
 
     def on_activated(self): pass  # open 時フック（サブクラスでオーバーライド）
 

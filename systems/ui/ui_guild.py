@@ -3,12 +3,13 @@ from systems.game_state import game_state
 from systems.resources import font_small, font_small_bold, font_medium
 from wordings import Text
 from systems.ui.ui_base import (
-    get_standard_upper_layout, draw_dialog_frame, draw_text_wrapped, BaseListDialog
+    get_standard_upper_layout, draw_dialog_frame, draw_text_wrapped, BaseListDialog, StateKeyMixin
 )
 
 
-class GuildDialog:
+class GuildDialog(StateKeyMixin):
     """冒険者ギルドでの依頼受注・報告を行うダイアログ"""
+    STATE_KEY = "guild_active"
     def __init__(self, screen_width, screen_height):
         self.x, self.y, self.width, self.height = get_standard_upper_layout(screen_width, screen_height)
         self.font = font_small
@@ -23,20 +24,12 @@ class GuildDialog:
         self.npc_role = "guild_receptionist"
         self.ore_gift_dialog = None
 
-    @property
-    def is_active(self): return game_state.get("guild_active", False)
-    @is_active.setter
-    def is_active(self, v):
-        game_state["guild_active"] = v
-        if v:
-            print(f"[UI] Open GuildDialog (Mode: {self.mode})")
-            self._skip_auto_report = False
-            self.cursor_idx = 0
-            if self.mode != "AUTO_REPORT":
-                self.mode = "MENU"
-        else:
-            print(f"[UI] Close GuildDialog")
-            game_state["dialog_just_closed"] = True
+    def _on_open(self):
+        print(f"[UI] Open GuildDialog (Mode: {self.mode})")
+        self._skip_auto_report = False
+        self.cursor_idx = 0
+        if self.mode != "AUTO_REPORT":
+            self.mode = "MENU"
 
     def setup(self, player, dungeon, npc_role=None):
         if npc_role is not None:
@@ -612,24 +605,18 @@ class GuildGuideDialog(BaseListDialog):
         if res == "cancel":
             play_sfx(SOUND_CANCEL)
             self.is_active = False
-            from systems.game_state import game_state
-            game_state[self.STATE_KEY] = False
             return None
         elif res == "confirm":
             selected = self.items[self.cursor_idx]
             if selected["key"] == "quit":
                 play_sfx(SOUND_CANCEL)
                 self.is_active = False
-                from systems.game_state import game_state
-                game_state[self.STATE_KEY] = False
                 return None
             else:
                 play_sfx(SOUND_SELECT)
-                from systems.game_state import game_state
                 dialog = game_state.get("ui_elements", {}).get("dialog")
                 if dialog:
                     dialog.text = selected["desc"]
                     dialog.is_active = True
                 self.is_active = False
-                game_state[self.STATE_KEY] = False
                 return None

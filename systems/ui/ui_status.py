@@ -3,7 +3,7 @@ from systems.game_state import game_state
 from systems.resources import font_small, font_medium, font_hud
 from wordings import Text
 from systems.ui.ui_base import (
-    get_standard_upper_layout, draw_dialog_frame, draw_text_wrapped, draw_stat_bar
+    get_standard_upper_layout, draw_dialog_frame, draw_text_wrapped, draw_stat_bar, StateKeyMixin
 )
 
 
@@ -105,8 +105,9 @@ class StatusBar:
         draw_text_shadow(f"GP: {player.guild_point}", self.font, (174, 214, 241), (rx, ry + 23))
 
 
-class StatusDialog:
+class StatusDialog(StateKeyMixin):
     """ステータスを詳細表示する画面 (Sキー)"""
+    STATE_KEY = "status_active"
     def __init__(self, screen_width, screen_height):
         self.x, self.y, self.width, self.height = get_standard_upper_layout(screen_width, screen_height)
         from systems.resources import font_small
@@ -116,39 +117,31 @@ class StatusDialog:
         self.categories = [("STATUS", "基本ステータス"), ("BONUS", "装備の加護"), ("QUIT", Text.UI.QUIT)]
         self._back_dialog = None
 
-    @property
-    def is_active(self): return game_state["status_active"]
-    @is_active.setter
-    def is_active(self, v):
-        game_state["status_active"] = v
-        if v:
-            if self.mode not in ("STATUS", "QUESTS", "BONUS", "MENU"):
-                self.mode = "STATUS"
-
-            if self.mode in ("MENU", "STATUS", "BONUS", "CURSE"):
-                self.categories = [("STATUS", "基本ステータス"), ("BONUS", "装備の加護"), ("CURSE", "呪い進行度"), ("QUIT", Text.UI.QUIT)]
-                if self.mode == "MENU" or self.mode == "STATUS":
-                    self.mode = "STATUS"
-                    self.cursor_idx = 0
-                elif self.mode == "BONUS":
-                    self.cursor_idx = 1
-                elif self.mode == "CURSE":
-                    self.cursor_idx = 2
-            else:
-                self.categories = [("QUIT", Text.UI.QUIT)]
-                self.cursor_idx = 0
-            print(f"[UI] Open StatusDialog (Mode: {self.mode})")
-        else:
+    def _on_open(self):
+        if self.mode not in ("STATUS", "QUESTS", "BONUS", "MENU"):
             self.mode = "STATUS"
-            print(f"[UI] Close StatusDialog")
-            game_state["dialog_just_closed"] = True
+        if self.mode in ("MENU", "STATUS", "BONUS", "CURSE"):
+            self.categories = [("STATUS", "基本ステータス"), ("BONUS", "装備の加護"), ("CURSE", "呪い進行度"), ("QUIT", Text.UI.QUIT)]
+            if self.mode in ("MENU", "STATUS"):
+                self.mode = "STATUS"
+                self.cursor_idx = 0
+            elif self.mode == "BONUS":
+                self.cursor_idx = 1
+            elif self.mode == "CURSE":
+                self.cursor_idx = 2
+        else:
+            self.categories = [("QUIT", Text.UI.QUIT)]
+            self.cursor_idx = 0
+        print(f"[UI] Open StatusDialog (Mode: {self.mode})")
+
+    def _on_close(self):
+        self.mode = "STATUS"
+        print(f"[UI] Close StatusDialog")
 
     def _close_back(self):
-        game_state["status_active"] = False
+        self.is_active = False
         if self._back_dialog:
             self._back_dialog.is_active = True
-        else:
-            game_state["dialog_just_closed"] = True
 
     def handle_events(self, events, player=None):
         if not self.is_active: return

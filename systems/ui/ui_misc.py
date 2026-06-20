@@ -4,7 +4,7 @@ from systems.game_state import game_state
 from systems.resources import font_medium
 from wordings import Text
 from systems.ui.ui_base import (
-    get_standard_upper_layout, draw_dialog_frame, draw_text_wrapped, BaseListDialog
+    get_standard_upper_layout, draw_dialog_frame, draw_text_wrapped, BaseListDialog, StateKeyMixin
 )
 
 
@@ -183,8 +183,9 @@ class TeleportDialog(BaseListDialog):
             screen.blit(font_small.render(f"{item['cost']} G", True, color), (sep_x - 110, y_pos))
 
 
-class OreGiftDialog:
+class OreGiftDialog(StateKeyMixin):
     """ランクアップお祝い時に好きなアイテムを1つ選んで受け取るダイアログ"""
+    STATE_KEY = "ore_gift_active"
     def __init__(self, screen_width, screen_height):
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -206,18 +207,6 @@ class OreGiftDialog:
         for key in RANKUP_GIFTS:
             name = CONSUMABLE_DATA.get(key, {}).get("name", key)
             self.ores.append((key, name))
-
-    @property
-    def is_active(self): return game_state.get("ore_gift_active", False)
-    @is_active.setter
-    def is_active(self, v):
-        game_state["ore_gift_active"] = v
-        if v:
-            print("[UI] Open OreGiftDialog")
-            self.cursor_idx = 0
-        else:
-            print("[UI] Close OreGiftDialog")
-            game_state["dialog_just_closed"] = True
 
     def handle_events(self, events):
         if not self.is_active: return
