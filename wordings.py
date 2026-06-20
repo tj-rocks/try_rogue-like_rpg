@@ -147,6 +147,7 @@ class Text:
         BUFF_ATTACK_USE = "{name}を使用した！ 攻撃力が一時的に上昇し、防御無視と会心率が強化された！"
         BUFF_REGEN_USE = "{name}を使用した！ 自然回復が一時的に上昇し、回復アイテムの効果がアップした！"
         BUFF_MAGIC_USE = "{name}を使用した！ 魔法が一時的に強化され、すべての杖の回数が{stave_recovery}回復した！"
+        BUFF_STEALTH_USE = "{name}を使用した！ 視界が広がり、敵に気づかれにくくなった！"
         BUFF_OVERWRITE_CONFIRM = "秘薬の効果が残っています\n{name}を飲むと現在の効果は消えます\nよろしいですか？"
         MATERIAL_DESC = "それは素材だ鍛冶屋に持っていこう"
         GET_LANTERN = "{name} を 手に入れた！\nインベントリの装備から 切り替えられます"

@@ -44,8 +44,16 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
         from systems.ui import show_loading_screen
         show_loading_screen(screen)
             
+    is_first_visit = floor_level > getattr(player, "max_reached_floor", 0)
     player.set_current_floor(floor_level)
     new_dungeon = Dungeon(level=floor_level, player=player, debug_overflow=debug_overflow)
+    
+    # エリア到達メッセージ（下り方向のみ表示）
+    area_msg = new_dungeon.floor_info.get("area_message")
+    is_descending = floor_level > getattr(player, "prev_floor", -1)
+    if area_msg and is_descending:
+        from systems.game_state import game_state
+        game_state["pending_area_message"] = area_msg
     
     # 専用メソッドでスポーン位置を決定
     new_dungeon.set_spawn_position(player, spawn_reason, is_death)

@@ -54,6 +54,7 @@ from systems.ui.ui_misc import (
     draw_all_ui,
     handle_ui_events,
 )
+from systems.ui_area_overlay import AreaMessageOverlay  # noqa: E402
 
 __all__ = [
     "get_standard_upper_layout",
@@ -96,4 +97,5 @@ __all__ = [
     "draw_minimap",
     "draw_all_ui",
     "handle_ui_events",
+    "AreaMessageOverlay",
 ]

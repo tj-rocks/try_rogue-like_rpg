@@ -39,6 +39,7 @@ SOUND_SELECT         = "components/sounds/sfx/select_new.wav"      # 決定音
 SOUND_CANCEL         = "components/sounds/sfx/cancel_new.wav"      # キャンセル音
 SOUND_STAIRS_UP      = "components/sounds/sfx/stairs.wav"          # 階段移動音
 SOUND_STAIRS_DOWN    = "components/sounds/sfx/stairs.wav"          # 階段移動音
+SOUND_AREA_MESSAGE   = "components/sounds/sfx/floor_description.mp3" # エリア名演出SE
 SOUND_HAMMER         = "components/sounds/sfx/attack_1.wav"       # 鍛冶屋の叩く音
 SOUND_BLACKSMITH_FINISH = "components/sounds/sfx/buy.wav"        # 鍛冶完了音
 

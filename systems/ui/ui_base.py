@@ -44,7 +44,7 @@ def format_stat_value(val):
         val_str = str(round(val, 2))
     return f"+{val_str}" if val > 0 else val_str
 
-def draw_stat_bar(screen, x, y, value, stat_key, bar_width=100, bar_height=10, font=None, ratio=None):
+def draw_stat_bar(screen, x, y, value, stat_key, bar_width=100, bar_height=10, font=None, ratio=None, display_ratio=None):
     """ステータスバーを描画する（長さ＋色＋ランク文字）
     
     Args:
@@ -55,7 +55,8 @@ def draw_stat_bar(screen, x, y, value, stat_key, bar_width=100, bar_height=10, f
         bar_width: バーの最大幅(px)
         bar_height: バーの高さ(px)
         font: ランク文字描画用フォント（Noneならfont_small）
-        ratio: バーの割合を直接指定（0.0-1.0）。指定時はvalueは表示専用
+        ratio: バーの割合を直接指定（0.0-1.0）。指定時はvalueは表示専用。ランク/色もこのratioで判定。
+        display_ratio: バーの塗り幅に使う割合。指定時、ランク/色はratioを使用し、バーの長さのみdisplay_ratioを使用。
     """
     from constants import STAT_RANGES, STAT_RANK_COLORS, get_stat_rank
     
@@ -104,8 +105,9 @@ def draw_stat_bar(screen, x, y, value, stat_key, bar_width=100, bar_height=10, f
     pygame.draw.rect(screen, (40, 40, 50), bg_rect, border_radius=3)
     
     # 値バー（ランク色）- マイナス値の場合は塗らない
-    if ratio > 0:
-        fill_w = int(bar_width * ratio)
+    fill_ratio = display_ratio if display_ratio is not None else ratio
+    if fill_ratio > 0:
+        fill_w = int(bar_width * max(0.0, min(1.0, fill_ratio)))
         fill_rect = pygame.Rect(x, y, fill_w, bar_height)
         pygame.draw.rect(screen, color, fill_rect, border_radius=3)
     

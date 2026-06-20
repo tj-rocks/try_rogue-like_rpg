@@ -46,7 +46,7 @@ CONSUMABLE_DATA:
     max_rank: SS
     rarity: 7
     image_path: components/pictures/icon/omamori.png
-    floor_spawnable: true
+    floor_spawnable: false
     shop_buyable: false
   expired_potion:
     quest_targetable: true
@@ -208,6 +208,25 @@ CONSUMABLE_DATA:
     describe: 一定ターンの間、魔法効果を上昇させ、さらに所持しているすべての杖の使用回数を回復する秘薬
     floor_spawnable: true
     color_tint: [180, 100, 255]
+  assassin_potion:
+    quest_targetable: true
+    name: 暗殺者の秘薬
+    effect: buff_stealth
+    duration: 70
+    value: 1
+    aggro_mod: 2
+    price: 1500
+    selling_price: 150
+    min_rank: A
+    max_rank: SS
+    rarity: 3
+    image_path: components/pictures/icon/special_potion.png
+    sound: components/sounds/sfx/drink.wav
+    shop_buyable: true
+    max_stack: 2
+    describe: 一定ターンの間、視界を1タイル広げ、敵に気づかれにくくなる秘薬
+    floor_spawnable: true
+    color_tint: [80, 80, 100]
   magic_crystal:
     quest_targetable: true
     name: 魔力の水晶

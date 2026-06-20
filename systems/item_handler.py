@@ -44,6 +44,7 @@ def use_consumable(item_key, player, dungeon=None):
         # 他の秘薬バフをクリア
         player.regen_buff_turns = 0
         player.magic_buff_turns = 0
+        player.stealth_buff_turns = 0
         msg = Text.Items.BUFF_ATTACK_USE.format(name=data['name'])
     elif effect == "buff_regen":
         duration_ratio = getattr(player, "get_magic_bonus", lambda k: 0)("buff_duration_ratio")
@@ -55,6 +56,7 @@ def use_consumable(item_key, player, dungeon=None):
         # 他の秘薬バフをクリア
         player.attack_buff_turns = 0
         player.magic_buff_turns = 0
+        player.stealth_buff_turns = 0
         msg = Text.Items.BUFF_REGEN_USE.format(name=data['name'])
     elif effect == "buff_magic":
         duration_ratio = getattr(player, "get_magic_bonus", lambda k: 0)("buff_duration_ratio")
@@ -65,6 +67,7 @@ def use_consumable(item_key, player, dungeon=None):
         # 他の秘薬バフをクリア
         player.attack_buff_turns = 0
         player.regen_buff_turns = 0
+        player.stealth_buff_turns = 0
         # 所持しているすべての杖の使用回数を回復する（効果切れ時に戻すためスナップショット記録）
         stave_recovery = data.get("stave_recovery", 0)
         recovered_staves = 0
@@ -76,6 +79,18 @@ def use_consumable(item_key, player, dungeon=None):
             name=data['name'],
             stave_recovery=stave_recovery
         )
+    elif effect == "buff_stealth":
+        duration_ratio = getattr(player, "get_magic_bonus", lambda k: 0)("buff_duration_ratio")
+        value_ratio = getattr(player, "get_magic_bonus", lambda k: 0)("buff_value_ratio")
+        player.stealth_buff_turns = round(data.get("duration", 15) * (1 + duration_ratio))
+        player.stealth_buff_max_turns = player.stealth_buff_turns  # HUDバー用
+        player.stealth_buff_lantern = round(data.get("value", 1) * (1 + value_ratio))
+        player.stealth_buff_aggro = round(data.get("aggro_mod", 2) * (1 + value_ratio))
+        # 他の秘薬バフをクリア
+        player.attack_buff_turns = 0
+        player.regen_buff_turns = 0
+        player.magic_buff_turns = 0
+        msg = Text.Items.BUFF_STEALTH_USE.format(name=data['name'])
     elif effect == "material":
         msg = Text.Items.MATERIAL_DESC
         return msg
@@ -271,13 +286,14 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
                         dialog.text = "システムエラー: 選択ダイアログがありません"
             else:
                 # バフ系消耗品の場合、別のバフが有効なら確認ダイアログを出す
-                buff_effects = ("buff_attack", "buff_regen", "buff_magic")
+                buff_effects = ("buff_attack", "buff_regen", "buff_magic", "buff_stealth")
                 effect = item_data.get("effect")
                 if effect in buff_effects:
                     has_other_buff = (
                         getattr(player, "attack_buff_turns", 0) > 0 or
                         getattr(player, "regen_buff_turns", 0) > 0 or
-                        getattr(player, "magic_buff_turns", 0) > 0
+                        getattr(player, "magic_buff_turns", 0) > 0 or
+                        getattr(player, "stealth_buff_turns", 0) > 0
                     )
                     confirm_dialog = kwargs.get("confirm_dialog")
                     if has_other_buff and confirm_dialog:
@@ -304,8 +320,10 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
                     dialog.on_close_callback = do_warp
                 else:
                     dialog.text = use_consumable(item_key_or_iid, player, current_dungeon)
-            
-            # アイテム使用・装備変更に成功したら敵にターンを渡す準備をする
+
+        # アイテム使用・装備変更に成功したら敵にターンを渡す準備をする
+        # 杖は _perform_wave 内で設定済み。失敗時（チャージ切れ・未発見）はターンを消費しない
+        if item_type != "stave":
             player.enemy_turn_pending = True
 
         game_state["dialog_modal"] = True

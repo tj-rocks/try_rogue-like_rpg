@@ -3,7 +3,7 @@ import random
 from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave, DroppedToken, DroppedAccessory
 from constants import WEAPON_DATA, CONSUMABLE_DATA, ARMOR_DATA, SHIELD_DATA, STAVE_DATA, ACCESSORY_DATA
 from constants import ENEMY_DATA, ITEM_DROP_RATES
-from systems.game_state import game_state
+from systems.game_state import game_state, is_enemy_acting
 
 def resolve_dynamic_drops(item_list, current_rank):
     """
@@ -266,10 +266,13 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
         all_thinking_done = (game_state["current_enemy_idx"] >= len(enemies))
         
         all_moving_done = True
-        for e in enemies:
-            if e.is_moving or e.is_attacking:
-                all_moving_done = False
-                break
+        if is_enemy_acting(dungeon):
+            all_moving_done = False
+        if all_moving_done:
+            for e in enemies:
+                if e.is_moving:
+                    all_moving_done = False
+                    break
         
         if all_thinking_done and all_moving_done and not (dialog and dialog.is_active):
             # --- プレイヤーにターンを戻す前の処理 ---

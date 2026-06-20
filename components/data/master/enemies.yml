@@ -23,7 +23,7 @@ ENEMY_DATA:
     accuracy_close: 89
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 4
+    stupidity: 6
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
@@ -55,7 +55,7 @@ ENEMY_DATA:
     accuracy_close: 80
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 4
+    stupidity: 6
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: sonic_wave
@@ -87,7 +87,7 @@ ENEMY_DATA:
     accuracy_close: 90
     accuracy_ranged: 100
     attack_range: 2
-    stupidity: 3
+    stupidity: 5
     image_scale: 0.8
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
@@ -119,7 +119,7 @@ ENEMY_DATA:
     accuracy_close: 80
     accuracy_ranged: 100
     attack_range: 2
-    stupidity: 5
+    stupidity: 6
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: arrow
@@ -152,7 +152,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 3
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
@@ -183,7 +183,7 @@ ENEMY_DATA:
     accuracy_close: 80
     accuracy_ranged: 100
     attack_range: 3
-    stupidity: 2
+    stupidity: 4
     image_scale: 1.0
     close_attack_effect: explosion
     ranged_attack_effect: explosion
@@ -217,7 +217,7 @@ ENEMY_DATA:
     accuracy_close: 90
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 3
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: strange_mucus
     ranged_attack_effect: strange_mucus
@@ -233,11 +233,11 @@ ENEMY_DATA:
       - broken_shield
       - broken_sword
       - broken_armor
-      - revive_amulet
       rare:
       - fullmetal_sword
       - fullmetal_round_shield
       - fullmetal_breastplate
+      - revive_amulet
     normal_drop_rate: 0.15
     rare_drop_rate: 0.05
     hp: 24
@@ -249,7 +249,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 90
     attack_range: 1
-    stupidity: 5
+    stupidity: 6
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
@@ -280,7 +280,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 2
-    stupidity: 3
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
@@ -312,7 +312,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 2
-    stupidity: 3
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
@@ -342,7 +342,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 3
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
@@ -372,7 +372,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 3
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
@@ -402,7 +402,7 @@ ENEMY_DATA:
     accuracy_close: 80
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 3
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
@@ -414,8 +414,9 @@ ENEMY_DATA:
     min_rank: C
     image_folder: components/pictures/enemies/skelton_sword
     drops:
-      normal: [revive_amulet]
+      normal: []
       rare:
+      - revive_amulet
       - fighters_sword
       - hunters_rapier
       - knights_heavy_axe
@@ -435,7 +436,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 3
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
@@ -447,8 +448,9 @@ ENEMY_DATA:
     min_rank: C
     image_folder: components/pictures/enemies/skelton_sword_armor
     drops:
-      normal: [revive_amulet]
+      normal: []
       rare:
+      - revive_amulet
       - hunters_armor
       - fighters_armor
       - knights_heavy_armor
@@ -470,7 +472,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 3
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
@@ -502,7 +504,7 @@ ENEMY_DATA:
     accuracy_close: 90
     accuracy_ranged: 100
     attack_range: 2
-    stupidity: 3
+    stupidity: 5
     image_scale: 0.9
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
@@ -534,7 +536,7 @@ ENEMY_DATA:
     accuracy_close: 79
     accuracy_ranged: 70
     attack_range: 1
-    stupidity: 4
+    stupidity: 6
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: explosion
@@ -566,7 +568,7 @@ ENEMY_DATA:
     accuracy_close: 85
     accuracy_ranged: 70
     attack_range: 1
-    stupidity: 5
+    stupidity: 6
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: explosion
@@ -597,7 +599,7 @@ ENEMY_DATA:
     accuracy_close: 90
     accuracy_ranged: 95
     attack_range: 3
-    stupidity: 2
+    stupidity: 4
     image_scale: 1.0
     close_attack_effect: explosion
     ranged_attack_effect: explosion
@@ -631,7 +633,7 @@ ENEMY_DATA:
     accuracy_close: 90
     accuracy_ranged: 85
     attack_range: 2
-    stupidity: 3
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt

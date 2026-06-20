@@ -140,7 +140,7 @@ def init_ui_elements(screen_width, screen_height):
     """
     全てのUIコンポーネントを初期化し、辞書で返す。
     """
-    from systems.ui import CutsceneManager
+    from systems.ui import CutsceneManager, AreaMessageOverlay
     return {
         "dialog": Dialog(screen_width, screen_height),
         "confirm_dialog": ConfirmDialog(screen_width, screen_height),
@@ -164,4 +164,5 @@ def init_ui_elements(screen_width, screen_height):
         "guild_guide_dialog": GuildGuideDialog(screen_width, screen_height),
         "ore_gift_dialog": OreGiftDialog(screen_width, screen_height),
         "cutscene_manager": CutsceneManager(screen_width, screen_height),
+        "area_message_overlay": AreaMessageOverlay(screen_width, screen_height),
     }

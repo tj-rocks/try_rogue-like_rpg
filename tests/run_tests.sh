@@ -74,6 +74,7 @@ TEST_FILES=(
     "tests/test_npc_collision.py"
     "tests/test_enemy_collision.py"
     "tests/test_item_turn_consumption.py"
+    "tests/test_equip_turn_consumption.py"
     "tests/test_town_services.py"
     "tests/test_inn_debt.py"
     "tests/test_stave_effects.py"

@@ -492,6 +492,216 @@ ARMOR_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
+  skill_master_armor:
+    quest_targetable: true
+    name: 技巧戦士の鎧
+    category: light
+    min_rank: A
+    max_rank: SS
+    rarity: 4
+    price: 8800
+    image_dir: components/pictures/armor/skill_master_armor
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    describe: 技巧に長けた戦士の軽装。機動力を損なわず、命中と会心率を高める。
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 2
+        accuracy_close: 20
+        accuracy_range: 20
+        crit_rate: 0.15
+        hp: 0
+        defense: 24
+        block_chance_close: 0.08
+        block_chance_ranged: 0.08
+        lantern_bonus: 0
+        regen: 0
+        aggro_mod: 1
+        stupidity: 0
+        armor_penetration: 0.15
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  great_knight_armor:
+    quest_targetable: true
+    name: 重騎士の鎧
+    category: heavy
+    min_rank: A
+    max_rank: SS
+    rarity: 4
+    price: 10000
+    image_dir: components/pictures/armor/great_knight_armor
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    describe: 重装の騎士が纏う鋼鉄の鎧。圧倒的な防御力を持つが、機動力と視野が低下する。
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 3
+        accuracy_close: -5
+        accuracy_range: -10
+        crit_rate: 0
+        hp: 10
+        defense: 32
+        block_chance_close: -0.15
+        block_chance_ranged: -0.15
+        lantern_bonus: -1
+        regen: 0
+        aggro_mod: -4
+        stupidity: 0
+        armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  great_fighters_armor:
+    quest_targetable: true
+    name: 偉大な戦士の鎧
+    category: medium
+    min_rank: A
+    max_rank: SS
+    rarity: 4
+    price: 9500
+    image_dir: components/pictures/armor/great_fighters_armor
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    describe: 偉大な戦士の遺物。高い攻防一体性能を持ち、秘薬の効果を長く持続させる。
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 4
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.08
+        hp: 8
+        defense: 26
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
+        lantern_bonus: 0
+        regen: 0
+        aggro_mod: 0
+        stupidity: 0
+        armor_penetration: 0.05
+        buff_value_ratio: 0.25
+        buff_duration_ratio: 0.25
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  assassin_light_armor:
+    quest_targetable: true
+    name: アサシンの軽装
+    category: light
+    min_rank: A
+    max_rank: SS
+    rarity: 4
+    price: 8500
+    image_dir: components/pictures/armor/assassin_light_armor
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    describe: 暗殺者が用いる漆黒の軽装。隠密性と会心、命中に極めて優れている。
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 1
+        accuracy_close: 30
+        accuracy_range: 35
+        crit_rate: 0.22
+        hp: 0
+        defense: 22
+        block_chance_close: 0.08
+        block_chance_ranged: 0.08
+        lantern_bonus: 0
+        regen: 0
+        aggro_mod: 5
+        stupidity: 0
+        armor_penetration: 0.25
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  holy_armor:
+    quest_targetable: true
+    name: 聖鎧
+    category: heavy
+    min_rank: A
+    max_rank: SS
+    rarity: 4
+    price: 11000
+    image_dir: components/pictures/armor/holy_armor
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    describe: 聖なる力を宿した鎧。高い防御力と回復能力を持ち、光の杖を強化する。
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
+    floor_spawnable: true
+    bonus:
+      common:
+        attack: 1
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0
+        hp: 15
+        defense: 25
+        block_chance_close: 0.1
+        block_chance_ranged: 0.1
+        lantern_bonus: 1
+        regen: 8
+        aggro_mod: 0
+        stupidity: 0
+        armor_penetration: 0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0.25
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 1
+        light_stave_bonus: 2
+
   test_all_bonus_armor:
     quest_targetable: false
     name: "[TEST]全加護の鎧"
