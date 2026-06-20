@@ -19,7 +19,300 @@ from systems.session_handler import init_ui_elements, setup_ui_relations
 from systems.resources import font_small, font_medium
 from systems.events import handle_events, active_direction_keys
 
-# show_menu is removed. Starting main directly.
+# ===== デバッグ起動時のセットアップ画面 =====
+
+def _build_equip_presets():
+    from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, ACCESSORY_DATA
+    presets = []
+    for key, d in WEAPON_DATA.items():
+        if d.get("category") == "event": continue
+        presets.append(("weapon", key, d.get("name", key)))
+    for key, d in ARMOR_DATA.items():
+        if d.get("category") == "event": continue
+        presets.append(("armor", key, d.get("name", key)))
+    for key, d in SHIELD_DATA.items():
+        if d.get("category") == "event": continue
+        presets.append(("shield", key, d.get("name", key)))
+    for key, d in ACCESSORY_DATA.items():
+        if d.get("category") == "event": continue
+        presets.append(("accessory", key, d.get("name", key)))
+    return presets
+
+def _build_item_presets():
+    from constants import CONSUMABLE_DATA, STAVE_DATA
+    presets = []
+    for key, d in CONSUMABLE_DATA.items():
+        if d.get("category") == "event": continue
+        presets.append((key, d.get("name", key), 3))
+    for key, d in STAVE_DATA.items():
+        if d.get("category") == "event": continue
+        presets.append((key, d.get("name", key), 1))
+    return presets
+
+
+def run_setup_screen(screen, font_s, font_m):
+    """起動時のセットアップ画面。セーブ読み込み・開始階層・持ち物を選択する。
+    戻り値: (player, start_floor) または None（キャンセル）"""
+    from systems.data_loader import SAVE_DATA_PATH
+    import os
+
+    EQUIP_PRESETS = _build_equip_presets()
+    ITEM_PRESETS  = _build_item_presets()
+
+    SW, SH = screen.get_width(), screen.get_height()
+    clock = pygame.time.Clock()
+    ROW_H = 26
+    VISIBLE_ROWS = (SH - 130) // ROW_H
+
+    # --- 状態 ---
+    has_save = os.path.exists(SAVE_DATA_PATH)
+    use_save = has_save
+    start_floor = 1
+    selected_equips = set()
+    selected_items  = set(range(len(ITEM_PRESETS)))  # アイテムは全ON
+    section = 0  # 0:基本設定 1:装備 2:アイテム
+    cursor = 0
+    scroll = 0
+
+    BG      = (18, 22, 35)
+    PANEL   = (30, 36, 55)
+    ACCENT  = (80, 160, 255)
+    WHITE   = (230, 230, 230)
+    GRAY    = (130, 130, 150)
+    YELLOW  = (255, 230, 80)
+    GREEN   = (80, 220, 120)
+    RED     = (220, 80, 80)
+
+    def draw_checkbox(surf, x, y, checked, color):
+        pygame.draw.rect(surf, (60, 70, 100), (x, y, 18, 18), border_radius=3)
+        if checked:
+            pygame.draw.rect(surf, color, (x+3, y+3, 12, 12), border_radius=2)
+        else:
+            pygame.draw.rect(surf, GRAY, (x, y, 18, 18), 1, border_radius=3)
+
+    def draw_btn(surf, x, y, w, h, label, active=False):
+        col = ACCENT if active else (55, 65, 90)
+        pygame.draw.rect(surf, col, (x, y, w, h), border_radius=6)
+        pygame.draw.rect(surf, (100, 130, 200) if active else GRAY, (x, y, w, h), 1, border_radius=6)
+        txt = font_s.render(label, True, WHITE if active else GRAY)
+        surf.blit(txt, (x + w//2 - txt.get_width()//2, y + h//2 - txt.get_height()//2))
+
+    TABS = ["基本設定", f"装備選択 ({len(EQUIP_PRESETS)})", f"アイテム選択 ({len(ITEM_PRESETS)})"]
+
+    running = True
+    while running:
+        clock.tick(60)
+        screen.fill(BG)
+
+        # --- タブ ---
+        for i, tab in enumerate(TABS):
+            col = ACCENT if i == section else (50, 60, 85)
+            pygame.draw.rect(screen, col, (20 + i * 220, 15, 210, 38), border_radius=5)
+            t = font_m.render(tab, True, WHITE)
+            screen.blit(t, (20 + i * 220 + 105 - t.get_width()//2, 15 + 19 - t.get_height()//2))
+
+        # --- セクション内容 ---
+        y = 80
+        if section == 0:
+            # セーブ使用
+            save_label = f"セーブデータを読み込む  ({'あり' if has_save else 'なし'})"
+            draw_checkbox(screen, 30, y, use_save, GREEN)
+            txt = font_s.render(save_label, True, WHITE if has_save else GRAY)
+            screen.blit(txt, (58, y))
+            if not has_save:
+                warn = font_s.render("  ← セーブファイルが見つかりません", True, RED)
+                screen.blit(warn, (58 + txt.get_width(), y))
+            y += 44
+
+            # 開始フロア
+            floor_label = font_m.render(f"開始フロア:  {start_floor} F", True, WHITE)
+            screen.blit(floor_label, (30, y))
+            y += 36
+            draw_btn(screen, 30,  y, 60, 30, "- 10", False)
+            draw_btn(screen, 100, y, 60, 30, "- 1",  False)
+            draw_btn(screen, 180, y, 60, 30, "+ 1",  False)
+            draw_btn(screen, 250, y, 60, 30, "+10",  False)
+            hint = font_s.render("← → または +/- ボタンで変更", True, GRAY)
+            screen.blit(hint, (330, y + 6))
+            y += 56
+
+            info = font_s.render("※ セーブデータ読み込み時: セーブ時点の所持品・装備が引き継がれます", True, GRAY)
+            screen.blit(info, (30, y))
+            y += 28
+            info2 = font_s.render("　 次の装備/アイテム画面で追加選択も可能です", True, GRAY)
+            screen.blit(info2, (30, y))
+
+        elif section == 1:
+            header = font_s.render(f"チェックした装備を追加で持たせます  ↑↓スクロール  選択中: {len(selected_equips)}/{len(EQUIP_PRESETS)}", True, GRAY)
+            screen.blit(header, (30, y - 20))
+            for ri in range(VISIBLE_ROWS):
+                i = scroll + ri
+                if i >= len(EQUIP_PRESETS): break
+                etype, ekey, ename = EQUIP_PRESETS[i]
+                checked = i in selected_equips
+                hl = i == cursor
+                ry = y + ri * ROW_H
+                if hl:
+                    pygame.draw.rect(screen, (40, 50, 80), (25, ry - 2, SW - 50, ROW_H - 2), border_radius=4)
+                draw_checkbox(screen, 30, ry, checked, GREEN)
+                type_col = {"weapon": (255,180,80), "armor": (100,180,255),
+                            "shield": (180,255,130), "accessory": (255,130,255)}.get(etype, WHITE)
+                screen.blit(font_s.render(f"[{etype[:3].upper()}]", True, type_col), (58, ry))
+                screen.blit(font_s.render(ename, True, YELLOW if hl else WHITE), (120, ry))
+            # スクロールバー
+            total = len(EQUIP_PRESETS)
+            if total > VISIBLE_ROWS:
+                bar_h = max(20, int(VISIBLE_ROWS / total * (SH - 130)))
+                bar_y = y + int(scroll / total * (SH - 130))
+                pygame.draw.rect(screen, GRAY, (SW - 12, y, 8, SH - 130 - 60), border_radius=4)
+                pygame.draw.rect(screen, ACCENT, (SW - 12, bar_y, 8, bar_h), border_radius=4)
+
+        elif section == 2:
+            header = font_s.render(f"チェックしたアイテムを追加で持たせます  ↑↓スクロール  選択中: {len(selected_items)}/{len(ITEM_PRESETS)}", True, GRAY)
+            screen.blit(header, (30, y - 20))
+            for ri in range(VISIBLE_ROWS):
+                i = scroll + ri
+                if i >= len(ITEM_PRESETS): break
+                ikey, iname, icount = ITEM_PRESETS[i]
+                checked = i in selected_items
+                hl = i == cursor
+                ry = y + ri * ROW_H
+                if hl:
+                    pygame.draw.rect(screen, (40, 50, 80), (25, ry - 2, SW - 50, ROW_H - 2), border_radius=4)
+                draw_checkbox(screen, 30, ry, checked, GREEN)
+                screen.blit(font_s.render(f"{iname}  x{icount}", True, YELLOW if hl else WHITE), (58, ry))
+            total = len(ITEM_PRESETS)
+            if total > VISIBLE_ROWS:
+                bar_h = max(20, int(VISIBLE_ROWS / total * (SH - 130)))
+                bar_y = y + int(scroll / total * (SH - 130))
+                pygame.draw.rect(screen, GRAY, (SW - 12, y, 8, SH - 130 - 60), border_radius=4)
+                pygame.draw.rect(screen, ACCENT, (SW - 12, bar_y, 8, bar_h), border_radius=4)
+
+        # --- 下部ボタン ---
+        draw_btn(screen, SW - 220, SH - 60, 190, 44, "▶ この設定で開始", True)
+        hint_keys = font_s.render("Tab: タブ切替 | ↑↓: 移動 | Space/Enter: ON/OFF | ←→: フロア変更", True, GRAY)
+        screen.blit(hint_keys, (20, SH - 28))
+
+        pygame.display.flip()
+
+        # --- イベント処理 ---
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return None
+            if event.type == pygame.KEYDOWN:
+                k = event.key
+                if k == pygame.K_ESCAPE:
+                    return None
+                elif k == pygame.K_TAB:
+                    section = (section + 1) % 3
+                    cursor = 0
+                    scroll = 0
+                elif k in (pygame.K_UP, pygame.K_w):
+                    if section == 1:
+                        cursor = (cursor - 1) % len(EQUIP_PRESETS)
+                        scroll = max(0, min(scroll, cursor))
+                        if cursor < scroll: scroll = cursor
+                    elif section == 2:
+                        cursor = (cursor - 1) % len(ITEM_PRESETS)
+                        if cursor < scroll: scroll = cursor
+                        if cursor == len(ITEM_PRESETS) - 1: scroll = max(0, cursor - VISIBLE_ROWS + 1)
+                elif k in (pygame.K_DOWN, pygame.K_s):
+                    if section == 1:
+                        cursor = (cursor + 1) % len(EQUIP_PRESETS)
+                        if cursor >= scroll + VISIBLE_ROWS: scroll = cursor - VISIBLE_ROWS + 1
+                        if cursor == 0: scroll = 0
+                    elif section == 2:
+                        cursor = (cursor + 1) % len(ITEM_PRESETS)
+                        if cursor >= scroll + VISIBLE_ROWS: scroll = cursor - VISIBLE_ROWS + 1
+                        if cursor == 0: scroll = 0
+                elif k in (pygame.K_SPACE, pygame.K_RETURN):
+                    if section == 0:
+                        if has_save: use_save = not use_save
+                    elif section == 1:
+                        if cursor in selected_equips: selected_equips.remove(cursor)
+                        else: selected_equips.add(cursor)
+                    elif section == 2:
+                        if cursor in selected_items: selected_items.remove(cursor)
+                        else: selected_items.add(cursor)
+                elif k in (pygame.K_LEFT, pygame.K_MINUS):
+                    mods = pygame.key.get_mods()
+                    start_floor = max(0, start_floor - (10 if mods & pygame.KMOD_SHIFT else 1))
+                elif k in (pygame.K_RIGHT, pygame.K_EQUALS, pygame.K_PLUS):
+                    mods = pygame.key.get_mods()
+                    start_floor = min(99, start_floor + (10 if mods & pygame.KMOD_SHIFT else 1))
+                elif k == pygame.K_F5:
+                    running = False
+            if event.type == pygame.MOUSEWHEEL:
+                if section == 1:
+                    scroll = max(0, min(len(EQUIP_PRESETS) - VISIBLE_ROWS, scroll - event.y))
+                elif section == 2:
+                    scroll = max(0, min(len(ITEM_PRESETS) - VISIBLE_ROWS, scroll - event.y))
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mx, my = event.pos
+                if section == 0:
+                    btn_y_base = 80 + 44 + 36
+                    if btn_y_base <= my <= btn_y_base + 30:
+                        if 30 <= mx <= 90:   start_floor = max(0,  start_floor - 10)
+                        elif 100 <= mx <= 160: start_floor = max(0,  start_floor - 1)
+                        elif 180 <= mx <= 240: start_floor = min(99, start_floor + 1)
+                        elif 250 <= mx <= 310: start_floor = min(99, start_floor + 10)
+                    if 30 <= mx <= 50 and 80 <= my <= 98 and has_save:
+                        use_save = not use_save
+                elif section == 1:
+                    for ri in range(VISIBLE_ROWS):
+                        ry = 80 + ri * ROW_H
+                        if ry - 2 <= my <= ry + ROW_H - 4:
+                            i = scroll + ri
+                            if i < len(EQUIP_PRESETS):
+                                cursor = i
+                                if i in selected_equips: selected_equips.remove(i)
+                                else: selected_equips.add(i)
+                elif section == 2:
+                    for ri in range(VISIBLE_ROWS):
+                        ry = 80 + ri * ROW_H
+                        if ry - 2 <= my <= ry + ROW_H - 4:
+                            i = scroll + ri
+                            if i < len(ITEM_PRESETS):
+                                cursor = i
+                                if i in selected_items: selected_items.remove(i)
+                                else: selected_items.add(i)
+                # 開始ボタン
+                if SW - 220 <= mx <= SW - 30 and SH - 60 <= my <= SH - 16:
+                    running = False
+
+    # --- プレイヤー構築 ---
+    player = Player()
+    player.is_debug = True
+    player.max_reached_floor = 99
+
+    if use_save and has_save:
+        player.load_from_file()
+        print(f"[Setup] セーブデータを読み込みました (Floor {player.current_floor}, Rank {player.guild_rank})")
+    else:
+        player.attack = 50
+        player.hp = 200
+        player.max_hp = 200
+        player.guild_point = 1000
+        player.guild_rank = "F"
+        player.coin = 100000
+        print("[Setup] デフォルト設定で開始")
+
+    # 追加装備
+    for idx in selected_equips:
+        etype, ekey, _ = EQUIP_PRESETS[idx]
+        inst = EquipInstance(etype, ekey)
+        if etype == "weapon":    player.weapon_inventory.append(inst)
+        elif etype == "armor":   player.armor_inventory.append(inst)
+        elif etype == "shield":  player.shield_inventory.append(inst)
+        elif etype == "accessory": player.accessory_inventory.append(inst)
+
+    # 追加アイテム
+    for idx in selected_items:
+        ikey, _, icount = ITEM_PRESETS[idx]
+        player.add_item_to_inventory(ikey, icount)
+
+    print(f"[Setup] 開始フロア: {start_floor}F")
+    return player, start_floor
 
 def setup_gungeon_mode(dungeon, player):
     """テクスチャ・アイテム確認用の特殊フロア設定"""
@@ -259,51 +552,21 @@ def draw_debug_overlay(screen, dungeon, player):
         y_offset += 30
 
 def main():
-    """最強デバッグツール：メニューを廃止し、最初から全機能を有効にして起動する"""
+    """最強デバッグツール：セットアップ画面でセーブ・装備・フロアを選んで起動する"""
     try:
         pygame.init()
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("ULTIMATE DEBUG TOOL")
 
-        # 1. プレイヤーの初期化
-        player = Player()
-        player.is_debug = True
-        player.attack = 50
-        player.hp = 200
-        player.max_hp = 200
-        player.guild_point = 1000
-        player.guild_rank = "F"
-        player.max_reached_floor = 99 # デバッグ用に最初から全ての休憩所を解放
-        player.coin = 100000
-        player.add_item_to_inventory("teleport_stone", 50)
-        
-        # 強化用の石を追加
-        player.add_item_to_inventory("red_stone", 2)
-        player.add_item_to_inventory("blue_stone", 2)
-        player.add_item_to_inventory("green_stone", 2)
-        player.add_item_to_inventory("purple_stone", 2)
-        
-        # 検証用の武器・防具・盾を追加
-        from components.sprites.player import EquipInstance
-        player.weapon_inventory.append(EquipInstance("weapon", "scount_small_knife"))
-        player.weapon_inventory.append(EquipInstance("weapon", "iron_sword"))
-        player.weapon_inventory.append(EquipInstance("weapon", "test_all_bonus_weapon"))
-        player.armor_inventory.append(EquipInstance("armor", "test_all_bonus_armor"))
-        player.shield_inventory.append(EquipInstance("shield", "test_all_bonus_shield"))
-        player.accessory_inventory.append(EquipInstance("accessory", "test_all_bonus_accessory"))
-        
-        # 【テスト用】皮の鎧と皮の鎧+10を追加
-        leather_armor_base = EquipInstance("armor", "leather_breastplate")
-        player.armor_inventory.append(leather_armor_base)
-        
-        leather_armor_plus10 = EquipInstance("armor", "leather_breastplate")
-        leather_armor_plus10.enhance = 10
-        # defense_bonusに全振り
-        leather_armor_plus10.stats = {"defense_bonus": 10}
-        player.armor_inventory.append(leather_armor_plus10)
+        # 1. セットアップ画面
+        result = run_setup_screen(screen, font_small, font_medium)
+        if result is None:
+            pygame.quit()
+            return
+        player, start_floor = result
 
-        # 2. ダンジョンの初期化 (1階から開始)
-        dungeon = warp_to_floor(1, player)
+        # 2. ダンジョンの初期化
+        dungeon = warp_to_floor(max(0, start_floor), player)
         
         # デバッグ用設定の強制有効化
         dungeon.is_combat_qa = True
