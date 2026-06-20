@@ -415,85 +415,85 @@ DUNGEON_IMAGES:
     map: 5th_rest_point.txt
     no_attack: true
   "57":
-    image: deesert_ruin
+    image: cave
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "58":
-    image: deesert_ruin
+    image: cave
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "59":
-    image: deesert_ruin
+    image: cave
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "60":
-    image: standard
+    image: cave
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "61":
-    image: standard
+    image: cave
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "62":
-    image: standard
+    image: cave
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "63":
-    image: standard
+    image: cave
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "64":
-    image: standard
+    image: shell
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "65":
-    image: standard
+    image: shell
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "66":
-    image: standard
+    image: shell
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "67":
-    image: standard
+    image: shell
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "68":
-    image: standard
+    image: shell
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "69":
-    image: standard
+    image: shell
     sound: just_move.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "70":
-    image: temple
+    image: shell
     sound: sandstone_floor.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
