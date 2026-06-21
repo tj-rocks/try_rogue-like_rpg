@@ -5,9 +5,76 @@ import threading
 import os
 import sys
 import json
+import glob
 
 PORT = 8765
 URL = f"http://localhost:{PORT}/tools/village_editor.html"
+
+
+def _get_theme_for_map(map_file):
+    """dungeon.yml から map_file に対応するテーマ(image)を返す。村は home。"""
+    if map_file == "village.txt":
+        return "home"
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if base_dir not in sys.path:
+        sys.path.append(base_dir)
+    from systems.data_loader import load_master_data
+    dungeon_data = load_master_data("dungeon.yml") or {}
+    dungeon_images = dungeon_data.get("DUNGEON_IMAGES", {})
+    for key, info in dungeon_images.items():
+        if key in ("path", "bgm_path"):
+            continue
+        if isinstance(info, dict) and info.get("map") == map_file:
+            return info.get("image", "home")
+    return "home"
+
+
+def _get_theme_image_path(theme_dir, category, tile_id=0):
+    """テーマディレクトリ内から category/tile_id に対応する画像ファイル名を返す。"""
+    candidates = []
+    fallback_pattern = None
+    if category == "floor":
+        candidates = [f"floor_{tile_id}.png", "floor.png"]
+        fallback_pattern = "floor_*.png"
+    elif category == "wall_top":
+        candidates = [f"wall_top_{tile_id}.png", "wall_top.png"]
+        fallback_pattern = "wall_top_*.png"
+    elif category == "wall_none":
+        candidates = [f"wall_none_{tile_id}.png", "wall_none.png"]
+        fallback_pattern = "wall_none_*.png"
+    elif category == "corridor":
+        candidates = ["corridor.png"]
+        fallback_pattern = "floor_*.png"
+    elif category == "wall_pass":
+        candidates = [f"wall_pass_{tile_id}.png", "wall_pass.png", "wall_top.png"]
+        fallback_pattern = "wall_top_*.png"
+    else:
+        return None
+    for c in candidates:
+        if os.path.exists(os.path.join(theme_dir, c)):
+            return c
+    if fallback_pattern:
+        matches = sorted(glob.glob(os.path.join(theme_dir, fallback_pattern)))
+        if matches:
+            return os.path.basename(matches[0])
+    return None
+
+
+def _resolve_tile_image_path_for_theme(base_dir, tile, theme):
+    """タイル定義を theme 用に image_path を上書きして返す（theme カテゴリのみ）。"""
+    if not isinstance(tile, dict):
+        return tile
+    category = tile.get("category")
+    if category not in ("floor", "wall_top", "wall_none", "corridor", "wall_pass"):
+        return tile
+    tile_id = tile.get("tile_id", 0)
+    theme_dir = os.path.join(base_dir, "components/pictures/dungeon", theme)
+    filename = _get_theme_image_path(theme_dir, category, tile_id)
+    if filename:
+        new_tile = dict(tile)
+        new_tile["image_path"] = f"components/pictures/dungeon/{theme}/{filename}"
+        return new_tile
+    return tile
 
 class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -20,26 +87,31 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/api/available_assets":
             try:
+                import urllib.parse
                 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                 if base_dir not in sys.path:
                     sys.path.append(base_dir)
                 from systems.data_loader import load_master_data
                 
-                # Load assets directory dynamically from village.yml config
-                village_data = load_master_data("village.yml") or {}
-                config = village_data.get("CONFIG", {})
-                image_dir_rel = config.get("image_dir", "components/pictures/dungeon/home")
-                home_dir = os.path.join(base_dir, image_dir_rel)
+                parsed_url = urllib.parse.urlparse(self.path)
+                query_params = urllib.parse.parse_qs(parsed_url.query)
+                theme = query_params.get("theme", [None])[0]
+                if not theme:
+                    map_file = os.path.basename(query_params.get("map_file", ["village.txt"])[0])
+                    theme = _get_theme_for_map(map_file)
+                
+                # Load assets directory dynamically from the selected theme
+                image_dir = os.path.join(base_dir, "components/pictures/dungeon", theme)
                 
                 files = []
-                if os.path.exists(home_dir):
-                    files = [f for f in os.listdir(home_dir) if os.path.isfile(os.path.join(home_dir, f))]
+                if os.path.exists(image_dir):
+                    files = [f for f in os.listdir(image_dir) if os.path.isfile(os.path.join(image_dir, f))]
                 
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                response = {"status": "success", "files": files}
+                response = {"status": "success", "files": files, "theme": theme}
                 self.wfile.write(json.dumps(response).encode('utf-8'))
             except Exception as e:
                 self.send_response(500)
@@ -96,6 +168,12 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 base_mappings = village_data.get("TILE_MAPPINGS", {})
                 config = village_data.get("CONFIG", {})
                 
+                # Determine theme for this map from dungeon.yml
+                theme = _get_theme_for_map(map_file)
+                config = dict(config)
+                config["image_dir"] = f"components/pictures/dungeon/{theme}"
+                config["theme"] = theme
+                
                 # Look for custom config
                 custom_file = None
                 if map_file != "village.txt":
@@ -131,8 +209,13 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                             if not is_village_map:
                                 tile_mappings[k].pop("positions", None)
                 
+                # 2. rest point 等の非村固定マップでは dungeon.yml のテーマ画像を使う
+                if not is_village_map:
+                    for k, tile in tile_mappings.items():
+                        if isinstance(tile, dict):
+                            tile_mappings[k] = _resolve_tile_image_path_for_theme(base_dir, tile, theme)
 
-                # 2. Enrich NPCs and Obstacles dynamically using IDs defined in village.yml
+                # 3. Enrich NPCs and Obstacles dynamically using IDs defined in village.yml
                 npcs = load_master_data("npcs.yml") or {}
                 obstacles = load_master_data("obstacles.yml") or {}
                 

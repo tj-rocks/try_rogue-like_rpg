@@ -154,7 +154,7 @@ DUNGEON_IMAGES:
 # Eランク 到達可能階層 (12F 〜 21F)
 # ==========================================
   '12':
-    image: home
+    image: standard
     sound: just_move.mp3
     brightness: 5
     map: 1st_rest_point.txt
@@ -213,7 +213,7 @@ DUNGEON_IMAGES:
 # Dランク 到達可能階層 (22F 〜 30F)
 # ==========================================
   "22":
-    image: home
+    image: temple
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -268,7 +268,7 @@ DUNGEON_IMAGES:
 # Cランク 到達可能階層 (31F 〜 40F)
 # ==========================================
   "31":
-    image: home
+    image: tanko
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -327,7 +327,7 @@ DUNGEON_IMAGES:
 # Bランク 到達可能階層 (41F 〜 55F)
 # ==========================================
   "41":
-    image: home
+    image: deep_rock
     sound: door_of_oldcity.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -431,7 +431,7 @@ DUNGEON_IMAGES:
 # Aランク 到達可能階層 (56F 〜 70F)
 # ==========================================
   "56":
-    image: home
+    image: fathers_city
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -531,7 +531,7 @@ DUNGEON_IMAGES:
 # Sランク 到達可能階層 (71F 〜 80F)
 # ==========================================
   "71":
-    image: home
+    image: cave
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -601,7 +601,7 @@ DUNGEON_IMAGES:
 # SSランク 到達可能階層 (81F 〜 99F)
 # ==========================================
   "81":
-    image: home
+    image: shell
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -667,7 +667,7 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "91":
-    image: home
+    image: deesert_ruin
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3

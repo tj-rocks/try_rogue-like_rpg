@@ -23,7 +23,8 @@ EQUIP_STAT_LABEL_MAP = {
     "block_chance_ranged": "遠距離回避率",
     "aggro_mod": "感知補正",
     "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION,
-    "stupidity": Text.UI.STAT_CONFUSION_ICON
+    "stupidity": Text.UI.STAT_CONFUSION_ICON,
+    "backstab_crit_bonus": "背後会心"
 }
 
 EQUIP_MAGIC_LABEL_MAP = {

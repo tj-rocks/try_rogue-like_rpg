@@ -798,6 +798,39 @@ class Dungeon:
             from systems.audio_manager import stop_bgm
             stop_bgm()
 
+    def _resolve_theme_texture_key(self, category, tile_id=0):
+        """現在ロードされているテーマのテクスチャから、カテゴリ/IDに対応する有効なキーを返す。
+        該当IDのテクスチャが存在しない場合は基本キー、それもなければ最初のバリアントを返す。
+        """
+        if category == "floor":
+            candidates = [f"floor_{tile_id}", "floor"]
+            if getattr(self, "available_floor_variants", None):
+                candidates.append(self.available_floor_variants[0])
+        elif category == "wall_top":
+            candidates = [f"wall_top_{tile_id}", "wall_top"]
+            if getattr(self, "available_wall_top_variants", None):
+                candidates.append(self.available_wall_top_variants[0])
+        elif category == "wall_none":
+            candidates = [f"wall_none_{tile_id}", "wall_none"]
+            if getattr(self, "available_wall_none_variants", None):
+                candidates.append(self.available_wall_none_variants[0])
+        elif category == "corridor":
+            candidates = ["corridor"]
+            if getattr(self, "available_floor_variants", None):
+                candidates.append(self.available_floor_variants[0])
+        elif category == "wall_pass":
+            candidates = [f"wall_pass_{tile_id}", "wall_pass"]
+            if getattr(self, "available_wall_top_variants", None):
+                candidates.append(self.available_wall_top_variants[0])
+            elif "wall_top" in self.textures:
+                candidates.append("wall_top")
+        else:
+            return "wall_none"
+        for k in candidates:
+            if k in self.textures:
+                return k
+        return candidates[-1] if candidates else "wall_none"
+
     def generate_fixed_map(self, map_name):
         """テキストファイルから固定マップを生成する（村や休憩ポイント用）"""
         # 読み込みパスの優先順位: 1. components/data/dungeon/  2. ルート
@@ -872,6 +905,16 @@ class Dungeon:
                             if not is_village_map:
                                 tile_mappings_raw[k].pop("positions", None)
                 
+                # 非村の固定マップ（rest point等）では village.yml の具体的な home 画像パスを使わず、
+                # その階層のテーマテクスチャを使うため image_path を削除する
+                # （wall_decoration 等のカスタム画像は保持）
+                if not is_village_map:
+                    for v in tile_mappings_raw.values():
+                        if isinstance(v, dict) and v.get("category") in (
+                            "floor", "wall_top", "wall_none", "corridor", "wall_pass"
+                        ):
+                            v.pop("image_path", None)
+                
                 # 地形文字マッピング（village.txtのパース用）
                 tile_mappings = {}
                 for k, v in tile_mappings_raw.items():
@@ -912,9 +955,9 @@ class Dungeon:
                                 import os as _os
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
                             else:
-                                fk = f"wall_pass_{tile_mappings[char].get('tile_id', 0)}"
+                                fk = self._resolve_theme_texture_key("wall_pass", tile_mappings[char].get("tile_id", 0))
                             self._wall_top_override[(c, r)] = fk
-                            self._floor_override[(c, r)] = "floor_lawn"
+                            self._floor_override[(c, r)] = self._resolve_theme_texture_key("floor", 0)
                             
                         # 2. 壁・天井
                         elif char in tile_mappings and tile_mappings[char].get("category") == "wall_top":
@@ -924,7 +967,7 @@ class Dungeon:
                                 import os as _os
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
                             else:
-                                fk = f"wall_top_{tile_mappings[char].get('tile_id', 0)}"
+                                fk = self._resolve_theme_texture_key("wall_top", tile_mappings[char].get("tile_id", 0))
                             self._wall_top_override[(c, r)] = fk
                             
                         # 4. 背景・虚無
@@ -935,7 +978,7 @@ class Dungeon:
                                 import os as _os
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
                             else:
-                                fk = f"wall_none_{tile_mappings[char].get('tile_id', 0)}"
+                                fk = self._resolve_theme_texture_key("wall_none", tile_mappings[char].get("tile_id", 0))
                             self._wall_none_override[(c, r)] = fk
                             
                         # 5. 床・地面
@@ -946,7 +989,7 @@ class Dungeon:
                                 import os as _os
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
                             else:
-                                fk = f"floor_{tile_mappings[char].get('tile_id', 0)}"
+                                fk = self._resolve_theme_texture_key("floor", tile_mappings[char].get("tile_id", 0))
                             self._floor_override[(c, r)] = fk
 
                         # 6. 通路
@@ -957,13 +1000,13 @@ class Dungeon:
                                 import os as _os
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
                             else:
-                                fk = "corridor"
+                                fk = self._resolve_theme_texture_key("corridor")
                             self._floor_override[(c, r)] = fk
                         # 6. 特別・特殊タイル (P, D, U)
                         elif char == "P":
                             self.start_pos = (c, r)
                             self.map_data[r][c] = 1
-                            self._floor_override[(c, r)] = "floor_lawn"
+                            self._floor_override[(c, r)] = self._resolve_theme_texture_key("floor", 0)
 
                         elif char == "D":
                             self.map_data[r][c] = 3
@@ -1118,7 +1161,7 @@ class Dungeon:
                                 fk = _os.path.splitext(_os.path.basename(img_path))[0]
                             else:
                                 tile_id = tile_info.get("tile_id", 0)
-                                fk = f"wall_pass_{tile_id}"
+                                fk = self._resolve_theme_texture_key("wall_pass", tile_id)
                             self._wall_top_override[(c, r)] = fk
                             print(f"[DEBUG-NPC]   Successfully placed wall_pass '{ent_id}' (fk={fk}) at grid coordinate ({c}, {r})")
                 

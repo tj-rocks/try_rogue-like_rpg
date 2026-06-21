@@ -3616,6 +3616,7 @@ class StatusDialog:
             total_aggro = get_total_bonus("aggro_mod")
             total_stupidity = get_total_bonus("stupidity")
             total_penetration = get_total_bonus("armor_penetration")
+            total_backstab = get_total_bonus("backstab_crit_bonus")
 
             total_fire_dmg = get_total_bonus("magic_fire_damage")
             total_fire_range = get_total_bonus("magic_fire_range")
@@ -3676,6 +3677,10 @@ class StatusDialog:
             if total_stupidity != 0:
                 from wordings import Text
                 left_lines.append(f"{Text.UI.STAT_CONFUSION_LABEL}      {format_val(total_stupidity)}")
+                has_any_bonus = True
+            if total_backstab != 0:
+                val = total_backstab * 100 if isinstance(total_backstab, float) and total_backstab <= 1.0 else total_backstab
+                left_lines.append(f"背後会心  {format_val(val)}%")
                 has_any_bonus = True
 
             # --- 右列: 魔法加護 ---

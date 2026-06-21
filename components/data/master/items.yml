@@ -215,9 +215,10 @@ CONSUMABLE_DATA:
     duration: 70
     value: 1
     aggro_mod: 2
+    stupidity: 1
     price: 1500
     selling_price: 150
-    min_rank: A
+    min_rank: E
     max_rank: SS
     rarity: 3
     image_path: components/pictures/icon/special_potion.png

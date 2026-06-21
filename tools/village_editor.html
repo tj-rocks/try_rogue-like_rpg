@@ -1148,6 +1148,7 @@ async function switchMapFile(filename) {
       const text = await res.text();
       document.getElementById('raw-text').value = text;
       
+      await loadAvailableAssets();
       await loadTileDefinitions();
       buildPalette();
       renderFromText();
@@ -1164,6 +1165,23 @@ async function switchMapFile(filename) {
     }
   } catch (e) {
     alert(`❌ ${filename} のロードに失敗しました。`);
+  }
+}
+
+// ==============================================================================
+// 利用可能アセット取得（テーマごと）
+// ==============================================================================
+async function loadAvailableAssets() {
+  try {
+    const res = await fetch(`/api/available_assets?map_file=${currentFilename}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'success' && data.files) {
+        availableFiles = new Set(data.files);
+      }
+    }
+  } catch (e) {
+    console.log("⚠️ アセット一覧APIへの接続に失敗しました。");
   }
 }
 
@@ -1250,21 +1268,8 @@ async function loadTileDefinitions() {
 // 初期ロード処理
 // ==============================================================================
 async function initEditor() {
-  // 1. サーバーから利用可能な画像ファイル名を取得
-  try {
-    const res = await fetch('/api/available_assets');
-    if (res.ok) {
-      const data = await res.json();
-      if (data.status === 'success' && data.files) {
-        availableFiles = new Set(data.files);
-      }
-    }
-  } catch (e) {
-    console.log("⚠️ アセット一覧APIへの接続に失敗しました。全アセットをデフォルトで表示します。");
-  }
-
   let defaultMap = 'village.txt';
-  // 1.5. サーバーから利用可能なマップファイルリストを取得し、セレクトボックスを構築
+  // 1. サーバーから利用可能なマップファイルリストを取得し、セレクトボックスを構築
   try {
     const res = await fetch('/api/available_maps');
     if (res.ok) {
@@ -1297,11 +1302,15 @@ async function initEditor() {
     console.log("⚠️ マップ一覧APIへの接続に失敗しました。デフォルトのセレクトボックスを使用します。");
   }
 
-  // 2. パレット構築 & 初期キャラ選択
+  // 2. テーマ別アセットを読み込み
+  currentFilename = defaultMap;
+  await loadAvailableAssets();
+
+  // 3. パレット構築 & 初期キャラ選択
   buildPalette();
   selectChar('.');
 
-  // 3. デフォルトマップをロード
+  // 4. デフォルトマップをロード
   await switchMapFile(defaultMap);
 }
 
@@ -1371,16 +1380,7 @@ initEditor();
 // キャッシュを無視したアセット・定義のリフレッシュ処理
 async function refreshAssets() {
   cacheBuster = '?v=' + new Date().getTime();
-  try {
-    const res = await fetch('/api/available_assets');
-    if (res.ok) {
-      const data = await res.json();
-      if (data.status === 'success' && data.files) {
-        availableFiles = new Set(data.files);
-      }
-    }
-  } catch (e) {}
-
+  await loadAvailableAssets();
   await loadTileDefinitions();
   buildPalette();
   drawGrid();

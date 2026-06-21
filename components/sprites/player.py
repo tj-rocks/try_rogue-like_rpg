@@ -345,6 +345,22 @@ class Player(Entity):
         ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("stupidity", 0)
+        # 暗殺者の秘薬バフ
+        if getattr(self, "stealth_buff_turns", 0) > 0:
+            bonus += getattr(self, "stealth_buff_stupidity", 0)
+        return bonus
+
+    @property
+    def total_backstab_crit_bonus(self):
+        bonus = 0.0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("backstab_crit_bonus", 0.0)
         return bonus
 
     def get_magic_bonus(self, key):
@@ -480,6 +496,7 @@ class Player(Entity):
         self.stealth_buff_max_turns = 0
         self.stealth_buff_lantern = 0
         self.stealth_buff_aggro = 0
+        self.stealth_buff_stupidity = 0
         self.regen_pool = 0.0
         self.waving_stave_inst = None
         self._status = "normal"
@@ -632,6 +649,9 @@ class Player(Entity):
                 self.stealth_buff_turns -= 1
                 if self.stealth_buff_turns == 0:
                     messages.append("暗殺者の秘薬の効果が 切れた！")
+                    self.stealth_buff_stupidity = 0
+                    self.stealth_buff_lantern = 0
+                    self.stealth_buff_aggro = 0
             
             if messages and dialog:
                 msg = "\n".join(messages)
@@ -1283,6 +1303,7 @@ class Player(Entity):
             "stealth_buff_max_turns": getattr(self, "stealth_buff_max_turns", 0),
             "stealth_buff_lantern": getattr(self, "stealth_buff_lantern", 0),
             "stealth_buff_aggro": getattr(self, "stealth_buff_aggro", 0),
+            "stealth_buff_stupidity": getattr(self, "stealth_buff_stupidity", 0),
             "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
             "completed_fixed_quests": self.completed_fixed_quests, "defeated_once_only": getattr(self, "defeated_once_only", []), "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
             "current_floor": self.current_floor, "max_reached_floor": self.max_reached_floor, "equip_id_counter": globals().get("_equip_id_counter", 0),
@@ -1334,6 +1355,7 @@ class Player(Entity):
         self.stealth_buff_max_turns = int(data.get("stealth_buff_max_turns", 0))
         self.stealth_buff_lantern = int(data.get("stealth_buff_lantern", 0))
         self.stealth_buff_aggro = int(data.get("stealth_buff_aggro", 0))
+        self.stealth_buff_stupidity = int(data.get("stealth_buff_stupidity", 0))
         self.guild_point = int(data.get("guild_point", 0)); self.guild_rank = data.get("guild_rank", "F")
         self.active_quests = data.get("active_quests", [])
         for q in self.active_quests:
