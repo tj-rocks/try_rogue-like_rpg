@@ -149,16 +149,13 @@ class Enemy(Entity):
     def _is_in_attack_range(self, dx, dy): return (abs(dx) <= self.attack_range and dy == 0 and dx != 0) or (abs(dy) <= self.attack_range and dx == 0 and dy != 0)
 
     def _handle_attack(self, dx, dy, player, dialog=None):
-        fn = self.facing
-        if dx > 0: fn = "right"
-        elif dx < 0: fn = "left"
-        elif dy > 0: fn = "down"
-        elif dy < 0: fn = "up"
-        if self.facing != fn: self.facing = fn
-        else:
-            from constants import ATTACK_PRE_DELAY_FRAMES
-            self.attack_pre_delay_timer = ATTACK_PRE_DELAY_FRAMES; self.is_attacking = True; self.is_long_range = (abs(dx)+abs(dy) > 1)
-            self.target_for_attack, self.dialog_for_attack = player, dialog
+        if dx > 0: self.facing = "right"
+        elif dx < 0: self.facing = "left"
+        elif dy > 0: self.facing = "down"
+        elif dy < 0: self.facing = "up"
+        from constants import ATTACK_PRE_DELAY_FRAMES
+        self.attack_pre_delay_timer = ATTACK_PRE_DELAY_FRAMES; self.is_attacking = True; self.is_long_range = (abs(dx)+abs(dy) > 1)
+        self.target_for_attack, self.dialog_for_attack = player, dialog
 
     def _is_line_of_sight_clear(self, dx, dy, dungeon, all_entities):
         sx, sy = (1 if dx > 0 else -1 if dx < 0 else 0), (1 if dy > 0 else -1 if dy < 0 else 0)

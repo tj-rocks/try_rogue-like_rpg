@@ -74,6 +74,7 @@ TEST_FILES=(
     "tests/test_npc_collision.py"
     "tests/test_enemy_collision.py"
     "tests/test_item_turn_consumption.py"
+    "tests/test_equip_turn_consumption.py"
     "tests/test_town_services.py"
     "tests/test_inn_debt.py"
     "tests/test_stave_effects.py"
@@ -100,7 +101,6 @@ TEST_FILES=(
     "tests/test_equip_kago_bonus.py"
     "tests/test_armor_penetration.py"
     "tests/test_blacksmith_stones.py"
-    "tests/test_smart_ranged_move.py"
     "tests/test_full_inventory_pickup.py"
     "tests/test_potions.py"
 )

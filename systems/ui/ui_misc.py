@@ -1,6 +1,6 @@
 import math
 import pygame
-from systems.game_state import game_state
+from systems.game_state import game_state, is_enemy_acting
 from systems.resources import font_medium
 from wordings import Text
 from systems.ui.ui_base import (
@@ -786,14 +786,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                         dialog.set_pages(npc.get_dialogue(player))
                                     return
                 elif event.key == KEY_MENU:
-                    enemies_acting = False
-                    if dungeon:
-                        enemies_acting = any(
-                            e.is_attacking or getattr(e, "attack_pre_delay_timer", 0) > 0
-                            or getattr(e, "damage_flash_timer", 0) > 0
-                            for e in dungeon.enemies if not getattr(e, "is_dead", False)
-                        )
-                    if menu_dialog and not enemies_acting:
+                    if menu_dialog and not is_enemy_acting(dungeon):
                         menu_dialog.is_active = True
 
 

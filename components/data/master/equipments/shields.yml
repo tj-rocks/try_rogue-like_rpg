@@ -501,6 +501,7 @@ SHIELD_DATA:
         armor_penetration: 0.1
         buff_value_ratio: 0
         buff_duration_ratio: 0
+        backstab_crit_bonus: 0.05
       magic:
         fire_damage: 0
         fire_range: 0

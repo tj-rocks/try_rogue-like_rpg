@@ -39,6 +39,7 @@ SOUND_SELECT         = "components/sounds/sfx/select_new.wav"      # 決定音
 SOUND_CANCEL         = "components/sounds/sfx/cancel_new.wav"      # キャンセル音
 SOUND_STAIRS_UP      = "components/sounds/sfx/stairs.wav"          # 階段移動音
 SOUND_STAIRS_DOWN    = "components/sounds/sfx/stairs.wav"          # 階段移動音
+SOUND_AREA_MESSAGE   = "components/sounds/sfx/floor_description.mp3" # エリア名演出SE
 SOUND_HAMMER         = "components/sounds/sfx/attack_1.wav"       # 鍛冶屋の叩く音
 SOUND_BLACKSMITH_FINISH = "components/sounds/sfx/buy.wav"        # 鍛冶完了音
 
@@ -188,6 +189,9 @@ BOSS_NO_QUEST_SPAWN_CHANCE = _ai.get("BOSS_NO_QUEST_SPAWN_CHANCE", 0.05)
 # Data Source: balance.yml (COMBAT)
 _cb = _balance.get("COMBAT", {})
 CRITICAL_RATE_MAX           = _cb.get("CRITICAL_RATE_MAX", 0.7)
+CRITICAL_DAMAGE_MULTIPLIER  = _cb.get("CRITICAL_DAMAGE_MULTIPLIER", 2.0)
+BACKSTAB_CRITICAL_DAMAGE_MULTIPLIER = _cb.get("BACKSTAB_CRITICAL_DAMAGE_MULTIPLIER", 2.5)
+BACKSTAB_CRIT_BONUS         = _cb.get("BACKSTAB_CRIT_BONUS", 0.25)
 ENEMY_THINK_LIMIT_PER_FRAME = _cb.get("ENEMY_THINK_LIMIT_PER_FRAME", 10)
 
 ATTACK_TAME_DURATION    = _cb.get("ATTACK_TAME_DURATION", 0)

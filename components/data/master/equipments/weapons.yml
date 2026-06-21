@@ -687,6 +687,7 @@ WEAPON_DATA:
         armor_penetration: 0.3
         buff_value_ratio: 0
         buff_duration_ratio: 0
+        backstab_crit_bonus: 0.15
       magic:
         fire_damage: 0
         fire_range: 0

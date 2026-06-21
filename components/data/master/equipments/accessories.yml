@@ -79,7 +79,7 @@ ACCESSORY_DATA:
         defense: 0
         block_chance_close: 0.0
         block_chance_ranged: 0.0
-        lantern_bonus: 8
+        lantern_bonus: 5
         regen: 0
         stupidity: 0
         armor_penetration: 0.0

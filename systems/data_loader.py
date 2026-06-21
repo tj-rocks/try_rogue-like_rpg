@@ -191,6 +191,7 @@ def get_normalized_equipment_data(floor_map):
         "armor_penetration":  "armor_penetration",
         "buff_value_ratio":   "magic_buff_value_ratio",
         "buff_duration_ratio":"magic_buff_duration_ratio",
+        "backstab_crit_bonus":"backstab_crit_bonus",
     }
 
     def _flatten_bonus(item_dict):

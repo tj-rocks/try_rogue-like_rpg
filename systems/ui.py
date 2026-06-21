@@ -1,6 +1,6 @@
 import pygame
 import random
-from systems.game_state import game_state
+from systems.game_state import game_state, is_enemy_acting
 from systems.resources import (
     font_small, font_small_bold, font_medium, font_large,
     font_dialog, font_menu, font_hud
@@ -44,7 +44,7 @@ def format_stat_value(val):
         val_str = str(round(val, 2))
     return f"+{val_str}" if val > 0 else val_str
 
-def draw_stat_bar(screen, x, y, value, stat_key, bar_width=100, bar_height=10, font=None, ratio=None):
+def draw_stat_bar(screen, x, y, value, stat_key, bar_width=100, bar_height=10, font=None, ratio=None, display_ratio=None):
     """ステータスバーを描画する（長さ＋色＋ランク文字）
     
     Args:
@@ -55,7 +55,8 @@ def draw_stat_bar(screen, x, y, value, stat_key, bar_width=100, bar_height=10, f
         bar_width: バーの最大幅(px)
         bar_height: バーの高さ(px)
         font: ランク文字描画用フォント（Noneならfont_small）
-        ratio: バーの割合を直接指定（0.0-1.0）。指定時はvalueは表示専用
+        ratio: バーの割合を直接指定（0.0-1.0）。指定時はvalueは表示専用。ランク/色もこのratioで判定。
+        display_ratio: バーの塗り幅に使う割合。指定時、ランク/色はratioを使用し、バーの長さのみdisplay_ratioを使用。
     """
     from constants import STAT_RANGES, STAT_RANK_COLORS, get_stat_rank
     
@@ -104,8 +105,9 @@ def draw_stat_bar(screen, x, y, value, stat_key, bar_width=100, bar_height=10, f
     pygame.draw.rect(screen, (40, 40, 50), bg_rect, border_radius=3)
     
     # 値バー（ランク色）- マイナス値の場合は塗らない
-    if ratio > 0:
-        fill_w = int(bar_width * ratio)
+    fill_ratio = display_ratio if display_ratio is not None else ratio
+    if fill_ratio > 0:
+        fill_w = int(bar_width * max(0.0, min(1.0, fill_ratio)))
         fill_rect = pygame.Rect(x, y, fill_w, bar_height)
         pygame.draw.rect(screen, color, fill_rect, border_radius=3)
     
@@ -1411,7 +1413,7 @@ class ParameterSelectionDialog(BaseListDialog):
         screen.blit(font_small.render("強化後", True, (255, 200, 100)), (bar_x, y))
         y += fh + fh // 4
         after_rank = draw_stat_bar(screen, bar_x, y, after, stat_key,
-                                  bar_width=bar_w, bar_height=16, font=font_small, ratio=exaggerated_after)
+                                  bar_width=bar_w, bar_height=16, font=font_small, ratio=after_ratio, display_ratio=exaggerated_after)
         rank_surf = font_small.render(after_rank, True, (255, 220, 100))
         screen.blit(rank_surf, (bar_x + bar_w + 10, y - 1))
 
@@ -2626,14 +2628,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                     return
                 elif event.key == KEY_MENU:
                     # 敵の攻撃モーション中・ダメージフラッシュ中はメニューを開けない
-                    enemies_acting = False
-                    if dungeon:
-                        enemies_acting = any(
-                            e.is_attacking or getattr(e, "attack_pre_delay_timer", 0) > 0
-                            or getattr(e, "damage_flash_timer", 0) > 0
-                            for e in dungeon.enemies if not getattr(e, "is_dead", False)
-                        )
-                    if menu_dialog and not enemies_acting:
+                    if menu_dialog and not is_enemy_acting(dungeon):
                         menu_dialog.is_active = True
 
 class GuildDialog:
@@ -3621,6 +3616,7 @@ class StatusDialog:
             total_aggro = get_total_bonus("aggro_mod")
             total_stupidity = get_total_bonus("stupidity")
             total_penetration = get_total_bonus("armor_penetration")
+            total_backstab = get_total_bonus("backstab_crit_bonus")
 
             total_fire_dmg = get_total_bonus("magic_fire_damage")
             total_fire_range = get_total_bonus("magic_fire_range")
@@ -3681,6 +3677,10 @@ class StatusDialog:
             if total_stupidity != 0:
                 from wordings import Text
                 left_lines.append(f"{Text.UI.STAT_CONFUSION_LABEL}      {format_val(total_stupidity)}")
+                has_any_bonus = True
+            if total_backstab != 0:
+                val = total_backstab * 100 if isinstance(total_backstab, float) and total_backstab <= 1.0 else total_backstab
+                left_lines.append(f"背後会心  {format_val(val)}%")
                 has_any_bonus = True
 
             # --- 右列: 魔法加護 ---

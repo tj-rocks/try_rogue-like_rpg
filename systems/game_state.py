@@ -58,3 +58,17 @@ def is_paused():
             game_state.get("teleport_active", False) or
             game_state.get("ore_gift_active", False) or
             game_state.get("event_item_active", False))
+
+
+def is_enemy_acting(dungeon):
+    """敵の攻撃モーション・攻撃前ディレイ・ピークホールド・ダメージフラッシュ中かどうかを判定"""
+    if not dungeon or not getattr(dungeon, "enemies", None):
+        return False
+    return any(
+        getattr(e, "is_attacking", False)
+        or getattr(e, "attack_pre_delay_timer", 0) > 0
+        or getattr(e, "peak_hold_timer", 0) > 0
+        or getattr(e, "damage_flash_timer", 0) > 0
+        for e in dungeon.enemies
+        if not getattr(e, "is_dead", False)
+    )

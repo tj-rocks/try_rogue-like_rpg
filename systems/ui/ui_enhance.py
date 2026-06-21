@@ -329,7 +329,7 @@ class ParameterSelectionDialog(BaseListDialog):
         screen.blit(font_small.render("強化後", True, (255, 200, 100)), (bar_x, y))
         y += fh + fh // 4
         after_rank = draw_stat_bar(screen, bar_x, y, after, stat_key,
-                                  bar_width=bar_w, bar_height=16, font=font_small, ratio=exaggerated_after)
+                                  bar_width=bar_w, bar_height=16, font=font_small, ratio=after_ratio, display_ratio=exaggerated_after)
         rank_surf = font_small.render(after_rank, True, (255, 220, 100))
         screen.blit(rank_surf, (bar_x + bar_w + 10, y - 1))
 

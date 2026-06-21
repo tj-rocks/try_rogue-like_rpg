@@ -206,6 +206,14 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
             new_dungeon.update_outbreak_status(player, ui_elements["dialog"])
         new_dungeon = new_dungeon.check_stairs(player, ui_elements["confirm_dialog"], ui_elements["dialog"])
 
+    # エリア到達メッセージの演出（ダクソ風オーバーレイ）
+    if game_state.get("pending_area_message"):
+        overlay = ui_elements.get("area_message_overlay")
+        if overlay:
+            overlay.show(game_state.pop("pending_area_message"))
+        else:
+            game_state.pop("pending_area_message")
+
     # 1-3. 死亡演出、カットシーンなどの更新
     new_dungeon = handle_death_sequence(player, new_dungeon, ui_elements["dialog"], game_state)
     if ui_elements.get("cutscene_manager"):
@@ -250,6 +258,12 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
                 parameter_selection_dialog=ui_elements.get("parameter_selection_dialog"),
                 ore_gift_dialog=ui_elements.get("ore_gift_dialog"))
     
+    # エリア名演出オーバーレイ（ダクソ風）
+    area_overlay = ui_elements.get("area_message_overlay")
+    if area_overlay:
+        area_overlay.update()
+        area_overlay.draw(screen)
+
     # 死亡演出: 暗転オーバーレイ＋「力尽きた…」テキスト
     fade_alpha = game_state.get("death_fade_alpha", 0)
     death_step = game_state.get("death_sequence_step", 0)

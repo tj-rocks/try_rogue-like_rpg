@@ -78,6 +78,7 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.2
 # ==========================================
 # Fランク 到達可能階層 (1F 〜 11F)
+# 浅層：冒険者が日常的に使う明るい通路
 # ==========================================
   '1':
     image: shallow
@@ -85,6 +86,10 @@ DUNGEON_IMAGES:
     brightness: 4
     map: null
     wall_decoration_ratio: 0.3
+    area_message:
+      - 冒険者の入口
+      - 多くの者がここから夢を追いはじめた。
+      - 君もその一人だ
   '2':
     image: shallow
     sound: need_more_adventures.mp3
@@ -98,14 +103,14 @@ DUNGEON_IMAGES:
     map: null
     wall_decoration_ratio: 0.3
   '4':
-    image: standard
-    sound: goto_unknown_area.mp3
+    image: shallow
+    sound: need_more_adventures.mp3
     brightness: 3
     map: null
     wall_decoration_ratio: 0.3
   '5':
-    image: standard
-    sound: goto_unknown_area.mp3
+    image: shallow
+    sound: need_more_adventures.mp3
     brightness: 3
     map: null
     wall_decoration_ratio: 0.3
@@ -138,74 +143,77 @@ DUNGEON_IMAGES:
     sound: goto_unknown_area.mp3
     brightness: 2
     map: null
+    wall_decoration_ratio: 0.3
   '11':
     image: standard
     sound: goto_unknown_area.mp3
     brightness: 2
-    # map: first_rest_point.txt
     wall_decoration_ratio: 0.3
 
 # ==========================================
 # Eランク 到達可能階層 (12F 〜 21F)
 # ==========================================
   '12':
-    image: home
+    image: standard
     sound: just_move.mp3
     brightness: 5
     map: 1st_rest_point.txt
     wall_decoration_ratio: 0.3
     no_attack: true
   '13':
-    image: temple
+    image: deesert_ruin
     sound: sandstone_floor.mp3
     brightness: 2
     wall_decoration_ratio: 0.3
+    area_message:
+      - 巡礼者の聖域
+      - 古代の人々がダンジョンへの巡礼をするための場所
+      - ダンジョンへの信仰が試される
   '14':
-    image: temple
+    image: deesert_ruin
     sound: sandstone_floor.mp3
     brightness: 2
     wall_decoration_ratio: 0.3
   '15':
-    image: temple
+    image: deesert_ruin
     sound: sandstone_floor.mp3
     brightness: 2
     wall_decoration_ratio: 0.3
   '16':
     image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    sound: sandstone_floor.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   '17':
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: temple
+    sound: sandstone_floor.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   '18':
-    image: deesert_ruin
+    image: temple
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   '19':
-    image: deesert_ruin
+    image: temple
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   '20':
-    image: deesert_ruin
+    image: temple
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   '21':
-    image: deesert_ruin
+    image: temple
     sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    # map: first_rest_point.txt
 # ==========================================
 # Dランク 到達可能階層 (22F 〜 30F)
 # ==========================================
   "22":
-    image: home
+    image: temple
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -213,41 +221,45 @@ DUNGEON_IMAGES:
     no_attack: true
   "23":
     image: wood
-    sound: sandstone_floor2.mp3
+    sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
+    area_message:
+      - 鉱石の炭鉱
+      - 多くの鉱石を取ってもまだ枯渇していない
+      - まだ掘り続けられている
   "24":
     image: wood
-    sound: sandstone_floor2.mp3
+    sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "25":
     image: wood
-    sound: sandstone_floor2.mp3
+    sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "26":
     image: wood
-    sound: sandstone_floor2.mp3
+    sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "27":
-    image: rock
+    image: wood
     sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "28":
-    image: rock
+    image: tanko
     sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "29":
-    image: rock
+    image: tanko
     sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "30":
-    image: rock
+    image: tanko
     sound: middle_1.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
@@ -256,7 +268,7 @@ DUNGEON_IMAGES:
 # Cランク 到達可能階層 (31F 〜 40F)
 # ==========================================
   "31":
-    image: home
+    image: tanko
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -267,6 +279,10 @@ DUNGEON_IMAGES:
     sound: deep_floors.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
+    area_message:
+      - 火口
+      - 膨大なエネルギーが集まる場所
+      - 一握りの冒険者のみが到達できる
   "33":
     image: deep_rock
     sound: deep_floors.mp3
@@ -278,8 +294,8 @@ DUNGEON_IMAGES:
     brightness: 1
     wall_decoration_ratio: 0.3
   "35":
-    image: lava
-    sound: turning_point.mp3
+    image: deep_rock
+    sound: deep_floors.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "36":
@@ -311,7 +327,7 @@ DUNGEON_IMAGES:
 # Bランク 到達可能階層 (41F 〜 55F)
 # ==========================================
   "41":
-    image: home
+    image: deep_rock
     sound: door_of_oldcity.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -324,6 +340,10 @@ DUNGEON_IMAGES:
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
+    area_message:
+      - 滅びた都市
+      - ダンジョンに飲み込まれた地下都市の廃墟
+      - ここに至れた者は、何かを犠牲にしてきた者だけだ
   "43":
     image: old_city
     sound: door_of_oldcity.mp3
@@ -367,37 +387,41 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "50":
-    image: evil_castle
+    image: fathers_city
     sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "51":
-    image: evil_castle
+    image: fathers_city
     sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "52":
-    image: evil_castle
+    image: fathers_city
     sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
+    area_message:
+      - 父の足跡
+      - 誰かがここを通った。
+      - それはずっと前のことではない。
   "53":
-    image: evil_castle
+    image: fathers_city
     sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "54":
-    image: evil_castle
+    image: fathers_city
     sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "55":
-    image: evil_castle
+    image: fathers_city
     sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
@@ -407,7 +431,7 @@ DUNGEON_IMAGES:
 # Aランク 到達可能階層 (56F 〜 70F)
 # ==========================================
   "56":
-    image: home
+    image: fathers_city
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -415,25 +439,29 @@ DUNGEON_IMAGES:
     map: 5th_rest_point.txt
     no_attack: true
   "57":
-    image: cave
+    image: water
     sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
+    area_message:
+      - 境界の水域
+      - 現実とダンジョンの境が溶ける場所。
+      - 「人間」であることが、ここから先では揺らぎ始める
   "58":
-    image: cave
+    image: water
     sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "59":
-    image: cave
+    image: water
     sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "60":
-    image: cave
+    image: water
     sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
@@ -457,43 +485,43 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "64":
-    image: shell
+    image: cave
     sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "65":
-    image: shell
+    image: cave
     sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "66":
-    image: shell
+    image: cave
     sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "67":
-    image: shell
+    image: cave
     sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "68":
-    image: shell
+    image: cave
     sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "69":
-    image: shell
+    image: cave
     sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "70":
-    image: shell
+    image: cave
     sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
@@ -503,7 +531,7 @@ DUNGEON_IMAGES:
 # Sランク 到達可能階層 (71F 〜 80F)
 # ==========================================
   "71":
-    image: home
+    image: cave
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -511,55 +539,59 @@ DUNGEON_IMAGES:
     map: 6th_rest_point.txt
     no_attack: true
   "72":
-    image: temple
+    image: shell
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
+    area_message:
+      - 残滓の回廊
+      - 試練に敗れた魂が形をなす場所。
+      - かつて冒険者だったものが、今もここを彷徨っている。
   "73":
-    image: temple
+    image: shell
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "74":
-    image: temple
+    image: shell
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "75":
-    image: temple
+    image: shell
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "76":
-    image: temple
+    image: shell
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "77":
-    image: temple
+    image: shell
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "78":
-    image: temple
+    image: shell
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "79":
-    image: temple
+    image: shell
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "80":
-    image: deesert_ruin
+    image: shell
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
@@ -569,7 +601,7 @@ DUNGEON_IMAGES:
 # SSランク 到達可能階層 (81F 〜 99F)
 # ==========================================
   "81":
-    image: home
+    image: shell
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -582,6 +614,10 @@ DUNGEON_IMAGES:
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
+    area_message:
+      - 大いなる祭壇
+      - ダンジョンコアが待つ、全ての始まりにして終わりの場所。
+      - ここに至った者だけが、世界の問いに答える権利を得る。
   "83":
     image: deesert_ruin
     sound: sandstone_floor2.mp3
@@ -625,13 +661,13 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "90":
-    image: standard
-    sound: just_move.mp3
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "91":
-    image: home
+    image: deesert_ruin
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -639,50 +675,54 @@ DUNGEON_IMAGES:
     map: 8th_rest_point.txt
     no_attack: true
   "92":
-    image: standard
-    sound: just_move.mp3
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "93":
-    image: standard
-    sound: just_move.mp3
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "94":
-    image: standard
-    sound: just_move.mp3
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "95":
-    image: standard
-    sound: just_move.mp3
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "96":
-    image: standard
-    sound: just_move.mp3
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "97":
-    image: standard
-    sound: just_move.mp3
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
+    area_message:
+      - 終わりの手前
+      - 戻る道はもうない。
+      - それでも、足が動く。
   "98":
-    image: standard
-    sound: just_move.mp3
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "99":
-    image: standard
-    sound: just_move.mp3
+    image: deesert_ruin
+    sound: sandstone_floor2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2

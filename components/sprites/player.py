@@ -1,6 +1,6 @@
 import pygame
 import random
-from systems.game_state import game_state, is_paused
+from systems.game_state import game_state, is_paused, is_enemy_acting
 from components.sprites.entity import Entity
 from systems.combat_handler import deal_damage
 from constants import (
@@ -345,6 +345,22 @@ class Player(Entity):
         ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("stupidity", 0)
+        # 暗殺者の秘薬バフ
+        if getattr(self, "stealth_buff_turns", 0) > 0:
+            bonus += getattr(self, "stealth_buff_stupidity", 0)
+        return bonus
+
+    @property
+    def total_backstab_crit_bonus(self):
+        bonus = 0.0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("backstab_crit_bonus", 0.0)
         return bonus
 
     def get_magic_bonus(self, key):
@@ -378,6 +394,9 @@ class Player(Entity):
         ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("lantern_bonus", 0)
+        # 暗殺者の秘薬バフ
+        if getattr(self, "stealth_buff_turns", 0) > 0:
+            bonus += getattr(self, "stealth_buff_lantern", 0)
         return bonus
 
     @property
@@ -473,6 +492,11 @@ class Player(Entity):
         self.regen_buff_val = 0
         self.magic_buff_turns = 0
         self.magic_buff_val = 0
+        self.stealth_buff_turns = 0
+        self.stealth_buff_max_turns = 0
+        self.stealth_buff_lantern = 0
+        self.stealth_buff_aggro = 0
+        self.stealth_buff_stupidity = 0
         self.regen_pool = 0.0
         self.waving_stave_inst = None
         self._status = "normal"
@@ -571,7 +595,7 @@ class Player(Entity):
             self.walk_images[d] = [frames[0], mid, frames[1], mid]
 
     def operate(self, dungeon, dialog=None, events=[]):
-        if is_paused() or self.is_moving or self.is_attacking or game_state.get("dialog_just_closed") or any(e.damage_flash_timer > 0 for e in dungeon.enemies):
+        if is_paused() or self.is_moving or self.is_attacking or game_state.get("dialog_just_closed") or is_enemy_acting(dungeon):
             return
         turn_consumed = False
         for event in events:
@@ -621,6 +645,13 @@ class Player(Entity):
                                 stave.charges = max(0, min(stave.charges, snapshot[stave.iid]))
                         self._sage_stave_snapshot = {}
                     messages.append("魔法強化の効果が 切れた！")
+            if getattr(self, "stealth_buff_turns", 0) > 0:
+                self.stealth_buff_turns -= 1
+                if self.stealth_buff_turns == 0:
+                    messages.append("暗殺者の秘薬の効果が 切れた！")
+                    self.stealth_buff_stupidity = 0
+                    self.stealth_buff_lantern = 0
+                    self.stealth_buff_aggro = 0
             
             if messages and dialog:
                 msg = "\n".join(messages)
@@ -817,6 +848,9 @@ class Player(Entity):
         ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: mod += inst.get_stat("aggro_mod", 0) + inst.get_enhance_bonus("aggro_mod")
+        # 暗殺者の秘薬バフ
+        if getattr(self, "stealth_buff_turns", 0) > 0:
+            mod += getattr(self, "stealth_buff_aggro", 0)
         return mod
 
     def unequip_accessory(self):
@@ -907,6 +941,9 @@ class Player(Entity):
         elif getattr(self, "magic_buff_turns", 0) > 0:
             has_any_buff = True
             buff_color = (155, 89, 182)   # 紫：賢者
+        elif getattr(self, "stealth_buff_turns", 0) > 0:
+            has_any_buff = True
+            buff_color = (60, 60, 80)     # 暗灰：暗殺者
 
         if has_any_buff:
             import math
@@ -1262,6 +1299,11 @@ class Player(Entity):
             "regen_buff_heal_boost": getattr(self, "regen_buff_heal_boost", 0.0),
             "magic_buff_turns": getattr(self, "magic_buff_turns", 0),
             "magic_buff_val": getattr(self, "magic_buff_val", 0),
+            "stealth_buff_turns": getattr(self, "stealth_buff_turns", 0),
+            "stealth_buff_max_turns": getattr(self, "stealth_buff_max_turns", 0),
+            "stealth_buff_lantern": getattr(self, "stealth_buff_lantern", 0),
+            "stealth_buff_aggro": getattr(self, "stealth_buff_aggro", 0),
+            "stealth_buff_stupidity": getattr(self, "stealth_buff_stupidity", 0),
             "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
             "completed_fixed_quests": self.completed_fixed_quests, "defeated_once_only": getattr(self, "defeated_once_only", []), "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
             "current_floor": self.current_floor, "max_reached_floor": self.max_reached_floor, "equip_id_counter": globals().get("_equip_id_counter", 0),
@@ -1309,6 +1351,11 @@ class Player(Entity):
         self.regen_buff_heal_boost = float(data.get("regen_buff_heal_boost", 0.0))
         self.magic_buff_turns = int(data.get("magic_buff_turns", 0))
         self.magic_buff_val = float(data.get("magic_buff_val", 0))
+        self.stealth_buff_turns = int(data.get("stealth_buff_turns", 0))
+        self.stealth_buff_max_turns = int(data.get("stealth_buff_max_turns", 0))
+        self.stealth_buff_lantern = int(data.get("stealth_buff_lantern", 0))
+        self.stealth_buff_aggro = int(data.get("stealth_buff_aggro", 0))
+        self.stealth_buff_stupidity = int(data.get("stealth_buff_stupidity", 0))
         self.guild_point = int(data.get("guild_point", 0)); self.guild_rank = data.get("guild_rank", "F")
         self.active_quests = data.get("active_quests", [])
         for q in self.active_quests:

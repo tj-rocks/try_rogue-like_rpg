@@ -215,5 +215,21 @@ class TestBlacksmithStones(unittest.TestCase):
         self.assertEqual(knife.stats.get("attack_bonus"), 1)
         self.assertEqual(knife.stats.get("crit_rate"), 0)
 
+    def test_enhance_rank_display_uses_actual_ratio(self):
+        """強化後のランク表示は実際の割合で判定し、誇張されたバー長さに引きずられないこと"""
+        from systems.ui.ui_base import draw_stat_bar
+        screen = pygame.display.set_mode((200, 200))
+        # 実際の強化後 ratio=0.55 (B) だが、誇張表示すると 0.65 (A) になるケース
+        before_ratio = 0.50
+        after_ratio = 0.55
+        diff = after_ratio - before_ratio
+        exaggerated_after = min(1.0, before_ratio + diff * 3)
+        # 誇張表示だけを使うと A になってしまう（旧バグ）
+        exaggerated_rank = draw_stat_bar(screen, 0, 20, 5.5, "attack_bonus", ratio=exaggerated_after)
+        self.assertEqual(exaggerated_rank, "A")
+        # 実際の ratio を使い、バーだけ誇張表示すれば B のまま
+        actual_rank = draw_stat_bar(screen, 0, 40, 5.5, "attack_bonus", ratio=after_ratio, display_ratio=exaggerated_after)
+        self.assertEqual(actual_rank, "B")
+
 if __name__ == "__main__":
     unittest.main()

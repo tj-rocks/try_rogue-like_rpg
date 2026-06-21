@@ -101,9 +101,13 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     crit_bonus = getattr(attacker, "crit_bonus", 0)
     crit_rate += crit_bonus
     
-    # [NEW] バックアタックボーナス (+25%)
-    if _is_back_attack(attacker, target):
-        crit_rate += 0.25
+    # [NEW] バックアタックボーナス
+    is_backstab = _is_back_attack(attacker, target)
+    if is_backstab:
+        from constants import BACKSTAB_CRIT_BONUS
+        crit_rate += BACKSTAB_CRIT_BONUS
+        if hasattr(attacker, "total_backstab_crit_bonus"):
+            crit_rate += attacker.total_backstab_crit_bonus
     
     # [NEW] 会心率の上限キャップ適用
     from constants import CRITICAL_RATE_MAX
@@ -111,7 +115,12 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     
     # クリティカル判定
     is_critical = random.random() < crit_rate
-    calc_atk = base_atk * 2 if is_critical else base_atk
+    from constants import CRITICAL_DAMAGE_MULTIPLIER, BACKSTAB_CRITICAL_DAMAGE_MULTIPLIER
+    if is_critical:
+        crit_multiplier = BACKSTAB_CRITICAL_DAMAGE_MULTIPLIER if is_backstab else CRITICAL_DAMAGE_MULTIPLIER
+    else:
+        crit_multiplier = 1.0
+    calc_atk = base_atk * crit_multiplier
     
     # 防御力によるベースダメージの算出 (防御力もボーナス込みを参照)
     defense = getattr(target, "total_defense", getattr(target, "defense", 0))
