@@ -38,17 +38,6 @@ def _build_equip_presets():
         presets.append(("accessory", key, d.get("name", key)))
     return presets
 
-def _build_item_presets():
-    from constants import CONSUMABLE_DATA, STAVE_DATA
-    presets = []
-    for key, d in CONSUMABLE_DATA.items():
-        if d.get("category") == "event": continue
-        presets.append((key, d.get("name", key), 3))
-    for key, d in STAVE_DATA.items():
-        if d.get("category") == "event": continue
-        presets.append((key, d.get("name", key), 1))
-    return presets
-
 
 def run_setup_screen(screen, font_s, font_m):
     """起動時のセットアップ画面。セーブ読み込み・開始階層・持ち物を選択する。
@@ -57,7 +46,6 @@ def run_setup_screen(screen, font_s, font_m):
     import os
 
     EQUIP_PRESETS = _build_equip_presets()
-    ITEM_PRESETS  = _build_item_presets()
 
     SW, SH = screen.get_width(), screen.get_height()
     clock = pygame.time.Clock()
@@ -66,11 +54,22 @@ def run_setup_screen(screen, font_s, font_m):
 
     # --- 状態 ---
     has_save = os.path.exists(SAVE_DATA_PATH)
-    use_save = has_save
+    use_save = False  # デフォルトはフレッシュスタート（セーブ汚染防止）
     start_floor = 1
-    selected_equips = set()
-    selected_items  = set(range(len(ITEM_PRESETS)))  # アイテムは全ON
-    section = 0  # 0:基本設定 1:装備 2:アイテム
+    # シリーズ装備プリセット
+    ASSASSIN_KEYS = {"assassin_dagger", "assassin_light_armor", "assassin_buckler"}
+    HOLY_KEYS = {"holy_sword", "holy_armor", "holy_shield"}
+    BRAVE_FIGHTER_KEYS = {"brave_fighter_sword", "brave_fighter_armor", "brave_fighter_shield"}
+    SKILLED_FIGHTER_KEYS = {"skilled_fighter_sword", "skilled_fighter_armor", "skilled_fighter_shield"}
+    SERIES_PRESETS = {
+        "アサシン": ASSASSIN_KEYS,
+        "神聖": HOLY_KEYS,
+        "勇敢戦士": BRAVE_FIGHTER_KEYS,
+        "技巧戦士": SKILLED_FIGHTER_KEYS,
+    }
+    # アサシンシリーズをデフォルトでチェック済みにしておく
+    selected_equips = {i for i, (_, ekey, _) in enumerate(EQUIP_PRESETS) if ekey in ASSASSIN_KEYS}
+    section = 0  # 0:基本設定 1:装備
     cursor = 0
     scroll = 0
 
@@ -97,7 +96,7 @@ def run_setup_screen(screen, font_s, font_m):
         txt = font_s.render(label, True, WHITE if active else GRAY)
         surf.blit(txt, (x + w//2 - txt.get_width()//2, y + h//2 - txt.get_height()//2))
 
-    TABS = ["基本設定", f"装備選択 ({len(EQUIP_PRESETS)})", f"アイテム選択 ({len(ITEM_PRESETS)})"]
+    TABS = ["基本設定", f"装備選択 ({len(EQUIP_PRESETS)})"]
 
     running = True
     while running:
@@ -138,13 +137,21 @@ def run_setup_screen(screen, font_s, font_m):
 
             info = font_s.render("※ セーブデータ読み込み時: セーブ時点の所持品・装備が引き継がれます", True, GRAY)
             screen.blit(info, (30, y))
-            y += 28
-            info2 = font_s.render("　 次の装備/アイテム画面で追加選択も可能です", True, GRAY)
-            screen.blit(info2, (30, y))
 
         elif section == 1:
             header = font_s.render(f"チェックした装備を追加で持たせます  ↑↓スクロール  選択中: {len(selected_equips)}/{len(EQUIP_PRESETS)}", True, GRAY)
             screen.blit(header, (30, y - 20))
+            # シリーズプリセットボタン
+            btn_x = 30
+            btn_y = y - 48
+            for label, keys in SERIES_PRESETS.items():
+                indices = {i for i, (_, ekey, _) in enumerate(EQUIP_PRESETS) if ekey in keys}
+                active = bool(indices) and indices.issubset(selected_equips)
+                bw = 100
+                draw_btn(screen, btn_x, btn_y, bw, 30, label, active)
+                btn_x += bw + 10
+            all_selected = len(selected_equips) == len(EQUIP_PRESETS)
+            draw_btn(screen, btn_x, btn_y, 90, 30, "全選択" if not all_selected else "全解除", False)
             for ri in range(VISIBLE_ROWS):
                 i = scroll + ri
                 if i >= len(EQUIP_PRESETS): break
@@ -167,27 +174,6 @@ def run_setup_screen(screen, font_s, font_m):
                 pygame.draw.rect(screen, GRAY, (SW - 12, y, 8, SH - 130 - 60), border_radius=4)
                 pygame.draw.rect(screen, ACCENT, (SW - 12, bar_y, 8, bar_h), border_radius=4)
 
-        elif section == 2:
-            header = font_s.render(f"チェックしたアイテムを追加で持たせます  ↑↓スクロール  選択中: {len(selected_items)}/{len(ITEM_PRESETS)}", True, GRAY)
-            screen.blit(header, (30, y - 20))
-            for ri in range(VISIBLE_ROWS):
-                i = scroll + ri
-                if i >= len(ITEM_PRESETS): break
-                ikey, iname, icount = ITEM_PRESETS[i]
-                checked = i in selected_items
-                hl = i == cursor
-                ry = y + ri * ROW_H
-                if hl:
-                    pygame.draw.rect(screen, (40, 50, 80), (25, ry - 2, SW - 50, ROW_H - 2), border_radius=4)
-                draw_checkbox(screen, 30, ry, checked, GREEN)
-                screen.blit(font_s.render(f"{iname}  x{icount}", True, YELLOW if hl else WHITE), (58, ry))
-            total = len(ITEM_PRESETS)
-            if total > VISIBLE_ROWS:
-                bar_h = max(20, int(VISIBLE_ROWS / total * (SH - 130)))
-                bar_y = y + int(scroll / total * (SH - 130))
-                pygame.draw.rect(screen, GRAY, (SW - 12, y, 8, SH - 130 - 60), border_radius=4)
-                pygame.draw.rect(screen, ACCENT, (SW - 12, bar_y, 8, bar_h), border_radius=4)
-
         # --- 下部ボタン ---
         draw_btn(screen, SW - 220, SH - 60, 190, 44, "▶ この設定で開始", True)
         hint_keys = font_s.render("Tab: タブ切替 | ↑↓: 移動 | Space/Enter: ON/OFF | ←→: フロア変更", True, GRAY)
@@ -204,7 +190,7 @@ def run_setup_screen(screen, font_s, font_m):
                 if k == pygame.K_ESCAPE:
                     return None
                 elif k == pygame.K_TAB:
-                    section = (section + 1) % 3
+                    section = (section + 1) % 2
                     cursor = 0
                     scroll = 0
                 elif k in (pygame.K_UP, pygame.K_w):
@@ -212,17 +198,9 @@ def run_setup_screen(screen, font_s, font_m):
                         cursor = (cursor - 1) % len(EQUIP_PRESETS)
                         scroll = max(0, min(scroll, cursor))
                         if cursor < scroll: scroll = cursor
-                    elif section == 2:
-                        cursor = (cursor - 1) % len(ITEM_PRESETS)
-                        if cursor < scroll: scroll = cursor
-                        if cursor == len(ITEM_PRESETS) - 1: scroll = max(0, cursor - VISIBLE_ROWS + 1)
                 elif k in (pygame.K_DOWN, pygame.K_s):
                     if section == 1:
                         cursor = (cursor + 1) % len(EQUIP_PRESETS)
-                        if cursor >= scroll + VISIBLE_ROWS: scroll = cursor - VISIBLE_ROWS + 1
-                        if cursor == 0: scroll = 0
-                    elif section == 2:
-                        cursor = (cursor + 1) % len(ITEM_PRESETS)
                         if cursor >= scroll + VISIBLE_ROWS: scroll = cursor - VISIBLE_ROWS + 1
                         if cursor == 0: scroll = 0
                 elif k in (pygame.K_SPACE, pygame.K_RETURN):
@@ -231,9 +209,6 @@ def run_setup_screen(screen, font_s, font_m):
                     elif section == 1:
                         if cursor in selected_equips: selected_equips.remove(cursor)
                         else: selected_equips.add(cursor)
-                    elif section == 2:
-                        if cursor in selected_items: selected_items.remove(cursor)
-                        else: selected_items.add(cursor)
                 elif k in (pygame.K_LEFT, pygame.K_MINUS):
                     mods = pygame.key.get_mods()
                     start_floor = max(0, start_floor - (10 if mods & pygame.KMOD_SHIFT else 1))
@@ -245,8 +220,6 @@ def run_setup_screen(screen, font_s, font_m):
             if event.type == pygame.MOUSEWHEEL:
                 if section == 1:
                     scroll = max(0, min(len(EQUIP_PRESETS) - VISIBLE_ROWS, scroll - event.y))
-                elif section == 2:
-                    scroll = max(0, min(len(ITEM_PRESETS) - VISIBLE_ROWS, scroll - event.y))
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mx, my = event.pos
                 if section == 0:
@@ -259,23 +232,36 @@ def run_setup_screen(screen, font_s, font_m):
                     if 30 <= mx <= 50 and 80 <= my <= 98 and has_save:
                         use_save = not use_save
                 elif section == 1:
-                    for ri in range(VISIBLE_ROWS):
-                        ry = 80 + ri * ROW_H
-                        if ry - 2 <= my <= ry + ROW_H - 4:
-                            i = scroll + ri
-                            if i < len(EQUIP_PRESETS):
-                                cursor = i
-                                if i in selected_equips: selected_equips.remove(i)
-                                else: selected_equips.add(i)
-                elif section == 2:
-                    for ri in range(VISIBLE_ROWS):
-                        ry = 80 + ri * ROW_H
-                        if ry - 2 <= my <= ry + ROW_H - 4:
-                            i = scroll + ri
-                            if i < len(ITEM_PRESETS):
-                                cursor = i
-                                if i in selected_items: selected_items.remove(i)
-                                else: selected_items.add(i)
+                    # シリーズプリセットボタンクリック
+                    btn_x = 30
+                    btn_y = 80 - 48
+                    series_clicked = False
+                    for label, keys in SERIES_PRESETS.items():
+                        indices = {i for i, (_, ekey, _) in enumerate(EQUIP_PRESETS) if ekey in keys}
+                        if btn_x <= mx <= btn_x + 100 and btn_y <= my <= btn_y + 30:
+                            if indices.issubset(selected_equips):
+                                selected_equips.difference_update(indices)
+                            else:
+                                selected_equips.update(indices)
+                            series_clicked = True
+                            break
+                        btn_x += 110
+                    if not series_clicked:
+                        all_selected = len(selected_equips) == len(EQUIP_PRESETS)
+                        if btn_x <= mx <= btn_x + 90 and btn_y <= my <= btn_y + 30:
+                            if all_selected:
+                                selected_equips.clear()
+                            else:
+                                selected_equips = set(range(len(EQUIP_PRESETS)))
+                        else:
+                            for ri in range(VISIBLE_ROWS):
+                                ry = 80 + ri * ROW_H
+                                if ry - 2 <= my <= ry + ROW_H - 4:
+                                    i = scroll + ri
+                                    if i < len(EQUIP_PRESETS):
+                                        cursor = i
+                                        if i in selected_equips: selected_equips.remove(i)
+                                        else: selected_equips.add(i)
                 # 開始ボタン
                 if SW - 220 <= mx <= SW - 30 and SH - 60 <= my <= SH - 16:
                     running = False
@@ -288,28 +274,54 @@ def run_setup_screen(screen, font_s, font_m):
     if use_save and has_save:
         player.load_from_file()
         print(f"[Setup] セーブデータを読み込みました (Floor {player.current_floor}, Rank {player.guild_rank})")
+        # 装備をクリアして選択した装備のみを持たせる
+        player.weapon_inventory.clear()
+        player.armor_inventory.clear()
+        player.shield_inventory.clear()
+        player.accessory_inventory.clear()
+        player.equipped_weapon = None
+        player.equipped_armor = None
+        player.equipped_shield = None
+        player.equipped_accessory = None
     else:
-        player.attack = 50
-        player.hp = 200
-        player.max_hp = 200
+        # 本番バランスに近い値でスタート（backstab/stupidity 動作確認用）
+        from constants import PLAYER_ATTACK, PLAYER_HP, PLAYER_DEFENSE
+        player.attack = PLAYER_ATTACK
+        player.hp = PLAYER_HP
+        player.max_hp = PLAYER_HP
+        player.defense = PLAYER_DEFENSE
         player.guild_point = 1000
         player.guild_rank = "F"
         player.coin = 100000
-        print("[Setup] デフォルト設定で開始")
+        print(f"[Setup] 本番バランスで開始 (attack={PLAYER_ATTACK}, hp={PLAYER_HP})")
 
     # 追加装備
-    for idx in selected_equips:
+    last_selected = {}
+    for idx in sorted(selected_equips):
         etype, ekey, _ = EQUIP_PRESETS[idx]
         inst = EquipInstance(etype, ekey)
-        if etype == "weapon":    player.weapon_inventory.append(inst)
-        elif etype == "armor":   player.armor_inventory.append(inst)
-        elif etype == "shield":  player.shield_inventory.append(inst)
-        elif etype == "accessory": player.accessory_inventory.append(inst)
+        if etype == "weapon":
+            player.weapon_inventory.append(inst)
+            last_selected["weapon"] = inst
+        elif etype == "armor":
+            player.armor_inventory.append(inst)
+            last_selected["armor"] = inst
+        elif etype == "shield":
+            player.shield_inventory.append(inst)
+            last_selected["shield"] = inst
+        elif etype == "accessory":
+            player.accessory_inventory.append(inst)
+            last_selected["accessory"] = inst
 
-    # 追加アイテム
-    for idx in selected_items:
-        ikey, _, icount = ITEM_PRESETS[idx]
-        player.add_item_to_inventory(ikey, icount)
+    # 選択した装備を自動装備（最後に選択したものが各部位に反映される）
+    if "weapon" in last_selected:
+        player.change_weapon(last_selected["weapon"].iid)
+    if "armor" in last_selected:
+        player.change_armor(last_selected["armor"].iid)
+    if "shield" in last_selected:
+        player.change_shield(last_selected["shield"].iid)
+    if "accessory" in last_selected:
+        player.change_accessory(last_selected["accessory"].iid)
 
     print(f"[Setup] 開始フロア: {start_floor}F")
     return player, start_floor

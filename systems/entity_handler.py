@@ -250,6 +250,9 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             # 敵の思考と行動実行
             enemy.take_turn(player, dungeon, all_entities, dialog, occupied_cells)
             enemy.has_acted = True
+            # 一時的 stupidity 上昇は敵ターン終了でリセット
+            if hasattr(enemy, "stupidity_temp"):
+                enemy.stupidity_temp = 0
             think_count += 1
             game_state["current_enemy_idx"] += 1
             

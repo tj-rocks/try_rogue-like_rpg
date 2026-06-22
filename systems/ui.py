@@ -3617,6 +3617,9 @@ class StatusDialog:
             total_stupidity = get_total_bonus("stupidity")
             total_penetration = get_total_bonus("armor_penetration")
             total_backstab = get_total_bonus("backstab_crit_bonus")
+            total_flank = get_total_bonus("flank_backstab")
+            total_stup_proc_chance = get_total_bonus("stupidity_proc_chance")
+            total_stup_proc_amount = get_total_bonus("stupidity_proc_amount")
 
             total_fire_dmg = get_total_bonus("magic_fire_damage")
             total_fire_range = get_total_bonus("magic_fire_range")
@@ -3681,6 +3684,17 @@ class StatusDialog:
             if total_backstab != 0:
                 val = total_backstab * 100 if isinstance(total_backstab, float) and total_backstab <= 1.0 else total_backstab
                 left_lines.append(f"背後会心  {format_val(val)}%")
+                has_any_bonus = True
+            if total_flank != 0:
+                active = "発動" if total_flank >= 3 else f"{int(total_flank)}/3"
+                left_lines.append(f"側面背後  {active}")
+                has_any_bonus = True
+            if total_stup_proc_chance != 0:
+                val = total_stup_proc_chance * 100 if isinstance(total_stup_proc_chance, float) and total_stup_proc_chance <= 1.0 else total_stup_proc_chance
+                left_lines.append(f"混乱発動  {format_val(val)}%")
+                has_any_bonus = True
+            if total_stup_proc_amount != 0:
+                left_lines.append(f"混乱上昇  {format_val(total_stup_proc_amount)}")
                 has_any_bonus = True
 
             # --- 右列: 魔法加護 ---
