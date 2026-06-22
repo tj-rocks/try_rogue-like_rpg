@@ -67,8 +67,8 @@ def run_setup_screen(screen, font_s, font_m):
         "勇敢戦士": BRAVE_FIGHTER_KEYS,
         "技巧戦士": SKILLED_FIGHTER_KEYS,
     }
-    # アサシンシリーズをデフォルトでチェック済みにしておく
-    selected_equips = {i for i, (_, ekey, _) in enumerate(EQUIP_PRESETS) if ekey in ASSASSIN_KEYS}
+    # デフォルトでは何も選択しない
+    selected_equips = set()
     section = 0  # 0:基本設定 1:装備
     cursor = 0
     scroll = 0
