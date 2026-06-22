@@ -632,27 +632,35 @@ ARMOR_DATA:
       buyable: true
       usually_buyable: false
       special_buyable: true
-    describe: 暗殺者が用いる漆黒の軽装。隠密性と会心、命中に極めて優れている。
+    describe: 暗殺者が用いる漆黒の軽装。3部位揃えると側面からの攻撃も背後扱いになり、背後攻撃が強化される。
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
       common:
-        attack: 1
-        accuracy_close: 30
-        accuracy_range: 35
-        crit_rate: 0.22
+        attack: 0
+        accuracy_close: 25
+        accuracy_range: 25
+        crit_rate: 0.05
         hp: 0
-        defense: 22
-        block_chance_close: 0.08
-        block_chance_ranged: 0.08
+        defense: 11
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 0
         regen: 0
-        aggro_mod: 5
+        aggro_mod: 3
         stupidity: 0
-        armor_penetration: 0.25
+        armor_penetration: 0.1
         buff_value_ratio: 0
         buff_duration_ratio: 0
-        backstab_crit_bonus: 0.2
+      skills:
+        backstab:
+          count_backstab: 1
+          backstab_crit_bonus: 0.2
+          flank_backstab: 1
+        confusion:
+          count_confusion: 1
+          stupidity_proc_chance: 0.1
+          stupidity_proc_amount: 1
       magic:
         fire_damage: 0
         fire_range: 0
@@ -664,7 +672,7 @@ ARMOR_DATA:
 
   holy_armor:
     quest_targetable: true
-    name: 聖鎧
+    name: 神聖な鎧
     category: heavy
     min_rank: A
     max_rank: SS
@@ -675,7 +683,7 @@ ARMOR_DATA:
       buyable: true
       usually_buyable: false
       special_buyable: true
-    describe: 聖なる力を宿した鎧。高い防御力と回復能力を持ち、光の杖を強化する。
+    describe: 聖なる力を宿した鎧。高い防御力と回復能力を持ち、攻撃で体力を吸収する効果を備える。
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -695,6 +703,11 @@ ARMOR_DATA:
         armor_penetration: 0
         buff_value_ratio: 0
         buff_duration_ratio: 0
+      skills:
+        lifesteal:
+          count_lifesteal: 1
+          lifesteal_chance: 0.15
+          lifesteal_ratio: 0.2
       magic:
         fire_damage: 0
         fire_range: 0
@@ -737,6 +750,150 @@ ARMOR_DATA:
         armor_penetration: 0.3
         buff_value_ratio: 0
         buff_duration_ratio: 0
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  # --- 勇敢な戦士シリーズ ---
+  brave_fighter_armor:
+    quest_targetable: true
+    name: "[勇敢]戦士の鎧"
+    min_rank: A
+    max_rank: SS
+    rarity: 5
+    price: 9000
+    image_path: components/pictures/armor/fighters_armor.png
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 勇気ある戦士の鎧。高い防御力と回復力を持つ。
+    growth: {bonus_limit: 3, times_limit: 40, over_limit_growth_rate: 0.004}
+    type: heavy_armor
+    bonus:
+      common:
+        attack: 5
+        defense: 18
+        accuracy_close: 10
+        accuracy_range: 5
+        crit_rate: 0.05
+        hp: 45
+        block_chance_close: 0.08
+        block_chance_ranged: 0.08
+        lantern_bonus: 0
+        regen: 3
+        aggro_mod: 2
+        armor_penetration: 0.1
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        stun:
+          count_stun: 1
+          stun_proc_chance: 0.10
+          stun_duration: 1
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  # --- 技巧戦士シリーズ ---
+  skilled_fighter_armor:
+    quest_targetable: true
+    name: "[技巧]戦士の鎧"
+    min_rank: A
+    max_rank: SS
+    rarity: 5
+    price: 9500
+    image_path: components/pictures/armor/fighters_armor.png
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 技巧を極めた戦士の鎧。回避とカウンターを強化する。
+    growth: {bonus_limit: 3, times_limit: 40, over_limit_growth_rate: 0.004}
+    type: heavy_armor
+    bonus:
+      common:
+        attack: 3
+        defense: 15
+        accuracy_close: 15
+        accuracy_range: 10
+        crit_rate: 0.10
+        hp: 30
+        block_chance_close: 0.15
+        block_chance_ranged: 0.15
+        lantern_bonus: 0
+        regen: 2
+        aggro_mod: 1
+        armor_penetration: 0.2
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        counter:
+          count_counter: 1
+          counter_proc_chance: 0.15
+          counter_damage_ratio: 0.5
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  # --- 上級騎士シリーズ ---
+  senior_knight_armor:
+    quest_targetable: true
+    name: "[上級]騎士の鎧"
+    min_rank: S
+    max_rank: SS
+    rarity: 6
+    price: 13000
+    image_path: components/pictures/armor/knight_heavy_armor.png
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 上級騎士の鎧。最高クラスの防御力とスタン効果。
+    growth: {bonus_limit: 4, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: heavy_armor
+    bonus:
+      common:
+        attack: 8
+        defense: 22
+        accuracy_close: 5
+        accuracy_range: 5
+        crit_rate: 0.05
+        hp: 50
+        block_chance_close: 0.10
+        block_chance_ranged: 0.10
+        lantern_bonus: 0
+        regen: 3
+        aggro_mod: 3
+        armor_penetration: 0.15
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        stun:
+          count_stun: 1
+          stun_proc_chance: 0.20
+          stun_duration: 1
       magic:
         fire_damage: 0
         fire_range: 0

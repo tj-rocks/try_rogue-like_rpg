@@ -23,7 +23,7 @@ ENEMY_DATA:
     accuracy_close: 89
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 6
+    stupidity: 4
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
@@ -55,7 +55,7 @@ ENEMY_DATA:
     accuracy_close: 80
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 6
+    stupidity: 4
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: sonic_wave
@@ -87,7 +87,7 @@ ENEMY_DATA:
     accuracy_close: 90
     accuracy_ranged: 100
     attack_range: 2
-    stupidity: 5
+    stupidity: 3
     image_scale: 0.8
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
@@ -119,7 +119,7 @@ ENEMY_DATA:
     accuracy_close: 80
     accuracy_ranged: 100
     attack_range: 2
-    stupidity: 6
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: arrow
@@ -152,7 +152,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 5
+    stupidity: 3
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
@@ -183,7 +183,7 @@ ENEMY_DATA:
     accuracy_close: 80
     accuracy_ranged: 100
     attack_range: 3
-    stupidity: 4
+    stupidity: 2
     image_scale: 1.0
     close_attack_effect: explosion
     ranged_attack_effect: explosion
@@ -217,7 +217,7 @@ ENEMY_DATA:
     accuracy_close: 90
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 5
+    stupidity: 3
     image_scale: 1.0
     close_attack_effect: strange_mucus
     ranged_attack_effect: strange_mucus
@@ -249,12 +249,13 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 90
     attack_range: 1
-    stupidity: 6
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
     attack_priority: close
     damaged_detect_range: 10
+    turn_attack: true
   kuchitanago:
     quest_targetable: true
     name: クチタナゴ
@@ -280,7 +281,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 2
-    stupidity: 5
+    stupidity: 3
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
@@ -312,7 +313,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 2
-    stupidity: 5
+    stupidity: 3
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
@@ -342,7 +343,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 5
+    stupidity: 3
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
@@ -372,7 +373,7 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 5
+    stupidity: 3
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
@@ -402,7 +403,7 @@ ENEMY_DATA:
     accuracy_close: 80
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 5
+    stupidity: 3
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
@@ -436,12 +437,13 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 5
+    stupidity: 3
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
     attack_priority: close
     damaged_detect_range: 10
+    turn_attack: true
   skelton_sword_armor:
     quest_targetable: true
     name: アーマースケルトン
@@ -472,12 +474,13 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 5
+    stupidity: 3
     image_scale: 1.0
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
     attack_priority: close
     damaged_detect_range: 10
+    turn_attack: true
   doku_doku_tako:
     quest_targetable: true
     name: 毒々たこ
@@ -504,7 +507,7 @@ ENEMY_DATA:
     accuracy_close: 90
     accuracy_ranged: 100
     attack_range: 2
-    stupidity: 5
+    stupidity: 3
     image_scale: 0.9
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
@@ -536,7 +539,7 @@ ENEMY_DATA:
     accuracy_close: 79
     accuracy_ranged: 70
     attack_range: 1
-    stupidity: 6
+    stupidity: 4
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: explosion
@@ -568,7 +571,7 @@ ENEMY_DATA:
     accuracy_close: 85
     accuracy_ranged: 70
     attack_range: 1
-    stupidity: 6
+    stupidity: 5
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: explosion
@@ -599,7 +602,7 @@ ENEMY_DATA:
     accuracy_close: 90
     accuracy_ranged: 95
     attack_range: 3
-    stupidity: 4
+    stupidity: 2
     image_scale: 1.0
     close_attack_effect: explosion
     ranged_attack_effect: explosion
@@ -633,7 +636,7 @@ ENEMY_DATA:
     accuracy_close: 90
     accuracy_ranged: 85
     attack_range: 2
-    stupidity: 5
+    stupidity: 3
     image_scale: 1.0
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
@@ -719,6 +722,7 @@ ENEMY_DATA:
     ranged_attack_effect: dark_bolt
     attack_priority: close
     damaged_detect_range: 100
+    turn_attack: true
   gogo_ghost:
     quest_targetable: true
     name: ゴーゴーゴースト
@@ -759,6 +763,7 @@ ENEMY_DATA:
     ranged_attack_effect: dark_bolt
     attack_priority: close
     damaged_detect_range: 100
+    turn_attack: true
   deka_komori:
     quest_targetable: true
     name: デカコウモリ
@@ -920,3 +925,4 @@ ENEMY_DATA:
     ranged_attack_effect: dark_bolt
     attack_priority: close
     damaged_detect_range: 50
+    turn_attack: true

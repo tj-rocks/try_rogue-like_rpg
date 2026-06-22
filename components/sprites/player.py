@@ -67,8 +67,18 @@ class EquipInstance:
         for cats in ORE_STAT_CATEGORIES.values():
             all_upgradeable_keys.update(cats)
         
+        # スキル系キーは鍔冶強化しない
+        SKILL_STAT_KEYS = {
+            "lifesteal_chance", "lifesteal_ratio",
+            "counter_proc_chance", "counter_damage_ratio",
+            "stun_proc_chance", "stun_duration",
+            "backstab_crit_bonus", "flank_backstab",
+            "stupidity_proc_chance", "stupidity_proc_amount",
+        }
         compatible = []
         for k in all_upgradeable_keys:
+            if k in SKILL_STAT_KEYS:
+                continue
             val = self.get_stat(k, 0)
             if k == "aggro_mod":
                 if val * -1 > 0:
@@ -362,6 +372,188 @@ class Player(Entity):
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("backstab_crit_bonus", 0.0)
         return bonus
+
+    @property
+    def total_flank_backstab(self):
+        bonus = 0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("flank_backstab", 0)
+        return bonus
+
+    @property
+    def total_backstab(self):
+        count = 0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: count += inst.get_stat("count_backstab", 0)
+        return count
+
+    @property
+    def total_stupidity_proc_chance(self):
+        bonus = 0.0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("stupidity_proc_chance", 0.0)
+        return bonus
+
+    @property
+    def total_stupidity_proc_amount(self):
+        bonus = 0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("stupidity_proc_amount", 0)
+        return bonus
+
+    @property
+    def total_confusion(self):
+        count = 0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: count += inst.get_stat("count_confusion", 0)
+        return count
+
+    @property
+    def total_stun_proc_chance(self):
+        bonus = 0.0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("stun_proc_chance", 0.0)
+        return bonus
+
+    @property
+    def total_stun_duration(self):
+        bonus = 0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("stun_duration", 0)
+        return bonus
+
+    @property
+    def total_stun(self):
+        count = 0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: count += inst.get_stat("count_stun", 0)
+        return count
+
+    @property
+    def total_lifesteal_chance(self):
+        bonus = 0.0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("lifesteal_chance", 0.0)
+        return bonus
+
+    @property
+    def total_lifesteal_ratio(self):
+        bonus = 0.0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("lifesteal_ratio", 0.0)
+        return bonus
+
+    @property
+    def total_lifesteal(self):
+        count = 0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: count += inst.get_stat("count_lifesteal", 0)
+        return count
+
+    @property
+    def total_counter_proc_chance(self):
+        bonus = 0.0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("counter_proc_chance", 0.0)
+        return bonus
+
+    @property
+    def total_counter_damage_ratio(self):
+        bonus = 0.0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("counter_damage_ratio", 0.0)
+        return bonus
+
+    @property
+    def total_counter(self):
+        count = 0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: count += inst.get_stat("count_counter", 0)
+        return count
 
     def get_magic_bonus(self, key):
         """装備品の bonus.magic 系ボーナスの合計を返す（例: get_magic_bonus("fire_damage")）
@@ -1369,6 +1561,8 @@ class Player(Entity):
         self.cursed_stats = data.get("cursed_stats", [])
         global _equip_id_counter
         _equip_id_counter = max(_equip_id_counter, data.get("equip_id_counter", 0))
+        # God Mode はセーブしないので、ロード時に常にOFF
+        self.is_god = False
 
 
     def accept_quest(self, q):

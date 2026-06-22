@@ -192,10 +192,25 @@ def get_normalized_equipment_data(floor_map):
         "buff_value_ratio":   "magic_buff_value_ratio",
         "buff_duration_ratio":"magic_buff_duration_ratio",
         "backstab_crit_bonus":"backstab_crit_bonus",
+        "flank_backstab":     "flank_backstab",
+        "stupidity_proc_chance": "stupidity_proc_chance",
+        "stupidity_proc_amount": "stupidity_proc_amount",
+        "stun_proc_chance": "stun_proc_chance",
+        "stun_duration": "stun_duration",
+        "counter_proc_chance": "counter_proc_chance",
+        "counter_damage_ratio": "counter_damage_ratio",
+        "lifesteal_chance": "lifesteal_chance",
+        "lifesteal_ratio": "lifesteal_ratio",
+        # スキルカウント値（自己マッピング）
+        "count_backstab":     "count_backstab",
+        "count_confusion":    "count_confusion",
+        "count_stun":         "count_stun",
+        "count_counter":      "count_counter",
+        "count_lifesteal":    "count_lifesteal",
     }
 
     def _flatten_bonus(item_dict):
-        """bonus.common / bonus.magic をフラットなキーに展開してアイテム辞書にマージする"""
+        """bonus.common / bonus.skills / bonus.magic をフラットなキーに展開してアイテム辞書にマージする"""
         bonus = item_dict.pop("bonus", None)
         if not isinstance(bonus, dict):
             return
@@ -205,6 +220,19 @@ def get_normalized_equipment_data(floor_map):
             for short_key, flat_key in COMMON_KEY_MAP.items():
                 if short_key in common:
                     item_dict.setdefault(flat_key, common[short_key])
+        # skills ボーナスを階層化して処理
+        skills = bonus.get("skills", {})
+        if isinstance(skills, dict):
+            # 直接のスキルパラメータ
+            for short_key, flat_key in COMMON_KEY_MAP.items():
+                if short_key in skills:
+                    item_dict.setdefault(flat_key, skills[short_key])
+            # 階層化されたスキルパラメータ
+            for skill_category, skill_params in skills.items():
+                if isinstance(skill_params, dict):
+                    for short_key, flat_key in COMMON_KEY_MAP.items():
+                        if short_key in skill_params:
+                            item_dict.setdefault(flat_key, skill_params[short_key])
         # magic ボーナスを magic_<key> としてマージ
         magic = bonus.get("magic", {})
         if isinstance(magic, dict):

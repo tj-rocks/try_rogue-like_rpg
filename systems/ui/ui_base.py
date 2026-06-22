@@ -24,7 +24,10 @@ EQUIP_STAT_LABEL_MAP = {
     "aggro_mod": "感知補正",
     "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION,
     "stupidity": Text.UI.STAT_CONFUSION_ICON,
-    "backstab_crit_bonus": "背後会心"
+    "backstab_crit_bonus": "背後会心",
+    "flank_backstab": "側面背後",
+    "stupidity_proc_chance": "混乱発動率",
+    "stupidity_proc_amount": "混乱上昇量"
 }
 
 EQUIP_MAGIC_LABEL_MAP = {
@@ -37,6 +40,41 @@ EQUIP_MAGIC_LABEL_MAP = {
     "magic_light_stave_bonus": "燈杖回",
     "magic_barrier_turns":     "障壁ターン",
 }
+
+# 装備に付与可能なスキルカテゴリ（表示用）
+EQUIP_SKILL_CATEGORY_MAP = {
+    "lifesteal": ("lifesteal_chance", "lifesteal_ratio"),
+    "counter":   ("counter_proc_chance", "counter_damage_ratio"),
+    "stun":      ("stun_proc_chance", "stun_duration"),
+    "backstab":  ("backstab_crit_bonus", "flank_backstab"),
+    "confusion": ("stupidity_proc_chance", "stupidity_proc_amount"),
+}
+EQUIP_SKILL_LABEL_MAP = {
+    "lifesteal": "ライフスティール",
+    "counter":   "カウンター",
+    "stun":      "スタン",
+    "backstab":  "バックスタブ強化",
+    "confusion": "混乱",
+}
+
+def get_player_skill_names(player):
+    """プレイヤーが発動中のスキルカテゴリ名リストを返す（カウント>=3で発現）"""
+    names = []
+    if not player:
+        return names
+
+    # スキルカウント値が3以上の場合のみ発現
+    if getattr(player, "total_lifesteal", 0) >= 3:
+        names.append(EQUIP_SKILL_LABEL_MAP.get("lifesteal", "lifesteal"))
+    if getattr(player, "total_counter", 0) >= 3:
+        names.append(EQUIP_SKILL_LABEL_MAP.get("counter", "counter"))
+    if getattr(player, "total_stun", 0) >= 3:
+        names.append(EQUIP_SKILL_LABEL_MAP.get("stun", "stun"))
+    if getattr(player, "total_backstab", 0) >= 3:
+        names.append(EQUIP_SKILL_LABEL_MAP.get("backstab", "backstab"))
+    if getattr(player, "total_confusion", 0) >= 3:
+        names.append(EQUIP_SKILL_LABEL_MAP.get("confusion", "confusion"))
+    return names
 
 def format_stat_value(val):
     if val % 1 == 0:
@@ -513,9 +551,13 @@ class BaseListDialog(StateKeyMixin):
         # instからステータスを取得してバー描画
         bar_items = []  # (label, value, stat_key)
         text_items = []  # バーにできない項目（テキスト表示）
-        
+        # スキルの個別パラメータはスキル名でまとめて表示する
+        SKILL_STAT_KEYS = {k for keys in EQUIP_SKILL_CATEGORY_MAP.values() for k in keys}
+
         if inst and hasattr(inst, "get_stat"):
             for k, label in EQUIP_STAT_LABEL_MAP.items():
+                if k in SKILL_STAT_KEYS:
+                    continue
                 val = inst.get_stat(k, 0)
                 # 強化ボーナスを加算（StaveInstanceの場合はenhanceがあってもget_enhance_bonusがない）
                 if hasattr(inst, 'enhance') and inst.enhance > 0 and hasattr(inst, 'get_enhance_bonus'):
@@ -544,7 +586,7 @@ class BaseListDialog(StateKeyMixin):
                     is_pct = mk in ("magic_fire_damage", "magic_heal_ratio", "magic_knockback_damage")
                     val_to_use = mval * 100 if is_pct and isinstance(mval, float) else mval
                     text_items.append(f"{mlabel}: {format_stat_value(val_to_use)}%" if is_pct else f"{mlabel}: {format_stat_value(mval)}")
-        
+
         # バー描画（左半分: ラベル列、右半分: バー+ランク列+値）
         max_y = start_y
         half_w = cw // 2

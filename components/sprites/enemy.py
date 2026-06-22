@@ -49,9 +49,12 @@ class Enemy(Entity):
         # ボスはアグレッシブに動くよう、困惑度（stupidity）を強制的に0にする
         if self.is_boss: self.stupidity = 0
         else: self.stupidity = data.get("stupidity", 0)
+        self.stupidity_temp = 0  # 装備スキルによる一時的 stupidity 上昇
+        self.stun_turns = 0  # スタン持続ターン
         self.dash_distance = data.get("dash_distance", 50)
         self.is_long_range = False; self.attack_priority = data.get("attack_priority", "close")
         self.smart_ranged_move = data.get("smart_ranged_move", True)
+        self.turn_attack = data.get("turn_attack", False)
         self.bgm = data.get("bgm"); self.crit_rate = data.get("crit_rate", 0.01)
         self.accuracy_close = data.get("accuracy_close", data.get("accuracy_bonus", 100))
         self.accuracy_ranged = data.get("accuracy_ranged", data.get("accuracy_bonus", 100))
@@ -356,6 +359,11 @@ class Enemy(Entity):
         if getattr(self, "is_dead", False):
             self._log_trace(dungeon, "take_turn bypassed: is_dead=True")
             return
+        # スタン状態チェック
+        if self.stun_turns > 0:
+            self.stun_turns -= 1
+            self._log_trace(dungeon, f"stunned! remaining turns: {self.stun_turns}")
+            return
         if self.is_static:
             self._log_trace(dungeon, "take_turn bypassed: is_static=True")
             if hasattr(self, "lifetime_turns") and self.lifetime_turns is not None:
@@ -420,8 +428,9 @@ class Enemy(Entity):
             self._log_trace(dungeon, f"out of range (dist to player: {abs(dx)},{abs(dy)} > detect_range: {rad}) | self:({self.x},{self.y}) player_target:({player.target_x},{player.target_y}) player_actual:({player.x},{player.y}) ts:{dungeon.tile_size}")
             return
             
-        # 困惑度テーブルを参照してぼーっと確率を決定
-        wander_chance = STUPIDITY_WANDER_RATES.get(self.stupidity, self.stupidity / 10.0)
+        # 困惑度テーブルを参照してぼーっと確率を決定（一時的 stupidity も加算）
+        effective_stupidity = min(10, self.stupidity + self.stupidity_temp)
+        wander_chance = STUPIDITY_WANDER_RATES.get(effective_stupidity, effective_stupidity / 10.0)
         if wander_chance > 0 and random.random() < wander_chance:
             self._log_trace(dungeon, f"decided to WANDER (chance: {wander_chance})")
             self._move_randomly(dungeon, all_entities)
@@ -476,6 +485,13 @@ class Enemy(Entity):
             self._log_trace(dungeon, f"AI status: gdist={gdist}, ideal={ideal}, los={los}, attack_priority={self.attack_priority}")
             if gdist == ideal:
                 if los:
+                    if not self.turn_attack:
+                        # 向き変え攻撃なし: 向きが違う場合はターンを使って向くだけ
+                        needed = "right" if dx > 0 else "left" if dx < 0 else "down" if dy > 0 else "up"
+                        if self.facing != needed:
+                            self.facing = needed
+                            self._log_trace(dungeon, f"turned to face player ({needed}), no attack this turn")
+                            return
                     self._log_trace(dungeon, "close-attacking player.")
                     self._handle_attack(dx, dy, player, dialog)
                     return

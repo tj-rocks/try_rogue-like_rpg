@@ -21,19 +21,27 @@ def _is_frontal_attack(attacker, target):
 def _is_back_attack(attacker, target):
     """
     攻撃が「背後から」かどうかを判定する。
+    flank_backstab 合計が 3 以上の場合、側面（正面以外）も背後扱いにする。
     """
     facing = getattr(target, "facing", None)
     if not facing:
         return False
-        
+
     from constants import TILE_SIZE
     ax, ay = int((attacker.x + TILE_SIZE / 2) // TILE_SIZE), int((attacker.y + TILE_SIZE / 2) // TILE_SIZE)
     tx, ty = int((target.x + TILE_SIZE / 2) // TILE_SIZE), int((target.y + TILE_SIZE / 2) // TILE_SIZE)
-    
+
+    # 完全な背後
     if facing == "left"  and ax > tx: return True
     if facing == "right" and ax < tx: return True
     if facing == "up"    and ay > ty: return True
     if facing == "down"  and ay < ty: return True
+
+    # 側面も背後扱いにするスキル（flank_backstab 合計 3 以上）
+    flank = getattr(attacker, "total_flank_backstab", 0)
+    if isinstance(flank, (int, float)) and flank >= 3:
+        if not _is_frontal_attack(attacker, target):
+            return True
     return False
 
 def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
@@ -76,11 +84,12 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
             if block_chance != 0.0:
                 hit_rate -= block_chance
     
-    # 命中率の上下限 (魔法以外は最低5%は当たる、最大99%)
+    # 命中率の上下限 (魔法以外は最低MIN_HIT_RATEは当たる、最大99%)
     if is_magic:
         is_miss = False
     else:
-        hit_rate = max(0.05, min(0.99, hit_rate))
+        from constants import MIN_HIT_RATE
+        hit_rate = max(MIN_HIT_RATE, min(0.99, hit_rate))
         is_miss = random.random() >= hit_rate
     
     if is_miss:
@@ -103,6 +112,9 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     
     # [NEW] バックアタックボーナス
     is_backstab = _is_back_attack(attacker, target)
+    import os as _os
+    if _os.environ.get("DEBUG_MODE") == "1" and getattr(attacker, "total_flank_backstab", 0) > 0:
+        print(f"[バックスタブ] {'✅ 成功' if is_backstab else '❌ 失敗'}")
     if is_backstab:
         from constants import BACKSTAB_CRIT_BONUS
         crit_rate += BACKSTAB_CRIT_BONUS
@@ -170,6 +182,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     ダメージを計算し、対象に適用し、メッセージを生成して返す。
     戻り値: (メッセージ, ダメージ量, クリティカルフラグ, ミスフラグ)
     """
+    import os as _os
     damage, is_critical, is_miss = calculate_damage(attacker, target, is_magic=is_magic, damage_mult=damage_mult)
     
     attacker_name = getattr(attacker, "name", "誰か")
@@ -212,6 +225,71 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
         if isinstance(stupidity_up, (int, float)) and stupidity_up > 0 and hasattr(target, "stupidity"):
             target.stupidity = min(10, target.stupidity + int(stupidity_up))
             msg += "\n" + Text.Combat.CONFUSED.format(target=target_name, amount=int(stupidity_up))
+
+    # --- 敵の一時的 stupidity 上昇効果（装備スキル） ---
+    if not is_miss and damage > 0 and hasattr(target, "stupidity_temp"):
+        proc_chance = getattr(attacker, "total_stupidity_proc_chance", 0.0)
+        if isinstance(proc_chance, (int, float)) and proc_chance > 0:
+            rolled = random.random()
+            if rolled < proc_chance:
+                proc_amount = getattr(attacker, "total_stupidity_proc_amount", 0)
+                if isinstance(proc_amount, (int, float)) and proc_amount > 0:
+                    target.stupidity_temp += int(proc_amount)
+                    msg += f"\n{target_name}は一時的に混乱した！"
+                    if _os.environ.get("DEBUG_MODE") == "1":
+                        print(f"[混乱] ✅ 成功")
+            elif _os.environ.get("DEBUG_MODE") == "1":
+                print(f"[混乱] ❌ 失敗")
+
+    # --- スタン効果 ---
+    if not is_miss and damage > 0 and hasattr(target, "stun_turns"):
+        proc_chance = getattr(attacker, "total_stun_proc_chance", 0.0)
+        if isinstance(proc_chance, (int, float)) and proc_chance > 0:
+            rolled = random.random()
+            if rolled < proc_chance:
+                stun_duration = getattr(attacker, "total_stun_duration", 1)
+                if isinstance(stun_duration, (int, float)) and stun_duration > 0:
+                    target.stun_turns = int(stun_duration)
+                    msg += f"\n{target_name}はスタンした！"
+                    if _os.environ.get("DEBUG_MODE") == "1":
+                        print(f"[スタン] ✅ 成功")
+            elif _os.environ.get("DEBUG_MODE") == "1":
+                print(f"[スタン] ❌ 失敗")
+
+    # --- ライフスティール効果 ---
+    if not is_miss and damage > 0 and hasattr(attacker, "hp"):
+        proc_chance = getattr(attacker, "total_lifesteal_chance", 0.0)
+        if isinstance(proc_chance, (int, float)) and proc_chance > 0:
+            rolled = random.random()
+            if rolled < proc_chance:
+                lifesteal_ratio = getattr(attacker, "total_lifesteal_ratio", 0.0)
+                if isinstance(lifesteal_ratio, (int, float)) and lifesteal_ratio > 0:
+                    heal_amount = int(damage * lifesteal_ratio)
+                    attacker.hp = min(attacker.max_hp, attacker.hp + heal_amount)
+                    msg += f"\n{attacker_name}は{heal_amount}回復した！"
+                    if _os.environ.get("DEBUG_MODE") == "1":
+                        print(f"[ライフスティール] ✅ 成功")
+            elif _os.environ.get("DEBUG_MODE") == "1":
+                print(f"[ライフスティール] ❌ 失敗")
+
+    # --- カウンター効果（攻撃時に発動） ---
+    if hasattr(target, "hp") and hasattr(attacker, "hp"):
+        # targetがプレイヤーで、attackerが敵の場合のみカウンター発動
+        if hasattr(target, "total_counter_proc_chance"):
+            proc_chance = getattr(target, "total_counter_proc_chance", 0.0)
+            if isinstance(proc_chance, (int, float)) and proc_chance > 0:
+                rolled = random.random()
+                if rolled < proc_chance:
+                    counter_damage_ratio = getattr(target, "total_counter_damage_ratio", 0.5)
+                    if isinstance(counter_damage_ratio, (int, float)) and counter_damage_ratio > 0:
+                        # カウンター攻撃を実行（プレイヤーの攻撃力ベース）
+                        counter_damage = int(getattr(target, "total_attack", target.attack) * counter_damage_ratio)
+                        attacker.hp = max(0, attacker.hp - counter_damage)
+                        msg += f"\n{target_name}は反撃！{counter_damage}のダメージ！"
+                        if _os.environ.get("DEBUG_MODE") == "1":
+                            print(f"[カウンター] ✅ 成功")
+                elif _os.environ.get("DEBUG_MODE") == "1":
+                    print(f"[カウンター] ❌ 失敗")
 
     target_hp = getattr(target, 'hp', '?')
     target_cond = getattr(target, 'condition', 'normal')

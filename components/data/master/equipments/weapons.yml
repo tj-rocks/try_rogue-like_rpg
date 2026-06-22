@@ -697,6 +697,60 @@ WEAPON_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
+  assassin_dagger:
+    quest_targetable: true
+    name: アサシンの短剣
+    category: dagger
+    min_rank: A
+    max_rank: SS
+    rarity: 4
+    price: 5000
+    image_path: components/pictures/weapon/assassin_dagger.png
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 暗殺者の短剣。攻撃力は低いが、背後攻撃を強化する。
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
+    type: dagger
+    bonus:
+      common:
+        aggro_mod: 2
+        attack: 11
+        accuracy_close: 20
+        accuracy_range: 20
+        crit_rate: 0.1
+        hp: 0
+        defense: 0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
+        lantern_bonus: 0
+        regen: 0
+        # stupidity: 0
+        armor_penetration: 0.3
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        backstab:
+          count_backstab: 1
+          backstab_crit_bonus: 0.1
+          flank_backstab: 1
+        confusion:
+          count_confusion: 1
+          stupidity_proc_chance: 0.1
+          stupidity_proc_amount: 1
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
   test_all_bonus_weapon:
     quest_targetable: false
     name: "[TEST]全加護の剣"
@@ -740,4 +794,200 @@ WEAPON_DATA:
         knockback_damage: 0.15
         invincible_turns: 1
         stave_bonus: 10
+        light_stave_bonus: 0
+
+  # --- 勇敢な戦士シリーズ ---
+  brave_fighter_sword:
+    quest_targetable: true
+    name: "勇敢な戦士の剣"
+    min_rank: A
+    max_rank: SS
+    rarity: 5
+    price: 8000
+    image_path: components/pictures/weapon/fighters_sword.png
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 勇気ある戦士の剣。攻撃力と生存性を高める。
+    growth: {bonus_limit: 3, times_limit: 40, over_limit_growth_rate: 0.004}
+    type: onehanded_sword
+    bonus:
+      common:
+        attack: 18
+        accuracy_close: 25
+        accuracy_range: 15
+        crit_rate: 0.18
+        hp: 35
+        defense: 8
+        block_chance_close: 0.10
+        block_chance_ranged: 0.10
+        lantern_bonus: 0
+        regen: 2
+        aggro_mod: 2
+        armor_penetration: 0.25
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        stun:
+          count_stun: 1
+          stun_proc_chance: 0.15
+          stun_duration: 1
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  # --- 技巧戦士シリーズ ---
+  skilled_fighter_sword:
+    quest_targetable: true
+    name: "技巧剣士の剣"
+    min_rank: A
+    max_rank: SS
+    rarity: 5
+    price: 8500
+    image_path: components/pictures/weapon/fighters_sword.png
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 技巧を極めた戦士の剣。カウンター攻撃を得意とする。
+    growth: {bonus_limit: 3, times_limit: 40, over_limit_growth_rate: 0.004}
+    type: onehanded_sword
+    bonus:
+      common:
+        attack: 16
+        accuracy_close: 30
+        accuracy_range: 20
+        crit_rate: 0.20
+        hp: 25
+        defense: 5
+        block_chance_close: 0.12
+        block_chance_ranged: 0.12
+        lantern_bonus: 0
+        regen: 1
+        aggro_mod: 1
+        armor_penetration: 0.30
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        counter:
+          count_counter: 1
+          counter_proc_chance: 0.20
+          counter_damage_ratio: 0.6
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  # --- 上級騎士シリーズ ---
+  senior_knight_sword:
+    quest_targetable: true
+    name: "上級騎士の剣"
+    min_rank: A
+    max_rank: SS
+    rarity: 6
+    price: 12000
+    image_path: components/pictures/weapon/fighters_sword.png
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 上級騎士の剣。圧倒的な攻撃力とスタン効果を持つ。
+    growth: {bonus_limit: 4, times_limit: 50, over_limit_growth_rate: 0.005}
+    type: onehanded_sword
+    bonus:
+      common:
+        attack: 22
+        accuracy_close: 20
+        accuracy_range: 10
+        crit_rate: 0.15
+        hp: 40
+        defense: 10
+        block_chance_close: 0.08
+        block_chance_ranged: 0.08
+        lantern_bonus: 0
+        regen: 2
+        aggro_mod: 3
+        armor_penetration: 0.35
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        stun:
+          count_stun: 1
+          stun_proc_chance: 0.25
+          stun_duration: 1
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  # --- 神聖な鎧シリーズ（アンバサダー戦士用） ---
+  holy_sword:
+    quest_targetable: true
+    name: 神聖な剣
+    min_rank: A
+    max_rank: SS
+    rarity: 4
+    price: 10000
+    image_path: components/pictures/weapon/fighters_sword.png
+    sound: components/sounds/sfx/sword_swing.wav
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: ブラッドソード的な力を宿した聖剣。攻撃時に体力を吸収し、長時間の探索を可能にする。
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
+    type: onehanded_sword
+    bonus:
+      common:
+        attack: 18
+        accuracy_close: 20
+        accuracy_range: 10
+        crit_rate: 0.15
+        hp: 20
+        defense: 5
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
+        lantern_bonus: 0
+        regen: 1
+        aggro_mod: 1
+        armor_penetration: 0.15
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        lifesteal:
+          count_lifesteal: 1
+          lifesteal_chance: 0.20
+          lifesteal_ratio: 0.25
+      magic:
+        fire_damage: 0
+        fire_range: 0
+        heal_ratio: 0
+        knockback_damage: 0
+        invincible_turns: 0
+        stave_bonus: 0
         light_stave_bonus: 0

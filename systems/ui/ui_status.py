@@ -2,8 +2,10 @@ import pygame
 from systems.game_state import game_state
 from systems.resources import font_small, font_medium, font_hud
 from wordings import Text
+from constants import get_stat_rank
 from systems.ui.ui_base import (
-    get_standard_upper_layout, draw_dialog_frame, draw_text_wrapped, draw_stat_bar, StateKeyMixin
+    get_standard_upper_layout, draw_dialog_frame, draw_text_wrapped, draw_stat_bar, StateKeyMixin,
+    get_player_skill_names
 )
 
 
@@ -59,6 +61,12 @@ class StatusBar:
 
         rank_name = player.guild_rank
         draw_text_shadow(f"Rank: {rank_name}", self.font, (241, 196, 15), (bar_x, bar_y + bar_h + 6))
+
+        # HPの下に発動中スキルを表示
+        skill_names = get_player_skill_names(player)
+        if skill_names:
+            skill_text = f"スキル：{' '.join(skill_names)}"
+            draw_text_shadow(skill_text, font_small, (180, 230, 255), (bar_x, bar_y + bar_h + 32))
 
         buff_turns = 0
         buff_max = 1
@@ -363,6 +371,13 @@ class StatusDialog(StateKeyMixin):
             ]
             draw_text_wrapped(screen, self.font, "\n".join(equip_lines), content_x, equip_y, cw)
 
+            # 発現スキルを表示
+            skill_names = get_player_skill_names(player)
+            if skill_names:
+                skill_y = equip_y + len(equip_lines) * self.font.get_height() + 25
+                skill_text = f"スキル：{' '.join(skill_names)}"
+                screen.blit(self.font.render(skill_text, True, (255, 220, 80)), (content_x, skill_y))
+
         elif self.mode == "CURSE":
             curse_level = getattr(player, "curse_level", 0)
             cursed_stats = getattr(player, "cursed_stats", [])
@@ -416,106 +431,62 @@ class StatusDialog(StateKeyMixin):
             total_crit = get_total_bonus("crit_rate")
             total_block_close = get_total_bonus("block_chance_close")
             total_block_ranged = get_total_bonus("block_chance_ranged")
-            total_stave = get_total_bonus("magic_stave_bonus")
             total_regen = get_total_bonus("regen_bonus")
             total_aggro = get_total_bonus("aggro_mod")
             total_stupidity = get_total_bonus("stupidity")
             total_penetration = get_total_bonus("armor_penetration")
-            total_backstab = get_total_bonus("backstab_crit_bonus")
-            total_fire_dmg = get_total_bonus("magic_fire_damage")
-            total_fire_range = get_total_bonus("magic_fire_range")
-            total_heal_ratio = get_total_bonus("magic_heal_ratio")
-            total_knockback = get_total_bonus("magic_knockback_damage")
-            total_invincible = get_total_bonus("magic_invincible_turns")
-            total_barrier = get_total_bonus("magic_barrier_turns")
-
-            def format_val(val):
-                if val % 1 == 0:
-                    val_str = str(int(val))
-                else:
-                    val_str = str(round(val, 2))
-                return f"+{val_str}" if val > 0 else val_str
 
             left_lines = ["【基本加護】"]
             has_any_bonus = False
 
             if total_hp != 0:
-                left_lines.append(f"最大HP    {format_val(total_hp)}")
+                left_lines.append(f"最大HP    {get_stat_rank(total_hp, 'hp_bonus')}")
                 has_any_bonus = True
             if total_atk != 0:
-                left_lines.append(f"攻撃力    {format_val(total_atk)}")
+                left_lines.append(f"攻撃力    {get_stat_rank(total_atk, 'attack_bonus')}")
                 has_any_bonus = True
             if total_def != 0:
-                left_lines.append(f"防御力    {format_val(total_def)}")
+                left_lines.append(f"防御力    {get_stat_rank(total_def, 'defense_bonus')}")
                 has_any_bonus = True
             if total_acc_close != 0:
                 val = total_acc_close * 100 if isinstance(total_acc_close, float) and total_acc_close < 1.0 else total_acc_close
-                left_lines.append(f"命中率    {format_val(val)}%")
+                left_lines.append(f"命中率    {get_stat_rank(val, 'accuracy_bonus_close')}")
                 has_any_bonus = True
             if total_crit != 0:
                 val = total_crit * 100 if isinstance(total_crit, float) and total_crit < 1.0 else total_crit
-                left_lines.append(f"会心率    {format_val(val)}%")
+                left_lines.append(f"会心率    {get_stat_rank(val, 'crit_rate')}")
                 has_any_bonus = True
             if total_block_close != 0:
                 val = total_block_close * 100 if isinstance(total_block_close, float) and total_block_close < 1.0 else total_block_close
-                left_lines.append(f"近距離回避 {format_val(val)}%")
+                left_lines.append(f"近距離回避 {get_stat_rank(val, 'block_chance_close')}")
                 has_any_bonus = True
             if total_block_ranged != 0:
                 val = total_block_ranged * 100 if isinstance(total_block_ranged, float) and total_block_ranged < 1.0 else total_block_ranged
-                left_lines.append(f"遠距離回避 {format_val(val)}%")
+                left_lines.append(f"遠距離回避 {get_stat_rank(val, 'block_chance_ranged')}")
                 has_any_bonus = True
             if total_regen != 0:
-                left_lines.append(f"自然回復  {format_val(total_regen)}/ターン")
+                left_lines.append(f"自然回復  {get_stat_rank(total_regen, 'regen_bonus')}")
                 has_any_bonus = True
             if total_aggro != 0:
-                left_lines.append(f"感知補正  {format_val(total_aggro)}")
+                left_lines.append(f"感知補正  {get_stat_rank(total_aggro, 'aggro_mod')}")
                 has_any_bonus = True
             if total_penetration != 0:
                 val = total_penetration * 100 if isinstance(total_penetration, float) and total_penetration <= 1.0 else total_penetration
                 from wordings import Text
-                left_lines.append(f"{Text.UI.STAT_ARMOR_PENETRATION_LABEL}  {format_val(val)}%")
+                left_lines.append(f"{Text.UI.STAT_ARMOR_PENETRATION_LABEL}  {get_stat_rank(val, 'armor_penetration')}")
                 has_any_bonus = True
             if total_stupidity != 0:
                 from wordings import Text
-                left_lines.append(f"{Text.UI.STAT_CONFUSION_LABEL}      {format_val(total_stupidity)}")
+                left_lines.append(f"{Text.UI.STAT_CONFUSION_LABEL}      {get_stat_rank(total_stupidity, 'stupidity')}")
                 has_any_bonus = True
-            if total_backstab != 0:
-                val = total_backstab * 100 if isinstance(total_backstab, float) and total_backstab <= 1.0 else total_backstab
-                left_lines.append(f"背後会心  {format_val(val)}%")
-                has_any_bonus = True
-
-            right_lines = ["【魔法加護】"]
-            has_magic_bonus = False
-
-            if total_stave != 0:
-                right_lines.append(f"杖回数    {format_val(total_stave)}")
-                has_magic_bonus = True
-            if total_fire_dmg != 0:
-                val = total_fire_dmg * 100 if isinstance(total_fire_dmg, float) and total_fire_dmg < 1.0 else total_fire_dmg
-                right_lines.append(f"火炎ダメ  {format_val(val)}%")
-                has_magic_bonus = True
-            if total_fire_range != 0:
-                right_lines.append(f"火炎射程  {format_val(total_fire_range)}マス")
-                has_magic_bonus = True
-            if total_heal_ratio != 0:
-                val = total_heal_ratio * 100 if isinstance(total_heal_ratio, float) and total_heal_ratio < 1.0 else total_heal_ratio
-                right_lines.append(f"回復効果  {format_val(val)}%")
-                has_magic_bonus = True
-            if total_knockback != 0:
-                val = total_knockback * 100 if isinstance(total_knockback, float) and total_knockback < 1.0 else total_knockback
-                right_lines.append(f"吹飛ダメ  {format_val(val)}%")
-                has_magic_bonus = True
-            if total_invincible != 0:
-                right_lines.append(f"無敵効果  {format_val(total_invincible)}ターン")
-                has_magic_bonus = True
-            if total_barrier != 0:
-                right_lines.append(f"障壁ターン {format_val(total_barrier)}ターン")
-                has_magic_bonus = True
-
-            if not has_magic_bonus:
+            right_lines = ["【スキル】"]
+            skill_names = get_player_skill_names(player)
+            if skill_names:
+                right_lines.append(f"スキル：{' '.join(skill_names)}")
+            else:
                 right_lines.append("なし")
 
-            if not has_any_bonus and not has_magic_bonus:
+            if not has_any_bonus and not skill_names:
                 screen.blit(self.font.render("適用中の装備の加護はありません", True, (200, 200, 200)), (content_x, content_y))
             else:
                 line_h = self.font.get_height() + 5
@@ -525,7 +496,7 @@ class StatusDialog(StateKeyMixin):
                     screen.blit(self.font.render(text, True, color), (content_x, content_y + i * line_h))
                 right_x = content_x + col_w
                 for i, text in enumerate(right_lines):
-                    color = (180, 200, 255) if i == 0 else (220, 220, 220)
+                    color = (255, 220, 80) if i == 0 else (220, 220, 220)
                     screen.blit(self.font.render(text, True, color), (right_x, content_y + i * line_h))
 
         elif self.mode == "QUESTS":

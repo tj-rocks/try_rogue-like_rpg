@@ -23,6 +23,9 @@ TILE_SIZE = 64
 # --- デバッグ・ログ設定 ---
 ENABLE_DEBUG_LOGGING = True  # Falseにすると全print出力がミュートされ、パフォーマンスが向上します
 
+# --- 戦闘バランス設定 ---
+MIN_HIT_RATE = 0.10  # 最低命中率（0.0で完全回避可能、0.10で最低10%命中）
+
 # --- BGM設定 ---
 BGM_TITLE   = "components/sounds/bgm/winding_adventure.mp3"
 BGM_OPENING = "components/sounds/bgm/winding_adventure.mp3"
@@ -313,11 +316,21 @@ def _compute_stat_ranges():
     """全装備データを走査してステータスごとのmin/maxを算出"""
     stat_keys = [
         "attack_bonus", "defense_bonus", "hp_bonus",
-        "crit_bonus", "block_chance_close", "block_chance_ranged",
+        "crit_rate", "block_chance_close", "block_chance_ranged",
         "armor_penetration", "aggro_mod", "stupidity",
+        "accuracy_bonus_close", "regen_bonus",
+        "backstab_crit_bonus", "flank_backstab",
+        "stupidity_proc_chance", "stupidity_proc_amount",
+        "stun_proc_chance", "stun_duration",
+        "counter_proc_chance", "counter_damage_ratio",
+        "lifesteal_chance", "lifesteal_ratio",
     ]
     # パーセント系のキー（UI表示時に100倍するので、レンジも100倍で格納）
-    pct_keys = {"crit_bonus", "block_chance_close", "block_chance_ranged", "armor_penetration"}
+    pct_keys = {
+        "crit_rate", "block_chance_close", "block_chance_ranged", "armor_penetration",
+        "stupidity_proc_chance", "stun_proc_chance", "counter_proc_chance",
+        "lifesteal_chance", "lifesteal_ratio", "counter_damage_ratio",
+    }
     all_equips = list(WEAPON_DATA.values()) + list(ARMOR_DATA.values()) + list(SHIELD_DATA.values()) + list(ACCESSORY_DATA.values())
     ranges = {}
     for key in stat_keys:
