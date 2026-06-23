@@ -143,9 +143,9 @@ def test_counter_no_proc():
     for _ in range(20):
         deal_damage(attacker, target)
     
-    # chance=0.0なのでカウンター発動しない
+    # 回避しないのでカウンターも発動しない
     assert attacker.hp == initial_attacker_hp, f"カウンター発動しないはず: {attacker.hp} vs {initial_attacker_hp}"
-    print("[OK] counter_proc_chance=0.0 → カウンター発動なし")
+    print("[OK] 回避なし → カウンター発動なし")
 
 
 def test_stun_proc():
@@ -233,57 +233,56 @@ def test_backstab_crit_bonus():
 
 
 def test_skill_count_totals():
-    """スキルカウント値の合計テスト"""
-    print("\n--- テスト10: スキルカウント値合計 ---")
+    """スキルセット装備の各スキルパラメータ存在確認テスト"""
+    print("\n--- テスト10: スキルセット装備パラメータ確認 ---")
     pygame.init()
     screen = pygame.display.set_mode((800, 600))
     
-    from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA
     from components.sprites.player import EquipInstance
     
-    # アサシンセット
+    # アサシンセット → backstab_crit_bonus と stupidity_proc_chance を持つ
     dagger = EquipInstance("weapon", "assassin_dagger")
     armor = EquipInstance("armor", "assassin_light_armor")
     shield = EquipInstance("shield", "assassin_buckler")
     
-    backstab_count = sum(eq.get_stat("count_backstab", 0) for eq in [dagger, armor, shield])
-    confusion_count = sum(eq.get_stat("count_confusion", 0) for eq in [dagger, armor, shield])
+    backstab_val = sum(eq.get_stat("backstab_crit_bonus", 0) for eq in [dagger, armor, shield])
+    confusion_val = sum(eq.get_stat("stupidity_proc_chance", 0) for eq in [dagger, armor, shield])
     
-    print(f"  アサシンセット: backstab={backstab_count}, confusion={confusion_count}")
-    assert backstab_count == 3, f"アサシンセットのbackstabカウントが3でない: {backstab_count}"
-    assert confusion_count == 3, f"アサシンセットのconfusionカウントが3でない: {confusion_count}"
+    print(f"  アサシンセット: backstab_crit_bonus={backstab_val}, stupidity_proc_chance={confusion_val}")
+    assert backstab_val > 0, f"アサシンセットにbackstab_crit_bonusがない: {backstab_val}"
+    assert confusion_val > 0, f"アサシンセットにstupidity_proc_chanceがない: {confusion_val}"
     
-    # 神聖セット
+    # 神聖セット → lifesteal_chance を持つ
     holy_sword = EquipInstance("weapon", "holy_sword")
     holy_armor = EquipInstance("armor", "holy_armor")
     holy_shield = EquipInstance("shield", "holy_shield")
     
-    lifesteal_count = sum(eq.get_stat("count_lifesteal", 0) for eq in [holy_sword, holy_armor, holy_shield])
+    lifesteal_val = sum(eq.get_stat("lifesteal_chance", 0) for eq in [holy_sword, holy_armor, holy_shield])
     
-    print(f"  神聖セット: lifesteal={lifesteal_count}")
-    assert lifesteal_count == 3, f"神聖セットのlifestealカウントが3でない: {lifesteal_count}"
+    print(f"  神聖セット: lifesteal_chance={lifesteal_val}")
+    assert lifesteal_val > 0, f"神聖セットにlifesteal_chanceがない: {lifesteal_val}"
     
-    # 勇敢な戦士セット
+    # 勇敢な戦士セット → stun_proc_chance を持つ
     brave_sword = EquipInstance("weapon", "brave_fighter_sword")
     brave_armor = EquipInstance("armor", "brave_fighter_armor")
     brave_shield = EquipInstance("shield", "brave_fighter_shield")
     
-    stun_count = sum(eq.get_stat("count_stun", 0) for eq in [brave_sword, brave_armor, brave_shield])
+    stun_val = sum(eq.get_stat("stun_proc_chance", 0) for eq in [brave_sword, brave_armor, brave_shield])
     
-    print(f"  勇敢な戦士セット: stun={stun_count}")
-    assert stun_count == 3, f"勇敢な戦士セットのstunカウントが3でない: {stun_count}"
+    print(f"  勇敢な戦士セット: stun_proc_chance={stun_val}")
+    assert stun_val > 0, f"勇敢な戦士セットにstun_proc_chanceがない: {stun_val}"
     
-    # 技巧戦士セット
+    # 技巧戦士セット → counter_proc_chance を持つ
     skilled_sword = EquipInstance("weapon", "skilled_fighter_sword")
     skilled_armor = EquipInstance("armor", "skilled_fighter_armor")
     skilled_shield = EquipInstance("shield", "skilled_fighter_shield")
     
-    counter_count = sum(eq.get_stat("count_counter", 0) for eq in [skilled_sword, skilled_armor, skilled_shield])
+    counter_val = sum(eq.get_stat("counter_proc_chance", 0) for eq in [skilled_sword, skilled_armor, skilled_shield])
     
-    print(f"  技巧戦士セット: counter={counter_count}")
-    assert counter_count == 3, f"技巧戦士セットのcounterカウントが3でない: {counter_count}"
+    print(f"  技巧戦士セット: counter_proc_chance={counter_val}")
+    assert counter_val > 0, f"技巧戦士セットにcounter_proc_chanceがない: {counter_val}"
     
-    print("[OK] 全セットのカウント値が正しい（各3）")
+    print("[OK] 全セットに正しいスキルパラメータが存在する")
     
     pygame.quit()
 

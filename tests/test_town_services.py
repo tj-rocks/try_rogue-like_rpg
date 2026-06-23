@@ -119,44 +119,35 @@ def test_priest_services():
     dialog = Dialog(800, 600)
     confirm = ConfirmDialog(800, 600)
     
-    from constants import CURSE_RECOVERY_COST_GOLD_MULTIPLIER
     cost = max(1, player.guild_point // 10)
-    gold_cost = cost * CURSE_RECOVERY_COST_GOLD_MULTIPLIER
     assert cost == 10
-    assert gold_cost == 100
     
-    # 1. ゴールドが足りない場合のテスト
-    player.coin = 50  # 100G必要だが50Gしかない
-    def on_priest_yes_no_gold():
+    # 1. GPが足りない場合のテスト
+    player.guild_point = 5  # 10GP必要だが5GPしかない
+    cost_low = max(1, player.guild_point // 10)
+    def on_priest_yes_no_gp():
         if player.guild_point < cost:
-            pass
-        elif player.coin < gold_cost:
-            dialog.text = Text.NPC.PRIEST_NO_GOLD.format(gold_cost=gold_cost)
+            dialog.text = Text.NPC.PRIEST_NO_GP.format(cost=cost)
         else:
             player.guild_point -= cost
-            player.coin -= gold_cost
             player.curse_level -= 1
             player.cursed_stats = ["hp"] if player.curse_level > 0 else []
             dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat="最大HP")
             
-    confirm.on_yes = on_priest_yes_no_gold
+    confirm.on_yes = on_priest_yes_no_gp
     confirm.on_yes()
-    assert "ゴールドが足りない" in dialog.text
+    assert "GP" in dialog.text
     assert player.curse_level == 1  # 解除されていないこと
-    assert player.guild_point == 100
-    assert player.coin == 50
-    print("[OK] ゴールド不足による解呪不可を確認")
+    assert player.coin == 1000  # コイン消費なし
+    print("[OK] GP不足による解呪不可を確認")
     
-    # 2. 呪われている状態でGPとゴールドが十分ある場合
-    player.coin = 1000
+    # 2. 呪われている状態でGPが十分ある場合
+    player.guild_point = 100
     def on_priest_yes_success():
         if player.guild_point < cost:
-            pass
-        elif player.coin < gold_cost:
-            dialog.text = Text.NPC.PRIEST_NO_GOLD.format(gold_cost=gold_cost)
+            dialog.text = Text.NPC.PRIEST_NO_GP.format(cost=cost)
         else:
             player.guild_point -= cost
-            player.coin -= gold_cost
             player.curse_level -= 1
             player.cursed_stats = ["hp"] if player.curse_level > 0 else []
             dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat="最大HP")
@@ -167,7 +158,7 @@ def test_priest_services():
     # 解呪後の状態検証
     print(f"解呪後: GP={player.guild_point}, 所持金={player.coin}, 呪いレベル={player.curse_level}, 被デバフステータス数={len(player.cursed_stats)}")
     assert player.guild_point == 90
-    assert player.coin == 900
+    assert player.coin == 1000  # コイン消費なし
     assert player.curse_level == 0
     assert len(player.cursed_stats) == 0
     

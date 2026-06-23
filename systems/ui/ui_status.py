@@ -374,7 +374,7 @@ class StatusDialog(StateKeyMixin):
             # 発現スキルを表示
             skill_names = get_player_skill_names(player)
             if skill_names:
-                skill_y = equip_y + len(equip_lines) * self.font.get_height() + 25
+                skill_y = equip_y + len(equip_lines) * self.font.get_height() + 15
                 skill_text = f"スキル：{' '.join(skill_names)}"
                 screen.blit(self.font.render(skill_text, True, (255, 220, 80)), (content_x, skill_y))
 

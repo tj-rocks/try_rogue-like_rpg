@@ -474,7 +474,7 @@ class Player(Entity):
             (self.accessory_inventory, self.equipped_accessory)
         ]:
             inst = self._find_equip_inst(inv, eid)
-            if inst: count += inst.get_stat("count_stun", 0)
+            if inst: count += inst.get_stat("stun", 0)
         return count
 
     @property
