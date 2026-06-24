@@ -787,7 +787,7 @@ SHIELD_DATA:
         buff_duration_ratio: 0
       skills:
         lifesteal:
-          count_lifesteal: 1
+          lifesteal: 1
           lifesteal_chance: 0.15
           lifesteal_ratio: 0.2
       magic:

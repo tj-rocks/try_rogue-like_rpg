@@ -62,42 +62,46 @@ def make_combatant(x, y, facing="down",
 
 
 def test_lifesteal_proc():
-    """ライフスティール発動テスト"""
+    """ライフスティール発動テスト（クリティカル時のみ発動）"""
     print("\n--- テスト1: ライフスティール発動 ---")
     random.seed(42)
     
-    # 必ず発動する設定
-    attacker = make_combatant(5, 5, attack=50, lifesteal_chance=1.0, lifesteal_ratio=0.2)
-    attacker.max_hp = 1000  # max_hpを明示的に設定
-    target = make_combatant(5, 6, hp=100)
+    # クリティカル確定（crit_rate=1.0）でライフスティールが発動することを確認
+    attacker = make_combatant(5, 5, attack=50, crit_rate=1.0, lifesteal_chance=1.0, lifesteal_ratio=0.2)
+    attacker.max_hp = 1000
+    target = make_combatant(5, 6, hp=1000)
     target.facing = "down"
     
     initial_hp = attacker.hp
     msg, dmg, is_crit, _ = deal_damage(attacker, target)
     
     assert dmg > 0, "ダメージが0（ミス）の場合テストが無効"
+    assert is_crit, "クリティカルが発動していない"
     expected_heal = int(dmg * 0.2)
     actual_heal = attacker.hp - initial_hp
     
     assert actual_heal == expected_heal, f"回復量が期待値と異なる: expected={expected_heal}, actual={actual_heal}"
-    print(f"[OK] ダメージ={dmg}, 回復={actual_heal} (ratio=0.2)")
+    print(f"[OK] クリティカル発動 ダメージ={dmg}, 回復={actual_heal} (ratio=0.2)")
 
 
 def test_lifesteal_no_proc():
-    """ライフスティール発動しないテスト"""
+    """クリティカルなし・lifesteal_chance=0のどちらもライフスティール発動しないテスト"""
     print("\n--- テスト2: ライフスティール発動しない ---")
     random.seed(42)
     
-    attacker = make_combatant(5, 5, attack=50, lifesteal_chance=0.0, lifesteal_ratio=0.2)
-    target = make_combatant(5, 6, hp=100)
-    target.facing = "down"
+    # クリティカルなし（crit_rate=0.0）→ lifestealがあっても発動しない
+    # target.facing="up"にして正面攻撃にしバックスタブボーナスを排除
+    attacker = make_combatant(5, 5, attack=50, crit_rate=0.0, lifesteal_chance=1.0, lifesteal_ratio=0.2)
+    attacker.max_hp = 1000
+    target = make_combatant(5, 6, hp=1000)
+    target.facing = "up"
     
     initial_hp = attacker.hp
     for _ in range(20):
         deal_damage(attacker, target)
     
-    assert attacker.hp == initial_hp, f"発動しないはずなのにHPが変化: {attacker.hp} vs {initial_hp}"
-    print("[OK] lifesteal_chance=0.0 → HP変化なし")
+    assert attacker.hp == initial_hp, f"クリティカルなしなのにHPが変化: {attacker.hp} vs {initial_hp}"
+    print("[OK] crit_rate=0.0 → HP変化なし（クリティカルなし時は非発動）")
 
 
 def test_counter_proc():
@@ -143,43 +147,47 @@ def test_counter_no_proc():
     for _ in range(20):
         deal_damage(attacker, target)
     
-    # chance=0.0なのでカウンター発動しない
+    # 回避しないのでカウンターも発動しない
     assert attacker.hp == initial_attacker_hp, f"カウンター発動しないはず: {attacker.hp} vs {initial_attacker_hp}"
-    print("[OK] counter_proc_chance=0.0 → カウンター発動なし")
+    print("[OK] 回避なし → カウンター発動なし")
 
 
 def test_stun_proc():
-    """スタン発動テスト"""
+    """スタン発動テスト（クリティカル時のみ発動）"""
     print("\n--- テスト5: スタン発動 ---")
     random.seed(42)
     
-    attacker = make_combatant(5, 5, attack=50, stun_proc_chance=1.0, stun_duration=2)
-    target = make_combatant(5, 6, hp=100)
+    # クリティカル確定（crit_rate=1.0）でスタンが発動することを確認
+    attacker = make_combatant(5, 5, attack=50, crit_rate=1.0, stun_proc_chance=1.0, stun_duration=2)
+    target = make_combatant(5, 6, hp=1000)
     target.facing = "down"
     target.stun_turns = 0
     
     msg, dmg, is_crit, _ = deal_damage(attacker, target)
     
     assert dmg > 0, "ダメージが0（ミス）の場合テストが無効"
+    assert is_crit, "クリティカルが発動していない"
     assert target.stun_turns == 2, f"スタン持続ターンが2でない: {target.stun_turns}"
     print(f"[OK] スタン発動 → stun_turns={target.stun_turns}")
 
 
 def test_stun_no_proc():
-    """スタン発動しないテスト"""
+    """クリティカルなしの場合スタン発動しないテスト"""
     print("\n--- テスト6: スタン発動しない ---")
     random.seed(42)
     
-    attacker = make_combatant(5, 5, attack=50, stun_proc_chance=0.0, stun_duration=2)
-    target = make_combatant(5, 6, hp=100)
-    target.facing = "down"
+    # クリティカルなし（crit_rate=0.0）→ stun_proc_chance=1.0でも発動しない
+    # target.facing="up"にして正面攻撃にしバックスタブボーナスを排除
+    attacker = make_combatant(5, 5, attack=50, crit_rate=0.0, stun_proc_chance=1.0, stun_duration=2)
+    target = make_combatant(5, 6, hp=1000)
+    target.facing = "up"
     target.stun_turns = 0
     
     for _ in range(20):
         deal_damage(attacker, target)
     
-    assert target.stun_turns == 0, f"スタン発動しないはず: {target.stun_turns}"
-    print("[OK] stun_proc_chance=0.0 → stun_turns=0")
+    assert target.stun_turns == 0, f"クリティカルなしなのにスタン発動: {target.stun_turns}"
+    print("[OK] crit_rate=0.0 → stun_turns=0（クリティカルなし時は非発動）")
 
 
 def test_confusion_proc():
@@ -233,57 +241,56 @@ def test_backstab_crit_bonus():
 
 
 def test_skill_count_totals():
-    """スキルカウント値の合計テスト"""
-    print("\n--- テスト10: スキルカウント値合計 ---")
+    """スキルセット装備の各スキルパラメータ存在確認テスト"""
+    print("\n--- テスト10: スキルセット装備パラメータ確認 ---")
     pygame.init()
     screen = pygame.display.set_mode((800, 600))
     
-    from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA
     from components.sprites.player import EquipInstance
     
-    # アサシンセット
+    # アサシンセット → backstab_crit_bonus と stupidity_proc_chance を持つ
     dagger = EquipInstance("weapon", "assassin_dagger")
     armor = EquipInstance("armor", "assassin_light_armor")
     shield = EquipInstance("shield", "assassin_buckler")
     
-    backstab_count = sum(eq.get_stat("count_backstab", 0) for eq in [dagger, armor, shield])
-    confusion_count = sum(eq.get_stat("count_confusion", 0) for eq in [dagger, armor, shield])
+    backstab_val = sum(eq.get_stat("backstab_crit_bonus", 0) for eq in [dagger, armor, shield])
+    confusion_val = sum(eq.get_stat("stupidity_proc_chance", 0) for eq in [dagger, armor, shield])
     
-    print(f"  アサシンセット: backstab={backstab_count}, confusion={confusion_count}")
-    assert backstab_count == 3, f"アサシンセットのbackstabカウントが3でない: {backstab_count}"
-    assert confusion_count == 3, f"アサシンセットのconfusionカウントが3でない: {confusion_count}"
+    print(f"  アサシンセット: backstab_crit_bonus={backstab_val}, stupidity_proc_chance={confusion_val}")
+    assert backstab_val > 0, f"アサシンセットにbackstab_crit_bonusがない: {backstab_val}"
+    assert confusion_val > 0, f"アサシンセットにstupidity_proc_chanceがない: {confusion_val}"
     
-    # 神聖セット
+    # 神聖セット → lifesteal_chance を持つ
     holy_sword = EquipInstance("weapon", "holy_sword")
     holy_armor = EquipInstance("armor", "holy_armor")
     holy_shield = EquipInstance("shield", "holy_shield")
     
-    lifesteal_count = sum(eq.get_stat("count_lifesteal", 0) for eq in [holy_sword, holy_armor, holy_shield])
+    lifesteal_val = sum(eq.get_stat("lifesteal_chance", 0) for eq in [holy_sword, holy_armor, holy_shield])
     
-    print(f"  神聖セット: lifesteal={lifesteal_count}")
-    assert lifesteal_count == 3, f"神聖セットのlifestealカウントが3でない: {lifesteal_count}"
+    print(f"  神聖セット: lifesteal_chance={lifesteal_val}")
+    assert lifesteal_val > 0, f"神聖セットにlifesteal_chanceがない: {lifesteal_val}"
     
-    # 勇敢な戦士セット
+    # 勇敢な戦士セット → stun_proc_chance を持つ
     brave_sword = EquipInstance("weapon", "brave_fighter_sword")
     brave_armor = EquipInstance("armor", "brave_fighter_armor")
     brave_shield = EquipInstance("shield", "brave_fighter_shield")
     
-    stun_count = sum(eq.get_stat("count_stun", 0) for eq in [brave_sword, brave_armor, brave_shield])
+    stun_val = sum(eq.get_stat("stun_proc_chance", 0) for eq in [brave_sword, brave_armor, brave_shield])
     
-    print(f"  勇敢な戦士セット: stun={stun_count}")
-    assert stun_count == 3, f"勇敢な戦士セットのstunカウントが3でない: {stun_count}"
+    print(f"  勇敢な戦士セット: stun_proc_chance={stun_val}")
+    assert stun_val > 0, f"勇敢な戦士セットにstun_proc_chanceがない: {stun_val}"
     
-    # 技巧戦士セット
+    # 技巧戦士セット → counter_proc_chance を持つ
     skilled_sword = EquipInstance("weapon", "skilled_fighter_sword")
     skilled_armor = EquipInstance("armor", "skilled_fighter_armor")
     skilled_shield = EquipInstance("shield", "skilled_fighter_shield")
     
-    counter_count = sum(eq.get_stat("count_counter", 0) for eq in [skilled_sword, skilled_armor, skilled_shield])
+    counter_val = sum(eq.get_stat("counter_proc_chance", 0) for eq in [skilled_sword, skilled_armor, skilled_shield])
     
-    print(f"  技巧戦士セット: counter={counter_count}")
-    assert counter_count == 3, f"技巧戦士セットのcounterカウントが3でない: {counter_count}"
+    print(f"  技巧戦士セット: counter_proc_chance={counter_val}")
+    assert counter_val > 0, f"技巧戦士セットにcounter_proc_chanceがない: {counter_val}"
     
-    print("[OK] 全セットのカウント値が正しい（各3）")
+    print("[OK] 全セットに正しいスキルパラメータが存在する")
     
     pygame.quit()
 

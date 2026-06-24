@@ -688,6 +688,18 @@ TILE_MAPPINGS:
       - x: 47
         y: 28
         flip: false
+  bed:
+    category: obstacle
+    id: bed
+  candelabra:
+    category: obstacle
+    id: candelabra
+  evil_statue:
+    category: obstacle
+    id: evil_statue
+  monster_statue:
+    category: obstacle
+    id: monster_statue
   weapon_shop:
     category: npc
     id: weapon_shop
@@ -1013,6 +1025,9 @@ TILE_MAPPINGS:
       - x: 37
         y: 18
         flip: false
+  scientist_1:
+    category: npc
+    id: scientist_1
   crank_adventurer2:
     category: npc
     id: crank_adventurer2
@@ -1244,6 +1259,11 @@ TILE_MAPPINGS:
       - x: 28
         y: 38
         flip: true
+  wall_deco_tapestry_obstacle:
+    category: wall_decoration
+    desc: タペストリー（障害物）
+    id: wall_decoration_tapestry_obstacle
+    image_path: components/pictures/obstacles/tapestry.png
   wall_deco_window:
     category: wall_decoration
     desc: 窓

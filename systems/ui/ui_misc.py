@@ -743,14 +743,12 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             guild_guide_dialog.is_active = True
                                             return
                                     elif getattr(npc, "role", None) == "priest":
-                                        from constants import CURSE_RECOVERY_COST_GOLD_MULTIPLIER
                                         cost = max(1, player.guild_point // 10)
-                                        gold_cost = cost * CURSE_RECOVERY_COST_GOLD_MULTIPLIER
                                         if getattr(player, "curse_level", 0) > 0:
                                             dialog.text = Text.NPC.PRIEST_WELCOME
                                             dialog.is_active = True
                                             if confirm_dialog:
-                                                confirm_dialog.text = Text.NPC.PRIEST_CURE_CONFIRM.format(cost=cost, gold_cost=gold_cost)
+                                                confirm_dialog.text = Text.NPC.PRIEST_CURE_CONFIRM.format(cost=cost)
                                                 def on_priest_yes():
                                                     from systems.audio_manager import play_sfx
                                                     from constants import SOUND_CANCEL, SOUND_SELECT
@@ -758,13 +756,8 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                                         dialog.text = Text.NPC.PRIEST_NO_GP.format(cost=cost)
                                                         dialog.is_active = True
                                                         play_sfx(SOUND_CANCEL)
-                                                    elif player.coin < gold_cost:
-                                                        dialog.text = Text.NPC.PRIEST_NO_GOLD.format(gold_cost=gold_cost)
-                                                        dialog.is_active = True
-                                                        play_sfx(SOUND_CANCEL)
                                                     else:
                                                         player.guild_point -= cost
-                                                        player.coin -= gold_cost
                                                         player.curse_level -= 1
                                                         player.cursed_stats = ["hp"] if player.curse_level > 0 else []
                                                         dialog.text = Text.NPC.PRIEST_CURE_DONE.format(stat="最大HP")

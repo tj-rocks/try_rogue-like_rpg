@@ -474,7 +474,7 @@ class Player(Entity):
             (self.accessory_inventory, self.equipped_accessory)
         ]:
             inst = self._find_equip_inst(inv, eid)
-            if inst: count += inst.get_stat("count_stun", 0)
+            if inst: count += inst.get_stat("stun", 0)
         return count
 
     @property
@@ -515,6 +515,32 @@ class Player(Entity):
             inst = self._find_equip_inst(inv, eid)
             if inst: count += inst.get_stat("count_lifesteal", 0)
         return count
+
+    @property
+    def total_knockback_proc_chance(self):
+        bonus = 0.0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("knockback_proc_chance", 0.0)
+        return bonus
+
+    @property
+    def total_knockback_max_distance(self):
+        bonus = 0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("knockback_max_distance", 0)
+        return bonus
 
     @property
     def total_counter_proc_chance(self):
@@ -1420,6 +1446,36 @@ class Player(Entity):
                     from systems.sound_handler import sound_manager
                     sound_manager.play_sfx(SOUND_ATTACK_MISS if miss or dmg == 0 else SOUND_ATTACK_HIT)
                     if crit: dungeon.flash_timer = 10
+                    # --- クリティカル時knockbackスキル発動 ---
+                    if crit and dmg > 0 and not miss:
+                        kb_chance = getattr(self, "total_knockback_proc_chance", 0.0)
+                        if isinstance(kb_chance, (int, float)) and kb_chance > 0:
+                            import os as _os
+                            kb_max_dist = max(1, int(getattr(self, "total_knockback_max_distance", 5)))
+                            e_gx = int((e.x + e.width / 2) // dungeon.tile_size)
+                            e_gy = int((e.y + e.height / 2) // dungeon.tile_size)
+                            dx, dy = {"up":(0,-1),"down":(0,1),"left":(-1,0),"right":(1,0)}.get(self.facing, (0,1))
+                            final_gx, final_gy = e_gx, e_gy
+                            for _ in range(kb_max_dist):
+                                next_gx, next_gy = final_gx + dx, final_gy + dy
+                                if not (0 <= next_gx < dungeon.map_width and 0 <= next_gy < dungeon.map_height) or dungeon.map_data[next_gy][next_gx] == 0:
+                                    break
+                                blocked = any(
+                                    oe != e and not getattr(oe, "is_dead", False) and
+                                    int((oe.x + oe.width/2) // dungeon.tile_size) == next_gx and
+                                    int((oe.y + oe.height/2) // dungeon.tile_size) == next_gy
+                                    for oe in dungeon.enemies
+                                )
+                                if blocked: break
+                                final_gx, final_gy = next_gx, next_gy
+                            if (final_gx, final_gy) != (e_gx, e_gy):
+                                e.move_speed = 1200
+                                e.target_x = final_gx * dungeon.tile_size
+                                e.target_y = final_gy * dungeon.tile_size
+                                e.is_moving = True
+                                msg += f"\n{e.name} を吹き飛ばした！"
+                                if _os.environ.get("DEBUG_MODE") == "1":
+                                    print(f"[ノックバック] ✅ クリティカル発動")
                     if dialog:
                         if dialog.is_active: dialog.text += "\n" + msg; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
                         else: dialog.text = msg; dialog.is_active = True; game_state["dialog_modal"] = False; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES

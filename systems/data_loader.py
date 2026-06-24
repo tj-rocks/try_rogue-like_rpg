@@ -201,12 +201,6 @@ def get_normalized_equipment_data(floor_map):
         "counter_damage_ratio": "counter_damage_ratio",
         "lifesteal_chance": "lifesteal_chance",
         "lifesteal_ratio": "lifesteal_ratio",
-        # スキルカウント値（自己マッピング）
-        "count_backstab":     "count_backstab",
-        "count_confusion":    "count_confusion",
-        "count_stun":         "count_stun",
-        "count_counter":      "count_counter",
-        "count_lifesteal":    "count_lifesteal",
     }
 
     def _flatten_bonus(item_dict):
