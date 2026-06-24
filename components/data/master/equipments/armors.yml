@@ -568,6 +568,10 @@ ARMOR_DATA:
         armor_penetration: 0
         buff_value_ratio: 0
         buff_duration_ratio: 0
+      skills:
+        knockback:
+          knockback_proc_chance: 1.0
+          knockback_max_distance: 5
       magic:
         fire_damage: 0
         fire_range: 0

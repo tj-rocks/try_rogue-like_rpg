@@ -241,36 +241,28 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
             elif _os.environ.get("DEBUG_MODE") == "1":
                 print(f"[混乱] ❌ 失敗")
 
-    # --- スタン効果 ---
-    if not is_miss and damage > 0 and hasattr(target, "stun_turns"):
-        proc_chance = getattr(attacker, "total_stun_proc_chance", 0.0)
-        if isinstance(proc_chance, (int, float)) and proc_chance > 0:
-            rolled = random.random()
-            if rolled < proc_chance:
-                stun_duration = getattr(attacker, "total_stun_duration", 1)
-                if isinstance(stun_duration, (int, float)) and stun_duration > 0:
-                    target.stun_turns = int(stun_duration)
-                    msg += f"\n{target_name}はスタンした！"
-                    if _os.environ.get("DEBUG_MODE") == "1":
-                        print(f"[スタン] ✅ 成功")
-            elif _os.environ.get("DEBUG_MODE") == "1":
-                print(f"[スタン] ❌ 失敗")
+    # --- スタン効果（クリティカル時のみ発動） ---
+    if not is_miss and damage > 0 and is_critical and hasattr(target, "stun_turns"):
+        stun_chance = getattr(attacker, "total_stun_proc_chance", 0.0)
+        if isinstance(stun_chance, (int, float)) and stun_chance > 0:
+            stun_duration = getattr(attacker, "total_stun_duration", 1)
+            if isinstance(stun_duration, (int, float)) and stun_duration > 0:
+                target.stun_turns = int(stun_duration)
+                msg += f"\n{target_name}はスタンした！"
+                if _os.environ.get("DEBUG_MODE") == "1":
+                    print(f"[スタン] ✅ クリティカル発動")
 
-    # --- ライフスティール効果 ---
-    if not is_miss and damage > 0 and hasattr(attacker, "hp"):
-        proc_chance = getattr(attacker, "total_lifesteal_chance", 0.0)
-        if isinstance(proc_chance, (int, float)) and proc_chance > 0:
-            rolled = random.random()
-            if rolled < proc_chance:
-                lifesteal_ratio = getattr(attacker, "total_lifesteal_ratio", 0.0)
-                if isinstance(lifesteal_ratio, (int, float)) and lifesteal_ratio > 0:
-                    heal_amount = int(damage * lifesteal_ratio)
-                    attacker.hp = min(attacker.max_hp, attacker.hp + heal_amount)
-                    msg += f"\n{attacker_name}は{heal_amount}回復した！"
-                    if _os.environ.get("DEBUG_MODE") == "1":
-                        print(f"[ライフスティール] ✅ 成功")
-            elif _os.environ.get("DEBUG_MODE") == "1":
-                print(f"[ライフスティール] ❌ 失敗")
+    # --- ライフスティール効果（クリティカル時のみ発動） ---
+    if not is_miss and damage > 0 and is_critical and hasattr(attacker, "hp"):
+        lifesteal_chance = getattr(attacker, "total_lifesteal_chance", 0.0)
+        if isinstance(lifesteal_chance, (int, float)) and lifesteal_chance > 0:
+            lifesteal_ratio = getattr(attacker, "total_lifesteal_ratio", 0.0)
+            if isinstance(lifesteal_ratio, (int, float)) and lifesteal_ratio > 0:
+                heal_amount = int(damage * lifesteal_ratio)
+                attacker.hp = min(attacker.max_hp, attacker.hp + heal_amount)
+                msg += f"\n{attacker_name}は{heal_amount}回復した！"
+                if _os.environ.get("DEBUG_MODE") == "1":
+                    print(f"[ライフスティール] ✅ クリティカル発動")
 
     # --- カウンター効果（攻撃時に発動） ---
     if hasattr(target, "hp") and hasattr(attacker, "hp"):

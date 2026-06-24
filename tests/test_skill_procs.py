@@ -62,42 +62,46 @@ def make_combatant(x, y, facing="down",
 
 
 def test_lifesteal_proc():
-    """ライフスティール発動テスト"""
+    """ライフスティール発動テスト（クリティカル時のみ発動）"""
     print("\n--- テスト1: ライフスティール発動 ---")
     random.seed(42)
     
-    # 必ず発動する設定
-    attacker = make_combatant(5, 5, attack=50, lifesteal_chance=1.0, lifesteal_ratio=0.2)
-    attacker.max_hp = 1000  # max_hpを明示的に設定
-    target = make_combatant(5, 6, hp=100)
+    # クリティカル確定（crit_rate=1.0）でライフスティールが発動することを確認
+    attacker = make_combatant(5, 5, attack=50, crit_rate=1.0, lifesteal_chance=1.0, lifesteal_ratio=0.2)
+    attacker.max_hp = 1000
+    target = make_combatant(5, 6, hp=1000)
     target.facing = "down"
     
     initial_hp = attacker.hp
     msg, dmg, is_crit, _ = deal_damage(attacker, target)
     
     assert dmg > 0, "ダメージが0（ミス）の場合テストが無効"
+    assert is_crit, "クリティカルが発動していない"
     expected_heal = int(dmg * 0.2)
     actual_heal = attacker.hp - initial_hp
     
     assert actual_heal == expected_heal, f"回復量が期待値と異なる: expected={expected_heal}, actual={actual_heal}"
-    print(f"[OK] ダメージ={dmg}, 回復={actual_heal} (ratio=0.2)")
+    print(f"[OK] クリティカル発動 ダメージ={dmg}, 回復={actual_heal} (ratio=0.2)")
 
 
 def test_lifesteal_no_proc():
-    """ライフスティール発動しないテスト"""
+    """クリティカルなし・lifesteal_chance=0のどちらもライフスティール発動しないテスト"""
     print("\n--- テスト2: ライフスティール発動しない ---")
     random.seed(42)
     
-    attacker = make_combatant(5, 5, attack=50, lifesteal_chance=0.0, lifesteal_ratio=0.2)
-    target = make_combatant(5, 6, hp=100)
-    target.facing = "down"
+    # クリティカルなし（crit_rate=0.0）→ lifestealがあっても発動しない
+    # target.facing="up"にして正面攻撃にしバックスタブボーナスを排除
+    attacker = make_combatant(5, 5, attack=50, crit_rate=0.0, lifesteal_chance=1.0, lifesteal_ratio=0.2)
+    attacker.max_hp = 1000
+    target = make_combatant(5, 6, hp=1000)
+    target.facing = "up"
     
     initial_hp = attacker.hp
     for _ in range(20):
         deal_damage(attacker, target)
     
-    assert attacker.hp == initial_hp, f"発動しないはずなのにHPが変化: {attacker.hp} vs {initial_hp}"
-    print("[OK] lifesteal_chance=0.0 → HP変化なし")
+    assert attacker.hp == initial_hp, f"クリティカルなしなのにHPが変化: {attacker.hp} vs {initial_hp}"
+    print("[OK] crit_rate=0.0 → HP変化なし（クリティカルなし時は非発動）")
 
 
 def test_counter_proc():
@@ -149,37 +153,41 @@ def test_counter_no_proc():
 
 
 def test_stun_proc():
-    """スタン発動テスト"""
+    """スタン発動テスト（クリティカル時のみ発動）"""
     print("\n--- テスト5: スタン発動 ---")
     random.seed(42)
     
-    attacker = make_combatant(5, 5, attack=50, stun_proc_chance=1.0, stun_duration=2)
-    target = make_combatant(5, 6, hp=100)
+    # クリティカル確定（crit_rate=1.0）でスタンが発動することを確認
+    attacker = make_combatant(5, 5, attack=50, crit_rate=1.0, stun_proc_chance=1.0, stun_duration=2)
+    target = make_combatant(5, 6, hp=1000)
     target.facing = "down"
     target.stun_turns = 0
     
     msg, dmg, is_crit, _ = deal_damage(attacker, target)
     
     assert dmg > 0, "ダメージが0（ミス）の場合テストが無効"
+    assert is_crit, "クリティカルが発動していない"
     assert target.stun_turns == 2, f"スタン持続ターンが2でない: {target.stun_turns}"
     print(f"[OK] スタン発動 → stun_turns={target.stun_turns}")
 
 
 def test_stun_no_proc():
-    """スタン発動しないテスト"""
+    """クリティカルなしの場合スタン発動しないテスト"""
     print("\n--- テスト6: スタン発動しない ---")
     random.seed(42)
     
-    attacker = make_combatant(5, 5, attack=50, stun_proc_chance=0.0, stun_duration=2)
-    target = make_combatant(5, 6, hp=100)
-    target.facing = "down"
+    # クリティカルなし（crit_rate=0.0）→ stun_proc_chance=1.0でも発動しない
+    # target.facing="up"にして正面攻撃にしバックスタブボーナスを排除
+    attacker = make_combatant(5, 5, attack=50, crit_rate=0.0, stun_proc_chance=1.0, stun_duration=2)
+    target = make_combatant(5, 6, hp=1000)
+    target.facing = "up"
     target.stun_turns = 0
     
     for _ in range(20):
         deal_damage(attacker, target)
     
-    assert target.stun_turns == 0, f"スタン発動しないはず: {target.stun_turns}"
-    print("[OK] stun_proc_chance=0.0 → stun_turns=0")
+    assert target.stun_turns == 0, f"クリティカルなしなのにスタン発動: {target.stun_turns}"
+    print("[OK] crit_rate=0.0 → stun_turns=0（クリティカルなし時は非発動）")
 
 
 def test_confusion_proc():

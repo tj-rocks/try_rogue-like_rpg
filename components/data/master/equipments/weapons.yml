@@ -951,7 +951,7 @@ WEAPON_DATA:
     max_rank: SS
     rarity: 4
     price: 10000
-    image_path: components/pictures/weapon/fighters_sword.png
+    image_path: components/pictures/weapon/holy_sword.png
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
     shop:

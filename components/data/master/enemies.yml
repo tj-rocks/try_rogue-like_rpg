@@ -594,15 +594,15 @@ ENEMY_DATA:
     normal_drop_rate: 0.15
     rare_drop_rate: 0.05
     hp: 19
-    attack: 25
+    attack: 18
     defense: 60
     evasion: 15
     exp: 25
     reward_gold: 650
     accuracy_close: 70
     accuracy_ranged: 70
-    attack_range: 3
-    stupidity: 3
+    attack_range: 2
+    stupidity: 4
     image_scale: 1.0
     close_attack_effect: explosion
     ranged_attack_effect: explosion
