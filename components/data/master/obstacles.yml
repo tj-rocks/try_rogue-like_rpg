@@ -191,7 +191,7 @@ crystal:
   min_rank: "E"
   max_rank: "SS"
   rarity: 4
-  hp: 4
+  hp: 2
   defense: 20
   evasion: 0
   crit_rate: 0.0
@@ -271,7 +271,7 @@ stained_armor_stand:
   min_rank: "D"
   max_rank: "SS"
   rarity: 3
-  hp: 3
+  hp: 2
   defense: 10
   evasion: 0
   crit_rate: 0.0
@@ -295,7 +295,7 @@ broken_pillar:
   min_rank: "D"
   max_rank: "SS"
   rarity: 3
-  hp: 4
+  hp: 2
   defense: 5
   evasion: 0
   crit_rate: 0.0
@@ -318,8 +318,8 @@ statue:
   name: 石像
   min_rank: "C"
   max_rank: "SS"
-  rarity: 4
-  hp: 5
+  rarity: 3
+  hp: 2
   defense: 30
   evasion: 0
   crit_rate: 0.0

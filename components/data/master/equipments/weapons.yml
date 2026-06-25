@@ -813,24 +813,25 @@ WEAPON_DATA:
       special_buyable: true
     floor_spawnable: true
     describe: 勇気ある戦士の剣。攻撃力と生存性を高める。
-    growth: {bonus_limit: 3, times_limit: 40, over_limit_growth_rate: 0.004}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     bonus:
       common:
-        attack: 18
-        accuracy_close: 25
-        accuracy_range: 15
-        crit_rate: 0.18
-        hp: 35
-        defense: 8
-        block_chance_close: 0.10
-        block_chance_ranged: 0.10
+        aggro_mod: 0
+        attack: 17
+        accuracy_close: 20
+        accuracy_range: 0
+        crit_rate: 0
+        hp: 0
+        defense: 0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
-        regen: 2
-        aggro_mod: 2
-        armor_penetration: 0.25
-        buff_value_ratio: 0
-        buff_duration_ratio: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.2
+        buff_value_ratio: 0.2
+        buff_duration_ratio: 0.2
       skills:
         stun:
           count_stun: 1
@@ -862,28 +863,29 @@ WEAPON_DATA:
       special_buyable: true
     floor_spawnable: true
     describe: 技巧を極めた戦士の剣。カウンター攻撃を得意とする。
-    growth: {bonus_limit: 3, times_limit: 40, over_limit_growth_rate: 0.004}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     bonus:
       common:
-        attack: 16
-        accuracy_close: 30
+        aggro_mod: 2
+        attack: 11
+        accuracy_close: 20
         accuracy_range: 20
-        crit_rate: 0.20
-        hp: 25
-        defense: 5
-        block_chance_close: 0.12
-        block_chance_ranged: 0.12
+        crit_rate: 0.2
+        hp: 0
+        defense: 0
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
         lantern_bonus: 0
-        regen: 1
-        aggro_mod: 1
-        armor_penetration: 0.30
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0
         buff_value_ratio: 0
         buff_duration_ratio: 0
       skills:
         counter:
           count_counter: 1
-          counter_proc_chance: 0.20
+          counter_proc_chance: 0.15
           counter_damage_ratio: 0.6
       magic:
         fire_damage: 0
@@ -895,14 +897,14 @@ WEAPON_DATA:
         light_stave_bonus: 0
 
   # --- 上級騎士シリーズ ---
-  senior_knight_sword:
+  senior_knight_hummer:
     quest_targetable: true
-    name: "上級騎士の剣"
+    name: "上級騎士のメイス"
     min_rank: A
     max_rank: SS
     rarity: 6
     price: 12000
-    image_path: components/pictures/weapon/fighters_sword.png
+    image_path: components/pictures/weapon/great_hummer.png
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
     shop:
@@ -910,30 +912,30 @@ WEAPON_DATA:
       usually_buyable: false
       special_buyable: true
     floor_spawnable: true
-    describe: 上級騎士の剣。圧倒的な攻撃力とスタン効果を持つ。
-    growth: {bonus_limit: 4, times_limit: 50, over_limit_growth_rate: 0.005}
+    describe: 上級騎士のメイス。圧倒的な攻撃力と吹き飛ばし効果を持つ。
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     bonus:
       common:
-        attack: 22
-        accuracy_close: 20
-        accuracy_range: 10
-        crit_rate: 0.15
-        hp: 40
-        defense: 10
-        block_chance_close: 0.08
-        block_chance_ranged: 0.08
+        aggro_mod: -3
+        attack: 20
+        accuracy_close: -4
+        accuracy_range: -10
+        crit_rate: -0.05
+        hp: 5
+        defense: 0
+        block_chance_close: -0.1
+        block_chance_ranged: -0.1
         lantern_bonus: 0
-        regen: 2
-        aggro_mod: 3
-        armor_penetration: 0.35
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0
         buff_value_ratio: 0
         buff_duration_ratio: 0
       skills:
-        stun:
-          count_stun: 1
-          stun_proc_chance: 0.25
-          stun_duration: 1
+        knockback:
+          knockback_proc_chance: 1.0
+          knockback_max_distance: 5
       magic:
         fire_damage: 0
         fire_range: 0
@@ -964,18 +966,19 @@ WEAPON_DATA:
     type: onehanded_sword
     bonus:
       common:
-        attack: 18
-        accuracy_close: 20
-        accuracy_range: 10
-        crit_rate: 0.15
-        hp: 20
-        defense: 5
-        block_chance_close: 0.05
-        block_chance_ranged: 0.05
+        aggro_mod: 0
+        attack: 15
+        accuracy_close: 5
+        accuracy_range: 0
+        crit_rate: 0.1
+        hp: 10
+        defense: 0
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
-        regen: 1
-        aggro_mod: 1
-        armor_penetration: 0.15
+        regen: 10
+        stupidity: 0
+        armor_penetration: 0.1
         buff_value_ratio: 0
         buff_duration_ratio: 0
       skills:
