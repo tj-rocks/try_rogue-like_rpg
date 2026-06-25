@@ -553,17 +553,17 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
-        attack: 3
+        aggro_mod: -3
+        attack: 2
         accuracy_close: -5
         accuracy_range: -10
         crit_rate: 0
-        hp: 10
-        defense: 32
-        block_chance_close: -0.15
-        block_chance_ranged: -0.15
+        hp: 5
+        defense: 20
+        block_chance_close: -0.11
+        block_chance_ranged: -0.11
         lantern_bonus: -1
         regen: 0
-        aggro_mod: -4
         stupidity: 0
         armor_penetration: 0
         buff_value_ratio: 0
@@ -642,13 +642,13 @@ ARMOR_DATA:
     bonus:
       common:
         attack: 0
-        accuracy_close: 25
-        accuracy_range: 25
-        crit_rate: 0.05
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.1
         hp: 0
-        defense: 11
-        block_chance_close: 0.05
-        block_chance_ranged: 0.05
+        defense: 10
+        block_chance_close: 0.1
+        block_chance_ranged: 0.1
         lantern_bonus: 0
         regen: 0
         aggro_mod: 3
@@ -692,19 +692,19 @@ ARMOR_DATA:
     floor_spawnable: true
     bonus:
       common:
-        attack: 1
+        aggro_mod: 0
+        attack: 0
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0
-        hp: 15
-        defense: 25
-        block_chance_close: 0.1
-        block_chance_ranged: 0.1
-        lantern_bonus: 1
-        regen: 8
-        aggro_mod: 0
+        hp: 10
+        defense: 12
+        block_chance_close: 0
+        block_chance_ranged: 0
+        lantern_bonus: 0
+        regen: 5
         stupidity: 0
-        armor_penetration: 0
+        armor_penetration: 0.1
         buff_value_ratio: 0
         buff_duration_ratio: 0
       skills:
@@ -766,12 +766,12 @@ ARMOR_DATA:
   # --- 勇敢な戦士シリーズ ---
   brave_fighter_armor:
     quest_targetable: true
-    name: "[勇敢]戦士の鎧"
+    name: "勇敢な戦士の鎧"
     min_rank: A
     max_rank: SS
     rarity: 5
     price: 9000
-    image_path: components/pictures/armor/fighters_armor.png
+    image_dir: components/pictures/armor/brave_fighters_armor
     image_scale: 1.0
     shop:
       buyable: true
@@ -779,24 +779,25 @@ ARMOR_DATA:
       special_buyable: true
     floor_spawnable: true
     describe: 勇気ある戦士の鎧。高い防御力と回復力を持つ。
-    growth: {bonus_limit: 3, times_limit: 40, over_limit_growth_rate: 0.004}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: heavy_armor
     bonus:
       common:
-        attack: 5
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0
+        hp: 0
         defense: 18
-        accuracy_close: 10
-        accuracy_range: 5
-        crit_rate: 0.05
-        hp: 45
-        block_chance_close: 0.08
-        block_chance_ranged: 0.08
+        block_chance_close: 0
+        block_chance_ranged: 0
         lantern_bonus: 0
-        regen: 3
-        aggro_mod: 2
-        armor_penetration: 0.1
-        buff_value_ratio: 0
-        buff_duration_ratio: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0
+        buff_value_ratio: 0.2
+        buff_duration_ratio: 0.2
       skills:
         stun:
           count_stun: 1
@@ -814,12 +815,12 @@ ARMOR_DATA:
   # --- 技巧戦士シリーズ ---
   skilled_fighter_armor:
     quest_targetable: true
-    name: "[技巧]戦士の鎧"
+    name: "技巧剣士の鎧"
     min_rank: A
     max_rank: SS
     rarity: 5
     price: 9500
-    image_path: components/pictures/armor/fighters_armor.png
+    image_dir: components/pictures/armor/skill_master_armor
     image_scale: 1.0
     shop:
       buyable: true
@@ -827,28 +828,29 @@ ARMOR_DATA:
       special_buyable: true
     floor_spawnable: true
     describe: 技巧を極めた戦士の鎧。回避とカウンターを強化する。
-    growth: {bonus_limit: 3, times_limit: 40, over_limit_growth_rate: 0.004}
+    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: heavy_armor
     bonus:
       common:
-        attack: 3
-        defense: 15
-        accuracy_close: 15
-        accuracy_range: 10
-        crit_rate: 0.10
-        hp: 30
-        block_chance_close: 0.15
-        block_chance_ranged: 0.15
-        lantern_bonus: 0
-        regen: 2
-        aggro_mod: 1
-        armor_penetration: 0.2
+        aggro_mod: 2
+        attack: 0
+        accuracy_close: 20
+        accuracy_range: 25
+        crit_rate: 0.15
+        hp: 0
+        defense: 17
+        block_chance_close: 0.05
+        block_chance_ranged: 0.05
+        lantern_bonus: 1
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
         buff_value_ratio: 0
         buff_duration_ratio: 0
       skills:
         counter:
           count_counter: 1
-          counter_proc_chance: 0.15
+          counter_proc_chance: 0.10
           counter_damage_ratio: 0.5
       magic:
         fire_damage: 0
@@ -862,12 +864,12 @@ ARMOR_DATA:
   # --- 上級騎士シリーズ ---
   senior_knight_armor:
     quest_targetable: true
-    name: "[上級]騎士の鎧"
+    name: "上級騎士の鎧"
     min_rank: S
     max_rank: SS
     rarity: 6
     price: 13000
-    image_path: components/pictures/armor/knight_heavy_armor.png
+    image_dir: components/pictures/armor/great_knight_armor
     image_scale: 1.0
     shop:
       buyable: true

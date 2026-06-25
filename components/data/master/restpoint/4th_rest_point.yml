@@ -247,6 +247,10 @@ TILE_MAPPINGS:
   anvil:
     category: obstacle
     id: anvil
+    positions:
+      - x: 31
+        y: 15
+        flip: false
   crystal:
     category: obstacle
     id: crystal
@@ -298,6 +302,10 @@ TILE_MAPPINGS:
   blacksmith:
     category: npc
     id: blacksmith
+    positions:
+      - x: 31
+        y: 14
+        flip: false
   guild_receptionist:
     category: npc
     id: guild_receptionist
@@ -559,4 +567,26 @@ TILE_MAPPINGS:
     positions:
       - x: 37
         y: 2
+        flip: false
+  bed:
+    category: obstacle
+    id: bed
+    positions:
+      - x: 3
+        y: 3
+        flip: false
+      - x: 5
+        y: 3
+        flip: false
+      - x: 7
+        y: 3
+        flip: false
+      - x: 3
+        y: 5
+        flip: false
+      - x: 5
+        y: 5
+        flip: false
+      - x: 7
+        y: 5
         flip: false

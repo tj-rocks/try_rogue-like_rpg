@@ -328,7 +328,7 @@ DUNGEON_IMAGES:
 # ==========================================
   "41":
     image: deep_rock
-    sound: door_of_oldcity.mp3
+    sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.5

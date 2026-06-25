@@ -53,7 +53,7 @@ EQUIP_SKILL_LABEL_MAP = {
     "lifesteal": "ライフスティール",
     "counter":   "カウンター",
     "stun":      "スタン",
-    "backstab":  "バックスタブ強化",
+    "backstab":  "サイドアタック",
     "confusion": "混乱",
 }
 
