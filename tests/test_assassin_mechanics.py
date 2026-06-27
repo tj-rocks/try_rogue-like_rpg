@@ -12,7 +12,7 @@ from constants import TILE_SIZE
 
 def make_combatant(x, y, facing="down", flank_backstab=0, stupidity_proc_chance=0.0, stupidity_proc_amount=0,
                    attack=10, hp=100, defense=0, crit_rate=0.0, accuracy_close=100, accuracy_ranged=100,
-                   evasion=0, stupidity=0):
+                   evasion=0, stupidity=0, total_confusion=0):
     """テスト用のシンプルな戦闘オブジェクトを作成する"""
     class Combatant:
         def take_damage(self, amount):
@@ -23,6 +23,7 @@ def make_combatant(x, y, facing="down", flank_backstab=0, stupidity_proc_chance=
     c.total_flank_backstab = flank_backstab
     c.total_stupidity_proc_chance = stupidity_proc_chance
     c.total_stupidity_proc_amount = stupidity_proc_amount
+    c.total_confusion = total_confusion
     c.attack = attack
     c.hp = hp
     c.defense = defense
@@ -110,7 +111,7 @@ def test_stupidity_temp_proc():
     random.seed(0)  # 再現性確保
 
     # proc_chance=1.0（必ず発動）でテスト
-    attacker = make_combatant(5, 5, stupidity_proc_chance=1.0, stupidity_proc_amount=3, attack=50)
+    attacker = make_combatant(5, 5, stupidity_proc_chance=1.0, stupidity_proc_amount=3, attack=50, total_confusion=3)
     target   = make_combatant(5, 6)
     target.facing = "down"
     assert target.stupidity_temp == 0, "初期値が0でない"
@@ -134,7 +135,7 @@ def test_stupidity_temp_proc():
 # ─────────────────────────────────────────────
 def test_stupidity_temp_reset():
     print("\n--- テスト4: stupidity_temp リセット ---")
-    attacker = make_combatant(5, 5, stupidity_proc_chance=1.0, stupidity_proc_amount=3, attack=50)
+    attacker = make_combatant(5, 5, stupidity_proc_chance=1.0, stupidity_proc_amount=3, attack=50, total_confusion=3)
     target   = make_combatant(5, 6)
     target.facing = "down"
 

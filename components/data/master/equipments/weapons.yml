@@ -631,7 +631,7 @@ WEAPON_DATA:
         attack: 15
         accuracy_close: 5
         accuracy_range: 0
-        crit_rate: 0.1
+        crit_rate: 0.2
         hp: 10
         defense: 0
         block_chance_close: 0
@@ -756,7 +756,7 @@ WEAPON_DATA:
     name: "[TEST]全加護の剣"
     category: onehanded_sword
     min_rank: F
-    max_rank: S
+    max_rank: SS
     rarity: 1
     price: 1
     image_path: components/pictures/weapon/iron_sword.png
@@ -847,14 +847,14 @@ WEAPON_DATA:
         light_stave_bonus: 0
 
   # --- 技巧戦士シリーズ ---
-  skilled_fighter_sword:
+  masters_rapier:
     quest_targetable: true
-    name: "技巧剣士の剣"
+    name: "マスターレイピア"
     min_rank: A
     max_rank: SS
     rarity: 5
     price: 8500
-    image_path: components/pictures/weapon/fighters_sword.png
+    image_path: components/pictures/weapon/masters_rapier.png
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
     shop:
@@ -934,8 +934,13 @@ WEAPON_DATA:
         buff_duration_ratio: 0
       skills:
         knockback:
+          count_knockback: 1
           knockback_proc_chance: 1.0
-          knockback_max_distance: 5
+          knockback_max_distance: 3
+        stun:
+          count_stun: 1
+          stun_proc_chance: 0.15
+          stun_duration: 1
       magic:
         fire_damage: 0
         fire_range: 0
@@ -961,7 +966,7 @@ WEAPON_DATA:
       usually_buyable: false
       special_buyable: true
     floor_spawnable: true
-    describe: ブラッドソード的な力を宿した聖剣。攻撃時に体力を吸収し、長時間の探索を可能にする。
+    describe: 装備者の生命を守る聖剣。攻撃時に体力を吸収し、長時間の探索を可能にする。
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     bonus:
@@ -970,7 +975,7 @@ WEAPON_DATA:
         attack: 15
         accuracy_close: 5
         accuracy_range: 0
-        crit_rate: 0.1
+        crit_rate: 0.2
         hp: 10
         defense: 0
         block_chance_close: 0
@@ -983,7 +988,7 @@ WEAPON_DATA:
         buff_duration_ratio: 0
       skills:
         lifesteal:
-          lifesteal: 1
+          count_lifesteal: 1
           lifesteal_chance: 0.20
           lifesteal_ratio: 0.25
       magic:

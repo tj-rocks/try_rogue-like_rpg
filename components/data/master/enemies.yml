@@ -531,9 +531,9 @@ ENEMY_DATA:
     normal_drop_rate: 0.15
     rare_drop_rate: 0.05
     hp: 21
-    attack: 30
+    attack: 24
     defense: 69
-    evasion: 5
+    evasion: 20
     exp: 25
     reward_gold: 600
     accuracy_close: 79
@@ -563,9 +563,9 @@ ENEMY_DATA:
     normal_drop_rate: 0.15
     rare_drop_rate: 0.05
     hp: 24
-    attack: 28
+    attack: 23
     defense: 75
-    evasion: 3
+    evasion: 15
     exp: 28
     reward_gold: 550
     accuracy_close: 85
@@ -594,7 +594,7 @@ ENEMY_DATA:
     normal_drop_rate: 0.15
     rare_drop_rate: 0.05
     hp: 19
-    attack: 18
+    attack: 20
     defense: 60
     evasion: 15
     exp: 25
@@ -628,7 +628,7 @@ ENEMY_DATA:
     normal_drop_rate: 0.15
     rare_drop_rate: 0.05
     hp: 17
-    attack: 30
+    attack: 22
     defense: 99
     evasion: 20
     exp: 25
@@ -642,6 +642,136 @@ ENEMY_DATA:
     ranged_attack_effect: dark_bolt
     attack_priority: close
     damaged_detect_range: 10
+  bukimi:
+    quest_targetable: true
+    name: ブキミン
+    min_rank: A
+    image_folder: components/pictures/enemies/bukimin
+    status: darkness
+    status_chance: 25
+    crit_rate: 0.08
+    drops:
+      normal:
+      - hi_potion
+      - hp_potion
+      rare:
+      - red_stone
+      - blue_stone
+      - green_stone
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.05
+    hp: 35
+    attack: 23
+    defense: 55
+    evasion: 20
+    exp: 45
+    reward_gold: 900
+    accuracy_close: 92
+    accuracy_ranged: 88
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: dark_bolt
+    ranged_attack_effect: dark_bolt
+    attack_priority: close
+    damaged_detect_range: 12
+  takotako:
+    quest_targetable: true
+    name: タコタコ
+    min_rank: A
+    image_folder: components/pictures/enemies/takotako
+    status: poison
+    status_chance: 0.3
+    crit_rate: 0.1
+    drops:
+      normal:
+      - antidote_potion
+      - hp_potion
+      rare:
+      - green_stone
+      - pilgrim_potion
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.05
+    hp: 10
+    attack: 22
+    defense: 50
+    evasion: 18
+    exp: 48
+    reward_gold: 1000
+    accuracy_close: 70
+    accuracy_ranged: 70
+    attack_range: 3
+    stupidity: 1
+    image_scale: 1.0
+    close_attack_effect: strange_mucus
+    ranged_attack_effect: strange_mucus
+    attack_priority: ranged
+    smart_ranged_move: true
+    damaged_detect_range: 12
+  medaman:
+    quest_targetable: true
+    name: メダマン
+    min_rank: A
+    image_folder: components/pictures/enemies/medaman
+    crit_rate: 0.12
+    drops:
+      normal:
+      - hi_potion
+      - hp_potion
+      rare:
+      - blue_stone
+      - green_stone
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.05
+    hp: 25
+    attack: 21
+    defense: 45
+    evasion: 22
+    exp: 55
+    reward_gold: 1100
+    accuracy_close: 95
+    accuracy_ranged: 95
+    attack_range: 3
+    stupidity: 2
+    image_scale: 1.0
+    close_attack_effect: dark_bolt
+    ranged_attack_effect: dark_bolt
+    attack_priority: ranged
+    smart_ranged_move: false
+    damaged_detect_range: 14
+  slime_green:
+    quest_targetable: true
+    name: みどりスライム
+    min_rank: A
+    image_folder: components/pictures/enemies/slime
+    image_color: '#FFFF00'
+    crit_rate: 0.05
+    drops:
+      normal:
+      - hi_potion
+      - hp_potion
+      rare:
+      - pilgrim_potion
+      - warrior_potion
+      - sage_potion
+    normal_drop_rate: 0.35
+    rare_drop_rate: 0.05
+    hp: 20
+    attack: 17
+    defense: 20
+    evasion: 15
+    exp: 5
+    reward_gold: 100
+    accuracy_close: 100
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 3
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: strange_mucus
+    attack_priority: close
+    damaged_detect_range: 10
+# ーボスーーーーーーーーーーーーーーーーーーーーーーーーー
   suisui_slime:
     quest_targetable: true
     name: スイスイスライム
@@ -652,9 +782,9 @@ ENEMY_DATA:
     spawn_chance: 0.2
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/suisui_slime
-    encounter_message: 'スイスイスライム に 発見された！
-
-      すばしっこい…気をつけろ！'
+    encounter_message: 
+      - スイスイスライム に 発見された！
+      - すばしっこい…気をつけろ！
     defeat_message: スイスイスライム を 討伐した！
     drops:
       normal:
@@ -691,9 +821,9 @@ ENEMY_DATA:
     spawn_chance: 0.15
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/skeleton
-    encounter_message: 'スケスケスケルトン に 発見された！
-
-      半透明の骨が不気味に揺れている…'
+    encounter_message: 
+      - スケスケスケルトン に 発見された！
+      - 半透明の骨が不気味に揺れている…'
     defeat_message: スケスケスケルトン を 討伐した！
     detect_range: 15
     drops:
@@ -732,9 +862,9 @@ ENEMY_DATA:
     spawn_chance: 0.1
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/gogo_ghost
-    encounter_message: 'ゴーゴーゴースト に 発見された！
-
-      猛スピードで突っ込んでくる！'
+    encounter_message: 
+      - ゴーゴーゴースト に 発見された！
+      - 猛スピードで突っ込んでくる！
     defeat_message: ゴーゴーゴースト を 討伐した！
     detect_range: 15
     drops:
@@ -773,9 +903,9 @@ ENEMY_DATA:
     spawn_chance: 0.1
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/deka_komori
-    encounter_message: 'デカコウモリ に 発見された！
-
-      巨大な翼が風を巻き起こす…毒に注意！'
+    encounter_message: 
+      - デカコウモリ に 発見された！
+      - 巨大な翼が風を巻き起こす…毒に注意！
     defeat_message: デカコウモリ を 討伐した！
     detect_range: 15
     status: poison
@@ -802,7 +932,7 @@ ENEMY_DATA:
     attack_range: 4
     stupidity: 0
     image_scale: 2.0
-    close_attack_effect: physical_heavy
+    close_attack_effect: explosion
     ranged_attack_effect: sonic_wave
     attack_priority: close
     damaged_detect_range: 100
@@ -817,9 +947,9 @@ ENEMY_DATA:
     detect_range: 15
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/meyon
-    encounter_message: 'メヨーン に 発見された！
-
-      巨大な眼球が立ちはだかる…！'
+    encounter_message: 
+      - メヨーン に 発見された！
+      - 巨大な眼球が立ちはだかる…！
     defeat_message: メヨーン を 討伐した！
     status: darkness
     status_chance: 40
@@ -834,10 +964,10 @@ ENEMY_DATA:
       - green_stone
     normal_drop_rate: 0.25
     rare_drop_rate: 0.2
-    hp: 45
-    attack: 35
+    hp: 90
+    attack: 22
     defense: 90
-    evasion: 10
+    evasion: 15
     exp: 120
     reward_gold: 2500
     accuracy_close: 90
@@ -845,9 +975,9 @@ ENEMY_DATA:
     attack_range: 3
     stupidity: 0
     image_scale: 2
-    close_attack_effect: physical_heavy
+    close_attack_effect: dark_bolt
     ranged_attack_effect: dark_bolt
-    attack_priority: close
+    attack_priority: ranged
     damaged_detect_range: 100
     smart_ranged_move: false
   guild_assassin:
@@ -878,6 +1008,47 @@ ENEMY_DATA:
     ranged_attack_effect: sonic_wave
     attack_priority: close
     damaged_detect_range: 50
+  korokoron:
+    quest_targetable: true
+    name: コロコロン
+    min_rank: A
+    max_concurrent: 1
+    max_spawns: 1
+    is_boss: true
+    spawn_chance: 0.1
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/korokoron
+    encounter_message: 
+    - コロコロン に 発見された！
+    - 丸い体が地面を転がり、こちらに向かってくる！
+    defeat_message: コロコロン を 討伐した！
+    detect_range: 15
+    crit_rate: 0.06
+    drops:
+      normal:
+      - hi_potion
+      - hi_potion
+      rare:
+      - red_stone
+      - blue_stone
+      - green_stone
+    normal_drop_rate: 0.25
+    rare_drop_rate: 0.15
+    hp: 90
+    attack: 28
+    defense: 100
+    evasion: 15
+    exp: 150
+    reward_gold: 2500
+    accuracy_close: 90
+    accuracy_ranged: 85
+    attack_range: 2
+    stupidity: 0
+    image_scale: 2.0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: sonic_wave
+    attack_priority: close
+    damaged_detect_range: 100
   undead_father:
     quest_targetable: false
     name: 父の亡霊
@@ -910,7 +1081,7 @@ ENEMY_DATA:
       - fathers_keepsake
     normal_drop_rate: 0.0
     rare_drop_rate: 1.0
-    hp: 90
+    hp: 100
     attack: 30
     defense: 60
     evasion: 40

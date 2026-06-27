@@ -19,7 +19,8 @@ def make_combatant(x, y, facing="down",
                    stun_proc_chance=0.0, stun_duration=1,
                    stupidity_proc_chance=0.0, stupidity_proc_amount=0,
                    backstab_crit_bonus=0.0, flank_backstab=0,
-                   block_chance_close=0.0, block_chance_ranged=0.0):
+                   block_chance_close=0.0, block_chance_ranged=0.0,
+                   total_lifesteal=0, total_confusion=0):
     """テスト用のシンプルな戦闘オブジェクトを作成する"""
     class Combatant:
         def take_damage(self, amount):
@@ -54,6 +55,8 @@ def make_combatant(x, y, facing="down",
     c.total_stun_duration = stun_duration
     c.total_stupidity_proc_chance = stupidity_proc_chance
     c.total_stupidity_proc_amount = stupidity_proc_amount
+    c.total_lifesteal = total_lifesteal
+    c.total_confusion = total_confusion
     c.total_lifesteal_ratio = lifesteal_ratio
     c.total_attack = attack
     c.width = TILE_SIZE
@@ -67,7 +70,7 @@ def test_lifesteal_proc():
     random.seed(42)
     
     # クリティカル確定（crit_rate=1.0）でライフスティールが発動することを確認
-    attacker = make_combatant(5, 5, attack=50, crit_rate=1.0, lifesteal_chance=1.0, lifesteal_ratio=0.2)
+    attacker = make_combatant(5, 5, attack=50, crit_rate=1.0, lifesteal_chance=1.0, lifesteal_ratio=0.2, total_lifesteal=3)
     attacker.max_hp = 1000
     target = make_combatant(5, 6, hp=1000)
     target.facing = "down"
@@ -195,7 +198,7 @@ def test_confusion_proc():
     print("\n--- テスト7: 混乱発動 ---")
     random.seed(42)
     
-    attacker = make_combatant(5, 5, attack=50, stupidity_proc_chance=1.0, stupidity_proc_amount=3)
+    attacker = make_combatant(5, 5, attack=50, stupidity_proc_chance=1.0, stupidity_proc_amount=3, total_confusion=3)
     target = make_combatant(5, 6, hp=100)
     target.facing = "down"
     target.stupidity_temp = 0
@@ -280,15 +283,15 @@ def test_skill_count_totals():
     print(f"  勇敢な戦士セット: stun_proc_chance={stun_val}")
     assert stun_val > 0, f"勇敢な戦士セットにstun_proc_chanceがない: {stun_val}"
     
-    # 技巧戦士セット → counter_proc_chance を持つ
-    skilled_sword = EquipInstance("weapon", "skilled_fighter_sword")
-    skilled_armor = EquipInstance("armor", "skilled_fighter_armor")
-    skilled_shield = EquipInstance("shield", "skilled_fighter_shield")
+    # マスターセット → counter_proc_chance を持つ
+    masters_sword = EquipInstance("weapon", "masters_rapier")
+    masters_armor = EquipInstance("armor", "masters_armor")
+    masters_buckler = EquipInstance("shield", "masters_buckler")
     
-    counter_val = sum(eq.get_stat("counter_proc_chance", 0) for eq in [skilled_sword, skilled_armor, skilled_shield])
+    counter_val = sum(eq.get_stat("counter_proc_chance", 0) for eq in [masters_sword, masters_armor, masters_buckler])
     
-    print(f"  技巧戦士セット: counter_proc_chance={counter_val}")
-    assert counter_val > 0, f"技巧戦士セットにcounter_proc_chanceがない: {counter_val}"
+    print(f"  マスターセット: counter_proc_chance={counter_val}")
+    assert counter_val > 0, f"マスターセットにcounter_proc_chanceがない: {counter_val}"
     
     print("[OK] 全セットに正しいスキルパラメータが存在する")
     

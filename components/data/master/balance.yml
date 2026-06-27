@@ -118,7 +118,7 @@ ENEMY_AI:
 # COMBAT (戦闘システム設定)
 # ------------------------------------------------------------------------------
 COMBAT:
-  CRITICAL_RATE_MAX: 0.8            # 会心率（痛恨率）の最終的な上限値 (0.7 = 70%)
+  CRITICAL_RATE_MAX: 0.7            # 会心率（痛恨率）の最終的な上限値 (0.7 = 70%)
   CRITICAL_DAMAGE_MULTIPLIER: 1.5  # クリティカル時のダメージ倍率
   BACKSTAB_CRITICAL_DAMAGE_MULTIPLIER: 2  # バックアタック時のクリティカルダメージ倍率
   BACKSTAB_CRIT_BONUS: 0.15        # バックアタック時の会心率増加量

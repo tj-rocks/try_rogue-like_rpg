@@ -1,5 +1,6 @@
 import pygame
 import random
+import os
 from systems.game_state import game_state, is_paused, is_enemy_acting
 from components.sprites.entity import Entity
 from systems.combat_handler import deal_damage
@@ -11,7 +12,7 @@ from constants import (
     PLAYER_WEAPON, WEAPON_DATA, PLAYER_DEFENSE, PLAYER_ARMOR, ARMOR_DATA, ARMOR_COLORS,
     PLAYER_SHIELD, SHIELD_DATA, SHIELD_COLORS, PLAYER_ORE, ACCESSORY_DATA,
     MAX_ITEM_SLOTS, MAX_EQUIP_SLOTS, MAX_STAVE_SLOTS, MAX_WAREHOUSE_SLOTS,
-    STAVE_DATA, HIT_STUN_DURATION, SOUND_ATTACK_HIT, SOUND_ATTACK_MISS,
+    STAVE_DATA, HIT_STUN_DURATION, SOUND_ATTACK_HIT, SOUND_ATTACK_MISS, SOUND_KNOCKBACK,
     ENABLE_DEBUG_LOGGING, PLAYER_MOVE_SPEED, STATUS_EFFECTS,
     PCT_STAT_KEYS
 )
@@ -321,15 +322,16 @@ class Player(Entity):
             if inst:
                 # crit_bonus または crit_rate を取得
                 val = inst.get_stat("crit_bonus", inst.get_stat("crit_rate", 0))
-                # 小数の場合は100倍してパーセントにする
+                # 小数の場合はそのまま加算（0.1 = 10%）
                 if isinstance(val, float) and val < 1.0:
-                    bonus += val * 100
-                else:
                     bonus += val
-        # 雷霆の秘薬バフ（会心率）の加算
+                else:
+                    # 整数の場合はパーセントとして小数に変換（10 = 10% → 0.1）
+                    bonus += val / 100.0
+        # 雷霆の秘薬バフ（会心率）の加算（整数を小数に変換）
         if getattr(self, "attack_buff_turns", 0) > 0:
-            bonus += getattr(self, "attack_buff_crit", 0)
-        return int(bonus)
+            bonus += getattr(self, "attack_buff_crit", 0) / 100.0
+        return bonus
 
     @property
     def stave_bonus(self):
@@ -541,6 +543,19 @@ class Player(Entity):
             inst = self._find_equip_inst(inv, eid)
             if inst: bonus += inst.get_stat("knockback_max_distance", 0)
         return bonus
+
+    @property
+    def total_knockback(self):
+        count = 0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory,  self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: count += inst.get_stat("count_knockback", 0)
+        return count
 
     @property
     def total_counter_proc_chance(self):
@@ -861,6 +876,13 @@ class Player(Entity):
                         for stave in getattr(self, "stave_inventory", []):
                             if stave.iid in snapshot:
                                 stave.charges = max(0, min(stave.charges, snapshot[stave.iid]))
+                        # 倉庫に預けた杖の回数も復元
+                        for item in getattr(self, "warehouse_items", []):
+                            if item.get("type") == "stave_inst":
+                                data = item.get("data", {})
+                                iid = data.get("iid")
+                                if iid in snapshot:
+                                    data["charges"] = max(0, min(data.get("charges", 0), snapshot[iid]))
                         self._sage_stave_snapshot = {}
                     messages.append("魔法強化の効果が 切れた！")
             if getattr(self, "stealth_buff_turns", 0) > 0:
@@ -1448,34 +1470,40 @@ class Player(Entity):
                     if crit: dungeon.flash_timer = 10
                     # --- クリティカル時knockbackスキル発動 ---
                     if crit and dmg > 0 and not miss:
-                        kb_chance = getattr(self, "total_knockback_proc_chance", 0.0)
-                        if isinstance(kb_chance, (int, float)) and kb_chance > 0:
-                            import os as _os
-                            kb_max_dist = max(1, int(getattr(self, "total_knockback_max_distance", 5)))
-                            e_gx = int((e.x + e.width / 2) // dungeon.tile_size)
-                            e_gy = int((e.y + e.height / 2) // dungeon.tile_size)
-                            dx, dy = {"up":(0,-1),"down":(0,1),"left":(-1,0),"right":(1,0)}.get(self.facing, (0,1))
-                            final_gx, final_gy = e_gx, e_gy
-                            for _ in range(kb_max_dist):
-                                next_gx, next_gy = final_gx + dx, final_gy + dy
-                                if not (0 <= next_gx < dungeon.map_width and 0 <= next_gy < dungeon.map_height) or dungeon.map_data[next_gy][next_gx] == 0:
-                                    break
-                                blocked = any(
-                                    oe != e and not getattr(oe, "is_dead", False) and
-                                    int((oe.x + oe.width/2) // dungeon.tile_size) == next_gx and
-                                    int((oe.y + oe.height/2) // dungeon.tile_size) == next_gy
-                                    for oe in dungeon.enemies
-                                )
-                                if blocked: break
-                                final_gx, final_gy = next_gx, next_gy
-                            if (final_gx, final_gy) != (e_gx, e_gy):
-                                e.move_speed = 1200
-                                e.target_x = final_gx * dungeon.tile_size
-                                e.target_y = final_gy * dungeon.tile_size
-                                e.is_moving = True
-                                msg += f"\n{e.name} を吹き飛ばした！"
-                                if _os.environ.get("DEBUG_MODE") == "1":
-                                    print(f"[ノックバック] ✅ クリティカル発動")
+                        total_knockback = getattr(self, "total_knockback", 0)
+                        if isinstance(total_knockback, int) and total_knockback >= 3:
+                            kb_chance = getattr(self, "total_knockback_proc_chance", 0.0)
+                            if isinstance(kb_chance, (int, float)) and kb_chance > 0:
+                                if random.random() < kb_chance:
+                                    kb_max_dist = max(1, int(getattr(self, "total_knockback_max_distance", 5)))
+                                    e_gx = int((e.x + e.width / 2) // dungeon.tile_size)
+                                    e_gy = int((e.y + e.height / 2) // dungeon.tile_size)
+                                    dx, dy = {"up":(0,-1),"down":(0,1),"left":(-1,0),"right":(1,0)}.get(self.facing, (0,1))
+                                    final_gx, final_gy = e_gx, e_gy
+                                    for _ in range(kb_max_dist):
+                                        next_gx, next_gy = final_gx + dx, final_gy + dy
+                                        if not (0 <= next_gx < dungeon.map_width and 0 <= next_gy < dungeon.map_height) or dungeon.map_data[next_gy][next_gx] == 0:
+                                            break
+                                        blocked = any(
+                                            oe != e and not getattr(oe, "is_dead", False) and
+                                            int((oe.x + oe.width/2) // dungeon.tile_size) == next_gx and
+                                            int((oe.y + oe.height/2) // dungeon.tile_size) == next_gy
+                                            for oe in dungeon.enemies
+                                        )
+                                        if blocked:
+                                            break
+                                        final_gx, final_gy = next_gx, next_gy
+                                    if (final_gx, final_gy) != (e_gx, e_gy):
+                                        e.move_speed = 1200
+                                        e.target_x = final_gx * dungeon.tile_size
+                                        e.target_y = final_gy * dungeon.tile_size
+                                        e.is_moving = True
+                                        sound_manager.play_sfx(SOUND_KNOCKBACK)
+                                        msg += f"\n{e.name} を吹き飛ばした！"
+                                        if os.environ.get("DEBUG_MODE") == "1":
+                                            print(f"[ノックバック] ✅ クリティカル発動")
+                                elif os.environ.get("DEBUG_MODE") == "1":
+                                    print(f"[ノックバック] ❌ 抽選失敗")
                     if dialog:
                         if dialog.is_active: dialog.text += "\n" + msg; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
                         else: dialog.text = msg; dialog.is_active = True; game_state["dialog_modal"] = False; dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES

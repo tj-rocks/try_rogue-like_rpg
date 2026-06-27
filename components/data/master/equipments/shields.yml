@@ -448,7 +448,7 @@ SHIELD_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0
+        crit_rate: 0.1
         hp: 10
         defense: 0
         block_chance_close: 0.1
@@ -475,7 +475,7 @@ SHIELD_DATA:
     max_rank: B
     rarity: 3
     price: 2600
-    image_dir: components/pictures/shield/scount_blackleather_sheld
+    image_dir: components/pictures/shield/scount_blackleather_sheild
     shop:
       buyable: true
       usually_buyable: false
@@ -569,7 +569,7 @@ SHIELD_DATA:
     name: "[TEST]全加護の盾"
     category: round_shield
     min_rank: F
-    max_rank: S
+    max_rank: SS
     rarity: 1
     price: 1
     image_dir: components/pictures/shield/test_all_bonus_shield
@@ -658,15 +658,15 @@ SHIELD_DATA:
         light_stave_bonus: 0
 
   # --- 技巧戦士シリーズ ---
-  skilled_fighter_shield:
+  masters_buckler:
     quest_targetable: true
-    name: "技巧剣士の盾"
+    name: "マスターのバックラー"
     category: round_shield
     min_rank: A
     max_rank: SS
     rarity: 5
     price: 9000
-    image_dir: components/pictures/shield/skill_master_shield
+    image_dir: components/pictures/shield/masters_buckler
     image_scale: 1.0
     shop:
       buyable: true
@@ -696,7 +696,7 @@ SHIELD_DATA:
       skills:
         counter:
           count_counter: 1
-          counter_proc_chance: 0.10
+          counter_proc_chance: 0.125
           counter_damage_ratio: 0.5
       magic:
         fire_damage: 0
@@ -745,8 +745,13 @@ SHIELD_DATA:
         buff_duration_ratio: 0
       skills:
         knockback:
+          count_knockback: 1
           knockback_proc_chance: 1.0
-          knockback_max_distance: 5
+          knockback_max_distance: 2
+        stun:
+          count_stun: 1
+          stun_proc_chance: 0.15
+          stun_duration: 1
       magic:
         fire_damage: 0
         fire_range: 0
@@ -781,7 +786,7 @@ SHIELD_DATA:
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
-        crit_rate: 0
+        crit_rate: 0.1
         hp: 10
         defense: 0
         block_chance_close: 0.1
@@ -794,7 +799,7 @@ SHIELD_DATA:
         buff_duration_ratio: 0
       skills:
         lifesteal:
-          lifesteal: 1
+          count_lifesteal: 1
           lifesteal_chance: 0.15
           lifesteal_ratio: 0.2
       magic:

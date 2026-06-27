@@ -199,6 +199,12 @@ def get_normalized_equipment_data(floor_map):
         "stun_duration": "stun_duration",
         "counter_proc_chance": "counter_proc_chance",
         "counter_damage_ratio": "counter_damage_ratio",
+        "count_counter": "count_counter",
+        "count_stun": "count_stun",
+        "count_backstab": "count_backstab",
+        "count_confusion": "count_confusion",
+        "count_lifesteal": "count_lifesteal",
+        "count_knockback": "count_knockback",
         "lifesteal_chance": "lifesteal_chance",
         "lifesteal_ratio": "lifesteal_ratio",
     }

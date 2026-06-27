@@ -2986,6 +2986,16 @@ class GuildDialog:
                     self.cutscene_manager.start_rank_up(callback=on_done)
                 else:
                     on_done()
+
+            # 共通達成処理：報酬付与・達成済み登録・ショップボーナス
+            reward_gold, gp_reward = self._calc_reward(player, q)
+            player.coin += reward_gold
+            player.guild_point += gp_reward
+            if q.get("id") and q.get("id") not in player.completed_fixed_quests:
+                player.completed_fixed_quests.append(q["id"])
+            player.shop_bonus_refresh = True
+            # ミッション達成→次回ショップ品揃え拡張
+
             # マスターデータからもエンディング対象かチェック（セーブデータにフラグがない場合への対策）
             is_ending_quest = q.get("ending", False)
             if not is_ending_quest and q.get("id"):
@@ -3002,22 +3012,17 @@ class GuildDialog:
                 game_state["ending_index"] = 0
                 game_state["ending_timer"] = 0
                 game_state["ending_alpha"] = 0
+                player.active_quests.remove(q)
+                # [AUTO-SAVE] クエスト達成時に自動セーブ
+                print(f"[GUILD] Quest '{q.get('title')}' completed. Auto-saving...")
+                player.save_to_file()
                 self.is_active = False # ギルド画面を閉じる
                 return
 
-            else:
-                reward_gold, gp_reward = self._calc_reward(player, q)
-
-                player.coin += reward_gold
-                report_msg = q.get("report_message") or self._get_fixed_quest_report_message(q)
-                dialog.text = report_msg if report_msg else "見事に依頼を達成しましたね！\nおめでとうございます！"
-                
-                player.guild_point += gp_reward
-                if q.get("id"): player.completed_fixed_quests.append(q["id"])
-                dialog.is_active = True
-
-            # ミッション達成→次回ショップ品揃え拡張
-            player.shop_bonus_refresh = True
+            # 通常の報告完了処理
+            report_msg = q.get("report_message") or self._get_fixed_quest_report_message(q)
+            dialog.text = report_msg if report_msg else "見事に依頼を達成しましたね！\nおめでとうございます！"
+            dialog.is_active = True
 
             # 報告完了画面（フラッシュ）のためにモードとアイテムをセット
             self.mode = "AUTO_REPORT"

@@ -17,9 +17,11 @@ class GuildSystem:
         return GUILD_RANKS[0]
 
     def get_next_rank_data(self, current_rank_name):
-        """現在のランクの次のランクデータを返す（最高ランクならNone）"""
+        """現在のランクの次のランクデータを返す（最高ランク・Sランク到達済みならNone）"""
         from constants import RANK_ORDER
         if current_rank_name not in RANK_ORDER: return None
+        # Sランク到達後は昇級クエストを発行しない（SSランクへの昇格は行わない）
+        if current_rank_name == "S": return None
         idx = RANK_ORDER.index(current_rank_name)
         if idx + 1 < len(RANK_ORDER):
             next_name = RANK_ORDER[idx + 1]

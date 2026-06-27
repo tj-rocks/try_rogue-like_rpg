@@ -8,8 +8,7 @@
 # - C ランク: 〜 40F
 # - B ランク: 〜 55F
 # - A ランク: 〜 70F
-# - S ランク: 〜 80F
-# - SS ランク: 〜 99F
+# - S ランク: 〜 99F (ラストダイブ区域 / SSランクも同じく到達可能)
 #
 # 【TRAP_DATA パラメータ】
 # - name       : 罠の名前
@@ -388,41 +387,38 @@ DUNGEON_IMAGES:
     item_ratio: 0.5
   "50":
     image: fathers_city
-    sound: evil_castle.mp3
+    sound: door_of_oldcity2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "51":
     image: fathers_city
-    sound: evil_castle.mp3
+    sound: door_of_oldcity2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "52":
     image: fathers_city
-    sound: evil_castle.mp3
+    sound: door_of_oldcity2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
-    area_message:
-      - 父の足跡
-      - 誰かがここを通った。
-      - それはずっと前のことではない。
+
   "53":
     image: fathers_city
-    sound: evil_castle.mp3
+    sound: door_of_oldcity2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "54":
     image: fathers_city
-    sound: evil_castle.mp3
+    sound: door_of_oldcity2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "55":
     image: fathers_city
-    sound: evil_castle.mp3
+    sound: door_of_oldcity2.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
@@ -467,19 +463,19 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "61":
-    image: cave
+    image: shell
     sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "62":
-    image: cave
+    image: shell
     sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "63":
-    image: cave
+    image: shell
     sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
@@ -491,13 +487,13 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "65":
-    image: cave
+    image: shell
     sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "66":
-    image: cave
+    image: shell
     sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
@@ -509,29 +505,29 @@ DUNGEON_IMAGES:
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "68":
-    image: cave
+    image: shell
     sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "69":
-    image: cave
+    image: shell
     sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "70":
-    image: cave
+    image: shell
     sound: still_in_journy.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
 
 # ==========================================
-# Sランク 到達可能階層 (71F 〜 80F)
+# Sランク 到達可能階層 (71F 〜 99F) ラストダイブ
 # ==========================================
   "71":
-    image: cave
+    image: wood
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -539,69 +535,69 @@ DUNGEON_IMAGES:
     map: 6th_rest_point.txt
     no_attack: true
   "72":
-    image: shell
+    image: old_castle
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
     area_message:
-      - 残滓の回廊
-      - 試練に敗れた魂が形をなす場所。
-      - かつて冒険者だったものが、今もここを彷徨っている。
+      - 古い聖地
+      - 最も古い都の残骸
+      - 古の魂と冒険者の魂が眠るところ
   "73":
-    image: shell
+    image: old_castle
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "74":
-    image: shell
+    image: old_castle
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "75":
-    image: shell
+    image: old_castle
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "76":
-    image: shell
+    image: old_castle
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "77":
-    image: shell
+    image: old_castle
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "78":
-    image: shell
+    image: old_liberary
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
+    area_message:
+      - 聖地の図書館
+      - ダンジョンの記録が全て保管されている
+      - 今まで散った冒険者たちの軌跡が記されている
   "79":
-    image: shell
+    image: old_liberary
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "80":
-    image: shell
+    image: old_liberary
     sound: still_going_on.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
-
-# ==========================================
-# SSランク 到達可能階層 (81F 〜 99F)
-# ==========================================
   "81":
-    image: shell
+    image: old_liberary
     sound: just_move.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
@@ -609,8 +605,26 @@ DUNGEON_IMAGES:
     map: 7th_rest_point.txt
     no_attack: true
   "82":
-    image: deesert_ruin
+    image: old_liberary
     sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+    item_ratio: 0.2
+  "83":
+    image: old_liberary
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+    item_ratio: 0.2
+  "84":
+    image: old_liberary
+    sound: sandstone_floor2.mp3
+    brightness: 1
+    wall_decoration_ratio: 0.3
+    item_ratio: 0.2
+  "85":
+    image: evil_castle
+    sound: beyond_the_suffer.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
@@ -618,57 +632,39 @@ DUNGEON_IMAGES:
       - 大いなる祭壇
       - ダンジョンコアが待つ、全ての始まりにして終わりの場所。
       - ここに至った者だけが、世界の問いに答える権利を得る。
-  "83":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
-    brightness: 1
-    wall_decoration_ratio: 0.3
-    item_ratio: 0.2
-  "84":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
-    brightness: 1
-    wall_decoration_ratio: 0.3
-    item_ratio: 0.2
-  "85":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
-    brightness: 1
-    wall_decoration_ratio: 0.3
-    item_ratio: 0.2
   "86":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: evil_castle
+    sound: beyond_the_suffer.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "87":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: evil_castle
+    sound: beyond_the_suffer.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "88":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: evil_castle
+    sound: beyond_the_suffer.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "89":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    image: evil_castle
+    sound: beyond_the_suffer.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "90":
     image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    sound: step_into_adventure.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "91":
     image: deesert_ruin
-    sound: just_move.mp3
+    sound: step_into_adventure.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
@@ -676,37 +672,37 @@ DUNGEON_IMAGES:
     no_attack: true
   "92":
     image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    sound: step_into_adventure.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "93":
     image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    sound: step_into_adventure.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "94":
     image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    sound: step_into_adventure.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "95":
     image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    sound: step_into_adventure.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "96":
     image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    sound: step_into_adventure.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "97":
     image: deesert_ruin
-    sound: sandstone_floor2.mp3
+    sound: step_into_adventure.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
