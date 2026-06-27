@@ -48,6 +48,7 @@ EQUIP_SKILL_CATEGORY_MAP = {
     "stun":      ("stun_proc_chance", "stun_duration"),
     "backstab":  ("backstab_crit_bonus", "flank_backstab"),
     "confusion": ("stupidity_proc_chance", "stupidity_proc_amount"),
+    "knockback": ("knockback_proc_chance", "knockback_max_distance"),
 }
 EQUIP_SKILL_LABEL_MAP = {
     "lifesteal": "ライフスティール",
@@ -55,6 +56,7 @@ EQUIP_SKILL_LABEL_MAP = {
     "stun":      "スタン",
     "backstab":  "サイドアタック",
     "confusion": "混乱",
+    "knockback": "ノックバック",
 }
 
 def _get_equipped_set_keys(player):
@@ -86,7 +88,7 @@ def get_player_skill_names(player):
 
     if has_holy_set and getattr(player, "total_lifesteal_chance", 0):
         names.append(EQUIP_SKILL_LABEL_MAP.get("lifesteal", "lifesteal"))
-    if getattr(player, "total_counter_proc_chance", 0):
+    if getattr(player, "total_counter", 0) >= 3:
         names.append(EQUIP_SKILL_LABEL_MAP.get("counter", "counter"))
     if getattr(player, "total_stun_proc_chance", 0):
         names.append(EQUIP_SKILL_LABEL_MAP.get("stun", "stun"))
@@ -94,6 +96,8 @@ def get_player_skill_names(player):
         names.append(EQUIP_SKILL_LABEL_MAP.get("backstab", "backstab"))
     if has_assassin_set and getattr(player, "total_stupidity_proc_chance", 0):
         names.append(EQUIP_SKILL_LABEL_MAP.get("confusion", "confusion"))
+    if getattr(player, "total_knockback", 0) >= 3:
+        names.append(EQUIP_SKILL_LABEL_MAP.get("knockback", "knockback"))
     return names
 
 def format_stat_value(val):

@@ -19,6 +19,7 @@ class Entity:
         self.is_attacking = False
         self.attack_timer = 0
         self.damage_flash_timer = 0
+        self.flash_color = (255, 255, 255)
         self.is_dead = False
         self.is_falling = False
         self.move_speed = 300 # 1秒あたりの移動ピクセル数 (例: 300なら1マス64ピクセルを約0.2秒で移動)
@@ -145,6 +146,7 @@ class Entity:
         from constants import HIT_STUN_DURATION
         self.hp = max(0, self.hp - amount)
         self.damage_flash_timer = 60 + HIT_STUN_DURATION
+        self.flash_color = (255, 255, 255)
         if self.hp <= 0:
             self.is_dead = True
             self.is_attacking = False

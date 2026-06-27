@@ -216,27 +216,6 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
         # 最新のダンジョン情報を取得
         current_dungeon = getattr(inventory_dialog, "dungeon", dungeon)
 
-        # ---- ランクチェック ----
-        from constants import WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, CONSUMABLE_DATA, STAVE_DATA, ACCESSORY_DATA
-        catalog = {"weapon": WEAPON_DATA, "armor": ARMOR_DATA, "shield": SHIELD_DATA, "stave": STAVE_DATA, "consumable": CONSUMABLE_DATA, "accessory": ACCESSORY_DATA}
-        
-        # 装備品の場合は iid からキーを取得してマスタデータを参照
-        item_key = None
-        if item_type in ["weapon", "armor", "shield", "accessory"]:
-            inv_map = {"weapon": player.weapon_inventory, "armor": player.armor_inventory, "shield": player.shield_inventory, "accessory": player.accessory_inventory}
-            inst = player._find_equip_inst(inv_map[item_type], item_key_or_iid)
-            if inst: item_key = inst.key
-        else:
-            item_key = item_key_or_iid
-
-        item_data = catalog.get(item_type, {}).get(item_key, {})
-        req_rank = item_data.get("rank") or item_data.get("min_rank") or "F"
-        if current_dungeon and current_dungeon.guild_system:
-            if not current_dungeon.guild_system.is_rank_at_least(player.guild_rank, req_rank):
-                dialog.text = Text.Items.RANK_REQUIRED.format(rank=req_rank)
-                dialog.is_active = True
-                return
-
         if item_type == "weapon":
             player.change_weapon(item_key_or_iid)
             inst = player._find_equip_inst(player.weapon_inventory, item_key_or_iid)

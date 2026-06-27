@@ -107,7 +107,7 @@ GUILD_RANKS:
   amount_range:
   - 5
   - 8
-  limit_floor: 80
+  limit_floor: 99
   rank_up_item: guild_cert_s
 - rank: SS
   required_gp: 40000

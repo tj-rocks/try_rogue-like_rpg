@@ -140,6 +140,13 @@ class Enemy(Entity):
             from constants import HIT_STUN_DURATION
             if not (self.damage_flash_timer > HIT_STUN_DURATION and (self.damage_flash_timer - HIT_STUN_DURATION) % 4 < 2):
                 screen.blit(cur, (draw_x, draw_y))
+                # 色付きダメージフラッシュ（スタン・背後攻撃など）
+                if self.damage_flash_timer > HIT_STUN_DURATION:
+                    color = getattr(self, "flash_color", (255, 255, 255))
+                    if color and color != (255, 255, 255):
+                        overlay = pygame.Surface(cur.get_size(), pygame.SRCALPHA)
+                        overlay.fill(color + (80,))
+                        screen.blit(overlay, (draw_x, draw_y), special_flags=pygame.BLEND_ADD)
 
     def _move_randomly(self, dungeon, all_entities):
         d = random.choice([("right", dungeon.tile_size, 0), ("left", -dungeon.tile_size, 0), ("down", 0, dungeon.tile_size), ("up", 0, -dungeon.tile_size)])

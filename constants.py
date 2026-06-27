@@ -490,6 +490,7 @@ PLAYER_SHIELD   = None
 SOUND_PURCHASE  = "components/sounds/sfx/buy.wav"
 SOUND_PROJECTILE_HIT = "components/sounds/sfx/get_damage.wav"
 SOUND_ATTACK_HIT = "components/sounds/sfx/damage.wav"
+SOUND_KNOCKBACK = "components/sounds/sfx/knockback.wav"
 SOUND_ATTACK_MISS = "components/sounds/sfx/attack_miss.wav" 
 
 # --- サービス料金 ---

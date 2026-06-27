@@ -80,7 +80,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             elif floor <= 40: current_rank = "C"
             elif floor <= 55: current_rank = "B"
             elif floor <= 70: current_rank = "A"
-            elif floor <= 80: current_rank = "S"
+            elif floor <= 99: current_rank = "S"
             else: current_rank = "SS"
             
             # 階層ランク別または共通ドロップ設定が含まれている場合の抽出・マージ処理

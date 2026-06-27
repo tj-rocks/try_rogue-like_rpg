@@ -60,12 +60,12 @@ def run_setup_screen(screen, font_s, font_m):
     ASSASSIN_KEYS = {"assassin_dagger", "assassin_light_armor", "assassin_buckler"}
     HOLY_KEYS = {"holy_sword", "holy_armor", "holy_shield"}
     BRAVE_FIGHTER_KEYS = {"brave_fighter_sword", "brave_fighter_armor", "brave_fighter_shield"}
-    SKILLED_FIGHTER_KEYS = {"skilled_fighter_sword", "skilled_fighter_armor", "skilled_fighter_shield"}
+    MASTERS_KEYS = {"masters_rapier", "masters_armor", "masters_buckler"}
     SERIES_PRESETS = {
         "アサシン": ASSASSIN_KEYS,
         "神聖": HOLY_KEYS,
         "勇敢戦士": BRAVE_FIGHTER_KEYS,
-        "技巧戦士": SKILLED_FIGHTER_KEYS,
+        "マスター": MASTERS_KEYS,
     }
     # デフォルトでは何も選択しない
     selected_equips = set()
@@ -530,9 +530,21 @@ def setup_gungeon_mode(dungeon, player):
         return dungeon
 
 def draw_debug_overlay(screen, dungeon, player):
+    # 会心率の計算
+    crit_rate = getattr(player, "crit_rate", 0.01)
+    weapon = getattr(player, "weapon", None)
+    if weapon:
+        crit_rate = weapon.data.get("crit_rate", 0.01)
+    crit_bonus = getattr(player, "crit_bonus", 0)
+    crit_rate += crit_bonus
+    from constants import CRITICAL_RATE_MAX
+    crit_rate = min(CRITICAL_RATE_MAX, crit_rate)
+    crit_percent = int(crit_rate * 100)
+
     info_lines = [
         f"ULTIMATE DEBUG MODE - Floor: {dungeon.current_floor}",
         f"Rank: {player.guild_rank} (GP: {player.guild_point})",
+        f"Crit Rate: {crit_percent}% (Base: {int(getattr(player, 'crit_rate', 0.01)*100)}% + Weapon: {int(weapon.data.get('crit_rate', 0.01)*100) if weapon else 0}% + Bonus: {int(crit_bonus*100)}%)",
         "[N/B] : Warp Next/Prev Floor | [Shift]+ : Jump 10F",
         "[G] : God Mode (Invincibility + Atk x100)",
         "[H] : Heal HP | [K] : Kill All Enemies",

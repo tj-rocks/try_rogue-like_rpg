@@ -50,7 +50,7 @@ def test_potions_and_fighter_set():
     print(f"初期攻撃力: {player.total_attack} (ベース: {player.attack})")
     print(f"初期回復ボーナス: {player.regen_bonus}")
     print(f"初期魔法(炎ダメージ)ボーナス: {player.get_magic_bonus('fire_damage')}")
-    print(f"初期会心ボーナス: {player.crit_bonus}%")
+    print(f"初期会心ボーナス: {player.crit_bonus}")
     print(f"初期防御無視ボーナス: {player.total_armor_penetration}")
 
     print("\n--- 2. 装備なしで雷霆の秘薬を使用 ---")
@@ -59,7 +59,7 @@ def test_potions_and_fighter_set():
     print(f"バフ状態: attack_buff_turns={player.attack_buff_turns}, attack_buff_val={player.attack_buff_val}")
     print(f"  attack_buff_crit={player.attack_buff_crit}, attack_buff_armor_pen={player.attack_buff_armor_pen}")
     print(f"適用後の攻撃力: {player.total_attack}")
-    print(f"適用後の会心率: {player.crit_bonus}%")
+    print(f"適用後の会心率: {player.crit_bonus}")
     print(f"適用後の防御無視: {player.total_armor_penetration}")
 
     # 装備なし: ratio=0 なので round(duration * 1.0) = duration, round(value * 1.0) = value
@@ -67,7 +67,7 @@ def test_potions_and_fighter_set():
     assert player.attack_buff_val == w_val,    f"雷霆のデフォルト効果は+{w_val}のはず"
     assert player.attack_buff_crit == 10,  "crit_bonusはitems.ymlから10が読まれるはず"
     assert abs(player.attack_buff_armor_pen - 0.20) < 0.001, "armor_penはitems.ymlから0.20が読まれるはず"
-    assert player.crit_bonus == 10,        "バフ中のcrit_bonusプロパティは+10%のはず"
+    assert abs(player.crit_bonus - 0.1) < 0.001, "バフ中のcrit_bonusプロパティは+0.1（10%）のはず"
     assert abs(player.total_armor_penetration - 0.20) < 0.001, "バフ中のarmor_penetrationは+20%のはず"
 
     # バフを一度クリア
@@ -102,7 +102,7 @@ def test_potions_and_fighter_set():
     expected_w_val = round(w_val * 1.4)
     assert player.attack_buff_turns == expected_w_turns, f"戦士の鎧(0.2)+剣(0.2)で持続がround({w_dur}*1.4)={expected_w_turns}Tになるはず"
     assert player.attack_buff_val == expected_w_val,    f"戦士の鎧(0.2)+剣(0.2)で効果量がround({w_val}*1.4)={expected_w_val}になるはず"
-    assert player.crit_bonus == 10,        "装備があっても雷霆バフによる会心率+10%は維持されるはず"
+    assert abs(player.crit_bonus - 0.1) < 0.001, "装備があっても雷霆バフによる会心率+0.1（10%）は維持されるはず"
     assert abs(player.total_armor_penetration - 0.40) < 0.001, "装備があっても雷霆バフによる防御無視+20%は維持されるはず"
 
     # 雷霆バフを一度クリア
@@ -171,14 +171,14 @@ def test_potions_and_fighter_set():
     print(msg)
     print(f"バフ状態: magic_buff_turns={player.magic_buff_turns}, magic_buff_val={player.magic_buff_val}")
     print(f"適用後の魔法(炎ダメージ)ボーナス: {player.get_magic_bonus('fire_damage')}")
-    print(f"適用後の会心ボーナス: {player.crit_bonus}%")
+    print(f"適用後の会心ボーナス: {player.crit_bonus}")
 
     # 賢者: 持続 * 1.4, 効果量 * 1.4, stave_recovery=3(items.ymlから)
     expected_s_turns = round(s_dur * 1.4)
     expected_s_val = s_val * 1.4
     assert player.magic_buff_turns == expected_s_turns,  f"戦士の鎧+剣で賢者の持続がround({s_dur}*1.4)={expected_s_turns}Tになるはず"
     assert abs(player.magic_buff_val - expected_s_val) < 0.001, f"戦士の鎧+剣で賢者の効果量が{s_val}*1.4={expected_s_val}になるはず"
-    assert player.crit_bonus == 0,         "賢者バフで会心率は上昇しないはず"
+    assert abs(player.crit_bonus - 0.0) < 0.001, "賢者バフで会心率は上昇しないはず"
     assert stave1.charges == 5,            "stave1のチャージがitems.ymlのstave_recovery=3で+3され5になるはず"
     assert stave2.charges == 3,            "stave2のチャージが+3されるはず"
 

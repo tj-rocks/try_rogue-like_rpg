@@ -605,3 +605,31 @@ TILE_MAPPINGS:
       - x: 40
         y: 8
         flip: false
+  bed:
+    category: obstacle
+    id: bed
+    positions:
+      - x: 3
+        y: 2
+        flip: false
+      - x: 5
+        y: 2
+        flip: false
+      - x: 7
+        y: 2
+        flip: false
+      - x: 9
+        y: 2
+        flip: false
+      - x: 3
+        y: 4
+        flip: false
+      - x: 5
+        y: 4
+        flip: false
+      - x: 7
+        y: 4
+        flip: false
+      - x: 9
+        y: 4
+        flip: false

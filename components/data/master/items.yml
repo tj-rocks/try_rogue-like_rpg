@@ -161,7 +161,7 @@ CONSUMABLE_DATA:
     selling_price: 150
     min_rank: F
     max_rank: SS
-    rarity: 2
+    rarity: 3
     image_path: components/pictures/icon/special_potion.png
     sound: components/sounds/sfx/drink.wav
     shop_buyable: true
@@ -234,7 +234,7 @@ CONSUMABLE_DATA:
     effect: recharge
     recharge_amount: 5
     price: 2000
-    min_rank: C
+    min_rank: E
     max_rank: SS
     rarity: 4
     image_path: components/pictures/icon/magic_crystal.png
@@ -536,7 +536,7 @@ STAVE_DATA:
     effect_type: invincible
     min_rank: D
     max_rank: SS
-    rarity: 5
+    rarity: 3
     price: 3000
     selling_price: 200
     charges: 5
@@ -556,7 +556,7 @@ STAVE_DATA:
     effect_type: light_all
     min_rank: F
     max_rank: SS
-    rarity: 1
+    rarity: 2
     price: 1500
     selling_price: 150
     charges: 5

@@ -34,9 +34,9 @@ def test_combat_damage_calculation():
     enemy.defense = 1
     enemy.facing = "right"
     
-    # 乱数制御: 1回目(Miss判定)は0.0, 2回目(Crit判定)は1.0. random.uniformは0.1(最大値)を返すよう固定
-    with patch('random.random', side_effect=[0.0, 1.0]): 
-        with patch('random.uniform', return_value=0.3):
+    # 乱数制御: 1回目(Miss判定)は0.0, 2回目(Crit判定)は1.0. random.uniformは0.1(中央値)を返すよう固定
+    with patch('random.random', side_effect=[0.0, 1.0]):
+        with patch('random.uniform', return_value=0.1):
             print(f"DEBUG: AttackerAtk={player.total_attack}, TargetDef={getattr(enemy, 'total_defense', enemy.defense)}")
             dmg, is_crit, is_miss = calculate_damage(player, enemy)
             print(f"プレイヤー攻撃テスト(正面): Damage={dmg}, Crit={is_crit}, Miss={is_miss}")
@@ -55,7 +55,7 @@ def test_combat_damage_calculation():
     player_def.unequip_armor()
     
     with patch('random.random', side_effect=[0.0, 1.0]):
-        with patch('random.uniform', return_value=0.3):
+        with patch('random.uniform', return_value=0.1):
             dmg, is_crit, is_miss = calculate_damage(enemy_atk, player_def)
             print(f"敵攻撃テスト(装備なし): Damage={dmg}, Def={player_def.total_defense}")
             assert player_def.total_defense == 3
@@ -82,7 +82,7 @@ def test_combat_damage_calculation():
     enemy_strong.facing = "left"
     
     with patch('random.random', side_effect=[0.0, 1.0]):
-        with patch('random.uniform', return_value=0.3):
+        with patch('random.uniform', return_value=0.1):
             dmg, is_crit, is_miss = calculate_damage(enemy_strong, player_equipped)
             print(f"敵攻撃テスト(防具あり): Damage={dmg}, TotalDef={player_equipped.total_defense}")
             assert dmg == 19.0, f"ダメージ計算が異常です: {dmg} (Expected: 19.0)"
