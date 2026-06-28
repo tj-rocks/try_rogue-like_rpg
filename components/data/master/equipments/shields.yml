@@ -302,6 +302,7 @@ SHIELD_DATA:
     category: round_shield
     min_rank: D
     max_rank: B
+    max_floor: 49
     rarity: 3
     price: 2000
     image_dir: components/pictures/shield/fighters_sheld
@@ -345,6 +346,7 @@ SHIELD_DATA:
     category: round_shield
     min_rank: D
     max_rank: B
+    max_floor: 49
     rarity: 3
     price: 1200
     image_dir: components/pictures/shield/hunters_wood_sheild
@@ -388,6 +390,7 @@ SHIELD_DATA:
     category: large_shield
     min_rank: D
     max_rank: B
+    max_floor: 49
     rarity: 4
     price: 4000
     image_dir: components/pictures/shield/knight_heavy_sheld
@@ -429,6 +432,7 @@ SHIELD_DATA:
     quest_targetable: true
     name: 巡礼者の丸盾
     category: round_shield
+    max_floor: 49
     min_rank: D
     max_rank: B
     rarity: 4
@@ -470,6 +474,7 @@ SHIELD_DATA:
   scount_blackleather_sheld:
     quest_targetable: true
     name: スカウトの黒革盾
+    max_floor: 49
     category: round_shield
     min_rank: D
     max_rank: B
@@ -510,16 +515,15 @@ SHIELD_DATA:
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
-
-
   assassin_buckler:
     quest_targetable: true
-    name: アサシンのバックラー
+    name: アサシンバックラー
     category: round_shield
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 4
-    price: 4000
+    price: 12000
     image_dir: components/pictures/shield/assassin_buckler
     shop:
       buyable: true
@@ -612,10 +616,11 @@ SHIELD_DATA:
     quest_targetable: true
     name: "勇敢な戦士の盾"
     category: round_shield
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 5
-    price: 8500
+    price: 12000
     image_dir: components/pictures/shield/brave_fighters_sheld
     image_scale: 1.0
     shop:
@@ -660,12 +665,13 @@ SHIELD_DATA:
   # --- 技巧戦士シリーズ ---
   masters_buckler:
     quest_targetable: true
-    name: "マスターのバックラー"
+    name: "マスターバックラー"
     category: round_shield
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 5
-    price: 9000
+    price: 12000
     image_dir: components/pictures/shield/masters_buckler
     image_scale: 1.0
     shop:
@@ -712,10 +718,11 @@ SHIELD_DATA:
     quest_targetable: true
     name: "上級騎士の盾"
     category: large_shield
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 6
-    price: 14000
+    price: 12000
     image_dir: components/pictures/shield/great_knight_shield
     image_scale: 1.0
     shop:
@@ -730,10 +737,10 @@ SHIELD_DATA:
       common:
         aggro_mod: -4
         attack: 2
-        accuracy_close: -5
+        accuracy_close: -2
         accuracy_range: -10
         crit_rate: 0
-        hp: -10
+        hp: 10
         defense: 2
         block_chance_close: 0.05
         block_chance_ranged: 0.05
@@ -746,12 +753,8 @@ SHIELD_DATA:
       skills:
         knockback:
           count_knockback: 1
-          knockback_proc_chance: 1.0
-          knockback_max_distance: 2
-        stun:
-          count_stun: 1
-          stun_proc_chance: 0.15
-          stun_duration: 1
+          knockback_proc_chance: 0.1
+          knockback_max_distance: 1
       magic:
         fire_damage: 0
         fire_range: 0
@@ -766,10 +769,11 @@ SHIELD_DATA:
     quest_targetable: true
     name: 神聖な盾
     category: round_shield
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 4
-    price: 9500
+    price: 12000
     image_dir: components/pictures/shield/holy_shield
     image_scale: 1.0
     shop:

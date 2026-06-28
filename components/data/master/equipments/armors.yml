@@ -286,6 +286,7 @@ ARMOR_DATA:
     quest_targetable: true
     name: 狩人の鎧
     category: light
+    man_floor: 49    
     min_rank: D
     max_rank: B
     rarity: 3
@@ -328,6 +329,7 @@ ARMOR_DATA:
     quest_targetable: true
     name: 戦士の鎧
     category: medium
+    man_floor: 49    
     min_rank: D
     max_rank: B
     rarity: 3
@@ -370,6 +372,7 @@ ARMOR_DATA:
     quest_targetable: true
     name: 騎士の重鎧
     category: heavy
+    man_floor: 49    
     min_rank: D
     max_rank: B
     rarity: 4
@@ -414,6 +417,7 @@ ARMOR_DATA:
     category: robe
     min_rank: D
     max_rank: B
+    man_floor: 49
     rarity: 4
     price: 3200
     image_dir: components/pictures/armor/pilgrims_armor
@@ -456,6 +460,7 @@ ARMOR_DATA:
     category: light
     min_rank: D
     max_rank: B
+    man_floor: 49
     rarity: 3
     price: 2800
     image_dir: components/pictures/armor/scount_armor
@@ -493,145 +498,15 @@ ARMOR_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
-  skill_master_armor:
-    quest_targetable: true
-    name: 技巧戦士の鎧
-    category: light
-    min_rank: A
-    max_rank: SS
-    rarity: 4
-    price: 8800
-    image_dir: components/pictures/armor/skill_master_armor
-    shop:
-      buyable: true
-      usually_buyable: false
-      special_buyable: true
-    describe: 技巧に長けた戦士の軽装。機動力を損なわず、命中と会心率を高める。
-    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
-    floor_spawnable: true
-    bonus:
-      common:
-        attack: 2
-        accuracy_close: 20
-        accuracy_range: 20
-        crit_rate: 0.15
-        hp: 0
-        defense: 24
-        block_chance_close: 0.08
-        block_chance_ranged: 0.08
-        lantern_bonus: 0
-        regen: 0
-        aggro_mod: 1
-        stupidity: 0
-        armor_penetration: 0.15
-        buff_value_ratio: 0
-        buff_duration_ratio: 0
-      magic:
-        fire_damage: 0
-        fire_range: 0
-        heal_ratio: 0
-        knockback_damage: 0
-        invincible_turns: 0
-        stave_bonus: 0
-        light_stave_bonus: 0
-
-  great_knight_armor:
-    quest_targetable: true
-    name: 重騎士の鎧
-    category: heavy
-    min_rank: A
-    max_rank: SS
-    rarity: 4
-    price: 10000
-    image_dir: components/pictures/armor/great_knight_armor
-    shop:
-      buyable: true
-      usually_buyable: false
-      special_buyable: true
-    describe: 重装の騎士が纏う鋼鉄の鎧。圧倒的な防御力を持つが、機動力と視野が低下する。
-    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
-    floor_spawnable: true
-    bonus:
-      common:
-        aggro_mod: -3
-        attack: 2
-        accuracy_close: -5
-        accuracy_range: -10
-        crit_rate: 0
-        hp: 5
-        defense: 20
-        block_chance_close: -0.11
-        block_chance_ranged: -0.11
-        lantern_bonus: -1
-        regen: 0
-        stupidity: 0
-        armor_penetration: 0
-        buff_value_ratio: 0
-        buff_duration_ratio: 0
-      skills:
-        knockback:
-          count_knockback: 1
-          knockback_proc_chance: 1.0
-          knockback_max_distance: 5
-      magic:
-        fire_damage: 0
-        fire_range: 0
-        heal_ratio: 0
-        knockback_damage: 0
-        invincible_turns: 0
-        stave_bonus: 0
-        light_stave_bonus: 0
-
-  great_fighters_armor:
-    quest_targetable: true
-    name: 偉大な戦士の鎧
-    category: medium
-    min_rank: A
-    max_rank: SS
-    rarity: 4
-    price: 9500
-    image_dir: components/pictures/armor/great_fighters_armor
-    shop:
-      buyable: true
-      usually_buyable: false
-      special_buyable: true
-    describe: 偉大な戦士の遺物。高い攻防一体性能を持ち、秘薬の効果を長く持続させる。
-    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
-    floor_spawnable: true
-    bonus:
-      common:
-        attack: 4
-        accuracy_close: 0
-        accuracy_range: 0
-        crit_rate: 0.08
-        hp: 8
-        defense: 26
-        block_chance_close: 0.05
-        block_chance_ranged: 0.05
-        lantern_bonus: 0
-        regen: 0
-        aggro_mod: 0
-        stupidity: 0
-        armor_penetration: 0.05
-        buff_value_ratio: 0.25
-        buff_duration_ratio: 0.25
-      magic:
-        fire_damage: 0
-        fire_range: 0
-        heal_ratio: 0
-        knockback_damage: 0
-        invincible_turns: 0
-        stave_bonus: 0
-        light_stave_bonus: 0
-
   assassin_light_armor:
     quest_targetable: true
     name: アサシンの軽装
     category: light
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 4
-    price: 8500
+    price: 12000
     image_dir: components/pictures/armor/assassin_light_armor
     shop:
       buyable: true
@@ -679,10 +554,11 @@ ARMOR_DATA:
     quest_targetable: true
     name: 神聖な鎧
     category: heavy
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 4
-    price: 11000
+    price: 12000
     image_dir: components/pictures/armor/holy_armor
     shop:
       buyable: true
@@ -768,10 +644,11 @@ ARMOR_DATA:
   brave_fighter_armor:
     quest_targetable: true
     name: "勇敢な戦士の鎧"
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 5
-    price: 9000
+    price: 12000
     image_dir: components/pictures/armor/brave_fighters_armor
     image_scale: 1.0
     shop:
@@ -816,11 +693,12 @@ ARMOR_DATA:
   # --- 技巧戦士シリーズ ---
   masters_armor:
     quest_targetable: true
-    name: "マスターの鎧"
-    min_rank: A
+    name: "マスターアーマー"
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 5
-    price: 9500
+    price: 12000
     image_dir: components/pictures/armor/masters_armor
     image_scale: 1.0
     shop:
@@ -866,10 +744,11 @@ ARMOR_DATA:
   senior_knight_armor:
     quest_targetable: true
     name: "上級騎士の鎧"
-    min_rank: S
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 6
-    price: 13000
+    price: 12000
     image_dir: components/pictures/armor/great_knight_armor
     image_scale: 1.0
     shop:
@@ -897,13 +776,9 @@ ARMOR_DATA:
         buff_value_ratio: 0
         buff_duration_ratio: 0
       skills:
-        stun:
-          count_stun: 1
-          stun_proc_chance: 0.20
-          stun_duration: 1
         knockback:
           count_knockback: 1
-          knockback_proc_chance: 0.5
+          knockback_proc_chance: 0.1
           knockback_max_distance: 1
       magic:
         fire_damage: 0

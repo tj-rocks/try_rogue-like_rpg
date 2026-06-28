@@ -182,6 +182,12 @@ _default_wander = {0:0.00, 1:0.10, 2:0.20, 3:0.30, 4:0.40,
 STUPIDITY_WANDER_RATES = {int(k): float(v)
                            for k, v in _ai.get("STUPIDITY_WANDER_RATES", _default_wander).items()}
 
+# 困惑度ごとの「斜め1マス時の縦移動優先」確率 (stupidity_level -> 0.0〜1.0)
+# 賢い（低stupidity）ほど縦移動（正面方向へ前進）を選びやすい
+_default_flank = {1: 0.80, 2: 0.60, 3: 0.50, 4: 0.40, 5: 0.20}
+STUPIDITY_FLANK_RATES = {int(k): float(v)
+                         for k, v in _ai.get("STUPIDITY_FLANK_RATES", _default_flank).items()}
+
 # 逃げ道封鎖AI 有効フラグ (balance.yml ENEMY_ESCAPE_BLOCK_ENABLED)
 ENEMY_ESCAPE_BLOCK_ENABLED: bool = _ai.get("ENEMY_ESCAPE_BLOCK_ENABLED", True)
 BOSS_NO_QUEST_SPAWN_CHANCE = _ai.get("BOSS_NO_QUEST_SPAWN_CHANCE", 0.05)

@@ -1468,8 +1468,8 @@ class Player(Entity):
                     from systems.sound_handler import sound_manager
                     sound_manager.play_sfx(SOUND_ATTACK_MISS if miss or dmg == 0 else SOUND_ATTACK_HIT)
                     if crit: dungeon.flash_timer = 10
-                    # --- クリティカル時knockbackスキル発動 ---
-                    if crit and dmg > 0 and not miss:
+                    # --- knockbackスキル発動（クリティカル不問） ---
+                    if dmg > 0 and not miss:
                         total_knockback = getattr(self, "total_knockback", 0)
                         if isinstance(total_knockback, int) and total_knockback >= 3:
                             kb_chance = getattr(self, "total_knockback_proc_chance", 0.0)
@@ -1501,7 +1501,7 @@ class Player(Entity):
                                         sound_manager.play_sfx(SOUND_KNOCKBACK)
                                         msg += f"\n{e.name} を吹き飛ばした！"
                                         if os.environ.get("DEBUG_MODE") == "1":
-                                            print(f"[ノックバック] ✅ クリティカル発動")
+                                            print(f"[ノックバック] ✅ 発動")
                                 elif os.environ.get("DEBUG_MODE") == "1":
                                     print(f"[ノックバック] ❌ 抽選失敗")
                     if dialog:

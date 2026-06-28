@@ -1829,39 +1829,45 @@ class Dungeon:
             return [{"key": k, "type": item_type, "name": v["name"], "price": v["price"], "count": 1} for k, v in items]
 
         # ボーナスモード: special_buyable かつランクOKの全品
-        def get_bonus_items(data_dict, item_type):
-            """ミッション後: special_buyable品を全部並べる"""
+        def get_bonus_items(data_dict, item_type, restrict_to_player_rank=False):
+            """ミッション後: special_buyable品を全部並べる。
+            restrict_to_player_rank=Trueの場合、プレイヤーと同じランクのみに絞る"""
             result = []
             for k, v in data_dict.items():
                 shop = v.get("shop", {})
-                if shop.get("special_buyable", False) and is_rank_ok(v):
-                    result.append({"key": k, "type": item_type, "name": v["name"], "price": v["price"], "count": 1})
+                if not shop.get("special_buyable", False): continue
+                if not is_rank_ok(v): continue
+                if restrict_to_player_rank:
+                    item_rank = v.get("min_rank") or v.get("rank") or "F"
+                    if item_rank != player_rank: continue
+                result.append({"key": k, "type": item_type, "name": v["name"], "price": v["price"], "count": 1})
             return result
 
         # --- 1. 武器屋 (武器・防具・盾) ---
         if bonus_mode:
-            weapon_cands = get_bonus_items(WEAPON_DATA, "weapon") + get_bonus_items(ARMOR_DATA, "armor") + get_bonus_items(SHIELD_DATA, "shield")
+            # ボーナスモード: プレイヤーと同じランクのみに絞る
+            weapon_cands = get_bonus_items(WEAPON_DATA, "weapon", restrict_to_player_rank=True) + get_bonus_items(ARMOR_DATA, "armor", restrict_to_player_rank=True) + get_bonus_items(SHIELD_DATA, "shield", restrict_to_player_rank=True)
         else:
             weapon_cands = get_fixed_items(WEAPON_DATA, "weapon") + get_fixed_items(ARMOR_DATA, "armor") + get_fixed_items(SHIELD_DATA, "shield")
-        self.weapon_shop_stock = weapon_cands[:SHOP_LIMIT_BONUS if bonus_mode else SHOP_LIMIT_NORMAL]
+        self.weapon_shop_stock = weapon_cands[:]  # ボーナスモードはリミットなし
 
         # --- 1.2 武器専用屋 (武器のみ) ---
         if bonus_mode:
-            d_weapon_cands = get_bonus_items(WEAPON_DATA, "weapon")
+            d_weapon_cands = get_bonus_items(WEAPON_DATA, "weapon", restrict_to_player_rank=True)
         else:
             d_weapon_cands = get_fixed_items(WEAPON_DATA, "weapon")
-        self.dedicated_weapon_shop_stock = d_weapon_cands[:SHOP_LIMIT_BONUS if bonus_mode else SHOP_LIMIT_NORMAL]
+        self.dedicated_weapon_shop_stock = d_weapon_cands[:]  # ボーナスモードはリミットなし
 
         # --- 1.3 防具専用屋 (防具・盾のみ) ---
         if bonus_mode:
-            d_armor_cands = get_bonus_items(ARMOR_DATA, "armor") + get_bonus_items(SHIELD_DATA, "shield")
+            d_armor_cands = get_bonus_items(ARMOR_DATA, "armor", restrict_to_player_rank=True) + get_bonus_items(SHIELD_DATA, "shield", restrict_to_player_rank=True)
         else:
             d_armor_cands = get_fixed_items(ARMOR_DATA, "armor") + get_fixed_items(SHIELD_DATA, "shield")
-        self.dedicated_armor_shop_stock = d_armor_cands[:SHOP_LIMIT_BONUS if bonus_mode else SHOP_LIMIT_NORMAL]
+        self.dedicated_armor_shop_stock = d_armor_cands[:]  # ボーナスモードはリミットなし
 
         # --- 1.4 アクセサリ専用屋 (アクセサリのみ) ---
         if bonus_mode:
-            d_acc_cands = get_bonus_items(ACCESSORY_DATA, "accessory")
+            d_acc_cands = get_bonus_items(ACCESSORY_DATA, "accessory", restrict_to_player_rank=True)
         else:
             d_acc_cands = get_fixed_items(ACCESSORY_DATA, "accessory")
             # アクセサリにfixed品がない場合、ランダムで補充

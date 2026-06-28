@@ -11,7 +11,7 @@ from constants import (
     ENEMY_SPAWN_NEAR_FLOOR, ENEMY_SPAWN_NEAR_RANDOM_FLOOR, ENEMY_SPAWN_NEAR_CHANCE,
     SOUND_ATTACK_HIT, SOUND_ATTACK_MISS,
     WEAPON_DATA, ARMOR_DATA, SHIELD_DATA,
-    STUPIDITY_WANDER_RATES, ENEMY_ESCAPE_BLOCK_ENABLED
+    STUPIDITY_WANDER_RATES, STUPIDITY_FLANK_RATES, ENEMY_ESCAPE_BLOCK_ENABLED
 )
 from systems.combat_handler import deal_damage
 
@@ -55,6 +55,7 @@ class Enemy(Entity):
         self.is_long_range = False; self.attack_priority = data.get("attack_priority", "close")
         self.smart_ranged_move = data.get("smart_ranged_move", True)
         self.turn_attack = data.get("turn_attack", False)
+        self.move_face_chance = data.get("move_face_chance", 0.0)
         self.bgm = data.get("bgm"); self.crit_rate = data.get("crit_rate", 0.01)
         self.accuracy_close = data.get("accuracy_close", data.get("accuracy_bonus", 100))
         self.accuracy_ranged = data.get("accuracy_ranged", data.get("accuracy_bonus", 100))
@@ -443,6 +444,49 @@ class Enemy(Entity):
             self._move_randomly(dungeon, all_entities)
             return
 
+        # ── [DIAGONAL] 斜め位置AIの意思決定（待機 or サイドステップ） ──
+        # プレイヤーが斜め1マス (adx==1, ady==1) の場合、stupidityに応じた確率で
+        # 「待機」か「サイドステップ（向きを変えずに移動）」かを選ぶ
+        # 賢い（低stupidity）ほどこの判断を行いやすい
+        if abs(dx) == 1 and abs(dy) == 1:
+            act_chance = STUPIDITY_FLANK_RATES.get(effective_stupidity, 0.0)
+            if act_chance > 0 and random.random() < act_chance:
+                # 待機 or サイドステップを半々で選ぶ
+                if random.random() < 0.5:
+                    self._log_trace(dungeon, f"diagonal-ai: stupidity={effective_stupidity} -> waiting (chance={act_chance})")
+                    return
+                else:
+                    # サイドステップ: 向きを変えずにdx方向またはdy方向に1マス移動
+                    # プレイヤーに正面を向けないようdx方向（横）を優先する
+                    saved_facing = self.facing
+                    moved = False
+                    # dx方向（横）を先に試みる
+                    sdx_px = mx + (1 if dx > 0 else -1)
+                    if self.can_move_grid(sdx_px * dungeon.tile_size, my * dungeon.tile_size, dungeon, debug_log=False):
+                        self.target_x = sdx_px * dungeon.tile_size
+                        self.target_y = my * dungeon.tile_size
+                        self.facing = saved_facing  # 向きを維持
+                        self.is_moving = True
+                        self.step_toggle = not self.step_toggle
+                        moved = True
+                    else:
+                        # dy方向（縦）を試みる
+                        sdy_py = my + (1 if dy > 0 else -1)
+                        if self.can_move_grid(mx * dungeon.tile_size, sdy_py * dungeon.tile_size, dungeon, debug_log=False):
+                            self.target_x = mx * dungeon.tile_size
+                            self.target_y = sdy_py * dungeon.tile_size
+                            self.facing = saved_facing  # 向きを維持
+                            self.is_moving = True
+                            self.step_toggle = not self.step_toggle
+                            moved = True
+                    if moved:
+                        self._log_trace(dungeon, f"diagonal-ai: stupidity={effective_stupidity} -> sidestep (facing={saved_facing}, moved to ({self.target_x//dungeon.tile_size},{self.target_y//dungeon.tile_size}))")
+                        return
+                    else:
+                        # サイドステップ失敗時は待機
+                        self._log_trace(dungeon, f"diagonal-ai: stupidity={effective_stupidity} -> sidestep failed, waiting")
+                        return
+
         # ── [ESCAPE_BLOCK] 逃げ道封鎖AI + フランク (削除時はこのブロックごと除去) ──
         if (abs(dx) + abs(dy)) > 1:
             nearby_allies = [
@@ -544,21 +588,51 @@ class Enemy(Entity):
             impact = int(ATTACK_ANIMATION_FRAMES * 0.8)
             if getattr(self, "attack_timer", 0) <= impact and not getattr(self, "has_dealt_impact_damage", False):
                 self._deal_impact_damage(dungeon); self.has_dealt_impact_damage = True
-        self.update_animation(dt)
+        movement_finished = self.update_animation(dt)
+        if movement_finished:
+            self._face_player_after_move(dungeon)
+
+    def _face_player_after_move(self, dungeon):
+        chance = getattr(self, "move_face_chance", 0.0)
+        if not chance:
+            return
+        if random.random() >= chance:
+            return
+        player = getattr(dungeon, "player", None)
+        if not player or getattr(player, "is_dead", False):
+            return
+        mx = int((self.x + self.width / 2) // dungeon.tile_size)
+        my = int((self.y + self.height / 2) // dungeon.tile_size)
+        px = int((player.x + player.width / 2) // dungeon.tile_size)
+        py = int((player.y + player.height / 2) // dungeon.tile_size)
+        dx = px - mx
+        dy = py - my
+        if dx == 0 and dy == 0:
+            return
+        if abs(dx) > abs(dy):
+            needed = "right" if dx > 0 else "left"
+        else:
+            needed = "down" if dy > 0 else "up"
+        if self.facing != needed:
+            self.facing = needed
+            self._log_trace(dungeon, f"move_face: turned to {needed}")
 
     def update_animation(self, dt=1/60):
         self.idle_anim_timer = (self.idle_anim_timer + 1) % 60
         if getattr(self, "attack_pre_delay_timer", 0) > 0:
             if getattr(self, "damage_flash_timer", 0) > 0: self.damage_flash_timer -= 1
-            if self.process_movement(dt): self.move_speed = 300
-            return
+            movement_finished = self.process_movement(dt)
+            if movement_finished: self.move_speed = 300
+            return movement_finished
         if getattr(self, "peak_hold_timer", 0) > 0:
             self.peak_hold_timer -= 1
             if getattr(self, "damage_flash_timer", 0) > 0: self.damage_flash_timer -= 1
-            if self.process_movement(dt): self.move_speed = 300
-            return
-        super().update_animation(dt)
+            movement_finished = self.process_movement(dt)
+            if movement_finished: self.move_speed = 300
+            return movement_finished
+        movement_finished = super().update_animation(dt)
         if not self.is_moving: self.move_speed = 300
+        return movement_finished
 
     @classmethod
     def spawn_enemies(cls, dungeon, player=None, is_outbreak=False):
