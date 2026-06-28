@@ -523,7 +523,7 @@ SHIELD_DATA:
     max_rank: SS
     min_floor: 50
     rarity: 4
-    price: 4000
+    price: 12000
     image_dir: components/pictures/shield/assassin_buckler
     shop:
       buyable: true
@@ -620,7 +620,7 @@ SHIELD_DATA:
     max_rank: SS
     min_floor: 50
     rarity: 5
-    price: 8500
+    price: 12000
     image_dir: components/pictures/shield/brave_fighters_sheld
     image_scale: 1.0
     shop:
@@ -671,7 +671,7 @@ SHIELD_DATA:
     max_rank: SS
     min_floor: 50
     rarity: 5
-    price: 9000
+    price: 12000
     image_dir: components/pictures/shield/masters_buckler
     image_scale: 1.0
     shop:
@@ -722,7 +722,7 @@ SHIELD_DATA:
     max_rank: SS
     min_floor: 50
     rarity: 6
-    price: 14000
+    price: 12000
     image_dir: components/pictures/shield/great_knight_shield
     image_scale: 1.0
     shop:
@@ -773,7 +773,7 @@ SHIELD_DATA:
     max_rank: SS
     min_floor: 50
     rarity: 4
-    price: 9500
+    price: 12000
     image_dir: components/pictures/shield/holy_shield
     image_scale: 1.0
     shop:

@@ -704,14 +704,14 @@ WEAPON_DATA:
 
   assassin_dagger:
     quest_targetable: true
-    name: アサシンの短剣
+    name: アサシンダガー
     category: dagger
     max_floor: 49
     min_rank: B
     max_rank: SS
     min_floor: 50
     rarity: 4
-    price: 5000
+    price: 12000
     image_path: components/pictures/weapon/assassin_dagger.png
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
@@ -811,7 +811,7 @@ WEAPON_DATA:
     max_rank: SS
     min_floor: 50
     rarity: 5
-    price: 8000
+    price: 12000
     image_path: components/pictures/weapon/fighters_sword.png
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
@@ -862,7 +862,7 @@ WEAPON_DATA:
     max_rank: SS
     min_floor: 50
     rarity: 5
-    price: 8500
+    price: 12000
     image_path: components/pictures/weapon/masters_rapier.png
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
@@ -964,7 +964,7 @@ WEAPON_DATA:
     max_rank: SS
     min_floor: 50
     rarity: 4
-    price: 10000
+    price: 12000
     image_path: components/pictures/weapon/holy_sword.png
     sound: components/sounds/sfx/sword_swing.wav
     image_scale: 1.0
