@@ -145,9 +145,16 @@ class Enemy(Entity):
                 if self.damage_flash_timer > HIT_STUN_DURATION:
                     color = getattr(self, "flash_color", (255, 255, 255))
                     if color and color != (255, 255, 255):
+                        # オーバーレイを敵画像の非透明部分のみに合成（床のタイルには影響しない）
+                        flashed = cur.copy()
                         overlay = pygame.Surface(cur.get_size(), pygame.SRCALPHA)
                         overlay.fill(color + (80,))
-                        screen.blit(overlay, (draw_x, draw_y), special_flags=pygame.BLEND_ADD)
+                        mask = pygame.mask.from_surface(cur)
+                        if mask.count() > 0:
+                            mask_surf = mask.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0, 0, 0, 0))
+                            overlay.blit(mask_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+                        flashed.blit(overlay, (0, 0), special_flags=pygame.BLEND_ADD)
+                        screen.blit(flashed, (draw_x, draw_y))
 
     def _move_randomly(self, dungeon, all_entities):
         d = random.choice([("right", dungeon.tile_size, 0), ("left", -dungeon.tile_size, 0), ("down", 0, dungeon.tile_size), ("up", 0, -dungeon.tile_size)])
