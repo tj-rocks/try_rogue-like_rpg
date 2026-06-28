@@ -205,6 +205,8 @@ def get_normalized_equipment_data(floor_map):
         "count_confusion": "count_confusion",
         "count_lifesteal": "count_lifesteal",
         "count_knockback": "count_knockback",
+        "knockback_proc_chance": "knockback_proc_chance",
+        "knockback_max_distance": "knockback_max_distance",
         "lifesteal_chance": "lifesteal_chance",
         "lifesteal_ratio": "lifesteal_ratio",
     }

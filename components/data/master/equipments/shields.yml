@@ -515,11 +515,9 @@ SHIELD_DATA:
         invincible_turns: 0
         stave_bonus: 0
         light_stave_bonus: 0
-
-
   assassin_buckler:
     quest_targetable: true
-    name: アサシンのバックラー
+    name: アサシンバックラー
     category: round_shield
     min_rank: B
     max_rank: SS
@@ -755,12 +753,8 @@ SHIELD_DATA:
       skills:
         knockback:
           count_knockback: 1
-          knockback_proc_chance: 1.0
-          knockback_max_distance: 2
-        stun:
-          count_stun: 1
-          stun_proc_chance: 0.15
-          stun_duration: 1
+          knockback_proc_chance: 0.1
+          knockback_max_distance: 1
       magic:
         fire_damage: 0
         fire_range: 0

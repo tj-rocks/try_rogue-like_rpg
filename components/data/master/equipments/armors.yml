@@ -589,49 +589,6 @@ ARMOR_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
-  great_fighters_armor:
-    quest_targetable: true
-    name: 偉大な戦士の鎧
-    category: medium
-    min_rank: B
-    max_rank: SS
-    min_floor: 50
-    rarity: 4
-    price: 9500
-    image_dir: components/pictures/armor/brave_fighters_armor
-    shop:
-      buyable: true
-      usually_buyable: false
-      special_buyable: true
-    describe: 偉大な戦士の遺物。高い攻防一体性能を持ち、秘薬の効果を長く持続させる。
-    growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
-    floor_spawnable: true
-    bonus:
-      common:
-        attack: 4
-        accuracy_close: 0
-        accuracy_range: 0
-        crit_rate: 0.08
-        hp: 8
-        defense: 26
-        block_chance_close: 0.05
-        block_chance_ranged: 0.05
-        lantern_bonus: 0
-        regen: 0
-        aggro_mod: 0
-        stupidity: 0
-        armor_penetration: 0.05
-        buff_value_ratio: 0.25
-        buff_duration_ratio: 0.25
-      magic:
-        fire_damage: 0
-        fire_range: 0
-        heal_ratio: 0
-        knockback_damage: 0
-        invincible_turns: 0
-        stave_bonus: 0
-        light_stave_bonus: 0
-
   assassin_light_armor:
     quest_targetable: true
     name: アサシンの軽装
@@ -910,13 +867,9 @@ ARMOR_DATA:
         buff_value_ratio: 0
         buff_duration_ratio: 0
       skills:
-        stun:
-          count_stun: 1
-          stun_proc_chance: 0.20
-          stun_duration: 1
         knockback:
           count_knockback: 1
-          knockback_proc_chance: 0.5
+          knockback_proc_chance: 0.1
           knockback_max_distance: 1
       magic:
         fire_damage: 0

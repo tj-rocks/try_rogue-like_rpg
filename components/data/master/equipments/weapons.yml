@@ -928,7 +928,7 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: -3
-        attack: 23
+        attack: 21
         accuracy_close: -4
         accuracy_range: -10
         crit_rate: -0.05
@@ -945,12 +945,8 @@ WEAPON_DATA:
       skills:
         knockback:
           count_knockback: 1
-          knockback_proc_chance: 1.0
+          knockback_proc_chance: 0.1
           knockback_max_distance: 3
-        stun:
-          count_stun: 1
-          stun_proc_chance: 0.15
-          stun_duration: 1
       magic:
         fire_damage: 0
         fire_range: 0
