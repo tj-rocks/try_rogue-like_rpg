@@ -286,6 +286,7 @@ ARMOR_DATA:
     quest_targetable: true
     name: 狩人の鎧
     category: light
+    man_floor: 49    
     min_rank: D
     max_rank: B
     rarity: 3
@@ -328,6 +329,7 @@ ARMOR_DATA:
     quest_targetable: true
     name: 戦士の鎧
     category: medium
+    man_floor: 49    
     min_rank: D
     max_rank: B
     rarity: 3
@@ -370,6 +372,7 @@ ARMOR_DATA:
     quest_targetable: true
     name: 騎士の重鎧
     category: heavy
+    man_floor: 49    
     min_rank: D
     max_rank: B
     rarity: 4
@@ -414,6 +417,7 @@ ARMOR_DATA:
     category: robe
     min_rank: D
     max_rank: B
+    man_floor: 49
     rarity: 4
     price: 3200
     image_dir: components/pictures/armor/pilgrims_armor
@@ -456,6 +460,7 @@ ARMOR_DATA:
     category: light
     min_rank: D
     max_rank: B
+    man_floor: 49
     rarity: 3
     price: 2800
     image_dir: components/pictures/armor/scount_armor
@@ -497,8 +502,9 @@ ARMOR_DATA:
     quest_targetable: true
     name: 技巧戦士の鎧
     category: light
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 4
     price: 8800
     image_dir: components/pictures/armor/skill_master_armor
@@ -539,8 +545,9 @@ ARMOR_DATA:
     quest_targetable: true
     name: 重騎士の鎧
     category: heavy
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 4
     price: 10000
     image_dir: components/pictures/armor/great_knight_armor
@@ -586,11 +593,12 @@ ARMOR_DATA:
     quest_targetable: true
     name: 偉大な戦士の鎧
     category: medium
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 4
     price: 9500
-    image_dir: components/pictures/armor/great_fighters_armor
+    image_dir: components/pictures/armor/brave_fighters_armor
     shop:
       buyable: true
       usually_buyable: false
@@ -628,8 +636,9 @@ ARMOR_DATA:
     quest_targetable: true
     name: アサシンの軽装
     category: light
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 4
     price: 8500
     image_dir: components/pictures/armor/assassin_light_armor
@@ -679,8 +688,9 @@ ARMOR_DATA:
     quest_targetable: true
     name: 神聖な鎧
     category: heavy
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 4
     price: 11000
     image_dir: components/pictures/armor/holy_armor
@@ -768,8 +778,9 @@ ARMOR_DATA:
   brave_fighter_armor:
     quest_targetable: true
     name: "勇敢な戦士の鎧"
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 5
     price: 9000
     image_dir: components/pictures/armor/brave_fighters_armor
@@ -817,8 +828,9 @@ ARMOR_DATA:
   masters_armor:
     quest_targetable: true
     name: "マスターの鎧"
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 5
     price: 9500
     image_dir: components/pictures/armor/masters_armor
@@ -866,8 +878,9 @@ ARMOR_DATA:
   senior_knight_armor:
     quest_targetable: true
     name: "上級騎士の鎧"
-    min_rank: S
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 6
     price: 13000
     image_dir: components/pictures/armor/great_knight_armor

@@ -475,6 +475,7 @@ WEAPON_DATA:
     quest_targetable: true
     name: 戦士の剣
     category: onehanded_sword
+    max_floor: 49
     min_rank: D
     max_rank: B
     rarity: 3
@@ -520,6 +521,7 @@ WEAPON_DATA:
     quest_targetable: true
     name: 狩人のレイピア
     category: onehanded_sword
+    max_floor: 49
     min_rank: D
     max_rank: B
     rarity: 3
@@ -565,6 +567,7 @@ WEAPON_DATA:
     quest_targetable: true
     name: 騎士の重斧
     category: axe
+    max_floor: 49
     min_rank: D
     max_rank: B
     rarity: 4
@@ -610,6 +613,7 @@ WEAPON_DATA:
     quest_targetable: true
     name: 巡礼者の剣
     category: onehanded_sword
+    max_floor: 49
     min_rank: D
     max_rank: B
     rarity: 4
@@ -655,6 +659,7 @@ WEAPON_DATA:
     quest_targetable: true
     name: スカウトの小刀
     category: dagger
+    max_floor: 49
     min_rank: D
     max_rank: B
     rarity: 3
@@ -701,8 +706,10 @@ WEAPON_DATA:
     quest_targetable: true
     name: アサシンの短剣
     category: dagger
-    min_rank: A
+    max_floor: 49
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 4
     price: 5000
     image_path: components/pictures/weapon/assassin_dagger.png
@@ -800,8 +807,9 @@ WEAPON_DATA:
   brave_fighter_sword:
     quest_targetable: true
     name: "勇敢な戦士の剣"
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 5
     price: 8000
     image_path: components/pictures/weapon/fighters_sword.png
@@ -850,8 +858,9 @@ WEAPON_DATA:
   masters_rapier:
     quest_targetable: true
     name: "マスターレイピア"
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 5
     price: 8500
     image_path: components/pictures/weapon/masters_rapier.png
@@ -900,8 +909,9 @@ WEAPON_DATA:
   senior_knight_hummer:
     quest_targetable: true
     name: "上級騎士のメイス"
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 6
     price: 12000
     image_path: components/pictures/weapon/great_hummer.png
@@ -909,7 +919,7 @@ WEAPON_DATA:
     image_scale: 1.0
     shop:
       buyable: true
-      usually_buyable: false
+      usually_buyable: true
       special_buyable: true
     floor_spawnable: true
     describe: 上級騎士のメイス。圧倒的な攻撃力と吹き飛ばし効果を持つ。
@@ -918,7 +928,7 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: -3
-        attack: 20
+        attack: 23
         accuracy_close: -4
         accuracy_range: -10
         crit_rate: -0.05
@@ -954,8 +964,9 @@ WEAPON_DATA:
   holy_sword:
     quest_targetable: true
     name: 神聖な剣
-    min_rank: A
+    min_rank: B
     max_rank: SS
+    min_floor: 50
     rarity: 4
     price: 10000
     image_path: components/pictures/weapon/holy_sword.png

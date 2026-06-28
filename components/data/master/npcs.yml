@@ -249,14 +249,15 @@ story_yuru:
   name: ユル
   image_path:
     default: components/pictures/npc/story_yuru
-    A: components/pictures/enemies/slime
-    S: components/pictures/enemies/slime
+    A: components/pictures/npc/story_yuru_1
+    S: components/pictures/icon/weapon.png
   alpha:
     F: 255
     E: 255
     D: 220
     C: 150
     B: 80
+    A: 80
   dialogue:
     F:
       - ユル： 希望に燃えている！冒険者って最高だな！
@@ -270,9 +271,11 @@ story_yuru:
     B:
       - ユル： ギルドポイントを使っても、もう呪いが治せない状態なんだ……
     A:
-      - ユル： （体が少しずつ変異している……モンスター化が始まっているようだ）
+      - ユル： たすけて・・・・
+      - ユル：冒険者になんてなるんじゃなかった。助けて怖い 苦しい
+      - ユル：体が少しずつ変異している……俺はもう直ぐ剣になるんだ
     S:
-      - ユル： ギョルル……グルルル……（完全にモンスター化してしまった）
+      - (平凡な鉄の剣が落ちている。だれも見向きもしない)
 
 story_kaya:
   name: カヤ
@@ -294,14 +297,15 @@ story_rain:
   name: レイン
   image_path:
     default: components/pictures/npc/story_rain
-    A: components/pictures/weapon/iron_sword.png
-    S: components/pictures/weapon/iron_sword.png
+    A: components/pictures/npc/story_rain_1
+    S: components/pictures/enemies/slime/down.png
   alpha:
     F: 255
     E: 255
     D: 255
     C: 255
     B: 128
+    A: 128
   dialogue:
     F:
       - レイン： アイテムの使い方なら俺に聞きな！
@@ -315,9 +319,11 @@ story_rain:
     B:
       - レイン： なんだか最近体が透けてきた気がするけど、まあ大丈夫さー！
     A:
-      - レイン： （体が硬直して、剣の形になり始めている……）
+      - レイン： 体が言うことを聞かなくなってきている
+      - レイン： もうすぐモンスターになるそんな気がする
+      - レイン： ああ、冒険者なんてやめておけばよかった
     S:
-      - レイン： （そこには、彼の面影を残した一振りの剣だけが落ちている）
+      - やけに人懐っこいもモンスターだ
 
 story_helena:
   name: ヘレナ
@@ -349,13 +355,14 @@ story_olivia:
   name: オリヴィア
   image_path: 
     default: components/pictures/npc/story_olivia
-    A: components/pictures/npc/guide_guild_1
+    S: components/pictures/npc/guide_guild_1
   alpha:
     F: 255
     E: 255
     D: 255
     C: 255
     B: 128
+    A: 128
   dialogue:
     F:
       - オリヴィア： 呪いのリスクをよく考えることね
@@ -382,7 +389,14 @@ story_geisel:
   name: ガイゼル
   image_path:
     default: components/pictures/npc/story_geisel
-    S: components/pictures/enemies/slime
+  alpha:
+    F: 255
+    E: 255
+    D: 255
+    C: 255
+    B: 128
+    A: 80
+    S: 80
   dialogue:
     F:
       - ガイゼル： お前の父は偉大だったぞ
@@ -398,10 +412,9 @@ story_geisel:
       - ガイゼル： お前の手で葬ってやれ 決着をつけてこい
     A:
       - ガイゼル： もう俺は……地上には帰れない
+      - ガイゼル： 転移の石をくれ・・・無理だよな・・忘れてくれ
     S:
-      - ガイゼル： スライム化が始まってしまった
       - ガイゼル： 俺の人生もそろそろ終幕だ……
-    SS:
       - ガイゼル： 頼む、ダンジョンコアにとどめをさしてくれ……！
 
 story_camila:
@@ -425,7 +438,6 @@ story_camila:
     S:
       - カミラ： ヘレナは、おそらくギルドに始末されたわ
       - カミラ： ギルドはダンジョンの真相に気づいた冒険者を殺すための人員を抱えているのよ
-    SS:
       - カミラ： ダンジョンコアを破壊すればこの不幸な冒険者たちは報われる……
       - カミラ： でも、人類はダンジョンに頼って生きている それもまた現実なのよね
       - カミラ： 人類とは矛盾を抱える種族ね
@@ -451,7 +463,6 @@ story_gareth:
     S:
       - ガレス： ダンジョンで死んだ冒険者の肉体は、アイテムやモンスターになってしまうんだ
       - ガレス： そして魂はダンジョンに食われる……それが呪いの正体だ
-    SS:
       - ガレス： 俺もそろそろギルドに始末されるだろう
       - ガレス： 俺はダンジョンコアを倒すことに賛成だぞ
 

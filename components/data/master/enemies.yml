@@ -3,6 +3,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: スライム
     min_rank: F
+    move_face_chance: 0.0
     image_folder: components/pictures/enemies/slime
     crit_rate: 0.05
     drops:
@@ -33,6 +34,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: まわるがめ
     min_rank: F
+    move_face_chance: 0.0
     max_rank: E
     image_folder: components/pictures/enemies/kame
     crit_rate: 0.05
@@ -65,6 +67,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: ふつうたこ
     min_rank: F
+    move_face_chance: 0.0
     image_folder: components/pictures/enemies/tako_doku
     status: poison
     status_chance: 0
@@ -97,6 +100,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: こわいくさ
     min_rank: E
+    move_face_chance: 0.05
     image_folder: components/pictures/enemies/kowai_kusa
     status: poison
     status_chance: 0
@@ -130,6 +134,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: あかいスライム
     min_rank: E
+    move_face_chance: 0.05
     image_folder: components/pictures/enemies/slime
     image_color: '#FF6666'
     crit_rate: 0.05
@@ -162,6 +167,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: バクダンマン
     min_rank: E
+    move_face_chance: 0.05
     image_folder: components/pictures/enemies/bakudan_man
     crit_rate: 0.05
     drops:
@@ -194,6 +200,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: どくがめ
     min_rank: E
+    move_face_chance: 0.05
     image_folder: components/pictures/enemies/kame
     image_color: '#FFCCCC'
     status: poison
@@ -227,6 +234,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: スケルトン
     min_rank: D
+    move_face_chance: 0.1
     image_folder: components/pictures/enemies/skeleton
     drops:
       normal:
@@ -260,6 +268,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: クチタナゴ
     min_rank: D
+    move_face_chance: 0.1
     image_folder: components/pictures/enemies/kuchitanago
     drops:
       normal:
@@ -291,6 +300,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: ムシグモ
     min_rank: D
+    move_face_chance: 0.1
     image_folder: components/pictures/enemies/mushigumo
     drops:
       normal:
@@ -323,6 +333,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: ポタロウ
     min_rank: D
+    move_face_chance: 0.1
     image_folder: components/pictures/enemies/potaro
     drops:
       normal:
@@ -353,6 +364,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: ミニドラゴン
     min_rank: C
+    move_face_chance: 0.3
     image_folder: components/pictures/enemies/mini_dragon
     drops:
       normal:
@@ -383,6 +395,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: オースト
     min_rank: C
+    move_face_chance: 0.3
     image_folder: components/pictures/enemies/ohst
     drops:
       normal:
@@ -413,6 +426,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: スケルトン剣士
     min_rank: C
+    move_face_chance: 0.3
     image_folder: components/pictures/enemies/skelton_sword
     drops:
       normal: []
@@ -448,6 +462,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: アーマースケルトン
     min_rank: C
+    move_face_chance: 0.3
     image_folder: components/pictures/enemies/skelton_sword_armor
     drops:
       normal: []
@@ -485,6 +500,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: 毒々たこ
     min_rank: C
+    move_face_chance: 0.3
     image_folder: components/pictures/enemies/tako_doku
     status: poison
     status_chance: 0.25
@@ -517,6 +533,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: ゴゴゴーレム
     min_rank: B
+    move_face_chance: 0.4
     image_folder: components/pictures/enemies/gogogolem
     crit_rate: 0.08
     drops:
@@ -549,8 +566,10 @@ ENEMY_DATA:
     quest_targetable: true
     name: グレイゴーレム
     min_rank: B
-    image_folder: components/pictures/enemies/gogogolem
+    move_face_chance: 0.4
+    image_folder: components/pictures/enemies/blackgolem
     crit_rate: 0.06
+    image_color: '#FFFF00'
     drops:
       normal:
       - red_stone
@@ -581,6 +600,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: マグマグロ
     min_rank: B
+    move_face_chance: 0.4
     image_folder: components/pictures/enemies/magmagro
     crit_rate: 0.1
     drops:
@@ -613,6 +633,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: スカスカメ
     min_rank: B
+    move_face_chance: 0.4
     image_folder: components/pictures/enemies/sukasukame
     status: darkness
     status_chance: 35
@@ -646,6 +667,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: ブキミン
     min_rank: A
+    move_face_chance: 0.4
     image_folder: components/pictures/enemies/bukimin
     status: darkness
     status_chance: 25
@@ -679,6 +701,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: タコタコ
     min_rank: A
+    move_face_chance: 0.4
     image_folder: components/pictures/enemies/takotako
     status: poison
     status_chance: 0.3
@@ -712,6 +735,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: メダマン
     min_rank: A
+    move_face_chance: 0.4
     image_folder: components/pictures/enemies/medaman
     crit_rate: 0.12
     drops:
@@ -743,6 +767,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: みどりスライム
     min_rank: A
+    move_face_chance: 0.4
     image_folder: components/pictures/enemies/slime
     image_color: '#FFFF00'
     crit_rate: 0.05
@@ -776,6 +801,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: スイスイスライム
     min_rank: F
+    move_face_chance: 0.0
     max_concurrent: 1
     max_spawns: 1
     is_boss: true
@@ -816,6 +842,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: スケスケスケルトン
     min_rank: E
+    move_face_chance: 0.05
     max_concurrent: 1
     is_boss: true
     spawn_chance: 0.15
@@ -857,6 +884,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: ゴーゴーゴースト
     min_rank: D
+    move_face_chance: 0.1
     max_concurrent: 1
     is_boss: true
     spawn_chance: 0.1
@@ -898,6 +926,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: デカコウモリ
     min_rank: C
+    move_face_chance: 0.3
     max_concurrent: 1
     is_boss: true
     spawn_chance: 0.1
@@ -940,6 +969,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: メヨーン
     min_rank: B
+    move_face_chance: 0.4
     max_concurrent: 1
     is_boss: true
     spawn_chance: 0.1
@@ -984,6 +1014,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: ギルドの刺客
     min_rank: S
+    move_face_chance: 0.4
     image_folder: components/pictures/enemies/skelton_sword_armor
     crit_rate: 0.15
     drops:
@@ -1012,6 +1043,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: コロコロン
     min_rank: A
+    move_face_chance: 0.4
     max_concurrent: 1
     max_spawns: 1
     is_boss: true
@@ -1053,6 +1085,7 @@ ENEMY_DATA:
     quest_targetable: false
     name: 父の亡霊
     min_rank: B
+    move_face_chance: 0.4
     min_floor: 50
     max_floor: 50
     max_concurrent: 1

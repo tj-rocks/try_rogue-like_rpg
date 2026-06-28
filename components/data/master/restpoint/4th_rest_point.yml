@@ -194,52 +194,55 @@ TILE_MAPPINGS:
     category: obstacle
     id: wood_barrel
     positions:
-      - x: 29
-        y: 2
+      - x: 19
+        y: 9
         flip: false
-      - x: 30
-        y: 2
+      - x: 21
+        y: 9
         flip: false
-      - x: 37
-        y: 3
+      - x: 25
+        y: 10
         flip: false
-      - x: 42
-        y: 3
+      - x: 36
+        y: 10
         flip: false
-      - x: 2
-        y: 5
-        flip: false
-      - x: 11
-        y: 17
+      - x: 21
+        y: 11
         flip: false
   crate:
     category: obstacle
     id: crate
     positions:
-      - x: 27
-        y: 2
+      - x: 25
+        y: 9
         flip: false
-      - x: 32
-        y: 2
+      - x: 13
+        y: 10
         flip: false
-      - x: 27
-        y: 3
+      - x: 13
+        y: 12
         flip: false
-      - x: 32
-        y: 3
+      - x: 25
+        y: 13
         flip: false
   pot:
     category: obstacle
     id: pot
     positions:
-      - x: 20
+      - x: 26
         y: 2
         flip: false
-      - x: 37
-        y: 5
+      - x: 28
+        y: 2
         flip: false
-      - x: 42
-        y: 5
+      - x: 17
+        y: 9
+        flip: false
+      - x: 25
+        y: 12
+        flip: false
+      - x: 21
+        y: 13
         flip: false
   rubble:
     category: obstacle
@@ -248,12 +251,37 @@ TILE_MAPPINGS:
     category: obstacle
     id: anvil
     positions:
-      - x: 31
-        y: 15
+      - x: 9
+        y: 10
         flip: false
   crystal:
     category: obstacle
     id: crystal
+    positions:
+      - x: 36
+        y: 2
+        flip: false
+      - x: 38
+        y: 2
+        flip: false
+      - x: 40
+        y: 2
+        flip: false
+      - x: 42
+        y: 2
+        flip: false
+      - x: 36
+        y: 4
+        flip: false
+      - x: 38
+        y: 4
+        flip: false
+      - x: 40
+        y: 4
+        flip: false
+      - x: 42
+        y: 4
+        flip: false
   sword_stuck:
     category: obstacle
     id: sword_stuck
@@ -261,56 +289,68 @@ TILE_MAPPINGS:
     category: obstacle
     id: stained_armor_stand
     positions:
-      - x: 18
-        y: 2
+      - x: 3
+        y: 9
+        flip: false
+      - x: 4
+        y: 9
+        flip: false
+      - x: 5
+        y: 9
+        flip: false
+      - x: 6
+        y: 9
+        flip: false
+      - x: 7
+        y: 9
         flip: false
   weapon_shop:
     category: npc
     id: weapon_shop
     positions:
-      - x: 42
-        y: 4
-        flip: true
+      - x: 13
+        y: 11
+        flip: false
   item_shop:
     category: npc
     id: item_shop
     positions:
-      - x: 42
-        y: 2
-        flip: false
+      - x: 13
+        y: 13
+        flip: true
   merchant:
     category: npc
     id: merchant
     positions:
-      - x: 37
-        y: 4
-        flip: true
+      - x: 21
+        y: 12
+        flip: false
   storage:
     category: npc
     id: storage
     positions:
-      - x: 31
-        y: 2
+      - x: 18
+        y: 9
         flip: false
   inn:
     category: npc
     id: inn
     positions:
-      - x: 2
-        y: 6
+      - x: 36
+        y: 9
         flip: true
   blacksmith:
     category: npc
     id: blacksmith
     positions:
-      - x: 31
-        y: 14
+      - x: 9
+        y: 9
         flip: false
   guild_receptionist:
     category: npc
     id: guild_receptionist
     positions:
-      - x: 19
+      - x: 27
         y: 2
         flip: false
   doctor:
@@ -320,19 +360,23 @@ TILE_MAPPINGS:
     category: npc
     id: bank
     positions:
-      - x: 28
-        y: 2
+      - x: 20
+        y: 9
         flip: false
   pub_master:
     category: npc
     id: pub_master
     positions:
-      - x: 11
-        y: 16
+      - x: 25
+        y: 11
         flip: true
   teleport_wizard:
     category: npc
     id: teleport_wizard
+    positions:
+      - x: 3
+        y: 12
+        flip: true
   tutorial_woman1:
     category: npc
     id: tutorial_woman1
@@ -340,38 +384,29 @@ TILE_MAPPINGS:
     category: obstacle
     id: table
     positions:
-      - x: 17
+      - x: 13
         y: 2
         flip: false
-      - x: 21
+      - x: 16
         y: 2
         flip: false
-      - x: 19
-        y: 4
-        flip: false
-      - x: 17
-        y: 6
-        flip: false
-      - x: 21
-        y: 6
-        flip: false
-      - x: 14
-        y: 15
-        flip: false
-      - x: 17
-        y: 15
-        flip: false
       - x: 20
-        y: 15
+        y: 2
         flip: false
-      - x: 14
-        y: 18
+      - x: 28
+        y: 10
+        flip: false
+      - x: 31
+        y: 10
         flip: false
       - x: 17
-        y: 18
+        y: 11
         flip: false
-      - x: 20
-        y: 18
+      - x: 28
+        y: 12
+        flip: false
+      - x: 31
+        y: 12
         flip: false
   special_P:
     char: P
@@ -399,92 +434,95 @@ TILE_MAPPINGS:
     category: npc
     id: story_noname5
     positions:
-      - x: 10
+      - x: 22
         y: 2
+        flip: false
+      - x: 41
+        y: 10
         flip: false
   story_noname1:
     category: npc
     id: story_noname1
     positions:
-      - x: 18
-        y: 4
-        flip: true
+      - x: 14
+        y: 2
+        flip: false
   story_noname3:
     category: npc
     id: story_noname3
     positions:
-      - x: 18
-        y: 6
+      - x: 17
+        y: 2
         flip: false
   story_noname2:
     category: npc
     id: story_noname2
     positions:
-      - x: 17
-        y: 5
+      - x: 31
+        y: 2
         flip: false
   story_noname4:
     category: npc
     id: story_noname4
     positions:
-      - x: 10
-        y: 6
-        flip: false
+      - x: 19
+        y: 2
+        flip: true
   story_camila:
     category: npc
     id: story_camila
     positions:
-      - x: 20
-        y: 14
+      - x: 31
+        y: 9
         flip: false
   story_helena:
     category: npc
     id: story_helena
     positions:
-      - x: 13
-        y: 15
+      - x: 30
+        y: 12
         flip: true
   story_geisel:
     category: npc
     id: story_geisel
     positions:
-      - x: 42
-        y: 11
+      - x: 33
+        y: 20
         flip: false
   story_kaya:
     category: npc
     id: story_kaya
     positions:
       - x: 18
-        y: 15
+        y: 11
         flip: false
   story_olivia:
     category: npc
     id: story_olivia
     positions:
-      - x: 13
-        y: 18
-        flip: true
+      - x: 32
+        y: 10
+        flip: false
   story_gareth:
     category: npc
     id: story_gareth
     positions:
-      - x: 15
-        y: 18
+      - x: 32
+        y: 12
         flip: false
   story_rain:
     category: npc
     id: story_rain
     positions:
-      - x: 19
-        y: 18
+      - x: 27
+        y: 10
         flip: true
   story_yuru:
     category: npc
     id: story_yuru
     positions:
-      - x: 21
-        y: 18
+      - x: 29
+        y: 10
         flip: false
   wall_deco_tapestry:
     category: wall_decoration
@@ -492,62 +530,80 @@ TILE_MAPPINGS:
     id: wall_decoration_tapestry
     image_path: components/pictures/dungeon/home/wall_decoration_tapestry.png
     positions:
-      - x: 38
-        y: 2
+      - x: 14
+        y: 9
         flip: false
-      - x: 41
-        y: 2
-        flip: true
-      - x: 38
-        y: 3
+      - x: 26
+        y: 9
         flip: false
-      - x: 41
-        y: 3
-        flip: true
-      - x: 38
-        y: 4
+      - x: 37
+        y: 9
         flip: false
-      - x: 41
-        y: 4
-        flip: true
-      - x: 38
-        y: 5
+      - x: 14
+        y: 10
         flip: false
-      - x: 41
-        y: 5
+      - x: 26
+        y: 10
+        flip: false
+      - x: 37
+        y: 10
+        flip: false
+      - x: 14
+        y: 11
+        flip: false
+      - x: 20
+        y: 11
         flip: true
+      - x: 26
+        y: 11
+        flip: false
+      - x: 14
+        y: 12
+        flip: false
+      - x: 20
+        y: 12
+        flip: true
+      - x: 26
+        y: 12
+        flip: false
+      - x: 14
+        y: 13
+        flip: false
+      - x: 20
+        y: 13
+        flip: true
+      - x: 26
+        y: 13
+        flip: false
   wall_deco_wooden_roof:
     category: wall_decoration
     desc: 木製の屋根飾り
     id: wall_decoration_wooden_roof
     image_path: components/pictures/dungeon/home/wall_decoration_wooden_roof.png
     positions:
-      - x: 17
+      - x: 26
         y: 3
         flip: false
-      - x: 18
-        y: 3
-        flip: false
-      - x: 19
-        y: 3
-        flip: false
-      - x: 20
-        y: 3
-        flip: false
-      - x: 21
+      - x: 27
         y: 3
         flip: false
       - x: 28
         y: 3
         flip: false
-      - x: 29
-        y: 3
+      - x: 17
+        y: 10
         flip: false
-      - x: 30
-        y: 3
+      - x: 18
+        y: 10
         flip: false
-      - x: 31
-        y: 3
+      - x: 19
+        y: 10
+        flip: false
+      - x: 20
+        y: 10
+        flip: false
+      - x: 21
+        y: 10
         flip: false
   wall_deco_shield:
     category: wall_decoration
@@ -555,38 +611,151 @@ TILE_MAPPINGS:
     id: wall_decoration_shield
     image_path: components/pictures/dungeon/home/wall_decoration_shield.png
     positions:
-      - x: 18
-        y: 8
+      - x: 22
+        y: 5
         flip: false
-      - x: 20
-        y: 8
+      - x: 24
+        y: 5
         flip: false
   wizard:
     category: npc
     id: wizard
     positions:
-      - x: 37
-        y: 2
+      - x: 13
+        y: 9
         flip: false
   bed:
     category: obstacle
     id: bed
     positions:
+      - x: 38
+        y: 9
+        flip: false
+      - x: 40
+        y: 9
+        flip: false
+      - x: 42
+        y: 9
+        flip: false
+      - x: 38
+        y: 11
+        flip: false
+      - x: 40
+        y: 11
+        flip: false
+      - x: 42
+        y: 11
+        flip: false
+      - x: 38
+        y: 13
+        flip: false
+      - x: 40
+        y: 13
+        flip: false
+      - x: 42
+        y: 13
+        flip: false
+  wall_decoration_pub:
+    category: wall_decoration
+    desc: パブの看板
+    id: wall_decoration_pub
+    image_path: components/pictures/dungeon/home/wall_decoration_pub.png
+  wall_deco_bank:
+    category: wall_decoration
+    desc: 銀行の看板
+    id: wall_decoration_bank
+    image_path: components/pictures/dungeon/home/wall_decoration_bank.png
+    positions:
+      - x: 19
+        y: 8
+        flip: false
+  guide_guild:
+    category: npc
+    id: guide_guild
+  wall_deco_weapon_shop:
+    category: wall_decoration
+    desc: 武器屋の看板
+    id: wall_decoration_weapon_shop
+    image_path: components/pictures/dungeon/home/wall_decoration_weapon_shop.png
+    positions:
+      - x: 13
+        y: 8
+        flip: false
+  wall_deco_masic_shop:
+    category: wall_decoration
+    desc: 魔法屋のシンボル
+    id: wall_decoration_masic_shop
+    image_path: components/pictures/icon/stave.png
+    positions:
+      - x: 14
+        y: 8
+        flip: false
+  wall_deco_item_shop:
+    category: wall_decoration
+    desc: アイテム屋のシンボル
+    id: wall_decoration_item_shop
+    image_path: components/pictures/icon/hp_potion.png
+    positions:
+      - x: 15
+        y: 8
+        flip: false
+  wall_deco_window:
+    category: wall_decoration
+    desc: 窓
+    id: wall_decoration_window
+    image_path: components/pictures/dungeon/home/wall_decoration_window.png
+    positions:
+      - x: 16
+        y: 8
+        flip: false
+      - x: 27
+        y: 8
+        flip: false
+      - x: 30
+        y: 8
+        flip: false
+  candelabra:
+    category: obstacle
+    id: candelabra
+    positions:
+      - x: 2
+        y: 2
+        flip: false
+      - x: 4
+        y: 2
+        flip: false
+      - x: 4
+        y: 11
+        flip: false
+      - x: 4
+        y: 13
+        flip: false
+  evil_statue:
+    category: obstacle
+    id: evil_statue
+    positions:
       - x: 3
+        y: 2
+        flip: false
+  broken_pillar:
+    category: obstacle
+    id: broken_pillar
+    positions:
+      - x: 2
         y: 3
         flip: false
-      - x: 5
+      - x: 9
         y: 3
+        flip: false
+      - x: 3
+        y: 18
         flip: false
       - x: 7
-        y: 3
+        y: 18
         flip: false
-      - x: 3
-        y: 5
+      - x: 14
+        y: 18
         flip: false
-      - x: 5
-        y: 5
-        flip: false
-      - x: 7
-        y: 5
+      - x: 19
+        y: 18
         flip: false

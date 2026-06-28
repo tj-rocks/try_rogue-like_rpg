@@ -106,20 +106,19 @@ class TestArmorPenetration(unittest.TestCase):
         
         # 1. 防御無視60%によるダメージシミュレーション
         # 防御力 50 は 60%無視されて 20 になるはず
-        # 新式ベースダメージ: 50 * (50 / 70) = 35.71
-        # 乱数範囲: 35.71 * (0.7 ~ 1.0) = 25.00 ~ 35.71 -> 繰り上げにより 25 ~ 36
-        # 最終ダメージは (25 ~ 36) の範囲に収まり、最低ダメージ 1 より確実に大きくなる
+        # ベースダメージ: 50 * (50 / 70) = 35.71
+        # 乱数範囲: 35.71 * (0.9 ~ 1.1) = 32.14 ~ 39.28 -> 繰り上げにより 33 ~ 40
         msg, dmg, is_crit, is_miss = deal_damage(attacker, target, is_magic=True)
         
-        self.assertTrue(25 <= dmg <= 36, f"Expected damage between 25 and 36, got {dmg}")
+        self.assertTrue(33 <= dmg <= 40, f"Expected damage between 33 and 40, got {dmg}")
         self.assertEqual(target.defense, 50) # 敵の元の防御力値は書き変わっていないこと
 
         # 2. 100%無視（防御無視率 1.0）のシミュレーション
         attacker.total_armor_penetration = 1.0
-        # 攻撃力 50 - 防御力 0 = ベースダメージ 50
-        # 乱数範囲: 50 * (0.7 ~ 1.0) = 35 ~ 50
+        # 防御力 0: ベースダメージ = 50 * (50/50) = 50
+        # 乱数範囲: 50 * (0.9 ~ 1.1) = 45 ~ 55
         msg, dmg, is_crit, is_miss = deal_damage(attacker, target, is_magic=True)
-        self.assertTrue(35 <= dmg <= 50, f"Expected damage between 35 and 50, got {dmg}")
+        self.assertTrue(45 <= dmg <= 55, f"Expected damage between 45 and 55, got {dmg}")
 
 if __name__ == "__main__":
     unittest.main()

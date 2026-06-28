@@ -124,7 +124,7 @@ class Entity:
 
     def update_animation(self, dt=1/60):
         """すべてのエンティティに共通するフレームごとのアニメーション進行処理"""
-        self.process_movement(dt)
+        movement_finished = self.process_movement(dt)
         self.idle_anim_timer = (self.idle_anim_timer + 1) % 60
         
         if self.is_moving:
@@ -140,6 +140,8 @@ class Entity:
                 
         if getattr(self, "damage_flash_timer", 0) > 0:
             self.damage_flash_timer -= 1
+
+        return movement_finished
 
     def take_damage(self, amount):
         """ダメージを受ける（共通処理）"""
