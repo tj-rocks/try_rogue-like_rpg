@@ -273,6 +273,11 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                     heal_amount = int(damage * lifesteal_ratio)
                     attacker.hp = min(attacker.max_hp, attacker.hp + heal_amount)
                     msg += f"\n{attacker_name}は{heal_amount}回復した！"
+                    # ライフスティール発動時も対象に赤色フラッシュ
+                    if hasattr(target, "flash_color"):
+                        target.flash_color = (255, 50, 50)
+                    if hasattr(target, "damage_flash_timer"):
+                        target.damage_flash_timer = max(target.damage_flash_timer, 60 + HIT_STUN_DURATION)
                     if _os.environ.get("DEBUG_MODE") == "1":
                         print(f"[ライフスティール] ✅ クリティカル発動")
 
