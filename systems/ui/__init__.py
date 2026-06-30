@@ -46,6 +46,7 @@ from systems.ui.ui_status import (
     StatusBar,
     StatusDialog,
 )
+from systems.ui.ui_manager import UIManager
 from systems.ui.ui_misc import (
     TeleportDialog,
     OreGiftDialog,
@@ -91,6 +92,7 @@ __all__ = [
     "GuildGuideDialog",
     "StatusBar",
     "StatusDialog",
+    "UIManager",
     "TeleportDialog",
     "OreGiftDialog",
     "draw_vision_overlay",

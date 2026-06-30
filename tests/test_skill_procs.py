@@ -20,7 +20,7 @@ def make_combatant(x, y, facing="down",
                    stupidity_proc_chance=0.0, stupidity_proc_amount=0,
                    backstab_crit_bonus=0.0, flank_backstab=0,
                    block_chance_close=0.0, block_chance_ranged=0.0,
-                   total_lifesteal=0, total_confusion=0):
+                   total_lifesteal=0, total_confusion=0, total_stun=0):
     """テスト用のシンプルな戦闘オブジェクトを作成する"""
     class Combatant:
         def take_damage(self, amount):
@@ -53,6 +53,7 @@ def make_combatant(x, y, facing="down",
     c.total_counter_damage_ratio = counter_damage_ratio
     c.total_stun_proc_chance = stun_proc_chance
     c.total_stun_duration = stun_duration
+    c.total_stun = total_stun
     c.total_stupidity_proc_chance = stupidity_proc_chance
     c.total_stupidity_proc_amount = stupidity_proc_amount
     c.total_lifesteal = total_lifesteal
@@ -161,7 +162,7 @@ def test_stun_proc():
     random.seed(42)
     
     # クリティカル確定（crit_rate=1.0）でスタンが発動することを確認
-    attacker = make_combatant(5, 5, attack=50, crit_rate=1.0, stun_proc_chance=1.0, stun_duration=2)
+    attacker = make_combatant(5, 5, attack=50, crit_rate=1.0, stun_proc_chance=1.0, stun_duration=2, total_stun=2)
     target = make_combatant(5, 6, hp=1000)
     target.facing = "down"
     target.stun_turns = 0
@@ -181,7 +182,7 @@ def test_stun_no_proc():
     
     # クリティカルなし（crit_rate=0.0）→ stun_proc_chance=1.0でも発動しない
     # target.facing="up"にして正面攻撃にしバックスタブボーナスを排除
-    attacker = make_combatant(5, 5, attack=50, crit_rate=0.0, stun_proc_chance=1.0, stun_duration=2)
+    attacker = make_combatant(5, 5, attack=50, crit_rate=0.0, stun_proc_chance=1.0, stun_duration=2, total_stun=2)
     target = make_combatant(5, 6, hp=1000)
     target.facing = "up"
     target.stun_turns = 0

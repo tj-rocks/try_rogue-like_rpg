@@ -3682,7 +3682,7 @@ class StatusDialog:
                 left_lines.append(f"背後会心  {format_val(val)}%")
                 has_any_bonus = True
             if total_flank != 0:
-                active = "発動" if total_flank >= 3 else f"{int(total_flank)}/3"
+                active = "発動" if total_flank >= 2 else f"{int(total_flank)}/2"
                 left_lines.append(f"側面背後  {active}")
                 has_any_bonus = True
             if total_stup_proc_chance != 0:
@@ -4865,6 +4865,3 @@ def draw_all_ui(screen, player, dialog, confirm_dialog, inventory_dialog, status
     # 最後にミニマップを最前面に描画
     if dungeon:
         draw_minimap(screen, dungeon, player)
-
-
-

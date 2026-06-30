@@ -530,7 +530,7 @@ SHIELD_DATA:
       usually_buyable: false
       special_buyable: true
     floor_spawnable: true
-    describe: 暗殺者用の小型盾。3部位揃えると背後攻撃性能が大きく向上する。
+    describe: 暗殺者用の小型盾。2部位から側面攻撃の気配が鋭くなり、3部位で背後攻撃性能がさらに伸びる。
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     image_scale: 1.0
     bonus:

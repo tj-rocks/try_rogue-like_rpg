@@ -159,22 +159,25 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
     ゲーム本編（探索・戦闘）のロジックを処理する。
     """
     # UIイベント処理
-    handle_ui_events(events, 
-                     ui_elements["dialog"], ui_elements["confirm_dialog"], ui_elements["inventory_dialog"], 
-                     ui_elements["status_dialog"], ui_elements["enhance_dialog"], ui_elements["item_action_dialog"], 
-                     ui_elements["ore_selection_dialog"], menu_dialog=ui_elements.get("menu_dialog"), player=player, dungeon=dungeon, 
-                     shop_dialog=ui_elements.get("shop_dialog"), stave_selection_dialog=ui_elements.get("stave_selection_dialog"), 
-                     guild_dialog=ui_elements.get("guild_dialog"), warehouse_dialog=ui_elements.get("warehouse_dialog"), 
-                     equip_dialog=ui_elements.get("equip_dialog"),
-                     stave_inv_dialog=ui_elements.get("stave_inventory_dialog"),
-                     event_inv_dialog=ui_elements.get("event_inventory_dialog"),
-                     bank_dialog=ui_elements.get("bank_dialog"),
-                     teleport_dialog=ui_elements.get("teleport_dialog"),
-                     guild_guide_dialog=ui_elements.get("guild_guide_dialog"),
-                     cutscene_manager=ui_elements.get("cutscene_manager"),
-                     parameter_selection_active=game_state.get("parameter_selection_active"),
-                     parameter_selection_dialog=ui_elements.get("parameter_selection_dialog"),
-                     ore_gift_dialog=ui_elements.get("ore_gift_dialog"))
+    if hasattr(ui_elements, "handle_events"):
+        ui_elements.handle_events(events, player=player, dungeon=dungeon)
+    else:
+        handle_ui_events(events, 
+                         ui_elements["dialog"], ui_elements["confirm_dialog"], ui_elements["inventory_dialog"], 
+                         ui_elements["status_dialog"], ui_elements["enhance_dialog"], ui_elements["item_action_dialog"], 
+                         ui_elements["ore_selection_dialog"], menu_dialog=ui_elements.get("menu_dialog"), player=player, dungeon=dungeon, 
+                         shop_dialog=ui_elements.get("shop_dialog"), stave_selection_dialog=ui_elements.get("stave_selection_dialog"), 
+                         guild_dialog=ui_elements.get("guild_dialog"), warehouse_dialog=ui_elements.get("warehouse_dialog"), 
+                         equip_dialog=ui_elements.get("equip_dialog"),
+                         stave_inv_dialog=ui_elements.get("stave_inventory_dialog"),
+                         event_inv_dialog=ui_elements.get("event_inventory_dialog"),
+                         bank_dialog=ui_elements.get("bank_dialog"),
+                         teleport_dialog=ui_elements.get("teleport_dialog"),
+                         guild_guide_dialog=ui_elements.get("guild_guide_dialog"),
+                         cutscene_manager=ui_elements.get("cutscene_manager"),
+                         parameter_selection_active=game_state.get("parameter_selection_active"),
+                         parameter_selection_dialog=ui_elements.get("parameter_selection_dialog"),
+                         ore_gift_dialog=ui_elements.get("ore_gift_dialog"))
     
     screen.fill((0, 0, 0))
     
@@ -240,29 +243,35 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
     draw_vision_overlay(screen, player, new_dungeon)
         
     # UIの描画
-    if ui_elements.get("status_bar"):
-        ui_elements["status_bar"].draw(screen, player, new_dungeon.get_current_floor_level())
-    
-    draw_all_ui(screen, player, ui_elements["dialog"], ui_elements["confirm_dialog"], ui_elements["inventory_dialog"], 
-                ui_elements["status_dialog"], ui_elements["enhance_dialog"], ui_elements["item_action_dialog"], 
-                ui_elements["ore_selection_dialog"], ui_elements.get("shop_dialog"), ui_elements.get("stave_selection_dialog"), 
-                guild_dialog=ui_elements.get("guild_dialog"), warehouse_dialog=ui_elements.get("warehouse_dialog"), 
-                bank_dialog=ui_elements.get("bank_dialog"), menu_dialog=ui_elements.get("menu_dialog"), 
-                equip_dialog=ui_elements.get("equip_dialog"), 
-                stave_inv_dialog=ui_elements.get("stave_inventory_dialog"),
-                event_inv_dialog=ui_elements.get("event_inventory_dialog"),
-                teleport_dialog=ui_elements.get("teleport_dialog"),
-                guild_guide_dialog=ui_elements.get("guild_guide_dialog"),
-                dungeon=new_dungeon, events=events,
-                cutscene_manager=ui_elements.get("cutscene_manager"),
-                parameter_selection_dialog=ui_elements.get("parameter_selection_dialog"),
-                ore_gift_dialog=ui_elements.get("ore_gift_dialog"))
+    if hasattr(ui_elements, "draw"):
+        ui_elements.draw(screen, player, dungeon=new_dungeon, events=events)
+    else:
+        if ui_elements.get("status_bar"):
+            ui_elements["status_bar"].draw(screen, player, new_dungeon.get_current_floor_level())
+
+        draw_all_ui(screen, player, ui_elements["dialog"], ui_elements["confirm_dialog"], ui_elements["inventory_dialog"], 
+                    ui_elements["status_dialog"], ui_elements["enhance_dialog"], ui_elements["item_action_dialog"], 
+                    ui_elements["ore_selection_dialog"], ui_elements.get("shop_dialog"), ui_elements.get("stave_selection_dialog"), 
+                    guild_dialog=ui_elements.get("guild_dialog"), warehouse_dialog=ui_elements.get("warehouse_dialog"), 
+                    bank_dialog=ui_elements.get("bank_dialog"), menu_dialog=ui_elements.get("menu_dialog"), 
+                    equip_dialog=ui_elements.get("equip_dialog"), 
+                    stave_inv_dialog=ui_elements.get("stave_inventory_dialog"),
+                    event_inv_dialog=ui_elements.get("event_inventory_dialog"),
+                    teleport_dialog=ui_elements.get("teleport_dialog"),
+                    guild_guide_dialog=ui_elements.get("guild_guide_dialog"),
+                    dungeon=new_dungeon, events=events,
+                    cutscene_manager=ui_elements.get("cutscene_manager"),
+                    parameter_selection_dialog=ui_elements.get("parameter_selection_dialog"),
+                    ore_gift_dialog=ui_elements.get("ore_gift_dialog"))
     
     # エリア名演出オーバーレイ（ダクソ風）
-    area_overlay = ui_elements.get("area_message_overlay")
-    if area_overlay:
-        area_overlay.update()
-        area_overlay.draw(screen)
+    if hasattr(ui_elements, "update_and_draw_area_overlay"):
+        ui_elements.update_and_draw_area_overlay(screen)
+    else:
+        area_overlay = ui_elements.get("area_message_overlay")
+        if area_overlay:
+            area_overlay.update()
+            area_overlay.draw(screen)
 
     # 死亡演出: 暗転オーバーレイ＋「力尽きた…」テキスト
     fade_alpha = game_state.get("death_fade_alpha", 0)
