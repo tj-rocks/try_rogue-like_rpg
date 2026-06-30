@@ -1471,7 +1471,7 @@ class Player(Entity):
                     # --- knockbackスキル発動（クリティカル不問） ---
                     if dmg > 0 and not miss:
                         total_knockback = getattr(self, "total_knockback", 0)
-                        if isinstance(total_knockback, int) and total_knockback >= 3:
+                        if isinstance(total_knockback, int) and total_knockback >= 2:
                             kb_chance = getattr(self, "total_knockback_proc_chance", 0.0)
                             if isinstance(kb_chance, (int, float)) and kb_chance > 0:
                                 if random.random() < kb_chance:
@@ -1498,6 +1498,13 @@ class Player(Entity):
                                         e.target_x = final_gx * dungeon.tile_size
                                         e.target_y = final_gy * dungeon.tile_size
                                         e.is_moving = True
+                                        push_distance = abs(final_gx - e_gx) + abs(final_gy - e_gy)
+                                        e.immobilized_turns = max(getattr(e, "immobilized_turns", 0), push_distance + 1)
+                                        e.flash_color = (180, 120, 255)
+                                        from systems.magic_handler import ParalysisEffect
+                                        dungeon.magic_effects.append(
+                                            ParalysisEffect(final_gx * dungeon.tile_size, final_gy * dungeon.tile_size, color=(180, 120, 255), duration=24)
+                                        )
                                         sound_manager.play_sfx(SOUND_KNOCKBACK)
                                         msg += f"\n{e.name} を吹き飛ばした！"
                                         if os.environ.get("DEBUG_MODE") == "1":

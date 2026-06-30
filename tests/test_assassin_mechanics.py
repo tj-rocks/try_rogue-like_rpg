@@ -72,35 +72,35 @@ def test_normal_backstab():
 
 
 # ─────────────────────────────────────────────
-# テスト2: flank_backstab 3以上で側面も背後扱い
+# テスト2: flank_backstab 2以上で側面も背後扱い
 # ─────────────────────────────────────────────
 def test_flank_backstab():
     print("\n--- テスト2: flank_backstab による側面背後 ---")
     target = make_combatant(5, 5, facing="down")
 
-    # 側面（右）からの攻撃 + flank_backstab=3 → 背後扱い
-    attacker = make_combatant(6, 5, flank_backstab=3)
+    # 側面（右）からの攻撃 + flank_backstab=2 → 背後扱い
+    attacker = make_combatant(6, 5, flank_backstab=2)
     result = _is_back_attack(attacker, target)
-    assert result == True, f"flank_backstab=3 の側面攻撃が True でない (expected True)"
-    print("[OK] 側面（flank_backstab=3） → True（背後扱い）")
+    assert result == True, f"flank_backstab=2 の側面攻撃が True でない (expected True)"
+    print("[OK] 側面（flank_backstab=2） → True（背後扱い）")
 
-    # 側面（左）からの攻撃 + flank_backstab=3 → 背後扱い
-    attacker2 = make_combatant(4, 5, flank_backstab=3)
+    # 側面（左）からの攻撃 + flank_backstab=2 → 背後扱い
+    attacker2 = make_combatant(4, 5, flank_backstab=2)
     result2 = _is_back_attack(attacker2, target)
-    assert result2 == True, f"flank_backstab=3 の左側面攻撃が True でない (expected True)"
-    print("[OK] 左側面（flank_backstab=3） → True（背後扱い）")
+    assert result2 == True, f"flank_backstab=2 の左側面攻撃が True でない (expected True)"
+    print("[OK] 左側面（flank_backstab=2） → True（背後扱い）")
 
-    # 正面からの攻撃 + flank_backstab=3 → 背後扱いにならない
-    front = make_combatant(5, 6, flank_backstab=3)  # 正面（下にいる）
+    # 正面からの攻撃 + flank_backstab=2 → 背後扱いにならない
+    front = make_combatant(5, 6, flank_backstab=2)  # 正面（下にいる）
     result3 = _is_back_attack(front, target)
-    assert result3 == False, f"正面攻撃が True になっている（flank_backstab=3でも正面は除外）"
-    print("[OK] 正面（flank_backstab=3） → False（正面は除外）")
+    assert result3 == False, f"正面攻撃が True になっている（flank_backstab=2でも正面は除外）"
+    print("[OK] 正面（flank_backstab=2） → False（正面は除外）")
 
-    # flank_backstab=2 では発動しない
-    attacker4 = make_combatant(6, 5, flank_backstab=2)
+    # flank_backstab=1 では発動しない
+    attacker4 = make_combatant(6, 5, flank_backstab=1)
     result4 = _is_back_attack(attacker4, target)
-    assert result4 == False, f"flank_backstab=2 で発動してはいけない (expected False)"
-    print("[OK] 側面（flank_backstab=2） → False（閾値未満）")
+    assert result4 == False, f"flank_backstab=1 で発動してはいけない (expected False)"
+    print("[OK] 側面（flank_backstab=1） → False（閾値未満）")
 
 
 # ─────────────────────────────────────────────
@@ -191,8 +191,10 @@ def test_assassin_set_totals():
         bsb = eq.get_stat("backstab_crit_bonus", 0.0)
         print(f"  {name}: flank_backstab={fb}, proc_chance={spc}, proc_amount={spa}, backstab_crit={bsb}")
         assert fb  == 1,   f"{name} の flank_backstab が 1 でない: {fb}"
-        assert spc == 0.1, f"{name} の stupidity_proc_chance が 0.1 でない: {spc}"
-        assert spa == 1,   f"{name} の stupidity_proc_amount が 1 でない: {spa}"
+        expected_spc = {"dagger": 0.1, "armor": 0.0, "shield": 0.1}[name]
+        expected_spa = {"dagger": 1, "armor": 0, "shield": 1}[name]
+        assert spc == expected_spc, f"{name} の stupidity_proc_chance が期待値でない: {spc}"
+        assert spa == expected_spa, f"{name} の stupidity_proc_amount が期待値でない: {spa}"
         assert bsb == {"dagger": 0.1, "armor": 0.2, "shield": 0.2}[name], f"{name} の backstab_crit_bonus が期待値でない: {bsb}"
 
     print("[OK] 各部位の個別値が正しい")
@@ -205,10 +207,10 @@ def test_assassin_set_totals():
 
     print(f"  合計: flank_backstab={total_flank}, proc_chance={round(total_chance,2)}, proc_amount={total_amount}, backstab_crit={round(total_crit,2)}")
     assert total_flank  == 3,   f"3部位合計 flank_backstab が 3 でない: {total_flank}"
-    assert round(total_chance, 2) == 0.3, f"3部位合計 stupidity_proc_chance が 0.3 でない: {total_chance}"
-    assert total_amount == 3,   f"3部位合計 stupidity_proc_amount が 3 でない: {total_amount}"
+    assert round(total_chance, 2) == 0.2, f"3部位合計 stupidity_proc_chance が 0.2 でない: {total_chance}"
+    assert total_amount == 2,   f"3部位合計 stupidity_proc_amount が 2 でない: {total_amount}"
     assert round(total_crit, 2) == 0.5, f"3部位合計 backstab_crit_bonus が 0.5 でない: {total_crit}"
-    print("[OK] 3部位合計値が正しい（flank=3, chance=0.3, amount=3, crit=0.5）")
+    print("[OK] 3部位合計値が正しい（flank=3, chance=0.2, amount=2, crit=0.5）")
 
     pygame.quit()
 

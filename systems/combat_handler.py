@@ -21,7 +21,7 @@ def _is_frontal_attack(attacker, target):
 def _is_back_attack(attacker, target):
     """
     攻撃が「背後から」かどうかを判定する。
-    flank_backstab 合計が 3 以上の場合、側面（正面以外）も背後扱いにする。
+    flank_backstab 合計が 2 以上の場合、側面（正面以外）も背後扱いにする。
     障害物（is_static）にはバックアタックを適用しない。
     """
     if getattr(target, "is_static", False):
@@ -40,9 +40,9 @@ def _is_back_attack(attacker, target):
     if facing == "up"    and ay > ty: return True
     if facing == "down"  and ay < ty: return True
 
-    # 側面も背後扱いにするスキル（flank_backstab 合計 3 以上）
+    # 側面も背後扱いにするスキル（flank_backstab 合計 2 以上）
     flank = getattr(attacker, "total_flank_backstab", 0)
-    if isinstance(flank, (int, float)) and flank >= 3:
+    if isinstance(flank, (int, float)) and flank >= 2:
         if not _is_frontal_attack(attacker, target):
             return True
     return False
@@ -235,7 +235,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     # --- 敵の一時的 stupidity 上昇効果（装備スキル） ---
     if not is_miss and damage > 0 and hasattr(target, "stupidity_temp"):
         total_confusion = getattr(attacker, "total_confusion", 0)
-        if isinstance(total_confusion, int) and total_confusion >= 3:
+        if isinstance(total_confusion, int) and total_confusion >= 2:
             proc_chance = getattr(attacker, "total_stupidity_proc_chance", 0.0)
             if isinstance(proc_chance, (int, float)) and proc_chance > 0:
                 rolled = random.random()
@@ -251,8 +251,9 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
 
     # --- スタン効果（クリティカル時のみ発動） ---
     if not is_miss and damage > 0 and is_critical and hasattr(target, "stun_turns"):
+        total_stun = getattr(attacker, "total_stun", 0)
         stun_chance = getattr(attacker, "total_stun_proc_chance", 0.0)
-        if isinstance(stun_chance, (int, float)) and stun_chance > 0:
+        if isinstance(total_stun, int) and total_stun >= 2 and isinstance(stun_chance, (int, float)) and stun_chance > 0:
             stun_duration = getattr(attacker, "total_stun_duration", 1)
             if isinstance(stun_duration, (int, float)) and stun_duration > 0:
                 target.stun_turns = int(stun_duration)
@@ -265,7 +266,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     # --- ライフスティール効果（クリティカル時のみ発動） ---
     if not is_miss and damage > 0 and is_critical and hasattr(attacker, "hp"):
         total_lifesteal = getattr(attacker, "total_lifesteal", 0)
-        if isinstance(total_lifesteal, int) and total_lifesteal >= 3:
+        if isinstance(total_lifesteal, int) and total_lifesteal >= 2:
             lifesteal_chance = getattr(attacker, "total_lifesteal_chance", 0.0)
             if isinstance(lifesteal_chance, (int, float)) and lifesteal_chance > 0:
                 lifesteal_ratio = getattr(attacker, "total_lifesteal_ratio", 0.0)
@@ -284,9 +285,9 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     # --- カウンター効果（攻撃時に発動） ---
     if hasattr(target, "hp") and hasattr(attacker, "hp"):
         # targetがプレイヤーで、attackerが敵の場合のみカウンター発動
-        # count_counter の合計が3以上（マスターズセットフル装備）で発動
+        # count_counter の合計が2以上で発動
         total_counter = getattr(target, "total_counter", 0)
-        if isinstance(total_counter, int) and total_counter >= 3:
+        if isinstance(total_counter, int) and total_counter >= 2:
             proc_chance = getattr(target, "total_counter_proc_chance", 0.0)
             if isinstance(proc_chance, (int, float)) and proc_chance > 0:
                 rolled = random.random()
@@ -320,4 +321,3 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     target_cond = getattr(target, 'condition', 'normal')
     print(f"[COMBAT] {attacker_name} -> {target_name}: Damage={damage}, Critical={is_critical}, Miss={is_miss}, TargetHP: {target_hp}, TargetCond: {target_cond}")
     return msg, damage, is_critical, False
-

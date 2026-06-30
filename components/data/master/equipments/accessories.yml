@@ -94,6 +94,261 @@ ACCESSORY_DATA:
         stave_bonus: 0
         light_stave_bonus: 0
 
+  ring_of_blowback:
+    quest_targetable: true
+    name: "逆風の指輪"
+    category: accessory
+    min_rank: F
+    max_rank: SS
+    rarity: 4
+    price: 4200
+    selling_price: 120
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 吹き飛ばしの術式を補助する指輪 ノックバックの発動に必要な力が高まる
+    growth: {bonus_limit: 5, times_limit: 30, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        knockback:
+          count_knockback: 1
+          knockback_proc_chance: 0.12
+          knockback_max_distance: 1
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_vampirism:
+    quest_targetable: true
+    name: "吸血の指輪"
+    category: accessory
+    min_rank: F
+    max_rank: SS
+    rarity: 4
+    price: 5200
+    selling_price: 140
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 生命を奪い返す指輪 ライフスティールを狙いやすくする
+    growth: {bonus_limit: 5, times_limit: 30, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        lifesteal:
+          count_lifesteal: 1
+          lifesteal_chance: 0.18
+          lifesteal_ratio: 0.18
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_retaliation:
+    quest_targetable: true
+    name: "報復の指輪"
+    category: accessory
+    min_rank: F
+    max_rank: SS
+    rarity: 4
+    price: 5200
+    selling_price: 140
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 攻撃に対して鋭く反応する指輪 カウンターを組み立てやすくする
+    growth: {bonus_limit: 5, times_limit: 30, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        counter:
+          count_counter: 1
+          counter_proc_chance: 0.14
+          counter_damage_ratio: 0.35
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_daze:
+    quest_targetable: true
+    name: "眩惑の指輪"
+    category: accessory
+    min_rank: F
+    max_rank: SS
+    rarity: 4
+    price: 4800
+    selling_price: 130
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 相手の意識を鈍らせる指輪 混乱を起こしやすくする
+    growth: {bonus_limit: 5, times_limit: 30, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        confusion:
+          count_confusion: 1
+          stupidity_proc_chance: 0.15
+          stupidity_proc_amount: 1
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_resonance:
+    quest_targetable: true
+    name: "共鳴の指輪"
+    category: accessory
+    min_rank: F
+    max_rank: SS
+    rarity: 4
+    price: 5400
+    selling_price: 150
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 術の反応を増幅する指輪 スタンのきっかけを作りやすい
+    growth: {bonus_limit: 5, times_limit: 30, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        stun:
+          count_stun: 1
+          stun_proc_chance: 0.12
+          stun_duration: 1
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
   luminous_gem:
     quest_targetable: true
     name: "光る指輪"
@@ -874,6 +1129,57 @@ ACCESSORY_DATA:
         invincible_turns: 1
         stave_bonus: 5
         light_stave_bonus: 3
+
+  ring_of_shadowstep:
+    quest_targetable: true
+    name: "影踏みの指輪"
+    category: accessory
+    min_rank: F
+    max_rank: SS
+    rarity: 4
+    price: 5600
+    selling_price: 150
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 背後を取る気配を研ぎ澄ます指輪 背後会心と側面判定を補助する
+    growth: {bonus_limit: 5, times_limit: 30, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+      skills:
+        backstab:
+          count_backstab: 1
+          backstab_crit_bonus: 0.12
+          flank_backstab: 1
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
 
   ring_of_protection:
     quest_targetable: true

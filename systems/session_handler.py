@@ -1,20 +1,30 @@
 
 from components.sprites.player import Player
 from systems.dungeon import warp_to_floor
-from systems.ui import (
-    Dialog, ConfirmDialog, InventoryDialog, StatusBar, StatusDialog, 
-    EquipDialog, EnhanceDialog, ItemActionDialog, OreSelectionDialog, ShopDialog,
-    ParameterSelectionDialog,
-    StaveSelectionDialog, GuildDialog, WarehouseDialog, BankDialog, MenuDialog,
-    StaveInventoryDialog, EventInventoryDialog, TeleportDialog, GuildGuideDialog,
-    OreGiftDialog
-)
+from systems.ui import UIManager
 from wordings import Text
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+
+
+def _ensure_display():
+    import pygame
+    if not pygame.get_init():
+        pygame.init()
+    if not pygame.display.get_init():
+        pygame.display.init()
+    screen = pygame.display.get_surface()
+    if screen is None:
+        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    return screen
 
 def setup_ui_relations(ui_elements, player, dungeon, game_state):
     """
     UIコンポーネント同士、およびプレイヤーやダンジョンとの依存関係をセットアップする。
     """
+    if hasattr(ui_elements, "setup_relations"):
+        ui_elements.setup_relations(player, dungeon, game_state)
+        return
+
     # 既存の UI オブジェクトを取得（辞書形式を想定）
     inventory_dialog = ui_elements["inventory_dialog"]
     dialog = ui_elements["dialog"]
@@ -84,7 +94,7 @@ def start_new_game(ui_elements, game_state):
     """
     import pygame
     from systems.dungeon import Dungeon
-    screen = pygame.display.get_surface()
+    screen = _ensure_display()
     Dungeon.preload_all_themes(screen)
     player = Player()
     dungeon = warp_to_floor(0, player, spawn_reason="new_game")
@@ -102,7 +112,7 @@ def continue_game(ui_elements, game_state, player):
     """
     import pygame
     from systems.dungeon import Dungeon
-    screen = pygame.display.get_surface()
+    screen = _ensure_display()
     Dungeon.preload_all_themes(screen)
     from systems.data_loader import SAVE_OFFICIAL_PATH, SAVE_SUSPEND_PATH
     import os
@@ -140,29 +150,4 @@ def init_ui_elements(screen_width, screen_height):
     """
     全てのUIコンポーネントを初期化し、辞書で返す。
     """
-    from systems.ui import CutsceneManager, AreaMessageOverlay
-    return {
-        "dialog": Dialog(screen_width, screen_height),
-        "confirm_dialog": ConfirmDialog(screen_width, screen_height),
-        "inventory_dialog": InventoryDialog(screen_width, screen_height),
-        "status_bar": StatusBar(screen_width, screen_height),
-        "status_dialog": StatusDialog(screen_width, screen_height),
-        "enhance_dialog": EnhanceDialog(screen_width, screen_height),
-        "item_action_dialog": ItemActionDialog(screen_width, screen_height),
-        "ore_selection_dialog": OreSelectionDialog(screen_width, screen_height),
-        "parameter_selection_dialog": ParameterSelectionDialog(screen_width, screen_height),
-        "shop_dialog": ShopDialog(screen_width, screen_height),
-        "stave_selection_dialog": StaveSelectionDialog(screen_width, screen_height),
-        "guild_dialog": GuildDialog(screen_width, screen_height),
-        "warehouse_dialog": WarehouseDialog(screen_width, screen_height),
-        "bank_dialog": BankDialog(screen_width, screen_height),
-        "menu_dialog": MenuDialog(screen_width, screen_height),
-        "equip_dialog": EquipDialog(screen_width, screen_height),
-        "stave_inventory_dialog": StaveInventoryDialog(screen_width, screen_height),
-        "event_inventory_dialog": EventInventoryDialog(screen_width, screen_height),
-        "teleport_dialog": TeleportDialog(screen_width, screen_height),
-        "guild_guide_dialog": GuildGuideDialog(screen_width, screen_height),
-        "ore_gift_dialog": OreGiftDialog(screen_width, screen_height),
-        "cutscene_manager": CutsceneManager(screen_width, screen_height),
-        "area_message_overlay": AreaMessageOverlay(screen_width, screen_height),
-    }
+    return UIManager(screen_width, screen_height)

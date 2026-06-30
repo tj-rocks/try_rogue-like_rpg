@@ -59,44 +59,23 @@ EQUIP_SKILL_LABEL_MAP = {
     "knockback": "ノックバック",
 }
 
-def _get_equipped_set_keys(player):
-    """装備中の武器・鎧・盾のキーをセットで返す"""
-    keys = set()
-    if player and player.equipped_weapon:
-        inst = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)
-        if inst: keys.add(inst.key)
-    if player and player.equipped_armor:
-        inst = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
-        if inst: keys.add(inst.key)
-    if player and player.equipped_shield:
-        inst = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
-        if inst: keys.add(inst.key)
-    return keys
-
-
 def get_player_skill_names(player):
     """プレイヤーが発動中のスキルカテゴリ名リストを返す"""
     names = []
     if not player:
         return names
 
-    equipped_keys = _get_equipped_set_keys(player)
-    ASSASSIN_SET = {"assassin_dagger", "assassin_light_armor", "assassin_buckler"}
-    HOLY_SET = {"holy_sword", "holy_armor", "holy_shield"}
-    has_assassin_set = ASSASSIN_SET.issubset(equipped_keys)
-    has_holy_set = HOLY_SET.issubset(equipped_keys)
-
-    if has_holy_set and getattr(player, "total_lifesteal_chance", 0):
+    if getattr(player, "total_lifesteal", 0) >= 2 and getattr(player, "total_lifesteal_chance", 0):
         names.append(EQUIP_SKILL_LABEL_MAP.get("lifesteal", "lifesteal"))
-    if getattr(player, "total_counter", 0) >= 3:
+    if getattr(player, "total_counter", 0) >= 2:
         names.append(EQUIP_SKILL_LABEL_MAP.get("counter", "counter"))
-    if getattr(player, "total_stun_proc_chance", 0):
+    if getattr(player, "total_stun", 0) >= 2 and getattr(player, "total_stun_proc_chance", 0):
         names.append(EQUIP_SKILL_LABEL_MAP.get("stun", "stun"))
-    if has_assassin_set and (getattr(player, "total_backstab_crit_bonus", 0) or getattr(player, "total_flank_backstab", 0)):
+    if getattr(player, "total_backstab", 0) >= 2 and (getattr(player, "total_backstab_crit_bonus", 0) or getattr(player, "total_flank_backstab", 0)):
         names.append(EQUIP_SKILL_LABEL_MAP.get("backstab", "backstab"))
-    if has_assassin_set and getattr(player, "total_stupidity_proc_chance", 0):
+    if getattr(player, "total_confusion", 0) >= 2 and getattr(player, "total_stupidity_proc_chance", 0):
         names.append(EQUIP_SKILL_LABEL_MAP.get("confusion", "confusion"))
-    if getattr(player, "total_knockback", 0) >= 3:
+    if getattr(player, "total_knockback", 0) >= 2:
         names.append(EQUIP_SKILL_LABEL_MAP.get("knockback", "knockback"))
     return names
 

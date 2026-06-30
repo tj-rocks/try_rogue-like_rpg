@@ -726,7 +726,7 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 2
-        attack: 11
+        attack: 14
         accuracy_close: 20
         accuracy_range: 20
         crit_rate: 0.1
@@ -826,10 +826,10 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 0
-        attack: 17
+        attack: 18
         accuracy_close: 20
         accuracy_range: 0
-        crit_rate: 0
+        crit_rate: 0.1
         hp: 0
         defense: 0
         block_chance_close: 0
@@ -877,7 +877,7 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 2
-        attack: 11
+        attack: 14
         accuracy_close: 20
         accuracy_range: 20
         crit_rate: 0.2
@@ -979,7 +979,7 @@ WEAPON_DATA:
     bonus:
       common:
         aggro_mod: 0
-        attack: 15
+        attack: 16
         accuracy_close: 5
         accuracy_range: 0
         crit_rate: 0.2
