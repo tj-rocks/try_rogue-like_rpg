@@ -1,0 +1,327 @@
+実装方針：Player Tactical Profile
+
+目的：
+
+コアはずっと見ていたを実装する。
+通常敵は条件反射。ラスボスだけは、Playerの行動傾向を参照する。
+
+ただし、ラスボスは露骨なメタ無効化で返さない。
+強い技を否定するのではなく、Playerの癖を読んで有利な位置を取る。
+
+このボスの強さは能力ではなく位置取りにある。
+ローグライクRPGの醍醐味である、
+「相手の攻撃を読む」「読まれていることを読む」駆け引きを成立させる。
+
+保存場所
+
+CSV/SQLiteではなく、Playerのセーブデータに持たせる。
+
+player.tactical_profile
+
+中身は Counter か dict。
+
+{
+  "front|1|melee": 42,
+  "front|1|move": 18,
+  "diagonal|1|move": 31,
+  "far|3plus|magic": 7
+}
+
+保存・読込は既存の Player.save/load に追加。
+
+記録する因子
+
+最小構成。
+
+relation:
+  front
+  diagonal
+  side
+  far
+
+distance:
+  1
+  2
+  3plus
+
+action:
+  melee
+  magic
+  item
+  move
+
+向き、HP、階層、敵種別は入れない。
+まずは引き算。
+
+記録タイミング
+
+おすすめは Player行動確定時。
+
+理由：
+
+攻撃だけでなく移動・アイテムも取れる
+ラスボスが「癖」を読める
+ダメージ発生時だけだと move が取れない
+
+処理は毎回ファイル書き込みしない。
+ゲーム中はメモリ上の dict/Counter を更新するだけ。
+
+profile.record(relation, distance, action)
+
+relation / distance 判定
+
+敵から見たPlayer位置。
+
+dx = player_tile_x - enemy_tile_x
+dy = player_tile_y - enemy_tile_y
+dist = max(abs(dx), abs(dy))
+
+if dist >= 3:
+    distance = "3plus"
+elif dist == 2:
+    distance = "2"
+else:
+    distance = "1"
+
+if dist >= 3:
+    relation = "far"
+elif dx == 0 or dy == 0:
+    relation = "front"
+elif abs(dx) == abs(dy):
+    relation = "diagonal"
+else:
+    relation = "side"
+
+遠距離は細かく分類しすぎず、まず far に寄せる。
+位置取りAIで使う都合上、近距離の front / diagonal / side を重視する。
+
+TacticalProfile クラス案
+from collections import Counter
+
+class TacticalProfile:
+    def __init__(self, data=None):
+        self.counter = Counter(data or {})
+
+    def _key(self, relation, distance, action):
+        return f"{relation}|{distance}|{action}"
+
+    def record(self, relation, distance, action):
+        self.counter[self._key(relation, distance, action)] += 1
+
+    def get_distribution(self, relation, distance):
+        result = {}
+        prefix = f"{relation}|{distance}|"
+        for key, count in self.counter.items():
+            if key.startswith(prefix):
+                action = key.split("|")[2]
+                result[action] = count
+        return result
+
+    def get_preferred_action(self, relation, distance):
+        dist = self.get_distribution(relation, distance)
+        if not dist:
+            return None
+        return max(dist.items(), key=lambda x: x[1])[0]
+
+    def to_dict(self):
+        return dict(self.counter)
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(data or {})
+
+コアAIの基本思想
+
+ラスボスは以下の4つの攻撃パターンを持つ。
+
+1. 直線攻撃
+2. 斜め攻撃
+3. カウンター
+4. 遠距離攻撃
+
+この4択の中から、その場の位置関係と Player Tactical Profile を見て選ぶ。
+
+重要なのは、
+見た目と実際の攻撃候補を少しズラせること。
+
+正面に立っているから直線攻撃、とは限らない。
+斜めに立っているから斜め攻撃、とは限らない。
+ただし完全ランダムにはしない。
+
+盤面が攻撃候補を作り、
+Player Tactical Profile がその候補に重み補正をかける。
+
+つまり、
+盤面が7割、履歴が3割。
+
+履歴は行動を強制決定するために使うのではなく、
+「どの択を少し選びやすくするか」を決めるために使う。
+
+攻撃4パターンの定義
+
+- 直線攻撃
+  正面軸を通す基本択。
+  Player が正面からの移動や詰めを繰り返すなら選ばれやすくなる。
+
+- 斜め攻撃
+  逃げ・差し込み・斜め取りを咎める択。
+  ボスが正面に立っていても、あえて斜め攻撃を選ぶことで誤読を誘える。
+
+- カウンター
+  待機技であり、誘い技でもある。
+  「何もしてこない、今がチャンス」と思わせて近接を誘うための択。
+  発動した場合はクリティカル扱いでよい。
+  ただし常用はしない。癖を読んだ時にだけ通す。
+
+- 遠距離攻撃
+  距離を取るPlayer、杖や回復に頼るPlayerへの返し。
+  ただし主目的は大ダメージではなく、Playerを接近戦に誘い込むこと。
+  威力は控えめでよいが、どの角度からでも通せる圧として使う。
+  Playerが逃げれば執拗に追い、距離を詰めてくるならその勝負に付き合う。
+
+カウンターの扱い
+
+カウンターは通常の「構え文化」とは別物。
+ラスボス全体としては位置取り重視だが、
+カウンターだけは例外的に待機技として採用する。
+
+理由：
+
+- 横を取れた
+- ボスが何もしてこない
+- 今がチャンスだと思う
+- そこで反撃が刺さる
+
+この一連の流れ自体が駆け引きになるから。
+
+したがって、カウンターは受け身の待機ではなく、
+主導権を持ってPlayerを誘うための待機と定義する。
+
+想定仕様：
+
+- 1ターン限定
+- その間に近接攻撃を受けたら発動
+- 発動時はクリティカル扱い
+- 不発なら次ターンに持ち越さない
+
+Player Tactical Profile の使い方
+
+relation, distance = get_relation_and_distance(player, boss)
+preferred = player.tactical_profile.get_preferred_action(relation, distance)
+
+AIはまず、その場の位置関係から自然な候補を並べる。
+
+例：
+
+- relation=front, distance=1
+  直線攻撃、カウンター、斜め攻撃が候補
+
+- relation=diagonal, distance=1
+  斜め攻撃、直線攻撃が候補
+
+- relation=far, distance=3plus
+  遠距離攻撃、距離調整移動が候補
+
+そのあと、preferred_action に応じて候補の重みを補正する。
+
+例：
+
+- front|1|melee が多い
+  → カウンター重みアップ
+
+- front|1|move が多い
+  → 直線攻撃より斜め攻撃や追従択を上げる
+
+- diagonal|1|move が多い
+  → 斜め攻撃重みアップ
+
+- far|3plus|magic が多い
+  → 遠距離攻撃重みアップ
+
+- far|3plus|move が多い
+  → 遠距離攻撃と追従移動の重みアップ
+
+- side|1|melee が多い
+  → カウンターや斜め攻撃重みアップ
+
+つまり TacticalProfile は、
+「このPlayerはここで何をしたがるか」を見るためのもの。
+
+位置取りAIとの関係
+
+ラスボスは攻撃だけでなく、移動自体が圧になるべき。
+
+理想の駆け引きはこういうもの：
+
+- ボスがPlayerの正面に立つ
+- Playerは直線攻撃を警戒する
+- しかし実際には斜め攻撃が来る
+- Playerが斜めへ位置を取る
+- ボスはその離脱・横ずれを読んで追従する
+
+このズレを楽しませたい。
+
+したがって、ボスは「今当たる技」だけでなく、
+「次にPlayerがどこへ逃げると思うか」で移動を選ぶ。
+
+杖への考え方
+
+火炎、吹き飛ばし、障壁などの強い杖に対しても、
+ラスボスは露骨な無効化で返さない。
+
+返し方は位置取りを主軸にする。
+
+- 火炎
+  正面一直線に立たない。
+  焼かれやすい軸を避け、斜めや横ずれで圧を維持する。
+
+- 吹き飛ばし
+  壁を背負わない。
+  吹き飛ばされても損しにくいマスを優先する。
+  必要ならボスのみ軽いノックバック耐性を持たせるが、主眼は位置取り。
+
+- 障壁
+  無理に殴らない。
+  障壁ターン中に有利マスへ移動し、切れた後に詰める。
+
+遠距離攻撃そのものも、
+遠距離戦を制するためではなく接近戦へ誘導するための技として扱う。
+逃げれば撃たれ続けるが、詰めればその勝負に付き合ってくる、
+という圧の作り方を目指す。
+
+無敵の杖はこの思想と相性が悪い。
+位置取りによる駆け引きではなく対話を切ってしまうため、
+実装から外す候補として扱う。
+
+AI思想コメント
+"""
+Dungeon Core AI
+
+通常Enemyは条件反射で行動する。
+DungeonCoreはPlayerの行動履歴を参照して行動を選択する。
+
+目的はPlayerを倒すことではない。
+Playerと最も美しい決闘を成立させること。
+
+そのため、
+- 派手な技ではなく位置取りを重視する
+- Playerを追い込むが、逃げ道は残す
+- 背後取り・壁ハメ・不自然なループは避ける
+- Playerの旅路を評価せず、理解する
+- 完全ランダムではなく、履歴で少しズラす
+- 露骨なメタ無効ではなく、立ち位置で返す
+- 遠距離戦を支配するのではなく、接近戦へ誘い込む
+
+コアはずっと見ていた。
+"""
+
+懸念点
+
+far の扱いは要検討。距離3以上は行動が move に偏りやすいので、
+ラスボスAIでは重みを低めにしてよさそう。
+
+また、preferred_action をそのまま強制採用すると不自然になりやすい。
+履歴は「行動を決める」のではなく「候補を少し傾ける」程度に使う方が自然。
+
+まずは Counter 保存方式で十分。
+SQLite/CSVは不要。

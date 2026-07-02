@@ -412,6 +412,7 @@ const GROUPS = {
   wall_pass: '🚪 通路扉・すり抜けゲート',
   wall_none: '🌌 虚無空間・背景暗闇',
   special: '⭐ 特殊・システム',
+  enemy: '👾 敵キャラ',
   npc_facility: '🏪 施設NPC (ショップ・サービス)',
   npc_dialogue: '💬 セリフNPC (案内人・村人)',
   obstacle: '📦 障害物・オブジェクト',
@@ -653,7 +654,7 @@ function buildPalette() {
       div.title = `[${ch}] ${desc}`;
       div.dataset.ch = ch;
       
-      if (category === 'npc' || category === 'obstacle' || category === 'wall_decoration' || category === 'wall_pass') {
+      if (category === 'npc' || category === 'enemy' || category === 'obstacle' || category === 'wall_decoration' || category === 'wall_pass') {
         div.style.backgroundColor = 'transparent';
       } else {
         div.style.backgroundColor = bg;
@@ -661,7 +662,7 @@ function buildPalette() {
       
       if (imgPath) {
         const cacheImgPath = imgPath + cacheBuster;
-        if (bgImgPath && category !== 'npc' && category !== 'obstacle' && category !== 'wall_decoration' && category !== 'wall_pass') {
+        if (bgImgPath && category !== 'npc' && category !== 'enemy' && category !== 'obstacle' && category !== 'wall_decoration' && category !== 'wall_pass') {
           const cacheBgImgPath = bgImgPath + cacheBuster;
           div.style.backgroundImage = `url(${cacheImgPath}), url(${cacheBgImgPath})`;
         } else {
@@ -785,7 +786,7 @@ function renderFromText() {
             }
         }
         const t = TILE[tileId];
-        if (t && t[6] && (t[6] === 'npc' || t[6] === 'obstacle' || t[6] === 'wall_decoration' || t[6] === 'wall_pass')) {
+        if (t && t[6] && (t[6] === 'npc' || t[6] === 'enemy' || t[6] === 'obstacle' || t[6] === 'wall_decoration' || t[6] === 'wall_pass')) {
             // It's an entity. Push to entity map, and fallback base map to floor or wall
             entityRow.push(tileId);
             entityFlipRow.push(false);
@@ -1008,7 +1009,7 @@ function setCell(ri, ci, ch, cell) {
   } else {
       const tileId = charToId[ch] || ch;
       const t = TILE[tileId];
-      const isEntity = t && t[6] && (t[6] === 'npc' || t[6] === 'obstacle' || t[6] === 'wall_decoration' || t[6] === 'wall_pass');
+      const isEntity = t && t[6] && (t[6] === 'npc' || t[6] === 'enemy' || t[6] === 'obstacle' || t[6] === 'wall_decoration' || t[6] === 'wall_pass');
       
       if (isEntity) {
           if (entityMapData[ri][ci] === tileId) {
@@ -1311,6 +1312,8 @@ async function loadTileDefinitions() {
         if (!displayChar) {
           if (val.category === 'npc') {
             displayChar = (val.subcategory === 'npc_facility') ? '🏪' : '💬';
+          } else if (val.category === 'enemy') {
+            displayChar = val.subcategory === 'enemy_boss' ? '👑' : '👾';
           } else if (val.category === 'obstacle') {
             displayChar = '📦';
           } else if (val.category === 'wall_decoration') {

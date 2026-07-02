@@ -1469,7 +1469,7 @@ class Player(Entity):
                     sound_manager.play_sfx(SOUND_ATTACK_MISS if miss or dmg == 0 else SOUND_ATTACK_HIT)
                     if crit: dungeon.flash_timer = 10
                     # --- knockbackスキル発動（クリティカル不問） ---
-                    if dmg > 0 and not miss:
+                    if dmg > 0 and not miss and not getattr(e, "is_static", False):
                         total_knockback = getattr(self, "total_knockback", 0)
                         if isinstance(total_knockback, int) and total_knockback >= 2:
                             kb_chance = getattr(self, "total_knockback_proc_chance", 0.0)

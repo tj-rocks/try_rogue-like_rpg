@@ -1,4 +1,5 @@
 import random
+from constants import HIT_STUN_DURATION
 from wordings import Text
 
 def _is_frontal_attack(attacker, target):
@@ -190,6 +191,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     
     attacker_name = getattr(attacker, "name", "誰か")
     target_name = getattr(target, "name", "誰か")
+    target_is_static = getattr(target, "is_static", False)
     
     if is_miss:
         msg = "ミス " + Text.Combat.MISS.format(attacker=attacker_name, target=target_name)
@@ -226,14 +228,14 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                     msg += f"\n{target_name}は暗闇に包まれた！視界が狭まった！"
 
     # --- 敵の困惑（stupidity）上昇効果 ---
-    if not is_miss and damage > 0:
+    if not target_is_static and not is_miss and damage > 0:
         stupidity_up = getattr(attacker, "total_stupidity", 0)
         if isinstance(stupidity_up, (int, float)) and stupidity_up > 0 and hasattr(target, "stupidity"):
             target.stupidity = min(10, target.stupidity + int(stupidity_up))
             msg += "\n" + Text.Combat.CONFUSED.format(target=target_name, amount=int(stupidity_up))
 
     # --- 敵の一時的 stupidity 上昇効果（装備スキル） ---
-    if not is_miss and damage > 0 and hasattr(target, "stupidity_temp"):
+    if not target_is_static and not is_miss and damage > 0 and hasattr(target, "stupidity_temp"):
         total_confusion = getattr(attacker, "total_confusion", 0)
         if isinstance(total_confusion, int) and total_confusion >= 2:
             proc_chance = getattr(attacker, "total_stupidity_proc_chance", 0.0)
@@ -250,7 +252,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                     print(f"[混乱] ❌ 失敗")
 
     # --- スタン効果（クリティカル時のみ発動） ---
-    if not is_miss and damage > 0 and is_critical and hasattr(target, "stun_turns"):
+    if not target_is_static and not is_miss and damage > 0 and is_critical and hasattr(target, "stun_turns"):
         total_stun = getattr(attacker, "total_stun", 0)
         stun_chance = getattr(attacker, "total_stun_proc_chance", 0.0)
         if isinstance(total_stun, int) and total_stun >= 2 and isinstance(stun_chance, (int, float)) and stun_chance > 0:
@@ -264,7 +266,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                     print(f"[スタン] ✅ クリティカル発動")
 
     # --- ライフスティール効果（クリティカル時のみ発動） ---
-    if not is_miss and damage > 0 and is_critical and hasattr(attacker, "hp"):
+    if not target_is_static and not is_miss and damage > 0 and is_critical and hasattr(attacker, "hp"):
         total_lifesteal = getattr(attacker, "total_lifesteal", 0)
         if isinstance(total_lifesteal, int) and total_lifesteal >= 2:
             lifesteal_chance = getattr(attacker, "total_lifesteal_chance", 0.0)
