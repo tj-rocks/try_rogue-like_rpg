@@ -315,6 +315,13 @@ TILE_MAPPINGS:
   tutorial_woman1:
     category: npc
     id: tutorial_woman1
+  skill_guide:
+    category: npc
+    id: skill_guide
+    positions:
+      - x: 24
+        y: 16
+        flip: false
   table:
     category: obstacle
     id: table

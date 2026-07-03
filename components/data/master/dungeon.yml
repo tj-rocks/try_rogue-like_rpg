@@ -440,6 +440,7 @@ DUNGEON_IMAGES:
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
+    darkness_type: fog
     area_message:
       - 境界の水域
       - 現実とダンジョンの境が溶ける場所。
@@ -450,36 +451,42 @@ DUNGEON_IMAGES:
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
+    darkness_type: fog
   "59":
     image: water
     sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
+    darkness_type: fog
   "60":
     image: water
     sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
+    darkness_type: fog    
   "61":
     image: shell
     sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
+    darkness_type: fog    
   "62":
     image: shell
     sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
+    darkness_type: fog    
   "63":
     image: shell
     sound: still_trial.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
+    darkness_type: fog    
   "64":
     image: cave
     sound: still_in_journy.mp3
@@ -628,6 +635,7 @@ DUNGEON_IMAGES:
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
+    darkness_type: fog
     area_message:
       - 大いなる祭壇
       - ダンジョンコアが待つ、全ての始まりにして終わりの場所。
@@ -638,24 +646,28 @@ DUNGEON_IMAGES:
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
+    darkness_type: fog
   "87":
     image: evil_castle
     sound: beyond_the_suffer.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
+    darkness_type: fog
   "88":
     image: evil_castle
     sound: beyond_the_suffer.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
+    darkness_type: fog
   "89":
     image: evil_castle
     sound: beyond_the_suffer.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
+    darkness_type: fog
   "90":
     image: deesert_ruin
     sound: step_into_adventure.mp3

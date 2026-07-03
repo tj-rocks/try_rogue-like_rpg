@@ -296,8 +296,37 @@ class Enemy(Entity):
         offsets = cat_data.get("position", {}).get("offsets", {}).get(self.facing, (0, 0))
         screen.blit(img, (draw_x + offsets[0], draw_y + offsets[1]))
 
+    @staticmethod
+    def _apply_alpha_surface(surface, alpha):
+        if alpha >= 255:
+            return surface
+        scaled = surface.copy()
+        scaled.set_alpha(alpha)
+        return scaled
+
     def draw(self, screen, camera_x, camera_y):
         import math; draw_x, draw_y = self.x - camera_x, self.y - camera_y
+        dungeon = getattr(self, "current_dungeon", None)
+        fog_alpha = 255
+        fog_visible = False
+        if dungeon and getattr(dungeon, "darkness_type", "dark") == "fog":
+            player = getattr(dungeon, "player", None)
+            tile_size = getattr(dungeon, "tile_size", 1) or 1
+            if player:
+                from systems.tactical_profile import get_relation_and_distance
+                relation, distance = get_relation_and_distance(player, self, tile_size)
+                lantern = max(1, 1 + getattr(player, "lantern_bonus", 0))
+                dist_map = {"1": 1, "2": 2, "3plus": 3}
+                dist = dist_map.get(distance, 3)
+                if dist <= lantern:
+                    fog_alpha = 255
+                elif dist == lantern + 1:
+                    fog_alpha = 185
+                elif dist == lantern + 2:
+                    fog_alpha = 125
+                else:
+                    fog_alpha = 70
+                fog_visible = True
         if self.is_attacking:
             off = 0
             if self.attack_pre_delay_timer > 0:
@@ -348,6 +377,8 @@ class Enemy(Entity):
                 if is_flipped:
                     cur = pygame.transform.flip(cur, True, False)
                 Enemy._scaled_image_cache[ck] = cur
+            if fog_visible and fog_alpha < 255:
+                cur = self._apply_alpha_surface(cur, fog_alpha)
             draw_x += (self.width - cur.get_width()) / 2; draw_y += (self.height - cur.get_height())
             from constants import HIT_STUN_DURATION
             if not (self.damage_flash_timer > HIT_STUN_DURATION and (self.damage_flash_timer - HIT_STUN_DURATION) % 4 < 2):
@@ -356,22 +387,44 @@ class Enemy(Entity):
                     cy = draw_y + cur.get_height() / 2
                     over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
                     if not over:
-                        if self.is_attacking: self.weapon.draw_attack(screen, cx, cy, self.facing, 1.0, scale_x=sx, scale_y=sy, alpha=255)
-                        else: self.weapon.draw_idle(screen, cx, cy, self.facing, scale_x=sx, scale_y=sy, alpha=255)
+                        weapon_alpha = fog_alpha if fog_visible else 255
+                        if self.is_attacking: self.weapon.draw_attack(screen, cx, cy, self.facing, 1.0, scale_x=sx, scale_y=sy, alpha=weapon_alpha)
+                        else: self.weapon.draw_idle(screen, cx, cy, self.facing, scale_x=sx, scale_y=sy, alpha=weapon_alpha)
                 so = {"up": False, "down": True, "left": True, "right": False}.get(self.facing, True)
                 if self.equipped_shield and not so:
-                    self._draw_enemy_shield_overlay(screen, draw_x, draw_y)
-                self._draw_enemy_armor_overlay(screen, draw_x, draw_y)
+                    shield_img = self._shield_images.get(self.facing) if self._shield_images else None
+                    if shield_img:
+                        shield_draw = self._apply_alpha_surface(shield_img, fog_alpha) if fog_visible else shield_img
+                        from constants import SHIELD_DATA, SHIELD_CATEGORIES
+                        inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
+                        data = SHIELD_DATA.get(inst.key, {}) if inst else {}
+                        cat_data = SHIELD_CATEGORIES.get(data.get("category"), {})
+                        offsets = cat_data.get("position", {}).get("offsets", {}).get(self.facing, (0, 0))
+                        screen.blit(shield_draw, (draw_x + offsets[0], draw_y + offsets[1]))
+                if self._armor_images:
+                    armor_img = self._armor_images.get(self.facing)
+                    if armor_img:
+                        armor_draw = self._apply_alpha_surface(armor_img, fog_alpha) if fog_visible else armor_img
+                        screen.blit(armor_draw, (draw_x, draw_y))
                 screen.blit(cur, (draw_x, draw_y))
                 if getattr(self, "weapon", None):
                     cx = draw_x + cur.get_width() / 2
                     cy = draw_y + cur.get_height() / 2
                     over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
                     if over:
-                        if self.is_attacking: self.weapon.draw_attack(screen, cx, cy, self.facing, 1.0, scale_x=sx, scale_y=sy, alpha=255)
-                        else: self.weapon.draw_idle(screen, cx, cy, self.facing, scale_x=sx, scale_y=sy, alpha=255)
+                        weapon_alpha = fog_alpha if fog_visible else 255
+                        if self.is_attacking: self.weapon.draw_attack(screen, cx, cy, self.facing, 1.0, scale_x=sx, scale_y=sy, alpha=weapon_alpha)
+                        else: self.weapon.draw_idle(screen, cx, cy, self.facing, scale_x=sx, scale_y=sy, alpha=weapon_alpha)
                 if self.equipped_shield and so:
-                    self._draw_enemy_shield_overlay(screen, draw_x, draw_y)
+                    shield_img = self._shield_images.get(self.facing) if self._shield_images else None
+                    if shield_img:
+                        shield_draw = self._apply_alpha_surface(shield_img, fog_alpha) if fog_visible else shield_img
+                        from constants import SHIELD_DATA, SHIELD_CATEGORIES
+                        inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
+                        data = SHIELD_DATA.get(inst.key, {}) if inst else {}
+                        cat_data = SHIELD_CATEGORIES.get(data.get("category"), {})
+                        offsets = cat_data.get("position", {}).get("offsets", {}).get(self.facing, (0, 0))
+                        screen.blit(shield_draw, (draw_x + offsets[0], draw_y + offsets[1]))
                 # 色付きダメージフラッシュ（スタン・背後攻撃など）
                 if self.damage_flash_timer > HIT_STUN_DURATION:
                     color = getattr(self, "flash_color", (255, 255, 255))

@@ -2107,9 +2107,9 @@ class StatusBar:
 
 # --- 視界制限（カンテラ）システム ---
 import math
-_vision_masks = {} # (radius, fade_radius) -> Surface
+_vision_masks = {} # (radius, fade_radius, center_alpha) -> Surface
 
-def _create_radial_mask(radius, fade_radius):
+def _create_radial_mask(radius, fade_radius, center_alpha=0):
     """円形の視界マスクを生成する（中心が透明、外側が黒）"""
     size = (radius + fade_radius) * 2
     surface = pygame.Surface((size, size), pygame.SRCALPHA)
@@ -2122,14 +2122,16 @@ def _create_radial_mask(radius, fade_radius):
             dist = math.sqrt(dx*dx + dy*dy)
             
             if dist <= radius:
-                alpha = 0
+                alpha = center_alpha
             elif dist >= radius + fade_radius:
                 alpha = 255
             else:
                 # 線形補間で透明度を計算
-                alpha = int(255 * (dist - radius) / fade_radius)
+                alpha = int(center_alpha + (255 - center_alpha) * (dist - radius) / fade_radius)
+                seed = (x * 73856093) ^ (y * 19349663) ^ (radius * 83492791) ^ (fade_radius * 2654435761)
+                alpha = max(0, min(255, alpha + (((seed >> 3) & 31) - 15)))
             
-            surface.set_at((x, y), (0, 0, 0, alpha))
+            surface.set_at((x, y), (255, 255, 255, alpha))
     return surface
 
 def draw_vision_overlay(screen, player, dungeon):
@@ -2157,14 +2159,17 @@ def draw_vision_overlay(screen, player, dungeon):
     brightness = getattr(dungeon, "brightness", 1)
     brightness_multipliers = {1: 1.0, 2: 1.5, 3: 2.5, 4: 4.5}
     mult = brightness_multipliers.get(brightness, 1.0)
-    
+
+    darkness_type = getattr(dungeon, "darkness_type", "dark")
+
     radius_px = int(r_tiles * tile_size * mult)
     fade_px = int(f_tiles * tile_size * mult)
     
     # 3. マスクの生成・取得
-    mask_key = (radius_px, fade_px)
+    fog_center_alpha = 18 if darkness_type == "fog" else 0
+    mask_key = (radius_px, fade_px, fog_center_alpha)
     if mask_key not in _vision_masks:
-        _vision_masks[mask_key] = _create_radial_mask(radius_px, fade_px)
+        _vision_masks[mask_key] = _create_radial_mask(radius_px, fade_px, fog_center_alpha)
     
     mask = _vision_masks[mask_key]
     
@@ -2173,11 +2178,15 @@ def draw_vision_overlay(screen, player, dungeon):
     px = sw // 2
     py = sh // 2
     
+    fog_colors = {
+        "dark": (0, 0, 0, 255),
+        "fog": (246, 246, 255, 210),
+    }
     fog = pygame.Surface((sw, sh), pygame.SRCALPHA)
-    fog.fill((0, 0, 0, 255)) # 真っ暗
-    
+    fog.fill(fog_colors.get(darkness_type, fog_colors["dark"]))
+
     mask_rect = mask.get_rect(center=(px, py))
-    fog.blit(mask, mask_rect, special_flags=pygame.BLEND_RGBA_MIN)
+    fog.blit(mask, mask_rect, special_flags=pygame.BLEND_RGBA_MULT)
     
     screen.blit(fog, (0, 0))
 
