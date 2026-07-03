@@ -578,6 +578,7 @@ class Dungeon:
         
         self.next_dungeon = None
         self.brightness = self.floor_info.get("brightness", 1)
+        self.darkness_type = self.floor_info.get("darkness_type", "dark")
         self.is_lighted = (self.current_floor == 0 or self.brightness == 5)
 
         # --- 探索システム (ミニマップ用) ---
