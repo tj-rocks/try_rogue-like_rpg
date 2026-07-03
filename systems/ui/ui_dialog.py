@@ -298,6 +298,8 @@ class ConfirmDialog:
         self.text = ""
         self.font = font_medium
         self.cursor_idx = 0  # 0: Yes, 1: No
+        self.yes_text = Text.UI.YES
+        self.no_text = Text.UI.NO
         self.on_yes = None   # Yesが選ばれた時に実行する処理（関数）
         self.on_no = None    # Noが選ばれた時に実行する処理（関数）
 
@@ -359,8 +361,8 @@ class ConfirmDialog:
         )
 
         # 選択肢の描画（中央付近にバランス良く配置）
-        yes_text = self.font.render(Text.UI.YES, True, (255, 255, 255))
-        no_text = self.font.render(Text.UI.NO, True, (255, 255, 255))
+        yes_text = self.font.render(self.yes_text or Text.UI.YES, True, (255, 255, 255))
+        no_text = self.font.render(self.no_text or Text.UI.NO, True, (255, 255, 255))
         
         # ウィンドウ幅に合わせて中央に寄せる
         center_x = self.x + self.width // 2

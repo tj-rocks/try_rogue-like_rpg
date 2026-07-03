@@ -200,7 +200,7 @@ def handle_game(screen, events, player, dungeon, ui_elements, game_state, dt=0):
     is_death_active = game_state.get("death_sequence_step", 0) > 0
     if not is_paused() and not is_death_active and not player.is_dead:
         # 敵の更新、アイテム取得判定
-        update_dungeon_entities(new_dungeon, player, dt, ui_elements["dialog"])
+        update_dungeon_entities(new_dungeon, player, dt, ui_elements["dialog"], ui_elements["confirm_dialog"])
         
         # 罠・階段・特殊イベントの判定
         if not player.is_falling:

@@ -1050,7 +1050,7 @@ class Dungeon:
                     cat = tile_info.get("category")
                     
                     if not positions:
-                        if cat in ("npc", "obstacle"):
+                        if cat in ("npc", "obstacle", "enemy"):
                             print(f"[DEBUG-NPC] Entity '{ent_id}' has NO positions listed in {source_yml}!")
                         continue
                     
@@ -1096,6 +1096,21 @@ class Dungeon:
                             obstacle.flip = pos.get("flip", False)
                             self.enemies.append(obstacle)
                             print(f"[DEBUG-NPC]   Successfully spawned obstacle '{ent_id}' at grid coordinate ({c}, {r})")
+
+                        elif cat == "enemy":
+                            self.map_data[r][c] = 1
+                            from components.sprites.enemy import Enemy
+                            if ent_id in ENEMY_DATA and not ENEMY_DATA[ent_id].get("is_static", False):
+                                ex, ey = c * ts, r * ts
+                                enemy = Enemy(ex, ey, ent_id, player=self.player)
+                                enemy.x = c * ts + (ts - enemy.width)//2
+                                enemy.y = r * ts + (ts - enemy.height)//2
+                                enemy.target_x, enemy.target_y = enemy.x, enemy.y
+                                enemy.flip = pos.get("flip", False)
+                                self.enemies.append(enemy)
+                                print(f"[DEBUG-NPC]   Successfully spawned enemy '{ent_id}' at grid coordinate ({c}, {r})")
+                            else:
+                                print(f"[DEBUG-NPC]   Enemy '{ent_id}' not found in ENEMY_DATA or is static-only")
                             
                         elif cat == "npc":
                             self.map_data[r][c] = 1
@@ -2134,6 +2149,7 @@ class Dungeon:
             flash_surf.set_alpha(alpha)
             screen.blit(flash_surf, (0, 0))
         for e in self.enemies:
+            e.current_dungeon = self
             if camera_x - e.width <= e.x <= camera_x + sw and camera_y - e.height <= e.y <= camera_y + sh: e.draw(screen, camera_x, camera_y)
 
     def get_current_floor_level(self): return self.current_floor

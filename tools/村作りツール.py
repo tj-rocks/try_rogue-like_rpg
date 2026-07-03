@@ -215,9 +215,11 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                         if isinstance(tile, dict):
                             tile_mappings[k] = _resolve_tile_image_path_for_theme(base_dir, tile, theme)
 
-                # 3. Enrich NPCs and Obstacles dynamically using IDs defined in village.yml
+                # 3. Enrich NPCs / Obstacles / Enemies dynamically using IDs defined in village.yml
                 npcs = load_master_data("npcs.yml") or {}
                 obstacles = load_master_data("obstacles.yml") or {}
+                enemies_raw = load_master_data("enemies.yml") or {}
+                enemies = enemies_raw.get("ENEMY_DATA", {})
                 
                 for char, tile in list(tile_mappings.items()):
                     if not isinstance(tile, dict): continue
@@ -255,7 +257,23 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                         if data:
                             tile["image_path"] = data.get("image_path", "")
                             tile["desc"] = data.get("name", tile.get("desc"))
-                            
+
+                    elif category == "enemy":
+                        data = enemies.get(entity_id)
+                        if data:
+                            img = data.get("image_path", "")
+                            if not img:
+                                folder = data.get("image_folder", "")
+                                if folder:
+                                    for candidate in ("down.png", "left.png", "up.png", "right.png"):
+                                        candidate_path = os.path.join(base_dir, folder, candidate)
+                                        if os.path.exists(candidate_path):
+                                            img = f"{folder}/{candidate}"
+                                            break
+                            tile["image_path"] = img
+                            tile["desc"] = data.get("name", tile.get("desc", entity_id))
+                            tile["subcategory"] = "enemy_boss" if data.get("is_boss") else "enemy"
+
                     elif category == "wall_decoration":
                         image_path = tile.get("image_path")
                         if not image_path:
@@ -404,11 +422,14 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 # YMLに未定義だがエディタで配置されたNPCエントリを自動追加
                 # (village.yml経由で新しく追加されたNPC等がここで保存される)
                 base_npcs = load_master_data("npcs.yml") or {}
+                base_enemies = (load_master_data("enemies.yml") or {}).get("ENEMY_DATA", {})
                 for ent_id, positions in grouped.items():
                     if ent_id not in mappings:
                         # npcs.ymlにあるNPCならcategory=npcで追加
                         if ent_id in base_npcs:
                             mappings[ent_id] = {"category": "npc", "id": ent_id, "positions": positions}
+                        elif ent_id in base_enemies:
+                            mappings[ent_id] = {"category": "enemy", "id": ent_id, "positions": positions}
                         else:
                             # obstacleやwall_decorationは village.yml のベースから探す
                             base_mappings = (load_master_data("village.yml") or {}).get("TILE_MAPPINGS", {})

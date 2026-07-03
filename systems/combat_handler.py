@@ -1,5 +1,22 @@
 import random
+from constants import HIT_STUN_DURATION, ATTACK_ANIMATION_FRAMES
 from wordings import Text
+
+
+def _as_int_or_zero(value):
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, (int, float)):
+        return int(value)
+    return 0
+
+
+def _as_bool(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return value != 0
+    return False
 
 def _is_frontal_attack(attacker, target):
     """
@@ -55,7 +72,7 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     from constants import ENABLE_DEBUG_LOGGING
 
     # 無敵状態のチェック
-    if getattr(target, "is_god", False) or getattr(target, "invincible_turns", 0) > 0:
+    if _as_bool(getattr(target, "is_god", False)) or _as_int_or_zero(getattr(target, "invincible_turns", 0)) > 0:
         return 0, False, False
         
     # 命中判定
@@ -129,7 +146,10 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     crit_rate = min(CRITICAL_RATE_MAX, crit_rate)
     
     # クリティカル判定
-    is_critical = random.random() < crit_rate
+    force_critical = _as_bool(getattr(attacker, "_force_critical_once", False))
+    is_critical = force_critical or (random.random() < crit_rate)
+    if force_critical:
+        attacker._force_critical_once = False
     from constants import CRITICAL_DAMAGE_MULTIPLIER, BACKSTAB_CRITICAL_DAMAGE_MULTIPLIER
     if is_critical:
         crit_multiplier = BACKSTAB_CRITICAL_DAMAGE_MULTIPLIER if is_backstab else CRITICAL_DAMAGE_MULTIPLIER
@@ -190,6 +210,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     
     attacker_name = getattr(attacker, "name", "誰か")
     target_name = getattr(target, "name", "誰か")
+    target_is_static = getattr(target, "is_static", False)
     
     if is_miss:
         msg = "ミス " + Text.Combat.MISS.format(attacker=attacker_name, target=target_name)
@@ -199,6 +220,24 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
         msg = Text.Combat.BLOCK.format(target=target_name)
         return msg, 0, False, False
     
+    counter_ready_turns = _as_int_or_zero(getattr(target, "counter_ready_turns", 0))
+    if (
+        counter_ready_turns > 0
+        and not is_magic
+        and getattr(attacker, "__class__", None).__name__ == "Player"
+    ):
+        target.counter_ready_turns = 0
+        target._force_critical_once = True
+        if hasattr(target, "is_attacking"):
+            target.is_attacking = True
+            target.attack_timer = ATTACK_ANIMATION_FRAMES
+            target.has_dealt_impact_damage = False
+            target.current_attack_mode = "counter"
+        counter_msg, _, _, _ = deal_damage(target, attacker, is_magic=False, damage_mult=1.25)
+        counter_prefix = f"{target_name}のカウンター！\n{counter_msg}\n"
+    else:
+        counter_prefix = ""
+
     target.take_damage(damage)
     
     # メッセージ生成
@@ -226,14 +265,14 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                     msg += f"\n{target_name}は暗闇に包まれた！視界が狭まった！"
 
     # --- 敵の困惑（stupidity）上昇効果 ---
-    if not is_miss and damage > 0:
+    if not target_is_static and not is_miss and damage > 0:
         stupidity_up = getattr(attacker, "total_stupidity", 0)
         if isinstance(stupidity_up, (int, float)) and stupidity_up > 0 and hasattr(target, "stupidity"):
             target.stupidity = min(10, target.stupidity + int(stupidity_up))
             msg += "\n" + Text.Combat.CONFUSED.format(target=target_name, amount=int(stupidity_up))
 
     # --- 敵の一時的 stupidity 上昇効果（装備スキル） ---
-    if not is_miss and damage > 0 and hasattr(target, "stupidity_temp"):
+    if not target_is_static and not is_miss and damage > 0 and hasattr(target, "stupidity_temp"):
         total_confusion = getattr(attacker, "total_confusion", 0)
         if isinstance(total_confusion, int) and total_confusion >= 2:
             proc_chance = getattr(attacker, "total_stupidity_proc_chance", 0.0)
@@ -250,7 +289,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                     print(f"[混乱] ❌ 失敗")
 
     # --- スタン効果（クリティカル時のみ発動） ---
-    if not is_miss and damage > 0 and is_critical and hasattr(target, "stun_turns"):
+    if not target_is_static and not is_miss and damage > 0 and is_critical and hasattr(target, "stun_turns"):
         total_stun = getattr(attacker, "total_stun", 0)
         stun_chance = getattr(attacker, "total_stun_proc_chance", 0.0)
         if isinstance(total_stun, int) and total_stun >= 2 and isinstance(stun_chance, (int, float)) and stun_chance > 0:
@@ -264,7 +303,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                     print(f"[スタン] ✅ クリティカル発動")
 
     # --- ライフスティール効果（クリティカル時のみ発動） ---
-    if not is_miss and damage > 0 and is_critical and hasattr(attacker, "hp"):
+    if not target_is_static and not is_miss and damage > 0 and is_critical and hasattr(attacker, "hp"):
         total_lifesteal = getattr(attacker, "total_lifesteal", 0)
         if isinstance(total_lifesteal, int) and total_lifesteal >= 2:
             lifesteal_chance = getattr(attacker, "total_lifesteal_chance", 0.0)
@@ -320,4 +359,4 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     target_hp = getattr(target, 'hp', '?')
     target_cond = getattr(target, 'condition', 'normal')
     print(f"[COMBAT] {attacker_name} -> {target_name}: Damage={damage}, Critical={is_critical}, Miss={is_miss}, TargetHP: {target_hp}, TargetCond: {target_cond}")
-    return msg, damage, is_critical, False
+    return counter_prefix + msg, damage, is_critical, False

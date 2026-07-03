@@ -13,6 +13,7 @@ game_state = {
     "dialog_active": False,
     "dialog_modal": True,   # ボタン入力を待つ（ポーズする）かどうか
     "confirm_active": False,
+    "boss_encounter_pending": False,
     "inventory_active": False,
     "enhance_active": False,
     "status_active": False,  # ステータス画面用

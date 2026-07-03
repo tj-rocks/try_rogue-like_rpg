@@ -11,13 +11,14 @@ os.environ["DEBUG_MODE"] = "1"
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from constants import *
-from components.sprites.player import Player, EquipInstance
+from components.sprites.player import Player, EquipInstance, StaveInstance
 from components.sprites.enemy import Enemy
 from systems.dungeon import warp_to_floor
 from systems.scene_handler import handle_game, handle_ending, handle_opening
 from systems.session_handler import init_ui_elements, setup_ui_relations
 from systems.resources import font_small, font_medium
 from systems.events import handle_events, active_direction_keys
+from systems.tactical_profile import TacticalProfile
 
 # ===== デバッグ起動時のセットアップ画面 =====
 
@@ -529,6 +530,178 @@ def setup_gungeon_mode(dungeon, player):
         traceback.print_exc()
         return dungeon
 
+
+def setup_last_boss_mode(dungeon, player):
+    try:
+        print("[Debug] Setting up Last Boss Mode...")
+        try:
+            if os.path.exists("duel_ai.log"):
+                os.remove("duel_ai.log")
+        except:
+            pass
+        apply_last_boss_mock_player(player)
+        dungeon = setup_gungeon_mode(dungeon, player)
+        ts = dungeon.tile_size
+        dungeon.dropped_items = []
+        dungeon.traps = []
+        dungeon.npcs = []
+        dungeon.enemies = []
+        dungeon.spawn_counts = {}
+        dungeon.is_combat_qa = False
+        dungeon.is_quest_qa = False
+
+        center_x = max(2, dungeon.map_width // 2)
+        center_y = max(2, dungeon.map_height // 2)
+        player.x = center_x * ts
+        player.y = min(dungeon.map_height - 3, center_y + 4) * ts
+        player.target_x = player.x
+        player.target_y = player.y
+        player.set_current_floor(99)
+
+        boss = Enemy(center_x * ts, center_y * ts, "dungeon_core", player=player)
+        boss.target_x, boss.target_y = boss.x, boss.y
+        boss.current_dungeon = dungeon
+        dungeon.enemies.append(boss)
+        dungeon.spawn_counts[boss.type] = 1
+        dungeon.current_floor = 99
+        dungeon.is_lighted = True
+        dungeon.reveal_floor()
+        print("[Debug] Last Boss Mode Ready.")
+        return dungeon
+    except Exception as e:
+        print(f"[Error] setup_last_boss_mode: {e}")
+        traceback.print_exc()
+        return dungeon
+
+def apply_last_boss_mock_player(player):
+    mock_weapon = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)
+    mock_armor = player._find_equip_inst(player.armor_inventory, player.equipped_armor)
+    mock_shield = player._find_equip_inst(player.shield_inventory, player.equipped_shield)
+    mock_accessory = player._find_equip_inst(player.accessory_inventory, player.equipped_accessory)
+
+    def clone_equip(inst):
+        if not inst:
+            return None
+        cloned = EquipInstance(inst.equip_type, inst.key)
+        cloned.enhance = getattr(inst, "enhance", 0)
+        cloned.stats = dict(getattr(inst, "stats", {}) or {})
+        return cloned
+
+    preserved = {
+        "weapon": clone_equip(mock_weapon),
+        "armor": clone_equip(mock_armor),
+        "shield": clone_equip(mock_shield),
+        "accessory": clone_equip(mock_accessory),
+    }
+
+    from constants import PLAYER_ATTACK, PLAYER_HP, PLAYER_DEFENSE
+    player.attack = PLAYER_ATTACK
+    player.hp = PLAYER_HP
+    player.max_hp = PLAYER_HP
+    player.defense = PLAYER_DEFENSE
+    player.coin = 5000
+    player.bank_coin = 0
+    player.guild_point = 9999
+    player.guild_rank = "A"
+    player.current_floor = 99
+    player.max_reached_floor = 99
+    player.items = [
+        {"key": "heal_potion", "count": 3},
+        {"key": "antidote", "count": 2},
+    ]
+    player.active_quests = []
+    player.quest_tokens = {}
+    player.completed_fixed_quests = []
+    player.defeated_once_only = []
+    player.warehouse_items = []
+    player.event_items = [{"key": "fathers_charm", "count": 1}]
+    player.regen_pool = 0
+    player.condition = "normal"
+    player.invincible_turns = 0
+    player.attack_buff_turns = 0
+    player.attack_buff_val = 0
+    player.attack_buff_crit = 0
+    player.attack_buff_armor_pen = 0.0
+    player.regen_buff_turns = 0
+    player.regen_buff_val = 0
+    player.regen_buff_heal_boost = 0.0
+    player.magic_buff_turns = 0
+    player.magic_buff_val = 0
+    player.stealth_buff_turns = 0
+    player.stealth_buff_max_turns = 0
+    player.stealth_buff_lantern = 0
+    player.stealth_buff_aggro = 0
+    player.stealth_buff_stupidity = 0
+    player.enemy_turn_pending = False
+    player.is_god = False
+    player.weapon_inventory = []
+    player.armor_inventory = []
+    player.shield_inventory = []
+    player.accessory_inventory = []
+    player.stave_inventory = [
+        StaveInstance("fire_stave", charges=5),
+        StaveInstance("knockback_stave", charges=5),
+        StaveInstance("heal_stave", charges=3),
+    ]
+    player.unequip_weapon()
+    player.unequip_armor()
+    player.unequip_shield()
+    player.unequip_accessory()
+
+    if preserved["weapon"]:
+        player.weapon_inventory.append(preserved["weapon"])
+        player.change_weapon(preserved["weapon"].iid)
+    if preserved["armor"]:
+        player.armor_inventory.append(preserved["armor"])
+        player.change_armor(preserved["armor"].iid)
+    if preserved["shield"]:
+        player.shield_inventory.append(preserved["shield"])
+        player.change_shield(preserved["shield"].iid)
+    if preserved["accessory"]:
+        player.accessory_inventory.append(preserved["accessory"])
+        player.change_accessory(preserved["accessory"].iid)
+
+    # ラスボスの読み筋を即確認できるよう、軽く傾向を仕込んでおく
+    player.tactical_profile = TacticalProfile({
+        "front|1|melee": 4,
+        "front|1|magic_knockback": 3,
+        "front|2|move": 3,
+        "diagonal|1|move": 4,
+        "far|3plus|magic_fire": 5,
+        "far|3plus|move": 2,
+    })
+    print("[Debug] Applied mocked player profile for Last Boss Mode.")
+
+def _build_last_boss_debug_lines(dungeon, player):
+    boss = None
+    for enemy in getattr(dungeon, "enemies", []):
+        if getattr(enemy, "type", "") == "dungeon_core" and not getattr(enemy, "is_dead", False):
+            boss = enemy
+            break
+    if not boss:
+        return []
+
+    try:
+        from systems.tactical_profile import get_relation_and_distance
+        relation, distance = get_relation_and_distance(player, boss, dungeon.tile_size)
+        profile = getattr(player, "tactical_profile", None)
+        preferred = profile.get_preferred_action(relation, distance) if profile else None
+        fire_local = profile.get_action_total("magic_fire", relation=relation, distance=distance) if profile else 0
+        knockback_local = profile.get_action_total("magic_knockback", relation=relation, distance=distance) if profile else 0
+        fire_total = profile.get_action_total("magic_fire") if profile else 0
+        knockback_total = profile.get_action_total("magic_knockback") if profile else 0
+        magic_read = boss._read_player_magic_habit(player, relation, distance)
+        current_mode = getattr(boss, "current_attack_mode", None) or "-"
+        counter_ready = getattr(boss, "counter_ready_turns", 0)
+        return [
+            "--- LAST BOSS READ ---",
+            f"Pos: relation={relation} distance={distance} preferred={preferred or '-'}",
+            f"Magic habit: read={magic_read or '-'} fire={fire_local}/{fire_total} knockback={knockback_local}/{knockback_total}",
+            f"Boss state: mode={current_mode} counter={counter_ready}",
+        ]
+    except Exception as e:
+        return [f"Last Boss Debug Error: {e}"]
+
 def draw_debug_overlay(screen, dungeon, player):
     # 会心率の計算
     crit_rate = getattr(player, "crit_rate", 0.01)
@@ -549,7 +722,8 @@ def draw_debug_overlay(screen, dungeon, player):
         "[G] : God Mode (Invincibility + Atk x100)",
         "[H] : Heal HP | [K] : Kill All Enemies",
         "[PageUp/Dn] : Adjust GP (+/-100)",
-        "[. / ,] : Rank UP / DOWN"
+        "[. / ,] : Rank UP / DOWN",
+        "[J] : Last Boss Mode",
     ]
     
     # 受注中クエストの表示
@@ -557,6 +731,8 @@ def draw_debug_overlay(screen, dungeon, player):
         info_lines.append("Active Quests:")
         for q in player.active_quests:
             info_lines.append(f" - {q['title']} ({q['type']})")
+
+    info_lines.extend(_build_last_boss_debug_lines(dungeon, player))
 
     # 表示位置の計算
     y_offset = SCREEN_HEIGHT - (len(info_lines) * 30 + 30)
@@ -670,6 +846,13 @@ def main():
                     elif event.key == pygame.K_l:
                         dungeon.is_lighted = not dungeon.is_lighted
                         print(f"[DEBUG] Light Mode: {'ON' if dungeon.is_lighted else 'OFF'}")
+                    elif event.key == pygame.K_j:
+                        dungeon = warp_to_floor(99, player, spawn_reason="debug")
+                        dungeon.is_combat_qa = True
+                        dungeon.is_quest_qa = True
+                        dungeon = setup_last_boss_mode(dungeon, player)
+                        setup_ui_relations(ui_elements, player, dungeon, game_state)
+                        print("[DEBUG] Last Boss Mode engaged")
 
             scene = game_state.get("current_scene", "game")
             
