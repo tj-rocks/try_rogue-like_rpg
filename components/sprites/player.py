@@ -4,6 +4,7 @@ import os
 from systems.game_state import game_state, is_paused, is_enemy_acting
 from components.sprites.entity import Entity
 from systems.combat_handler import deal_damage
+from systems.tactical_profile import TacticalProfile, get_relation_and_distance
 from constants import (
     KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_MOVE_LEFT, KEY_MOVE_RIGHT,
     KEY_ATTACK, KEY_CONFIRM, KEY_TURN_ONLY,
@@ -756,6 +757,7 @@ class Player(Entity):
         self.curse_level = 0
         self.cursed_stats = []
         self.shop_bonus_refresh = False  # ミッション達成後にショップ品揃え拡張
+        self.tactical_profile = TacticalProfile()
 
         if PLAYER_ARMOR and PLAYER_ARMOR in ARMOR_DATA:
             inst = EquipInstance("armor", PLAYER_ARMOR); self.armor_inventory.append(inst); self._apply_armor(inst)
@@ -772,6 +774,54 @@ class Player(Entity):
         self.current_floor = floor
         if floor > self.max_reached_floor:
             self.max_reached_floor = floor
+
+    def _log_duel_trace(self, dungeon, action_type, extra=""):
+        boss = self._get_tactical_boss(dungeon)
+        if not boss:
+            return
+        try:
+            tile = dungeon.tile_size
+            px = int((self.target_x + self.width / 2) // tile)
+            py = int((self.target_y + self.height / 2) // tile)
+            bx = int((boss.target_x + boss.width / 2) // tile)
+            by = int((boss.target_y + boss.height / 2) // tile)
+            relation, distance = get_relation_and_distance(self, boss, tile)
+            with open("duel_ai.log", "a", encoding="utf-8") as f:
+                floor = getattr(dungeon, "current_floor", "?")
+                suffix = f" | {extra}" if extra else ""
+                f.write(
+                    f"[Floor {floor}] [PLAYER] pos=({px},{py}) facing={self.facing} "
+                    f"boss=({bx},{by}) relation={relation} distance={distance} "
+                    f"action={action_type}{suffix}\n"
+                )
+        except:
+            pass
+
+    def _get_tactical_boss(self, dungeon):
+        if not dungeon:
+            return None
+        for enemy in getattr(dungeon, "enemies", []):
+            if getattr(enemy, "is_dead", False):
+                continue
+            if getattr(enemy, "type", "") == "dungeon_core":
+                return enemy
+        return None
+
+    def record_tactical_action(self, dungeon, action_type):
+        boss = self._get_tactical_boss(dungeon)
+        if not boss:
+            return
+        relation, distance = get_relation_and_distance(self, boss, dungeon.tile_size)
+        self.tactical_profile.record(relation, distance, action_type)
+        self._log_duel_trace(dungeon, action_type)
+
+    def _get_tactical_action_for_stave(self, inst):
+        effect_type = STAVE_DATA.get(getattr(inst, "key", None), {}).get("effect_type")
+        if effect_type == "fire":
+            return "magic_fire"
+        if effect_type == "knockback":
+            return "magic_knockback"
+        return "magic"
 
     def apply_curse(self):
         self.curse_level = min(5, self.curse_level + 1)
@@ -830,10 +880,13 @@ class Player(Entity):
     def operate(self, dungeon, dialog=None, events=[]):
         if is_paused() or self.is_moving or self.is_attacking or game_state.get("dialog_just_closed") or is_enemy_acting(dungeon):
             return
+        if game_state.get("boss_encounter_pending", False):
+            return
         turn_consumed = False
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == KEY_ATTACK:
                 if dungeon.current_floor == 0 or dungeon.floor_info.get("no_attack", False): break
+                self.record_tactical_action(dungeon, "melee")
                 self.waving_stave_inst = None; self._perform_attack(); turn_consumed = True; break
 
         if not turn_consumed:
@@ -849,6 +902,7 @@ class Player(Entity):
                 if is_turning: return
                 tx, ty = self.x + dx, self.y + dy
                 if self.can_move_grid(tx, ty, dungeon):
+                    self.record_tactical_action(dungeon, "move")
                     self.prev_x, self.prev_y = self.x, self.y; self.target_x, self.target_y = tx, ty; self.is_moving = True
                     dungeon.reveal_area(tx // dungeon.tile_size, ty // dungeon.tile_size)
                     self.step_toggle = not self.step_toggle; turn_consumed = True
@@ -915,6 +969,7 @@ class Player(Entity):
         elif self.weapon: sound_manager.play_sfx(self.weapon.data.get("sound"))
 
     def _perform_wave(self, inst, dungeon, dialog):
+        self.record_tactical_action(dungeon, self._get_tactical_action_for_stave(inst))
         self.waving_stave_inst = inst
         self.is_attacking = True
         self.attack_timer = ATTACK_ANIMATION_FRAMES
@@ -1026,14 +1081,21 @@ class Player(Entity):
         if img_dir and os.path.exists(img_dir):
             from systems.resources import load_image
             shared = None
-            for c in ["down.png", "shield.png", f"{inst.key}.png"]:
+            for c in ["down.png", "left.png", "shield.png", f"{inst.key}.png"]:
                 p = os.path.join(img_dir, c); raw = load_image(p)
                 if raw: shared = pygame.transform.scale(raw, (self.width, self.height)); break
-            for d in ("down", "left", "right", "up"):
+            for d in ("down", "left", "up"):
                 r = load_image(f"{img_dir}/{d}.png")
-                if r: self._shield_images[d] = pygame.transform.scale(r, (self.width, self.height))
-                elif d == "right" and "left" in self._shield_images: self._shield_images[d] = pygame.transform.flip(self._shield_images["left"], True, False)
-                elif shared: self._shield_images[d] = shared
+                if r:
+                    self._shield_images[d] = pygame.transform.scale(r, (self.width, self.height))
+                elif shared:
+                    self._shield_images[d] = shared
+            if "left" in self._shield_images:
+                self._shield_images["right"] = pygame.transform.flip(self._shield_images["left"], True, False)
+            elif shared:
+                self._shield_images["right"] = shared
+            if "down" in self._shield_images and "up" not in self._shield_images:
+                self._shield_images["up"] = self._shield_images["down"]
 
     def _apply_armor(self, inst):
         self.equipped_armor = inst.iid; data = ARMOR_DATA.get(inst.key)
@@ -1043,14 +1105,21 @@ class Player(Entity):
         if img_dir and os.path.exists(img_dir):
             from systems.resources import load_image
             shared = None
-            for c in ["down.png", "armor.png", f"{inst.key}.png"]:
+            for c in ["down.png", "left.png", "armor.png", f"{inst.key}.png"]:
                 p = os.path.join(img_dir, c); raw = load_image(p)
                 if raw: shared = pygame.transform.scale(raw, (self.width, self.height)); break
-            for d in ("down", "left", "right", "up"):
+            for d in ("down", "left", "up"):
                 r = load_image(f"{img_dir}/{d}.png")
-                if r: self._armor_images[d] = pygame.transform.scale(r, (self.width, self.height))
-                elif d == "right" and "left" in self._armor_images: self._armor_images[d] = pygame.transform.flip(self._armor_images["left"], True, False)
-                elif shared: self._armor_images[d] = shared
+                if r:
+                    self._armor_images[d] = pygame.transform.scale(r, (self.width, self.height))
+                elif shared:
+                    self._armor_images[d] = shared
+            if "left" in self._armor_images:
+                self._armor_images["right"] = pygame.transform.flip(self._armor_images["left"], True, False)
+            elif shared:
+                self._armor_images["right"] = shared
+            if "down" in self._armor_images and "up" not in self._armor_images:
+                self._armor_images["up"] = self._armor_images["down"]
 
     def _clamp_hp_to_max(self):
         """現在HPが最大HPを超えている場合、最大HPに収める"""
@@ -1593,6 +1662,7 @@ class Player(Entity):
             "boss_message_shown": getattr(self, "boss_message_shown", False),
             "curse_level": getattr(self, "curse_level", 0),
             "cursed_stats": getattr(self, "cursed_stats", []),
+            "tactical_profile": self.tactical_profile.to_dict(),
         }
 
     def load_dict(self, data):
@@ -1650,6 +1720,7 @@ class Player(Entity):
         self.boss_message_shown = data.get("boss_message_shown", False)
         self.curse_level = int(data.get("curse_level", 0))
         self.cursed_stats = data.get("cursed_stats", [])
+        self.tactical_profile = TacticalProfile.from_dict(data.get("tactical_profile", {}))
         global _equip_id_counter
         _equip_id_counter = max(_equip_id_counter, data.get("equip_id_counter", 0))
         # God Mode はセーブしないので、ロード時に常にOFF

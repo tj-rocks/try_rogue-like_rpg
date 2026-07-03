@@ -281,6 +281,7 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
                         item_name = item_data.get("name", "この秘薬")
                         confirm_dialog.text = Text.Items.BUFF_OVERWRITE_CONFIRM.format(name=item_name)
                         def _do_use(iid=item_key_or_iid, p=player, d=current_dungeon):
+                            p.record_tactical_action(d, "item")
                             dialog.text = use_consumable(iid, p, d)
                             p.enemy_turn_pending = True
                             game_state["dialog_modal"] = True
@@ -294,11 +295,13 @@ def make_use_item_callback(player, dialog, inventory_dialog, game_state, dungeon
                 if item_data.get("effect") == "warp_home":
                     # ワープ実行
                     from systems.dungeon import warp_to_floor
+                    player.record_tactical_action(current_dungeon, "item")
                     dialog.text = use_consumable(item_key_or_iid, player, current_dungeon)
                     def do_warp():
                         current_dungeon.next_dungeon = warp_to_floor(0, player, spawn_reason="return")
                     dialog.on_close_callback = do_warp
                 else:
+                    player.record_tactical_action(current_dungeon, "item")
                     dialog.text = use_consumable(item_key_or_iid, player, current_dungeon)
 
         # アイテム使用・装備変更に成功したら敵にターンを渡す準備をする
@@ -434,4 +437,3 @@ def make_unequip_item_callback(player, dialog, inventory_dialog, game_state):
         inventory_dialog.is_active = True
         
     return unequip
-

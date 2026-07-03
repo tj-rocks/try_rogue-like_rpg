@@ -1,6 +1,22 @@
 import random
-from constants import HIT_STUN_DURATION
+from constants import HIT_STUN_DURATION, ATTACK_ANIMATION_FRAMES
 from wordings import Text
+
+
+def _as_int_or_zero(value):
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, (int, float)):
+        return int(value)
+    return 0
+
+
+def _as_bool(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return value != 0
+    return False
 
 def _is_frontal_attack(attacker, target):
     """
@@ -56,7 +72,7 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     from constants import ENABLE_DEBUG_LOGGING
 
     # 無敵状態のチェック
-    if getattr(target, "is_god", False) or getattr(target, "invincible_turns", 0) > 0:
+    if _as_bool(getattr(target, "is_god", False)) or _as_int_or_zero(getattr(target, "invincible_turns", 0)) > 0:
         return 0, False, False
         
     # 命中判定
@@ -130,7 +146,10 @@ def calculate_damage(attacker, target, is_magic=False, damage_mult=1.0):
     crit_rate = min(CRITICAL_RATE_MAX, crit_rate)
     
     # クリティカル判定
-    is_critical = random.random() < crit_rate
+    force_critical = _as_bool(getattr(attacker, "_force_critical_once", False))
+    is_critical = force_critical or (random.random() < crit_rate)
+    if force_critical:
+        attacker._force_critical_once = False
     from constants import CRITICAL_DAMAGE_MULTIPLIER, BACKSTAB_CRITICAL_DAMAGE_MULTIPLIER
     if is_critical:
         crit_multiplier = BACKSTAB_CRITICAL_DAMAGE_MULTIPLIER if is_backstab else CRITICAL_DAMAGE_MULTIPLIER
@@ -201,6 +220,24 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
         msg = Text.Combat.BLOCK.format(target=target_name)
         return msg, 0, False, False
     
+    counter_ready_turns = _as_int_or_zero(getattr(target, "counter_ready_turns", 0))
+    if (
+        counter_ready_turns > 0
+        and not is_magic
+        and getattr(attacker, "__class__", None).__name__ == "Player"
+    ):
+        target.counter_ready_turns = 0
+        target._force_critical_once = True
+        if hasattr(target, "is_attacking"):
+            target.is_attacking = True
+            target.attack_timer = ATTACK_ANIMATION_FRAMES
+            target.has_dealt_impact_damage = False
+            target.current_attack_mode = "counter"
+        counter_msg, _, _, _ = deal_damage(target, attacker, is_magic=False, damage_mult=1.25)
+        counter_prefix = f"{target_name}のカウンター！\n{counter_msg}\n"
+    else:
+        counter_prefix = ""
+
     target.take_damage(damage)
     
     # メッセージ生成
@@ -322,4 +359,4 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     target_hp = getattr(target, 'hp', '?')
     target_cond = getattr(target, 'condition', 'normal')
     print(f"[COMBAT] {attacker_name} -> {target_name}: Damage={damage}, Critical={is_critical}, Miss={is_miss}, TargetHP: {target_hp}, TargetCond: {target_cond}")
-    return msg, damage, is_critical, False
+    return counter_prefix + msg, damage, is_critical, False

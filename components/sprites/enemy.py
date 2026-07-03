@@ -14,6 +14,13 @@ from constants import (
     STUPIDITY_WANDER_RATES, STUPIDITY_FLANK_RATES, ENEMY_ESCAPE_BLOCK_ENABLED
 )
 from systems.combat_handler import deal_damage
+from systems.tactical_profile import get_relation_and_distance
+
+def _enemy_equipment_inst(equip_type, key):
+    if not key:
+        return None
+    from components.sprites.player import EquipInstance
+    return EquipInstance(equip_type, key)
 
 class Enemy(Entity):
     _image_cache = {}
@@ -55,6 +62,7 @@ class Enemy(Entity):
         self.is_long_range = False; self.attack_priority = data.get("attack_priority", "close")
         self.smart_ranged_move = data.get("smart_ranged_move", True)
         self.turn_attack = data.get("turn_attack", False)
+        self.turn_attack_chance = data.get("turn_attack_chance", 0.5)
         self.move_face_chance = data.get("move_face_chance", 0.0)
         self.bgm = data.get("bgm"); self.crit_rate = data.get("crit_rate", 0.01)
         self.accuracy_close = data.get("accuracy_close", data.get("accuracy_bonus", 100))
@@ -62,9 +70,68 @@ class Enemy(Entity):
         self.status_to_inflict = data.get("status"); self.status_chance = data.get("status_chance", 100)
         self.detect_range = data.get("detect_range", ENEMY_AGGRO_RADIUS)
         self.damaged_detect_range = data.get("damaged_detect_range", 100)
+        self.counter_ready_turns = 0
+        self.attack_modes = data.get("attack_modes", [])
+        self.attack_range_line = data.get("attack_range_line", self.attack_range)
+        self.attack_range_diagonal = data.get("attack_range_diagonal", self.attack_range)
+        self.attack_effects = data.get("attack_effects", {})
+        self.current_attack_mode = None
+        self.walk_frames = {}
+        self.walk_frame_sources = {}
+        self._last_draw_frame_info = None
+        self.weapon_inventory = []
+        self.armor_inventory = []
+        self.shield_inventory = []
+        self.accessory_inventory = []
+        self.equipped_weapon = None
+        self.equipped_armor = None
+        self.equipped_shield = None
+        self.equipped_accessory = None
+        eq_cfg = data.get("equipment", {}) or {}
+        if isinstance(eq_cfg, dict):
+            wcfg = eq_cfg.get("weapon") or {}
+            acfg = eq_cfg.get("armor") or {}
+            scfg = eq_cfg.get("shield") or {}
+            xcfg = eq_cfg.get("accessory") or {}
+            wkey = wcfg.get("key")
+            akey = acfg.get("key")
+            skey = scfg.get("key")
+            xkey = xcfg.get("key")
+            winst = _enemy_equipment_inst("weapon", wkey)
+            ainst = _enemy_equipment_inst("armor", akey)
+            sinst = _enemy_equipment_inst("shield", skey)
+            xinst = _enemy_equipment_inst("accessory", xkey)
+            if winst:
+                self.weapon_inventory.append(winst)
+                self.equipped_weapon = winst.iid
+                from components.sprites.weapon import get_weapon_instance
+                self.weapon = get_weapon_instance(winst.key, winst.enhance)
+            else:
+                self.weapon = None
+            if ainst:
+                self.armor_inventory.append(ainst)
+                self.equipped_armor = ainst.iid
+            if sinst:
+                self.shield_inventory.append(sinst)
+                self.equipped_shield = sinst.iid
+            if xinst:
+                self.accessory_inventory.append(xinst)
+                self.equipped_accessory = xinst.iid
+        self._armor_images = {}
+        self._shield_images = {}
+        self._load_enemy_equipment_images()
         
         color_hex = data.get("image_color"); cache_key = (enemy_type, self.width, self.height, color_hex)
-        if cache_key in Enemy._image_cache: self.images = Enemy._image_cache[cache_key]
+        cache_entry = Enemy._image_cache.get(cache_key)
+        if cache_entry:
+            if isinstance(cache_entry, dict) and "images" in cache_entry:
+                self.images = cache_entry.get("images", {})
+                self.walk_frames = cache_entry.get("walk_frames", {})
+                self.walk_frame_sources = cache_entry.get("walk_frame_sources", {})
+            else:
+                self.images = cache_entry
+                self.walk_frames = {}
+                self.walk_frame_sources = {}
         else:
             self.images = {}; ip = data.get("image_path"); fp = data.get("image_folder", "")
             tint = None
@@ -74,33 +141,160 @@ class Enemy(Entity):
             def apply_tint(s):
                 if tint: ts = s.copy(); ts.fill(tint, special_flags=pygame.BLEND_RGB_MULT); return ts
                 return s
+            def load_frame(path):
+                try:
+                    return apply_tint(pygame.transform.scale(pygame.image.load(path).convert_alpha(), (self.width, self.height)))
+                except:
+                    return None
             if ip:
                 try:
-                    img = apply_tint(pygame.transform.scale(pygame.image.load(ip).convert_alpha(), (self.width, self.height)))
+                    img = load_frame(ip)
                     if not self.is_static: self.images = {"up": img, "down": img, "left": img, "right": pygame.transform.flip(img, True, False)}
                     else: self.images = {d: img for d in ["up", "down", "left", "right"]}
                 except: pass
             if not self.images and fp:
                 for d in ["up", "down", "left", "right"]:
-                    try:
-                        img = apply_tint(pygame.transform.scale(pygame.image.load(f"{fp}/{d}.png").convert_alpha(), (self.width, self.height)))
-                        self.images[d] = img
-                    except:
-                        if d == "right" and not self.is_static and "left" in self.images: self.images[d] = pygame.transform.flip(self.images["left"], True, False)
-                        else: self.images[d] = pygame.Surface((self.width, self.height))
+                    frame_list = []
+                    frame_sources = []
+                    for suffix in ("0", "1"):
+                        frame_path = f"{fp}/{d}_{suffix}.png"
+                        frame = load_frame(frame_path)
+                        if frame:
+                            frame_list.append(frame)
+                            frame_sources.append(f"{d}_{suffix}")
+                    if not frame_list:
+                        single_path = f"{fp}/{d}.png"
+                        single = load_frame(single_path)
+                        if single:
+                            frame_list = [single]
+                            frame_sources = [d]
+                    if not frame_list and d == "right" and not self.is_static and "left" in self.walk_frames:
+                        frame_list = [pygame.transform.flip(img, True, False) for img in self.walk_frames["left"]]
+                        frame_sources = [f"flip({src})" for src in self.walk_frame_sources.get("left", ["left"])]
+                    if not frame_list:
+                        frame_list = [pygame.Surface((self.width, self.height))]
+                        frame_sources = ["blank"]
+                    self.walk_frames[d] = frame_list
+                    self.walk_frame_sources[d] = frame_sources
+                    self.images[d] = frame_list[0]
+                    if getattr(self, "type", "") == "dungeon_core":
+                        try:
+                            self._log_trace(
+                                None,
+                                f"load_frames facing={d} count={len(frame_list)} srcs={','.join(frame_sources)}"
+                            )
+                        except:
+                            pass
             if not self.images: self.images = {d: pygame.Surface((self.width, self.height)) for d in ["up", "down", "left", "right"]}
-            Enemy._image_cache[cache_key] = self.images
+            if not self.walk_frames:
+                self.walk_frames = {d: [self.images.get(d, pygame.Surface((self.width, self.height)))] for d in ["up", "down", "left", "right"]}
+                self.walk_frame_sources = {d: [d] for d in ["up", "down", "left", "right"]}
+            Enemy._image_cache[cache_key] = {
+                "images": self.images,
+                "walk_frames": self.walk_frames,
+                "walk_frame_sources": self.walk_frame_sources,
+            }
+        if getattr(self, "type", "") == "dungeon_core":
+            try:
+                for d in ("down", "left", "right", "up"):
+                    fl = self.walk_frames.get(d, [])
+                    srcs = self.walk_frame_sources.get(d, [])
+                    self._log_trace(None, f"frame_cache facing={d} count={len(fl)} srcs={','.join(srcs) if srcs else '-'} cached={cache_key in Enemy._image_cache}")
+            except:
+                pass
 
     def _log_trace(self, dungeon, msg):
         try:
             with open("enemy_ai.log", "a", encoding="utf-8") as f:
-                floor = getattr(dungeon, 'current_floor', '?')
-                f.write(f"[Floor {floor}] [{self.name}#{id(self)%10000}] at ({int(self.x//dungeon.tile_size)}, {int(self.y//dungeon.tile_size)}): {msg}\n")
+                floor = getattr(dungeon, 'current_floor', '?') if dungeon else '?'
+                tile_size = getattr(dungeon, "tile_size", 1) if dungeon else 1
+                f.write(f"[Floor {floor}] [{self.name}#{id(self)%10000}] at ({int(self.x//tile_size)}, {int(self.y//tile_size)}): {msg}\n")
             import constants
             if constants.ENABLE_DEBUG_LOGGING:
                 print(f"[TRACE-AI] [{self.name}#{id(self)%10000}]: {msg}")
         except:
             pass
+
+    def _log_duel_trace(self, dungeon, player, action_type, extra=""):
+        if getattr(self, "type", "") != "dungeon_core":
+            return
+        try:
+            tile = dungeon.tile_size
+            bx = int((self.target_x + self.width / 2) // tile)
+            by = int((self.target_y + self.height / 2) // tile)
+            px = int((player.x + player.width / 2) // tile)
+            py = int((player.y + player.height / 2) // tile)
+            relation, distance = get_relation_and_distance(player, self, tile)
+            with open("duel_ai.log", "a", encoding="utf-8") as f:
+                floor = getattr(dungeon, "current_floor", "?")
+                suffix = f" | {extra}" if extra else ""
+                f.write(
+                    f"[Floor {floor}] [BOSS] pos=({bx},{by}) facing={self.facing} "
+                    f"player=({px},{py}) relation={relation} distance={distance} "
+                    f"action={action_type}{suffix}\n"
+                )
+        except:
+            pass
+
+    def _load_enemy_equipment_images(self):
+        import os
+        from systems.resources import load_image
+        from constants import ARMOR_DATA, SHIELD_DATA
+        armor_inst = self._find_equip_inst(self.armor_inventory, self.equipped_armor) if hasattr(self, "_find_equip_inst") else None
+        shield_inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield) if hasattr(self, "_find_equip_inst") else None
+        for inst, data_map, target_attr in [
+            (armor_inst, ARMOR_DATA, "_armor_images"),
+            (shield_inst, SHIELD_DATA, "_shield_images"),
+        ]:
+            if not inst:
+                continue
+            data = data_map.get(inst.key, {})
+            img_dir = data.get("image_dir", "")
+            if not img_dir or not os.path.exists(img_dir):
+                continue
+            images = {}
+            shared = None
+            for c in ["shield.png", "down.png", f"{inst.key}.png"]:
+                raw = load_image(f"{img_dir}/{c}")
+                if raw:
+                    shared = pygame.transform.scale(raw, (self.width, self.height))
+                    break
+            for d in ("down", "left", "right", "up"):
+                raw = load_image(f"{img_dir}/{d}.png")
+                if raw:
+                    images[d] = pygame.transform.scale(raw, (self.width, self.height))
+                elif d == "right" and "left" in images:
+                    images[d] = pygame.transform.flip(images["left"], True, False)
+                elif shared:
+                    images[d] = shared
+            setattr(self, target_attr, images)
+
+    def _find_equip_inst(self, inv, iid):
+        for inst in inv or []:
+            if getattr(inst, "iid", None) == iid:
+                return inst
+        return None
+
+    def _draw_enemy_armor_overlay(self, screen, draw_x, draw_y):
+        if not self.equipped_armor or not self._armor_images:
+            return
+        img = self._armor_images.get(self.facing)
+        if not img:
+            return
+        screen.blit(img, (draw_x, draw_y))
+
+    def _draw_enemy_shield_overlay(self, screen, draw_x, draw_y):
+        if not self.equipped_shield or not self._shield_images:
+            return
+        img = self._shield_images.get(self.facing)
+        if not img:
+            return
+        from constants import SHIELD_DATA, SHIELD_CATEGORIES
+        inst = self._find_equip_inst(self.shield_inventory, self.equipped_shield)
+        data = SHIELD_DATA.get(inst.key, {}) if inst else {}
+        cat_data = SHIELD_CATEGORIES.get(data.get("category"), {})
+        offsets = cat_data.get("position", {}).get("offsets", {}).get(self.facing, (0, 0))
+        screen.blit(img, (draw_x + offsets[0], draw_y + offsets[1]))
 
     def draw(self, screen, camera_x, camera_y):
         import math; draw_x, draw_y = self.x - camera_x, self.y - camera_y
@@ -126,7 +320,24 @@ class Enemy(Entity):
         (sx, sy), ph = self.get_breathing_scale() if not (self.is_attacking or self.is_static) else ((1.0, 1.0), 0)
         if -self.width <= draw_x <= screen.get_width() and -self.height <= draw_y <= screen.get_height():
             is_flipped = getattr(self, "flip", False)
-            base = self.images.get(self.facing, pygame.Surface((self.width, self.height)))
+            frame_list = self.walk_frames.get(self.facing) or [self.images.get(self.facing, pygame.Surface((self.width, self.height)))]
+            if self.is_moving:
+                frame_idx = (self.walk_anim_timer // 12) % len(frame_list)
+                base = frame_list[frame_idx]
+            else:
+                idle_step = 20 if getattr(self, "type", "") == "dungeon_core" else 8
+                frame_idx = (self.idle_anim_timer // idle_step) % len(frame_list)
+                base = frame_list[frame_idx]
+            if getattr(self, "type", "") == "dungeon_core":
+                src_list = self.walk_frame_sources.get(self.facing, [self.facing])
+                src_name = src_list[frame_idx] if frame_idx < len(src_list) else src_list[0]
+                draw_info = (self.facing, frame_idx, src_name, self.is_moving)
+                if draw_info != self._last_draw_frame_info:
+                    self._last_draw_frame_info = draw_info
+                    mode = "walk" if self.is_moving else "idle"
+                    dungeon = getattr(self, "current_dungeon", None)
+                    if dungeon:
+                        self._log_trace(dungeon, f"draw_frame mode={mode} facing={self.facing} idx={frame_idx} src={src_name}")
             ck = (base, "attack" if self.is_attacking else ph, is_flipped)
             cur = Enemy._scaled_image_cache.get(ck)
             if cur is None:
@@ -140,7 +351,27 @@ class Enemy(Entity):
             draw_x += (self.width - cur.get_width()) / 2; draw_y += (self.height - cur.get_height())
             from constants import HIT_STUN_DURATION
             if not (self.damage_flash_timer > HIT_STUN_DURATION and (self.damage_flash_timer - HIT_STUN_DURATION) % 4 < 2):
+                if getattr(self, "weapon", None):
+                    cx = draw_x + cur.get_width() / 2
+                    cy = draw_y + cur.get_height() / 2
+                    over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
+                    if not over:
+                        if self.is_attacking: self.weapon.draw_attack(screen, cx, cy, self.facing, 1.0, scale_x=sx, scale_y=sy, alpha=255)
+                        else: self.weapon.draw_idle(screen, cx, cy, self.facing, scale_x=sx, scale_y=sy, alpha=255)
+                so = {"up": False, "down": True, "left": True, "right": False}.get(self.facing, True)
+                if self.equipped_shield and not so:
+                    self._draw_enemy_shield_overlay(screen, draw_x, draw_y)
+                self._draw_enemy_armor_overlay(screen, draw_x, draw_y)
                 screen.blit(cur, (draw_x, draw_y))
+                if getattr(self, "weapon", None):
+                    cx = draw_x + cur.get_width() / 2
+                    cy = draw_y + cur.get_height() / 2
+                    over = self.weapon.DRAW_OVER_PLAYER.get(self.facing, False)
+                    if over:
+                        if self.is_attacking: self.weapon.draw_attack(screen, cx, cy, self.facing, 1.0, scale_x=sx, scale_y=sy, alpha=255)
+                        else: self.weapon.draw_idle(screen, cx, cy, self.facing, scale_x=sx, scale_y=sy, alpha=255)
+                if self.equipped_shield and so:
+                    self._draw_enemy_shield_overlay(screen, draw_x, draw_y)
                 # 色付きダメージフラッシュ（スタン・背後攻撃など）
                 if self.damage_flash_timer > HIT_STUN_DURATION:
                     color = getattr(self, "flash_color", (255, 255, 255))
@@ -164,13 +395,35 @@ class Enemy(Entity):
         else:
             self._log_trace(dungeon, f"_move_randomly: failed to move to {d[0]} ({tx//dungeon.tile_size}, {ty//dungeon.tile_size})")
 
-    def _is_in_attack_range(self, dx, dy): return (abs(dx) <= self.attack_range and dy == 0 and dx != 0) or (abs(dy) <= self.attack_range and dx == 0 and dy != 0)
+    def _is_in_attack_range(self, dx, dy):
+        mode = getattr(self, "current_attack_mode", None)
+        if mode == "diagonal":
+            return abs(dx) == abs(dy) and 0 < abs(dx) <= max(1, self.attack_range_diagonal)
+        if mode == "line":
+            return ((abs(dx) <= max(1, self.attack_range_line) and dy == 0 and dx != 0)
+                    or (abs(dy) <= max(1, self.attack_range_line) and dx == 0 and dy != 0))
+        return (abs(dx) <= self.attack_range and dy == 0 and dx != 0) or (abs(dy) <= self.attack_range and dx == 0 and dy != 0)
 
     def _handle_attack(self, dx, dy, player, dialog=None):
-        if dx > 0: self.facing = "right"
-        elif dx < 0: self.facing = "left"
-        elif dy > 0: self.facing = "down"
-        elif dy < 0: self.facing = "up"
+        if getattr(self, "current_attack_mode", None) == "counter":
+            if dx > 0: self.facing = "right"
+            elif dx < 0: self.facing = "left"
+            elif dy > 0: self.facing = "down"
+            elif dy < 0: self.facing = "up"
+            self.counter_ready_turns = 1
+            return
+        if dx > 0: needed = "right"
+        elif dx < 0: needed = "left"
+        elif dy > 0: needed = "down"
+        elif dy < 0: needed = "up"
+        else: needed = self.facing
+        if self.facing != needed:
+            self.facing = needed
+            if not self.turn_attack:
+                return
+            relation, distance = get_relation_and_distance(player, self, 1)
+            if random.random() >= self._get_turn_attack_chance(player, relation, distance):
+                return
         from constants import ATTACK_PRE_DELAY_FRAMES
         self.attack_pre_delay_timer = ATTACK_PRE_DELAY_FRAMES; self.is_attacking = True; self.is_long_range = (abs(dx)+abs(dy) > 1)
         self.target_for_attack, self.dialog_for_attack = player, dialog
@@ -178,7 +431,8 @@ class Enemy(Entity):
     def _is_line_of_sight_clear(self, dx, dy, dungeon, all_entities):
         sx, sy = (1 if dx > 0 else -1 if dx < 0 else 0), (1 if dy > 0 else -1 if dy < 0 else 0)
         gx, gy = int((self.x + self.width/2)//dungeon.tile_size), int((self.y + self.height/2)//dungeon.tile_size)
-        for i in range(1, abs(dx)+abs(dy)):
+        steps = abs(dx) if abs(dx) == abs(dy) else abs(dx) + abs(dy)
+        for i in range(1, steps):
             cx, cy = gx + sx*i, gy + sy*i
             if not (0 <= cx < dungeon.map_width and 0 <= cy < dungeon.map_height) or dungeon.map_data[cy][cx] == 0: return False
             for e in all_entities:
@@ -189,7 +443,12 @@ class Enemy(Entity):
     def _execute_actual_attack(self, player, dungeon, dialog):
         from constants import ATTACK_ANIMATION_FRAMES, ATTACK_EFFECT_DATA
         self.is_attacking = True; self.attack_timer = ATTACK_ANIMATION_FRAMES; self.has_dealt_impact_damage = False
-        spec = ENEMY_DATA.get(self.type, {}); pk = spec.get("ranged_attack_effect" if getattr(self, "is_long_range", False) else "close_attack_effect")
+        spec = ENEMY_DATA.get(self.type, {})
+        mode = getattr(self, "current_attack_mode", None)
+        if mode and mode in self.attack_effects:
+            pk = self.attack_effects.get(mode)
+        else:
+            pk = spec.get("ranged_attack_effect" if getattr(self, "is_long_range", False) else "close_attack_effect")
         self.current_attack_pattern = ATTACK_EFFECT_DATA.get(pk, {})
         from systems.sound_handler import sound_manager
         sound_manager.play_sfx(self.current_attack_pattern.get("launch_sound", "components/sounds/sfx/enemy_attack_common.wav"))
@@ -211,10 +470,152 @@ class Enemy(Entity):
         from systems.sound_handler import sound_manager
         sound_manager.play_sfx(SOUND_ATTACK_MISS if miss or dmg == 0 else (self.current_attack_pattern.get("hit_sound", "components/sounds/sfx/projectile_hit.wav")))
         if crit: dungeon.flash_timer = 10
+        if (
+            dmg > 0
+            and not miss
+            and getattr(self, "type", "") == "dungeon_core"
+            and getattr(self, "current_attack_mode", None) == "knockback"
+            and getattr(t, "__class__", None).__name__ == "Player"
+            and not getattr(t, "is_static", False)
+        ):
+            self._boss_knockback_player(t, dungeon)
         if d:
             from systems.game_state import game_state
             if d.is_active: d.text += "\n" + msg; d.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
             else: d.text = msg; d.is_active = True; game_state["dialog_modal"] = False; d.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+
+    def _boss_knockback_player(self, player, dungeon):
+        tile = dungeon.tile_size
+        bx = int((self.x + self.width / 2) // tile)
+        by = int((self.y + self.height / 2) // tile)
+        px = int((player.x + player.width / 2) // tile)
+        py = int((player.y + player.height / 2) // tile)
+
+        dx = px - bx
+        dy = py - by
+        if abs(dx) >= abs(dy):
+            step = (1 if dx > 0 else -1, 0)
+        else:
+            step = (0, 1 if dy > 0 else -1)
+
+        start_gx = int((player.x + player.width / 2) // tile)
+        start_gy = int((player.y + player.height / 2) // tile)
+        fgx, fgy = start_gx, start_gy
+
+        def _can_stand(gx, gy):
+            if not (0 <= gx < dungeon.map_width and 0 <= gy < dungeon.map_height):
+                return False
+            if dungeon.map_data[gy][gx] == 0:
+                return False
+            for e in getattr(dungeon, "enemies", []):
+                if e is player or getattr(e, "is_dead", False):
+                    continue
+                if (gx, gy) in e.get_occupied_grids(dungeon.tile_size):
+                    return False
+            return True
+
+        for _ in range(2):
+            ngx, ngy = fgx + step[0], fgy + step[1]
+            if not _can_stand(ngx, ngy):
+                break
+            fgx, fgy = ngx, ngy
+
+        if (fgx, fgy) == (start_gx, start_gy):
+            return False
+
+        player.target_x = fgx * tile
+        player.target_y = fgy * tile
+        player.is_moving = True
+        player.move_speed = 300
+        player.flash_color = (180, 120, 255)
+        try:
+            from systems.magic_handler import KnockbackEffect
+            dungeon.magic_effects.append(
+                KnockbackEffect(
+                    start_gx * tile,
+                    start_gy * tile,
+                    fgx * tile,
+                    fgy * tile,
+                    color=(220, 220, 255),
+                    duration=15,
+                )
+            )
+        except Exception:
+            pass
+        self._log_trace(dungeon, f"dungeon_core knockback player to ({fgx}, {fgy})")
+        return True
+
+    def _move_dungeon_core_behind_player(self, player, dungeon):
+        tile = dungeon.tile_size
+        px = int((player.x + player.width / 2) // tile)
+        py = int((player.y + player.height / 2) // tile)
+        facing = getattr(player, "facing", None)
+        if facing == "up":
+            back = (0, 1)
+            side_candidates = [(-1, 0), (1, 0)]
+        elif facing == "down":
+            back = (0, -1)
+            side_candidates = [(-1, 0), (1, 0)]
+        elif facing == "left":
+            back = (1, 0)
+            side_candidates = [(0, -1), (0, 1)]
+        elif facing == "right":
+            back = (-1, 0)
+            side_candidates = [(0, -1), (0, 1)]
+        else:
+            mx = int((self.x + self.width / 2) // tile)
+            my = int((self.y + self.height / 2) // tile)
+            dx = px - mx
+            dy = py - my
+            if abs(dx) >= abs(dy):
+                back = (-1 if dx > 0 else 1, 0)
+                side_candidates = [(0, 1), (0, -1)]
+            else:
+                back = (0, -1 if dy > 0 else 1)
+                side_candidates = [(1, 0), (-1, 0)]
+
+        start_gx = int((self.x + self.width / 2) // tile)
+        start_gy = int((self.y + self.height / 2) // tile)
+
+        def _can_stand(gx, gy):
+            if not (0 <= gx < dungeon.map_width and 0 <= gy < dungeon.map_height):
+                return False
+            if dungeon.map_data[gy][gx] == 0:
+                return False
+            if (gx, gy) in player.get_occupied_grids(dungeon.tile_size):
+                return False
+            for e in getattr(dungeon, "enemies", []):
+                if e is self or getattr(e, "is_dead", False):
+                    continue
+                if (gx, gy) in e.get_occupied_grids(dungeon.tile_size):
+                    return False
+            return True
+
+        def _try_line(step_dx, step_dy):
+            gx, gy = start_gx, start_gy
+            for _ in range(2):
+                nx, ny = gx + step_dx, gy + step_dy
+                if not _can_stand(nx, ny):
+                    return None
+                gx, gy = nx, ny
+            return gx, gy
+
+        final = _try_line(*back)
+        if final is None:
+            for cand in side_candidates:
+                final = _try_line(*cand)
+                if final is not None:
+                    break
+        if final is None:
+            return False
+
+        fgx, fgy = final
+        self.target_x = fgx * tile
+        self.target_y = fgy * tile
+        self.is_moving = True
+        self.move_speed = 300
+        self._log_trace(dungeon, f"dungeon_core moved behind player to ({fgx}, {fgy})")
+        return True
 
     def _move_smartly_check_success(self, player, dungeon, all_entities, px, py, mx, my, occs=None, ideal=None):
         if ideal is None: ideal = max(0, self.attack_range - 1)
@@ -371,6 +772,9 @@ class Enemy(Entity):
         return False
 
     def take_turn(self, player, dungeon, all_entities, dialog=None, occupied_cells=None):
+        if getattr(self, "battle_locked", False):
+            self._log_trace(dungeon, "battle_locked: take_turn skipped")
+            return
         if getattr(self, "is_dead", False):
             self._log_trace(dungeon, "take_turn bypassed: is_dead=True")
             return
@@ -418,6 +822,10 @@ class Enemy(Entity):
                 self._handle_attack(dx, dy, player, dialog)
             else:
                 self._log_trace(dungeon, f"immobilized ({self.immobilized_turns} turns left). Cannot move.")
+            return
+
+        if getattr(self, "type", "") == "dungeon_core":
+            self._take_turn_dungeon_core(player, dungeon, all_entities, dialog)
             return
 
         mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
@@ -582,6 +990,269 @@ class Enemy(Entity):
                     self._log_trace(dungeon, "no fallback move: too close or diagonal but dist <= 1")
         else:
             self._log_trace(dungeon, f"skipping turn because stupidity is {self.stupidity} (>= 7)")
+
+    def _get_dungeon_core_attack_weights(self, player, dungeon):
+        relation, distance = get_relation_and_distance(player, self, dungeon.tile_size)
+        preferred = player.tactical_profile.get_preferred_action(relation, distance) if hasattr(player, "tactical_profile") else None
+        weights = {"line": 50, "diagonal": 45, "counter": 20, "knockback": 18}
+        if relation == "front":
+            weights["line"] += 10
+            weights["counter"] += 20
+            weights["knockback"] += 10
+            if preferred == "melee":
+                weights["counter"] += 50
+                weights["knockback"] += 25
+            elif preferred == "move":
+                weights["diagonal"] += 20
+        elif relation == "diagonal":
+            weights["diagonal"] += 25
+            weights["counter"] += 10
+            if preferred == "move":
+                weights["diagonal"] += 15
+            elif preferred == "melee":
+                weights["line"] += 5
+        elif relation == "side":
+            weights["diagonal"] += 12
+            weights["counter"] += 25
+            weights["knockback"] += 10
+            if preferred == "melee":
+                weights["counter"] += 35
+        elif relation == "far":
+            weights["line"] += 10
+            weights["diagonal"] += 10
+            weights["counter"] -= 5
+            weights["knockback"] -= 5
+        return weights, relation, distance, preferred
+
+    def _read_player_magic_habit(self, player, relation, distance):
+        profile = getattr(player, "tactical_profile", None)
+        if not profile:
+            return None
+        fire_local = profile.get_action_total("magic_fire", relation=relation, distance=distance)
+        knockback_local = profile.get_action_total("magic_knockback", relation=relation, distance=distance)
+        if fire_local >= 2 or knockback_local >= 2:
+            return "magic_fire" if fire_local >= knockback_local else "magic_knockback"
+        fire_total = profile.get_action_total("magic_fire")
+        knockback_total = profile.get_action_total("magic_knockback")
+        if fire_total >= 3 or knockback_total >= 3:
+            return "magic_fire" if fire_total >= knockback_total else "magic_knockback"
+        return None
+
+    def _get_turn_attack_chance(self, player, relation, distance):
+        profile = getattr(player, "tactical_profile", None)
+        base = max(0.0, min(1.0, getattr(self, "turn_attack_chance", 0.5)))
+        if not profile:
+            return base
+        melee = profile.get_action_probability("melee", relation=relation, distance=distance, default=0.0)
+        move = profile.get_action_probability("move", relation=relation, distance=distance, default=0.0)
+        magic = profile.get_action_probability("magic", relation=relation, distance=distance, default=0.0)
+        item = profile.get_action_probability("item", relation=relation, distance=distance, default=0.0)
+        learned = 0.2 + (0.6 * melee) + (0.15 * magic) + (0.05 * item) - (0.2 * move)
+        return max(0.05, min(0.95, learned if learned > 0 else base))
+
+    def _can_use_attack_mode(self, mode, dx, dy, dungeon, all_entities):
+        if mode == "line":
+            if not (((abs(dx) <= max(1, self.attack_range_line) and dy == 0 and dx != 0)
+                    or (abs(dy) <= max(1, self.attack_range_line) and dx == 0 and dy != 0))):
+                return False
+            return self._is_line_of_sight_clear(dx, dy, dungeon, all_entities)
+        if mode == "diagonal":
+            if not (abs(dx) == abs(dy) and 0 < abs(dx) <= max(1, self.attack_range_diagonal)):
+                return False
+            return self._is_line_of_sight_clear(dx, dy, dungeon, all_entities)
+        if mode == "counter":
+            return max(abs(dx), abs(dy)) == 1
+        if mode == "knockback":
+            return max(abs(dx), abs(dy)) == 1
+        return False
+
+    def _score_dungeon_core_tile(self, gx, gy, px, py, relation=None):
+        dx, dy = px - gx, py - gy
+        dist = max(abs(dx), abs(dy))
+        line_ready = ((abs(dx) <= max(1, self.attack_range_line) and dy == 0 and dx != 0)
+                      or (abs(dy) <= max(1, self.attack_range_line) and dx == 0 and dy != 0))
+        diag_ready = abs(dx) == abs(dy) and 0 < abs(dx) <= max(1, self.attack_range_diagonal)
+        score = 0
+        if line_ready:
+            score += 35
+        if diag_ready:
+            score += 35
+        if max(abs(dx), abs(dy)) == 1:
+            score += 10
+        score -= abs(dist - 2) * 4
+        score += max(0, 8 - dist * 2)
+        if relation == "front":
+            if diag_ready:
+                score += 20
+            elif line_ready:
+                score -= 8
+        elif relation == "diagonal":
+            if diag_ready:
+                score += 14
+        elif relation == "side":
+            if line_ready:
+                score += 10
+        if dist >= 3:
+            if line_ready or diag_ready:
+                score += 18
+            else:
+                score -= 10
+        return score
+
+    def _score_dungeon_core_defensive_tile(self, gx, gy, px, py, magic_read):
+        dx, dy = px - gx, py - gy
+        dist = max(abs(dx), abs(dy))
+        line_ready = ((abs(dx) <= max(1, self.attack_range_line) and dy == 0 and dx != 0)
+                      or (abs(dy) <= max(1, self.attack_range_line) and dx == 0 and dy != 0))
+        diag_ready = abs(dx) == abs(dy) and 0 < abs(dx) <= max(1, self.attack_range_diagonal)
+
+        score = 0
+        if dist == 1:
+            score += 26
+        elif dist == 2:
+            score += 14
+        else:
+            score -= dist * 20
+
+        if line_ready:
+            score += 22
+        if diag_ready:
+            score += 22
+
+        if magic_read == "magic_fire":
+            if dist == 2:
+                score += 12
+            if dx != 0 and dy != 0:
+                score += 8
+        elif magic_read == "magic_knockback":
+            if dx != 0 and dy != 0:
+                score += 10
+            else:
+                score -= 4
+
+        return score
+
+    def _move_to_best_core_candidate(self, dungeon, candidates):
+        valid = []
+        for score, facing, tx, ty in candidates:
+            if self.can_move_grid(tx, ty, dungeon, debug_log=False):
+                valid.append((score, facing, tx, ty))
+        if not valid:
+            return False
+        valid.sort(key=lambda x: x[0], reverse=True)
+        best_score, best_facing, best_tx, best_ty = valid[0]
+        self.target_x, self.target_y = best_tx, best_ty
+        self.facing = best_facing
+        self.is_moving = True
+        self.step_toggle = not self.step_toggle
+        self._log_trace(dungeon, f"dungeon_core moved to ({best_tx//dungeon.tile_size}, {best_ty//dungeon.tile_size}) score={best_score}")
+        return True
+
+    def _move_dungeon_core(self, player, dungeon, relation=None):
+        px = int((player.x + player.width / 2) // dungeon.tile_size)
+        py = int((player.y + player.height / 2) // dungeon.tile_size)
+        candidates = []
+        for facing, sdx, sdy in [("right", dungeon.tile_size, 0), ("left", -dungeon.tile_size, 0), ("down", 0, dungeon.tile_size), ("up", 0, -dungeon.tile_size)]:
+            tx, ty = self.x + sdx, self.y + sdy
+            if not self.can_move_grid(tx, ty, dungeon, debug_log=False):
+                continue
+            gx = int((tx + self.width / 2) // dungeon.tile_size)
+            gy = int((ty + self.height / 2) // dungeon.tile_size)
+            score = self._score_dungeon_core_tile(gx, gy, px, py, relation)
+            candidates.append((score, facing, tx, ty))
+        return self._move_to_best_core_candidate(dungeon, candidates)
+
+    def _take_turn_dungeon_core(self, player, dungeon, all_entities, dialog=None):
+        if getattr(self, "counter_ready_turns", 0) > 0:
+            self.counter_ready_turns = 0
+        mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
+        px, py = int((player.x+player.width/2)//dungeon.tile_size), int((player.y+player.height/2)//dungeon.tile_size)
+        dx, dy = px - mx, py - my
+        weights, relation, distance, preferred = self._get_dungeon_core_attack_weights(player, dungeon)
+        self.turn_attack_chance = self._get_turn_attack_chance(player, relation, distance)
+        if relation == "diagonal" and distance == "1":
+            moved = self._move_dungeon_core(player, dungeon, relation)
+            if moved:
+                self._log_duel_trace(dungeon, player, "diagonal_move", extra=f"preferred={preferred}")
+            else:
+                self._log_duel_trace(dungeon, player, "diagonal_wait", extra=f"preferred={preferred}")
+            return
+        available = []
+        for mode in ("line", "diagonal", "counter", "knockback"):
+            if distance == "1" and mode == "diagonal":
+                continue
+            if self._can_use_attack_mode(mode, dx, dy, dungeon, all_entities):
+                available.append((weights.get(mode, 0), mode))
+        if available:
+            available.sort(key=lambda x: x[0], reverse=True)
+            if relation == "front" and distance == "1":
+                chosen_mode = random.choice([mode for _, mode in available])
+            else:
+                chosen_mode = available[0][1]
+            self.current_attack_mode = chosen_mode
+            self._log_trace(dungeon, f"dungeon_core action={self.current_attack_mode} relation={relation} distance={distance} preferred={preferred}")
+            self._log_duel_trace(dungeon, player, self.current_attack_mode, extra=f"preferred={preferred}")
+            if chosen_mode == "knockback":
+                self._handle_attack(dx, dy, player, dialog)
+                return
+            if chosen_mode == "counter":
+                self._handle_attack(dx, dy, player, dialog)
+                return
+            self._handle_attack(dx, dy, player, dialog)
+            return
+
+        if relation in ("front", "diagonal") and distance == "2":
+            rush_candidates = []
+            for facing, sdx, sdy in [("right", dungeon.tile_size, 0), ("left", -dungeon.tile_size, 0), ("down", 0, dungeon.tile_size), ("up", 0, -dungeon.tile_size)]:
+                tx, ty = self.x + sdx, self.y + sdy
+                if not self.can_move_grid(tx, ty, dungeon, debug_log=False):
+                    continue
+                gx = int((tx + self.width / 2) // dungeon.tile_size)
+                gy = int((ty + self.height / 2) // dungeon.tile_size)
+                score = self._score_dungeon_core_tile(gx, gy, px, py, relation)
+                if max(abs(px - gx), abs(py - gy)) == 1:
+                    score += 18
+                rush_candidates.append((score, facing, tx, ty))
+            if rush_candidates:
+                rush_candidates.sort(key=lambda x: x[0], reverse=True)
+                best_score, best_facing, best_tx, best_ty = rush_candidates[0]
+                self.target_x, self.target_y = best_tx, best_ty
+                self.facing = best_facing
+                self.is_moving = True
+                self.step_toggle = not self.step_toggle
+                self._log_trace(dungeon, f"dungeon_core rush to ({best_tx//dungeon.tile_size}, {best_ty//dungeon.tile_size}) score={best_score}")
+                self._log_duel_trace(dungeon, player, "rush", extra=f"relation={relation}")
+                return
+
+        if distance == "3plus":
+            rush_candidates = []
+            for facing, sdx, sdy in [("right", dungeon.tile_size, 0), ("left", -dungeon.tile_size, 0), ("down", 0, dungeon.tile_size), ("up", 0, -dungeon.tile_size)]:
+                tx, ty = self.x + sdx, self.y + sdy
+                if not self.can_move_grid(tx, ty, dungeon, debug_log=False):
+                    continue
+                gx = int((tx + self.width / 2) // dungeon.tile_size)
+                gy = int((ty + self.height / 2) // dungeon.tile_size)
+                score = self._score_dungeon_core_tile(gx, gy, px, py, relation)
+                if max(abs(px - gx), abs(py - gy)) < max(abs(px - mx), abs(py - my)):
+                    score += 22
+                rush_candidates.append((score, facing, tx, ty))
+            if rush_candidates:
+                rush_candidates.sort(key=lambda x: x[0], reverse=True)
+                best_score, best_facing, best_tx, best_ty = rush_candidates[0]
+                self.target_x, self.target_y = best_tx, best_ty
+                self.facing = best_facing
+                self.is_moving = True
+                self.step_toggle = not self.step_toggle
+                self._log_trace(dungeon, f"dungeon_core advance to ({best_tx//dungeon.tile_size}, {best_ty//dungeon.tile_size}) score={best_score}")
+                self._log_duel_trace(dungeon, player, "advance", extra=f"relation={relation}")
+                return
+
+            self.current_attack_mode = None
+            moved = self._move_dungeon_core(player, dungeon, relation)
+            if moved:
+                self._log_duel_trace(dungeon, player, "reposition")
+            else:
+                self._log_duel_trace(dungeon, player, "wait")
 
     def update(self, dungeon, dt=1/60):
         if self.is_static: self.update_animation(dt); return
@@ -842,4 +1513,3 @@ class Enemy(Entity):
             gy = int((ty + self.height // 2) // tile_size)
             return [(gx, gy)]
         return super().get_occupied_grids_at(tx, ty, tile_size)
-

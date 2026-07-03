@@ -694,7 +694,7 @@ ENEMY_DATA:
     stupidity: 3
     image_scale: 1.0
     close_attack_effect: dark_bolt
-    ranged_attack_effect: dark_bolt
+    ranged_attack_effect: fireball
     attack_priority: close
     damaged_detect_range: 12
   takotako:
@@ -724,7 +724,7 @@ ENEMY_DATA:
     accuracy_close: 70
     accuracy_ranged: 70
     attack_range: 3
-    stupidity: 1
+    stupidity: 3
     image_scale: 1.0
     close_attack_effect: strange_mucus
     ranged_attack_effect: strange_mucus
@@ -792,8 +792,8 @@ ENEMY_DATA:
     attack_range: 1
     stupidity: 3
     image_scale: 1.0
-    close_attack_effect: physical_light
-    ranged_attack_effect: strange_mucus
+    close_attack_effect: fireball
+    ranged_attack_effect: fireball
     attack_priority: close
     damaged_detect_range: 10
 # ーボスーーーーーーーーーーーーーーーーーーーーーーーーー
@@ -1096,7 +1096,7 @@ ENEMY_DATA:
     crit_rate: 0.1
     detect_range: 15
     bgm: components/sounds/bgm/fight_against_destiny.mp3
-    image_folder: components/pictures/enemies/father
+    image_folder: components/pictures/enemies/dungeon_core_playerlike
     encounter_message:
     - …懐かしい感じがする。
     - 父さん…父さんだろ…!
@@ -1129,4 +1129,66 @@ ENEMY_DATA:
     ranged_attack_effect: dark_bolt
     attack_priority: close
     damaged_detect_range: 50
+    turn_attack: true
+  dungeon_core:
+    quest_targetable: false
+    name: ダンジョンコア
+    min_rank: S
+    min_floor: 99
+    max_floor: 99
+    max_concurrent: 1
+    max_spawns: 1
+    is_boss: true
+    spawn_chance: 0.0
+    crit_rate: 0.08
+    detect_range: 20
+    encounter_trigger_range: 3
+    bgm: components/sounds/bgm/fight_against_destiny.mp3
+    image_folder: components/pictures/enemies/dungeon_core_playerlike
+    encounter_message:
+      - ダンジョンコア に 発見された！
+      - 静かな視線が、こちらの旅路を見つめている。
+    dialog_message:
+      - 「ここまで来たのか」
+      - 「進むのなら、覚悟を見せろ」
+    select_dialog:
+      message:
+        - 戦いますか
+      yes_text: はい
+      no_text: いいえ
+      yes_action: battle_start
+      no_action: village_warp
+    equipment:
+      weapon:
+        key: fighters_sword
+      shield:
+        key: broken_shield
+    defeat_message:
+      - ダンジョンコア は 静かに崩れ落ちた。
+    drops:
+      normal: []
+      rare: []
+    normal_drop_rate: 0.0
+    rare_drop_rate: 0.0
+    hp: 220
+    attack: 28
+    defense: 95
+    evasion: 18
+    exp: 0
+    reward_gold: 0
+    accuracy_close: 96
+    accuracy_ranged: 96
+    attack_range: 3
+    attack_range_line: 3
+    attack_range_diagonal: 3
+    stupidity: 0
+    image_scale: 1.0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: sonic_wave
+    attack_effects:
+      line: physical_heavy
+      diagonal: sonic_wave
+      counter: physical_heavy
+    attack_priority: close
+    damaged_detect_range: 100
     turn_attack: true

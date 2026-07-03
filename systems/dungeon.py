@@ -2149,6 +2149,7 @@ class Dungeon:
             flash_surf.set_alpha(alpha)
             screen.blit(flash_surf, (0, 0))
         for e in self.enemies:
+            e.current_dungeon = self
             if camera_x - e.width <= e.x <= camera_x + sw and camera_y - e.height <= e.y <= camera_y + sh: e.draw(screen, camera_x, camera_y)
 
     def get_current_floor_level(self): return self.current_floor

@@ -1,5 +1,6 @@
 import pygame
 import random
+from collections.abc import Mapping
 from components.sprites.item import DroppedWeapon, DroppedConsumable, DroppedArmor, DroppedShield, DroppedStave, DroppedToken, DroppedAccessory
 from constants import WEAPON_DATA, CONSUMABLE_DATA, ARMOR_DATA, SHIELD_DATA, STAVE_DATA, ACCESSORY_DATA
 from constants import ENEMY_DATA, ITEM_DROP_RATES
@@ -48,11 +49,59 @@ def resolve_dynamic_drops(item_list, current_rank):
             resolved.append(item)
     return resolved
 
-def update_dungeon_entities(dungeon, player, dt, dialog=None):
+def _normalize_dialog_text(value):
+    if not value:
+        return None
+    if isinstance(value, list):
+        return "\n".join(str(v) for v in value if v is not None)
+    return str(value)
+
+def _get_boss_encounter_config(boss_type):
+    cfg = ENEMY_DATA.get(boss_type, {})
+    select_cfg = cfg.get("select_dialog") or {}
+    if not isinstance(select_cfg, Mapping):
+        select_cfg = {}
+    return {
+        "encounter_message": _normalize_dialog_text(cfg.get("encounter_message")),
+        "dialog_message": _normalize_dialog_text(cfg.get("dialog_message")),
+        "prompt": _normalize_dialog_text(select_cfg.get("message")) or "戦いますか",
+        "yes_text": str(select_cfg.get("yes_text") or "はい"),
+        "no_text": str(select_cfg.get("no_text") or "いいえ"),
+        "yes_action": select_cfg.get("yes_action") or "battle_start",
+        "no_action": select_cfg.get("no_action") or "village_warp",
+        "encounter_trigger_range": int(cfg.get("encounter_trigger_range", cfg.get("detect_range", 3) or 3)),
+    }
+
+def _start_boss_battle(dungeon, player, boss):
+    from systems.audio_manager import play_bgm
+    from constants import BGM_BOSS
+    game_state["is_boss_battle"] = True
+    game_state["boss_encounter_pending"] = False
+    if boss:
+        boss.battle_locked = False
+    target_bgm = getattr(boss, "bgm", None) or BGM_BOSS
+    play_bgm(target_bgm)
+    print(f"[SOUND] Boss battle confirmed! Switching to: {target_bgm}")
+
+def _warp_to_village_from_boss(dungeon, player):
+    from systems.dungeon import warp_to_floor
+    game_state["boss_encounter_pending"] = False
+    dungeon.next_dungeon = warp_to_floor(0, player, spawn_reason="return", old_dungeon=dungeon)
+
+def _open_boss_select_dialog(confirm_dialog, boss_cfg):
+    if not confirm_dialog:
+        return
+    confirm_dialog.text = boss_cfg["prompt"]
+    confirm_dialog.yes_text = boss_cfg["yes_text"]
+    confirm_dialog.no_text = boss_cfg["no_text"]
+    confirm_dialog.is_active = True
+
+def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=None):
     """
     ダンジョン内の動的なエンティティ（敵・アイテム・NPC）の状態を更新する。
     main.py のメインループをスッキリさせるためのハンドラ関数。
     """
+    from systems.game_state import game_state
     # 1. 敵の状態更新（アニメーション進行と死亡処理）
     for enemy in dungeon.enemies[:]:
         if enemy.is_dead:
@@ -227,8 +276,13 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
         enemy.update(dungeon, dt)
 
     # 2. 敵の「思考（行動決定）」を処理する
-    from systems.game_state import game_state
     from constants import INTER_ACTION_BREATHER, ENEMY_THINK_LIMIT_PER_FRAME
+
+    if game_state.get("boss_encounter_pending", False):
+        for enemy in dungeon.enemies:
+            if getattr(enemy, "is_boss", False):
+                enemy.battle_locked = True
+        return
     
     if game_state["turn_state"] == "enemies":
         enemies = dungeon.enemies
@@ -371,7 +425,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
 
     # 3. 敵のリスポーン処理（ターン制へ移行したため、ここでは何もしない）
     # 4. ボスBGMの切り替え判定 [NEW]
-    from constants import ENEMY_AGGRO_RADIUS, BGM_BOSS
+    from constants import BGM_BOSS
     from systems.game_state import game_state
     from systems.audio_manager import play_bgm
     
@@ -385,13 +439,11 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
             # グリッド距離で判定
             egx, egy = int(enemy.x // dungeon.tile_size), int(enemy.y // dungeon.tile_size)
             pgx, pgy = int(player.x // dungeon.tile_size), int(player.y // dungeon.tile_size)
-            dist_x, dist_y = abs(egx - pgx), abs(egy - pgy)
-            
-            # 認識範囲（隠密補正込み）を取得
-            aggro_mod = player.get_aggro_modifier() if hasattr(player, "get_aggro_modifier") else 0
-            effective_radius = max(1, ENEMY_AGGRO_RADIUS - aggro_mod)
-            
-            if dist_x <= effective_radius and dist_y <= effective_radius:
+            dist = max(abs(egx - pgx), abs(egy - pgy))
+            boss_cfg = _get_boss_encounter_config(getattr(enemy, "type", None))
+            trigger_range = max(1, boss_cfg["encounter_trigger_range"])
+
+            if dist <= trigger_range:
                 active_boss = enemy
                 has_aggroed_boss = True
                 break
@@ -399,29 +451,39 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None):
     # BGMの切り替え実行
     if has_aggroed_boss:
         if not was_boss_battle:
-            game_state["is_boss_battle"] = True
-            # 個別BGM設定があればそれを使う。なければ定数 BGM_BOSS を使う
-            target_bgm = getattr(active_boss, "bgm", None) or BGM_BOSS
-            play_bgm(target_bgm)
-            
-            # ボス遭遇メッセージ (モーダル表示：入力を待つ)
-            # 各ボスごとに1回だけ表示する
             shown_bosses = getattr(player, "_shown_boss_messages", set())
             boss_type = getattr(active_boss, "type", None)
-            if boss_type not in shown_bosses:
-                from systems.ui import show_dialog
-                # enemies.yml の encounter_message があればそれを使う
-                encounter_msg = ENEMY_DATA.get(boss_type, {}).get("encounter_message")
-                if encounter_msg:
-                    if isinstance(encounter_msg, list):
-                        encounter_msg = "\n".join(encounter_msg)
-                    show_dialog(dialog, encounter_msg, modal=True, auto_close=0)
-                else:
-                    show_dialog(dialog, f"{active_boss.name} に 発見された！", modal=True, auto_close=0)
+            if boss_type not in shown_bosses and not game_state.get("confirm_active", False):
+                from systems.game_state import game_state as gs
+                boss_cfg = _get_boss_encounter_config(boss_type)
+                encounter_msg = boss_cfg["encounter_message"] or f"{active_boss.name} に 発見された！"
                 shown_bosses.add(boss_type)
                 player._shown_boss_messages = shown_bosses
-            
-            print(f"[SOUND] Boss encountered! Switching to: {target_bgm}")
+
+                if confirm_dialog:
+                    from systems.ui import show_dialog
+                    dialog_msg = boss_cfg["dialog_message"]
+                    game_state["boss_encounter_pending"] = True
+                    active_boss.battle_locked = True
+                    if dialog_msg:
+                        show_dialog(dialog, dialog_msg, modal=True, auto_close=0)
+                    else:
+                        show_dialog(dialog, encounter_msg, modal=True, auto_close=0)
+
+                    def on_yes(boss=active_boss, dun=dungeon, pl=player):
+                        _start_boss_battle(dun, pl, boss)
+
+                    def on_no(boss=active_boss, dun=dungeon, pl=player):
+                        _warp_to_village_from_boss(dun, pl)
+
+                    confirm_dialog.on_yes = on_yes if boss_cfg["yes_action"] == "battle_start" else None
+                    confirm_dialog.on_no = on_no if boss_cfg["no_action"] == "village_warp" else None
+                    dialog.on_close_callback = lambda cd=confirm_dialog, cfg=boss_cfg: _open_boss_select_dialog(cd, cfg)
+                    gs["dialog_modal"] = True
+            else:
+                if boss_type not in shown_bosses:
+                    shown_bosses.add(boss_type)
+                    player._shown_boss_messages = shown_bosses
     else:
         if was_boss_battle:
             game_state["is_boss_battle"] = False
