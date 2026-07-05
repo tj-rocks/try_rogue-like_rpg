@@ -484,7 +484,7 @@ ARMOR_DATA:
         lantern_bonus: 0
         regen: 0
         aggro_mod: 3
-        stupidity: 0
+        stupidity: 0.4
         armor_penetration: 0.1
         buff_value_ratio: 0
         buff_duration_ratio: 0

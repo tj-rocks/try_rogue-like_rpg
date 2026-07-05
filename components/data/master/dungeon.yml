@@ -71,7 +71,7 @@ DUNGEON_IMAGES:
   bgm_path: components/sounds/bgm
   '0':
     image: home
-    sound: components/sounds/bgm/village_theme.mp3
+    sound: home.mp3
     brightness: 5
     map: village.txt
     wall_decoration_ratio: 0.2
@@ -81,7 +81,7 @@ DUNGEON_IMAGES:
 # ==========================================
   '1':
     image: shallow
-    sound: need_more_adventures.mp3
+    sound: shallow.mp3
     brightness: 4
     map: null
     wall_decoration_ratio: 0.3
@@ -91,61 +91,61 @@ DUNGEON_IMAGES:
       - 君もその一人だ
   '2':
     image: shallow
-    sound: need_more_adventures.mp3
+    sound: shallow.mp3
     brightness: 4
     map: null
     wall_decoration_ratio: 0.3
   '3':
     image: shallow
-    sound: need_more_adventures.mp3
+    sound: shallow.mp3
     brightness: 4
     map: null
     wall_decoration_ratio: 0.3
   '4':
     image: shallow
-    sound: need_more_adventures.mp3
+    sound: shallow.mp3
     brightness: 3
     map: null
     wall_decoration_ratio: 0.3
   '5':
     image: shallow
-    sound: need_more_adventures.mp3
+    sound: shallow.mp3
     brightness: 3
     map: null
     wall_decoration_ratio: 0.3
   '6':
     image: standard
-    sound: goto_unknown_area.mp3
+    sound: standard.mp3
     brightness: 3
     map: null
     wall_decoration_ratio: 0.3
   '7':
     image: standard
-    sound: goto_unknown_area.mp3
+    sound: standard.mp3
     brightness: 2
     map: null
     wall_decoration_ratio: 0.3
   '8':
     image: standard
-    sound: goto_unknown_area.mp3
+    sound: standard.mp3
     brightness: 2
     map: null
     wall_decoration_ratio: 0.3
   '9':
     image: standard
-    sound: goto_unknown_area.mp3
+    sound: standard.mp3
     brightness: 2
     map: null
     wall_decoration_ratio: 0.3
   '10':
     image: standard
-    sound: goto_unknown_area.mp3
+    sound: standard.mp3
     brightness: 2
     map: null
     wall_decoration_ratio: 0.3
   '11':
     image: standard
-    sound: goto_unknown_area.mp3
+    sound: standard.mp3
     brightness: 2
     wall_decoration_ratio: 0.3
 
@@ -154,14 +154,14 @@ DUNGEON_IMAGES:
 # ==========================================
   '12':
     image: standard
-    sound: just_move.mp3
+    sound: standard.mp3
     brightness: 5
     map: 1st_rest_point.txt
     wall_decoration_ratio: 0.3
     no_attack: true
   '13':
     image: deesert_ruin
-    sound: sandstone_floor.mp3
+    sound: deesert_ruin.mp3
     brightness: 2
     wall_decoration_ratio: 0.3
     area_message:
@@ -170,42 +170,42 @@ DUNGEON_IMAGES:
       - ダンジョンへの信仰が試される
   '14':
     image: deesert_ruin
-    sound: sandstone_floor.mp3
+    sound: deesert_ruin.mp3
     brightness: 2
     wall_decoration_ratio: 0.3
   '15':
     image: deesert_ruin
-    sound: sandstone_floor.mp3
+    sound: deesert_ruin.mp3
     brightness: 2
     wall_decoration_ratio: 0.3
   '16':
     image: deesert_ruin
-    sound: sandstone_floor.mp3
+    sound: deesert_ruin.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   '17':
     image: temple
-    sound: sandstone_floor.mp3
+    sound: temple.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   '18':
     image: temple
-    sound: sandstone_floor2.mp3
+    sound: temple.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   '19':
     image: temple
-    sound: sandstone_floor2.mp3
+    sound: temple.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   '20':
     image: temple
-    sound: sandstone_floor2.mp3
+    sound: temple.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   '21':
     image: temple
-    sound: sandstone_floor2.mp3
+    sound: temple.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
 # ==========================================
@@ -213,14 +213,14 @@ DUNGEON_IMAGES:
 # ==========================================
   "22":
     image: temple
-    sound: just_move.mp3
+    sound: temple.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     map: 2nd_rest_point.txt
     no_attack: true
   "23":
     image: wood
-    sound: middle_1.mp3
+    sound: where_is_hopes.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     area_message:
@@ -229,37 +229,37 @@ DUNGEON_IMAGES:
       - まだ掘り続けられている
   "24":
     image: wood
-    sound: middle_1.mp3
+    sound: where_is_hopes.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "25":
     image: wood
-    sound: middle_1.mp3
+    sound: where_is_hopes.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "26":
     image: wood
-    sound: middle_1.mp3
+    sound: where_is_hopes.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "27":
     image: wood
-    sound: middle_1.mp3
+    sound: wood.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "28":
     image: tanko
-    sound: middle_1.mp3
+    sound: wood.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "29":
     image: tanko
-    sound: middle_1.mp3
+    sound: wood.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "30":
     image: tanko
-    sound: middle_1.mp3
+    sound: wood.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
 
@@ -268,14 +268,14 @@ DUNGEON_IMAGES:
 # ==========================================
   "31":
     image: tanko
-    sound: just_move.mp3
+    sound: wood.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     map: 3rd_rest_point.txt
     no_attack: true
   "32":
     image: deep_rock
-    sound: deep_floors.mp3
+    sound: deep_rock.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     area_message:
@@ -284,42 +284,42 @@ DUNGEON_IMAGES:
       - 一握りの冒険者のみが到達できる
   "33":
     image: deep_rock
-    sound: deep_floors.mp3
+    sound: deep_rock.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "34":
     image: deep_rock
-    sound: deep_floors.mp3
+    sound: deep_rock.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "35":
     image: deep_rock
-    sound: deep_floors.mp3
+    sound: deep_rock.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "36":
     image: lava
-    sound: turning_point.mp3
+    sound: lava.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "37":
     image: lava
-    sound: turning_point.mp3
+    sound: lava.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "38":
     image: lava
-    sound: turning_point.mp3
+    sound: lava.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "39":
     image: lava
-    sound: turning_point.mp3
+    sound: lava.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
   "40":
     image: lava
-    sound: turning_point.mp3
+    sound: lava.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
 # ==========================================
@@ -327,7 +327,7 @@ DUNGEON_IMAGES:
 # ==========================================
   "41":
     image: deep_rock
-    sound: just_move.mp3
+    sound: deep_rock.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
@@ -335,7 +335,7 @@ DUNGEON_IMAGES:
     no_attack: true
   "42":
     image: old_city
-    sound: door_of_oldcity.mp3
+    sound: old_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
@@ -345,80 +345,80 @@ DUNGEON_IMAGES:
       - ここに至れた者は、何かを犠牲にしてきた者だけだ
   "43":
     image: old_city
-    sound: door_of_oldcity.mp3
+    sound: old_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "44":
     image: old_city
-    sound: door_of_oldcity.mp3
+    sound: old_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "45":
     image: old_city
-    sound: door_of_oldcity.mp3
+    sound: old_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "46":
     image: old_city
-    sound: door_of_oldcity.mp3
+    sound: old_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "47":
     image: old_city
-    sound: door_of_oldcity.mp3
+    sound: old_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "48":
     image: old_city
-    sound: door_of_oldcity.mp3
+    sound: old_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "49":
     image: old_city
-    sound: door_of_oldcity.mp3
+    sound: old_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "50":
     image: fathers_city
-    sound: door_of_oldcity2.mp3
+    sound: fathers_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "51":
     image: fathers_city
-    sound: door_of_oldcity2.mp3
+    sound: fathers_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "52":
     image: fathers_city
-    sound: door_of_oldcity2.mp3
+    sound: fathers_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
 
   "53":
     image: fathers_city
-    sound: door_of_oldcity2.mp3
+    sound: fathers_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "54":
     image: fathers_city
-    sound: door_of_oldcity2.mp3
+    sound: fathers_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
   "55":
     image: fathers_city
-    sound: door_of_oldcity2.mp3
+    sound: fathers_city.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
@@ -428,7 +428,7 @@ DUNGEON_IMAGES:
 # ==========================================
   "56":
     image: fathers_city
-    sound: just_move.mp3
+    sound: fathers_city.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
@@ -436,8 +436,8 @@ DUNGEON_IMAGES:
     no_attack: true
   "57":
     image: water
-    sound: still_trial.mp3
-    brightness: 1
+    sound: water.mp3
+    brightness: 3
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
     darkness_type: fog
@@ -447,85 +447,85 @@ DUNGEON_IMAGES:
       - 「人間」であることが、ここから先では揺らぎ始める
   "58":
     image: water
-    sound: still_trial.mp3
+    sound: water.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
     darkness_type: fog
   "59":
     image: water
-    sound: still_trial.mp3
+    sound: water.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
     darkness_type: fog
   "60":
     image: water
-    sound: still_trial.mp3
+    sound: water.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
     darkness_type: fog    
   "61":
     image: shell
-    sound: still_trial.mp3
+    sound: shell.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
     darkness_type: fog    
   "62":
     image: shell
-    sound: still_trial.mp3
+    sound: shell.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
     darkness_type: fog    
   "63":
     image: shell
-    sound: still_trial.mp3
+    sound: shell.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
     darkness_type: fog    
   "64":
-    image: cave
-    sound: still_in_journy.mp3
+    image: shell
+    sound: shell.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "65":
     image: shell
-    sound: still_in_journy.mp3
+    sound: shell.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "66":
-    image: shell
-    sound: still_in_journy.mp3
+    image: cave
+    sound: cave.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "67":
     image: cave
-    sound: still_in_journy.mp3
+    sound: cave.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "68":
-    image: shell
-    sound: still_in_journy.mp3
+    image: cave
+    sound: cave.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "69":
-    image: shell
-    sound: still_in_journy.mp3
+    image: cave
+    sound: cave.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
   "70":
-    image: shell
-    sound: still_in_journy.mp3
+    image: cave
+    sound: cave.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
@@ -534,56 +534,61 @@ DUNGEON_IMAGES:
 # Sランク 到達可能階層 (71F 〜 99F) ラストダイブ
 # ==========================================
   "71":
-    image: wood
-    sound: just_move.mp3
+    image: cave
+    sound: cave.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
     map: 6th_rest_point.txt
     no_attack: true
   "72":
-    image: old_castle
-    sound: still_going_on.mp3
+    image: holy_place
+    sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
+    darkness_type: fog   
     area_message:
       - 古い聖地
       - 最も古い都の残骸
       - 古の魂と冒険者の魂が眠るところ
   "73":
-    image: old_castle
-    sound: still_going_on.mp3
+    image: holy_place
+    sound: holy_place.mp3
+    darkness_type: fog   
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "74":
-    image: old_castle
-    sound: still_going_on.mp3
+    image: holy_place
+    sound: holy_place.mp3
+    darkness_type: fog       
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "75":
-    image: old_castle
-    sound: still_going_on.mp3
+    image: holy_place
+    sound: holy_place.mp3
+    darkness_type: fog
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "76":
-    image: old_castle
-    sound: still_going_on.mp3
+    image: holy_place
+    sound: holy_place.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "77":
-    image: old_castle
-    sound: still_going_on.mp3
+    image: holy_place
+    sound: holy_place.mp3
+    darkness_type: fog   
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "78":
     image: old_liberary
-    sound: still_going_on.mp3
+    sound: old_liberary.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
@@ -593,19 +598,19 @@ DUNGEON_IMAGES:
       - 今まで散った冒険者たちの軌跡が記されている
   "79":
     image: old_liberary
-    sound: still_going_on.mp3
+    sound: old_liberary.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "80":
     image: old_liberary
-    sound: still_going_on.mp3
+    sound: old_liberary.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
   "81":
     image: old_liberary
-    sound: just_move.mp3
+    sound: old_liberary.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
@@ -613,124 +618,131 @@ DUNGEON_IMAGES:
     no_attack: true
   "82":
     image: old_liberary
-    sound: sandstone_floor2.mp3
+    sound: old_liberary.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "83":
     image: old_liberary
-    sound: sandstone_floor2.mp3
+    sound: old_liberary.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "84":
     image: old_liberary
-    sound: sandstone_floor2.mp3
+    sound: old_liberary.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "85":
     image: evil_castle
-    sound: beyond_the_suffer.mp3
+    sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
-    darkness_type: fog
+    darkness_level: 5
     area_message:
-      - 大いなる祭壇
-      - ダンジョンコアが待つ、全ての始まりにして終わりの場所。
-      - ここに至った者だけが、世界の問いに答える権利を得る。
+      - 邪悪な神殿
+      - 古くからの試練の場所
+      - ここを突破した先に何があるのか明らかになっていない
   "86":
     image: evil_castle
-    sound: beyond_the_suffer.mp3
+    sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
     darkness_type: fog
+    darkness_level: 4
   "87":
     image: evil_castle
-    sound: beyond_the_suffer.mp3
+    sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
     darkness_type: fog
+    darkness_level: 4
   "88":
     image: evil_castle
-    sound: beyond_the_suffer.mp3
+    sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
     darkness_type: fog
+    darkness_level: 4
   "89":
     image: evil_castle
-    sound: beyond_the_suffer.mp3
+    sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
     darkness_type: fog
+    darkness_level: 4
   "90":
-    image: deesert_ruin
-    sound: step_into_adventure.mp3
+    image: evil_castle
+    sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "91":
-    image: deesert_ruin
-    sound: step_into_adventure.mp3
+    image: old_castle
+    sound: old_castle.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
     map: 8th_rest_point.txt
     no_attack: true
   "92":
-    image: deesert_ruin
-    sound: step_into_adventure.mp3
+    image: old_castle
+    sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "93":
-    image: deesert_ruin
-    sound: step_into_adventure.mp3
+    image: old_castle
+    sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "94":
-    image: deesert_ruin
-    sound: step_into_adventure.mp3
+    image: old_castle
+    sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "95":
-    image: deesert_ruin
-    sound: step_into_adventure.mp3
+    image: old_castle
+    sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "96":
-    image: deesert_ruin
-    sound: step_into_adventure.mp3
+    image: old_castle
+    sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "97":
-    image: deesert_ruin
-    sound: step_into_adventure.mp3
-    brightness: 1
+    image: garden
+    sound: garden.mp3
+    darkness_type: fog     
+    brightness: 2
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
     area_message:
-      - 終わりの手前
-      - 戻る道はもうない。
-      - それでも、足が動く。
+      - ダンジョンの終着の入り口の庭園
+      - 整えられた庭園が誰をもてなすのか
   "98":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
-    brightness: 1
+    image: garden
+    sound: garden.mp3
+    darkness_type: fog     
+    brightness: 2
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
   "99":
-    image: deesert_ruin
-    sound: sandstone_floor2.mp3
-    brightness: 1
+    image: garden
+    sound: garden.mp3
+    darkness_type: fog     
+    brightness: 4
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
+    map: garden.txt

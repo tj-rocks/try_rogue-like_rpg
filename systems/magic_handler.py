@@ -347,7 +347,7 @@ def _effect_knockback(player, settings, dungeon, dialog, is_enhanced=False):
             scan_gy += dy
 
     # 吹き飛ばしロジック
-    max_dist = settings.get("max_distance", 10)
+    max_dist = min(5, settings.get("max_distance", 10))
     current_gx, current_gy = target_gx, target_gy
     
     hit_other = None

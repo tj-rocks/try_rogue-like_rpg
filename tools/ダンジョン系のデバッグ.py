@@ -708,7 +708,7 @@ def draw_debug_overlay(screen, dungeon, player):
     weapon = getattr(player, "weapon", None)
     if weapon:
         crit_rate = weapon.data.get("crit_rate", 0.01)
-    crit_bonus = getattr(player, "crit_bonus", 0)
+    crit_bonus = getattr(player, "crit_bonus", 0)                   
     crit_rate += crit_bonus
     from constants import CRITICAL_RATE_MAX
     crit_rate = min(CRITICAL_RATE_MAX, crit_rate)

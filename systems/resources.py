@@ -81,3 +81,22 @@ ending_imgs = [
     load_scale_img(f"components/pictures/ending/ending_{i}.png", SCREEN_WIDTH, SCREEN_HEIGHT)
     for i in range(1, 4)
 ]
+
+def get_story_ending_images(story=None, route="core"):
+    story = story or story_data
+    default_imgs = ending_imgs
+    if not story or "ending" not in story:
+        return default_imgs
+
+    ending_story = story.get("ending", {})
+    route_story = ending_story.get(route) if isinstance(ending_story, dict) else None
+    if not isinstance(route_story, dict):
+        return default_imgs
+
+    images = []
+    for idx in range(1, 4):
+        page_data = route_story.get(idx) or route_story.get(str(idx)) or {}
+        image_path = page_data.get("image")
+        img = load_scale_img(image_path, SCREEN_WIDTH, SCREEN_HEIGHT) if image_path else None
+        images.append(img if img else (default_imgs[idx - 1] if idx - 1 < len(default_imgs) else None))
+    return images

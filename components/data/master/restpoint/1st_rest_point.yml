@@ -185,7 +185,7 @@ TILE_MAPPINGS:
             flip: false}, {x: 6, y: 9, flip: false}, {x: 20, y: 11, flip: false},
        {x: 8, y: 12, flip: false}]}
   special_P: {char: P, category: special, desc: プレイヤー開始地点, image_path: 
-      components/pictures/player/walk/down_idel.png, bg_image_path: 
+      components/pictures/player/walk/down_idle.png, bg_image_path: 
       components/pictures/dungeon/home/floor_lawn.png, bg_color: '#2244cc', 
       fg_color: '#fff'}
   special_D: {char: D, category: special, desc: ダンジョン入口階段 (Stairs Down), 

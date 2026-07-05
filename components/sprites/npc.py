@@ -32,17 +32,17 @@ class NPC(Entity):
         if base_image_path and os.path.exists(base_image_path):
             base_cache_key = (base_image_path, self.width, self.height)
             if base_cache_key in NPC._anim_dir_cache:
-                self.base_image = NPC._anim_dir_cache[base_cache_key].get("idel")
+                self.base_image = NPC._anim_dir_cache[base_cache_key].get("idle")
             else:
                 try:
                     raw_base = pygame.image.load(base_image_path).convert_alpha()
                     scaled = pygame.transform.scale(raw_base, (self.width, self.height))
-                    NPC._anim_dir_cache[base_cache_key] = {"idel": scaled}
+                    NPC._anim_dir_cache[base_cache_key] = {"idle": scaled}
                     self.base_image = scaled
                 except Exception as e:
                     print(f"[NPC] Failed to load base image {base_image_path}: {e}")
 
-        # [NEW] 画像の読み込み（アニメーション対応：idel, 0, 1 構成）
+        # [NEW] 画像の読み込み（アニメーション対応：idle, 0, 1 構成）
         self._image_dicts_by_rank = {}
         
         def load_anim_dir(path):
@@ -54,23 +54,23 @@ class NPC(Entity):
             img_dict = {}
             if os.path.isdir(path):
                 try:
-                    for key in ["idel", "0", "1"]:
+                    for key in ["idle", "0", "1"]:
                         fname = f"{key}.png"
                         full_path = os.path.join(path, fname)
                         if os.path.exists(full_path):
                             raw = pygame.image.load(full_path).convert_alpha()
                             img_dict[key] = pygame.transform.scale(raw, (self.width, self.height))
-                    if "idel" not in img_dict:
+                    if "idle" not in img_dict:
                         path01 = os.path.join(path, "01.png")
                         if os.path.exists(path01):
                             raw = pygame.image.load(path01).convert_alpha()
-                            img_dict["idel"] = pygame.transform.scale(raw, (self.width, self.height))
+                            img_dict["idle"] = pygame.transform.scale(raw, (self.width, self.height))
                 except Exception as e:
                     print(f"[NPC] Failed to load animation from {path}: {e}")
             elif os.path.isfile(path):
                 try:
                     raw = pygame.image.load(path).convert_alpha()
-                    img_dict["idel"] = pygame.transform.scale(raw, (self.width, self.height))
+                    img_dict["idle"] = pygame.transform.scale(raw, (self.width, self.height))
                 except Exception as e:
                     print(f"[NPC] Failed to load image from {path}: {e}")
             NPC._anim_dir_cache[cache_key] = img_dict
@@ -107,7 +107,7 @@ class NPC(Entity):
         if self.base_image:
             screen.blit(self.base_image, (draw_x, draw_y))
 
-        # 2. アニメーションフレームの決定 (idel -> 0 -> idel -> 1 の 4段階サイクル)
+        # 2. アニメーションフレームの決定 (idle -> 0 -> idle -> 1 の 4段階サイクル)
         rank = player.guild_rank if player else None
         current_image_dict = {}
         if rank and rank in self._image_dicts_by_rank:
@@ -118,14 +118,14 @@ class NPC(Entity):
             current_image_dict = list(self._image_dicts_by_rank.values())[0]
 
         img = None
-        if "idel" in current_image_dict and "0" in current_image_dict and "1" in current_image_dict:
+        if "idle" in current_image_dict and "0" in current_image_dict and "1" in current_image_dict:
             # 60フレーム周期を4分割 (15フレームごと)
             step = (self.idle_anim_timer // 15) % 4
-            anim_key = ["idel", "0", "idel", "1"][step]
+            anim_key = ["idle", "0", "idle", "1"][step]
             img = current_image_dict.get(anim_key)
         elif current_image_dict:
-            # idel があれば優先、なければ適当なものを表示
-            img = current_image_dict.get("idel") or list(current_image_dict.values())[0]
+            # idle があれば優先、なければ適当なものを表示
+            img = current_image_dict.get("idle") or list(current_image_dict.values())[0]
 
         if not img:
             # 簡易的な描画（画像がない場合のフォールバック）
@@ -172,4 +172,3 @@ class NPC(Entity):
 
         screen.blit(img, (draw_x_scaled, draw_y_scaled))
         
-
