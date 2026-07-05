@@ -87,17 +87,31 @@ class Trap:
         return msg
 
 
-    def draw(self, screen, camera_x, camera_y, tile_size):
-        """発見済みの罠のみ描画する (スイッチは常に表示)"""
-        if not self.is_revealed:
-            return
-            
+    def draw(self, screen, camera_x, camera_y, tile_size, player=None, dungeon=None):
+        """発見済みの罠を描画する。罠感知のある場合は視界内でうっすら表示する。"""
         draw_x = self.x * tile_size - camera_x
         draw_y = self.y * tile_size - camera_y
-        
+
+        sensed = False
+        if not self.is_revealed and player and dungeon and getattr(player, "trap_sense", 0) > 0:
+            px = int(player.x // dungeon.tile_size)
+            py = int(player.y // dungeon.tile_size)
+            dist = max(abs(px - self.x), abs(py - self.y))
+            if getattr(player, "condition", "normal") == "darkness":
+                vision_tiles = 1
+            else:
+                vision_tiles = 1 + getattr(player, "lantern_bonus", 0)
+            sensed = dist <= vision_tiles
+
+        if not self.is_revealed and not sensed:
+            return
+            
         if self.image:
             # 画像が読み込めている場合は画像を描画
             scaled_img = pygame.transform.scale(self.image, (tile_size, tile_size))
+            if sensed:
+                scaled_img = scaled_img.copy()
+                scaled_img.set_alpha(95)
             screen.blit(scaled_img, (draw_x, draw_y))
         else:
             # フォールバック: 図形描画
@@ -112,4 +126,6 @@ class Trap:
                 points = [(tile_size//2, 8), (8, tile_size-8), (tile_size-8, tile_size-8)]
                 pygame.draw.polygon(s, (*color, 150), points)
 
+            if sensed:
+                s.set_alpha(95)
             screen.blit(s, (draw_x, draw_y))

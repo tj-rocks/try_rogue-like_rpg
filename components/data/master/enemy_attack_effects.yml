@@ -48,3 +48,9 @@ explosion:
   launch_sound: components/sounds/sfx/attack_3.wav
   hit_sound: components/sounds/sfx/explosion.wav
   visual: explosion
+knockback:
+  type: close
+  launch_sound: components/sounds/sfx/attack_2.wav
+  hit_sound: components/sounds/sfx/attack_0.wav
+  visual: sonic_wave
+  pushback: true

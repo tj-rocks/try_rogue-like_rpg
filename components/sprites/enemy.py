@@ -75,6 +75,13 @@ class Enemy(Entity):
         self.attack_range_line = data.get("attack_range_line", self.attack_range)
         self.attack_range_diagonal = data.get("attack_range_diagonal", self.attack_range)
         self.attack_effects = data.get("attack_effects", {})
+        self.knockback_proc_chance = data.get("knockback_proc_chance", 0.0)
+        self.knockback_max_distance = data.get("knockback_max_distance", 1)
+        self.stealth = data.get("stealth", False)
+        self.stealth_reveal_range = data.get("stealth_reveal_range", 3)
+        self.stealth_outline_alpha = data.get("stealth_outline_alpha", 90)
+        self.trap_type = data.get("trap_type")
+        self.trap_proc_chance = data.get("trap_proc_chance", 0.0)
         self.current_attack_mode = None
         self.walk_frames = {}
         self.walk_frame_sources = {}
@@ -87,36 +94,10 @@ class Enemy(Entity):
         self.equipped_armor = None
         self.equipped_shield = None
         self.equipped_accessory = None
-        eq_cfg = data.get("equipment", {}) or {}
-        if isinstance(eq_cfg, dict):
-            wcfg = eq_cfg.get("weapon") or {}
-            acfg = eq_cfg.get("armor") or {}
-            scfg = eq_cfg.get("shield") or {}
-            xcfg = eq_cfg.get("accessory") or {}
-            wkey = wcfg.get("key")
-            akey = acfg.get("key")
-            skey = scfg.get("key")
-            xkey = xcfg.get("key")
-            winst = _enemy_equipment_inst("weapon", wkey)
-            ainst = _enemy_equipment_inst("armor", akey)
-            sinst = _enemy_equipment_inst("shield", skey)
-            xinst = _enemy_equipment_inst("accessory", xkey)
-            if winst:
-                self.weapon_inventory.append(winst)
-                self.equipped_weapon = winst.iid
-                from components.sprites.weapon import get_weapon_instance
-                self.weapon = get_weapon_instance(winst.key, winst.enhance)
-            else:
-                self.weapon = None
-            if ainst:
-                self.armor_inventory.append(ainst)
-                self.equipped_armor = ainst.iid
-            if sinst:
-                self.shield_inventory.append(sinst)
-                self.equipped_shield = sinst.iid
-            if xinst:
-                self.accessory_inventory.append(xinst)
-                self.equipped_accessory = xinst.iid
+        self._pending_equipment_cfg = data.get("equipment", {}) or {}
+        self._equipment_deferred = getattr(self, "type", "") == "dungeon_core"
+        if not self._equipment_deferred:
+            self._load_enemy_equipment_from_cfg(self._pending_equipment_cfg)
         self._armor_images = {}
         self._shield_images = {}
         self._load_enemy_equipment_images()
@@ -269,6 +250,48 @@ class Enemy(Entity):
                     images[d] = shared
             setattr(self, target_attr, images)
 
+    def _load_enemy_equipment_from_cfg(self, eq_cfg):
+        if not isinstance(eq_cfg, dict):
+            return
+        wcfg = eq_cfg.get("weapon") or {}
+        acfg = eq_cfg.get("armor") or {}
+        scfg = eq_cfg.get("shield") or {}
+        xcfg = eq_cfg.get("accessory") or {}
+        wkey = wcfg.get("key")
+        akey = acfg.get("key")
+        skey = scfg.get("key")
+        xkey = xcfg.get("key")
+        winst = _enemy_equipment_inst("weapon", wkey)
+        ainst = _enemy_equipment_inst("armor", akey)
+        sinst = _enemy_equipment_inst("shield", skey)
+        xinst = _enemy_equipment_inst("accessory", xkey)
+        if winst:
+            self.weapon_inventory.append(winst)
+            self.equipped_weapon = winst.iid
+            from components.sprites.weapon import get_weapon_instance
+            self.weapon = get_weapon_instance(winst.key, winst.enhance)
+        else:
+            self.weapon = None
+        if ainst:
+            self.armor_inventory.append(ainst)
+            self.equipped_armor = ainst.iid
+        if sinst:
+            self.shield_inventory.append(sinst)
+            self.equipped_shield = sinst.iid
+        if xinst:
+            self.accessory_inventory.append(xinst)
+            self.equipped_accessory = xinst.iid
+
+    def activate_battle_equipment(self):
+        if not getattr(self, "_equipment_deferred", False):
+            return
+        if self.weapon_inventory or self.armor_inventory or self.shield_inventory or self.accessory_inventory:
+            self._equipment_deferred = False
+            return
+        self._load_enemy_equipment_from_cfg(getattr(self, "_pending_equipment_cfg", {}) or {})
+        self._load_enemy_equipment_images()
+        self._equipment_deferred = False
+
     def _find_equip_inst(self, inv, iid):
         for inst in inv or []:
             if getattr(inst, "iid", None) == iid:
@@ -304,6 +327,23 @@ class Enemy(Entity):
         scaled.set_alpha(alpha)
         return scaled
 
+    @staticmethod
+    def _apply_outline_stealth(surface, alpha):
+        if alpha >= 255:
+            return surface
+        w, h = surface.get_size()
+        outline = pygame.transform.smoothscale(surface, (max(1, int(w * 1.08)), max(1, int(h * 1.08)))).copy()
+        outline.fill((0, 0, 0, 255), special_flags=pygame.BLEND_RGBA_MULT)
+        outline.set_alpha(min(255, alpha))
+        body = surface.copy()
+        body.set_alpha(min(255, alpha + 20))
+        combined = pygame.Surface((outline.get_width(), outline.get_height()), pygame.SRCALPHA)
+        combined.blit(outline, (0, 0))
+        ox = (combined.get_width() - body.get_width()) // 2
+        oy = (combined.get_height() - body.get_height()) // 2
+        combined.blit(body, (ox, oy))
+        return combined
+
     def draw(self, screen, camera_x, camera_y):
         import math; draw_x, draw_y = self.x - camera_x, self.y - camera_y
         dungeon = getattr(self, "current_dungeon", None)
@@ -327,6 +367,21 @@ class Enemy(Entity):
                 else:
                     fog_alpha = 70
                 fog_visible = True
+        stealth_visible = False
+        stealth_alpha = 255
+        if dungeon and self.stealth:
+            player = getattr(dungeon, "player", None)
+            if player:
+                from systems.tactical_profile import get_relation_and_distance
+                relation, distance = get_relation_and_distance(player, self, getattr(dungeon, "tile_size", 1) or 1)
+                dist = 3 if distance == "3plus" else int(distance)
+                reveal_range = max(1, int(getattr(self, "stealth_reveal_range", 3)))
+                if dist > reveal_range:
+                    stealth_visible = True
+                    stealth_alpha = max(50, int(getattr(self, "stealth_outline_alpha", 90)))
+                elif dist == reveal_range:
+                    stealth_visible = True
+                    stealth_alpha = max(110, int(getattr(self, "stealth_outline_alpha", 90)) + 20)
         if self.is_attacking:
             off = 0
             if self.attack_pre_delay_timer > 0:
@@ -377,6 +432,8 @@ class Enemy(Entity):
                 if is_flipped:
                     cur = pygame.transform.flip(cur, True, False)
                 Enemy._scaled_image_cache[ck] = cur
+            if stealth_visible:
+                cur = self._apply_outline_stealth(cur, stealth_alpha)
             if fog_visible and fog_alpha < 255:
                 cur = self._apply_alpha_surface(cur, fog_alpha)
             draw_x += (self.width - cur.get_width()) / 2; draw_y += (self.height - cur.get_height())
@@ -458,6 +515,7 @@ class Enemy(Entity):
         return (abs(dx) <= self.attack_range and dy == 0 and dx != 0) or (abs(dy) <= self.attack_range and dx == 0 and dy != 0)
 
     def _handle_attack(self, dx, dy, player, dialog=None):
+        self.current_attack_distance = max(abs(dx), abs(dy))
         if getattr(self, "current_attack_mode", None) == "counter":
             if dx > 0: self.facing = "right"
             elif dx < 0: self.facing = "left"
@@ -515,29 +573,40 @@ class Enemy(Entity):
             px, py = int((player.x+player.width/2)//TILE_SIZE), int((player.y+player.height/2)//TILE_SIZE)
             self.dash_distance = (abs(px-mx)+abs(py-my) - (self.width/TILE_SIZE/2 + player.width/TILE_SIZE/2) + 1) * TILE_SIZE
         else: self.dash_distance = 0
+        self.current_attack_damage_mult = 1.0
+        if (
+            getattr(self, "type", "") == "dungeon_core"
+            and mode == "line"
+            and getattr(self, "current_attack_distance", 0) == 2
+        ):
+            self.current_attack_damage_mult = 2 / 3
 
     def _deal_impact_damage(self, dungeon):
         t, d = getattr(self, "target_for_attack", None), getattr(self, "dialog_for_attack", None); self.peak_hold_timer = 30
         if not t or t.is_dead: return
-        from constants import COMBAT_LOG_WAIT_FRAMES; msg, dmg, crit, miss = deal_damage(self, t)
+        from constants import COMBAT_LOG_WAIT_FRAMES; msg, dmg, crit, miss = deal_damage(self, t, damage_mult=getattr(self, "current_attack_damage_mult", 1.0))
         from systems.sound_handler import sound_manager
         sound_manager.play_sfx(SOUND_ATTACK_MISS if miss or dmg == 0 else (self.current_attack_pattern.get("hit_sound", "components/sounds/sfx/projectile_hit.wav")))
         if crit: dungeon.flash_timer = 10
         if (
             dmg > 0
             and not miss
-            and getattr(self, "type", "") == "dungeon_core"
-            and getattr(self, "current_attack_mode", None) == "knockback"
             and getattr(t, "__class__", None).__name__ == "Player"
             and not getattr(t, "is_static", False)
+            and (
+                getattr(self, "current_attack_mode", None) == "knockback"
+                or getattr(getattr(self, "current_attack_pattern", {}), "get", lambda *_: None)("pushback", False)
+            )
         ):
-            self._boss_knockback_player(t, dungeon)
+            proc_chance = float(getattr(self, "knockback_proc_chance", 1.0))
+            if random.random() < max(0.0, min(1.0, proc_chance)):
+                self._apply_knockback_to_player(t, dungeon)
         if d:
             from systems.game_state import game_state
             if d.is_active: d.text += "\n" + msg; d.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
             else: d.text = msg; d.is_active = True; game_state["dialog_modal"] = False; d.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
 
-    def _boss_knockback_player(self, player, dungeon):
+    def _apply_knockback_to_player(self, player, dungeon):
         tile = dungeon.tile_size
         bx = int((self.x + self.width / 2) // tile)
         by = int((self.y + self.height / 2) // tile)
@@ -567,7 +636,8 @@ class Enemy(Entity):
                     return False
             return True
 
-        for _ in range(2):
+        max_distance = max(1, int(getattr(self, "knockback_max_distance", 1)))
+        for _ in range(max_distance):
             ngx, ngy = fgx + step[0], fgy + step[1]
             if not _can_stand(ngx, ngy):
                 break
@@ -595,7 +665,8 @@ class Enemy(Entity):
             )
         except Exception:
             pass
-        self._log_trace(dungeon, f"dungeon_core knockback player to ({fgx}, {fgy})")
+        attacker_name = getattr(self, "name", "enemy")
+        self._log_trace(dungeon, f"{attacker_name} knockback player to ({fgx}, {fgy})")
         return True
 
     def _move_dungeon_core_behind_player(self, player, dungeon):
@@ -687,6 +758,53 @@ class Enemy(Entity):
                 self._log_trace(dungeon, f"_move_smartly: chose movement to {chosen['f']} ({self.target_x//dungeon.tile_size}, {self.target_y//dungeon.tile_size})")
                 return True
         return False
+
+    def _get_trap_deploy_target(self, player, dungeon, all_entities):
+        tile = dungeon.tile_size
+        mx = int((self.x + self.width / 2) // tile)
+        my = int((self.y + self.height / 2) // tile)
+        px = int((player.x + player.width / 2) // tile)
+        py = int((player.y + player.height / 2) // tile)
+        if max(abs(px - mx), abs(py - my)) > 3:
+            return None
+        candidates = [
+            (px + (1 if px >= mx else -1), py),
+            (px, py + (1 if py >= my else -1)),
+            (px + 1, py),
+            (px - 1, py),
+            (px, py + 1),
+            (px, py - 1),
+        ]
+        def _occupied(gx, gy):
+            if not (0 <= gx < dungeon.map_width and 0 <= gy < dungeon.map_height):
+                return True
+            if dungeon.map_data[gy][gx] != 1:
+                return True
+            if (gx, gy) in player.get_occupied_grids(tile):
+                return True
+            for e in all_entities:
+                if e is self or getattr(e, "is_dead", False):
+                    continue
+                if (gx, gy) in e.get_occupied_grids(tile):
+                    return True
+            return any(t.x == gx and t.y == gy and not getattr(t, "is_triggered", False) for t in getattr(dungeon, "traps", []))
+        for gx, gy in candidates:
+            if not _occupied(gx, gy):
+                return gx, gy
+        return None
+
+    def _deploy_trap(self, player, dungeon, all_entities):
+        from components.sprites.trap import Trap
+        trap_type = getattr(self, "trap_type", None)
+        if not trap_type:
+            return False
+        target = self._get_trap_deploy_target(player, dungeon, all_entities)
+        if not target:
+            return False
+        gx, gy = target
+        dungeon.traps.append(Trap(gx, gy, trap_type))
+        self._log_trace(dungeon, f"deployed trap={trap_type} at ({gx}, {gy})")
+        return True
 
     # ════════════════════════════════════════════════════════════════
     # [ESCAPE_BLOCK] 逃げ道封鎖AI
@@ -869,7 +987,7 @@ class Enemy(Entity):
             if self.immobilized_turns <= 0:
                 self.vulnerable_mult = 1.0  # 弱点化も解除
             mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
-            px, py = int((player.target_x+player.width/2)//dungeon.tile_size), int((player.target_y+player.height/2)//dungeon.tile_size)
+            px, py = int((player.x+player.width/2)//dungeon.tile_size), int((player.y+player.height/2)//dungeon.tile_size)
             dx, dy = px - mx, py - my
             if abs(dx) + abs(dy) <= 1:
                 self._handle_attack(dx, dy, player, dialog)
@@ -882,7 +1000,7 @@ class Enemy(Entity):
             return
 
         mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
-        px, py = int((player.target_x+player.width/2)//dungeon.tile_size), int((player.target_y+player.height/2)//dungeon.tile_size)
+        px, py = int((player.x+player.width/2)//dungeon.tile_size), int((player.y+player.height/2)//dungeon.tile_size)
         
         # [NEW] 大型モンスター対応: 自分の占有グリッドの中からプレイヤーに最も近いものを選ぶ
         my_grids = self.get_occupied_grids_at(self.x, self.y, dungeon.tile_size)
@@ -901,7 +1019,7 @@ class Enemy(Entity):
         
         # 感知範囲外チェック
         if abs(dx) > rad or abs(dy) > rad:
-            self._log_trace(dungeon, f"out of range (dist to player: {abs(dx)},{abs(dy)} > detect_range: {rad}) | self:({self.x},{self.y}) player_target:({player.target_x},{player.target_y}) player_actual:({player.x},{player.y}) ts:{dungeon.tile_size}")
+            self._log_trace(dungeon, f"out of range (dist to player: {abs(dx)},{abs(dy)} > detect_range: {rad}) | self:({self.x},{self.y}) player_actual:({player.x},{player.y}) ts:{dungeon.tile_size}")
             return
             
         # 困惑度テーブルを参照してぼーっと確率を決定（一時的 stupidity も加算）
@@ -911,6 +1029,15 @@ class Enemy(Entity):
             self._log_trace(dungeon, f"decided to WANDER (chance: {wander_chance})")
             self._move_randomly(dungeon, all_entities)
             return
+
+        trap_chance = float(getattr(self, "trap_proc_chance", 0.0))
+        if trap_chance > 0 and random.random() < max(0.0, min(1.0, trap_chance)):
+            if self._deploy_trap(player, dungeon, all_entities):
+                return
+
+        # `smart_ranged_move` は「理想行動を取りやすい」だけにして、
+        # `stupidity` が高いほど位置取りの精度を落とす
+        smart_move_leniency = max(0.25, 1.0 - (effective_stupidity * 0.08))
 
         # ── [DIAGONAL] 斜め位置AIの意思決定（待機 or サイドステップ） ──
         # プレイヤーが斜め1マス (adx==1, ady==1) の場合、stupidityに応じた確率で
@@ -997,9 +1124,11 @@ class Enemy(Entity):
 
         if self.stupidity < 7:
             if not self.smart_ranged_move:
-                ideal = 1
+                ideal = 2 if self.attack_range > 1 else 1
             else:
                 ideal = 1 if self.attack_priority == "close" else (2 if self.attack_range == 2 else max(1, self.attack_range - 1))
+            if self.attack_priority == "ranged" and abs(dx) > abs(dy):
+                ideal = max(1, ideal + 1)
             los = self._is_in_attack_range(dx, dy) and self._is_line_of_sight_clear(dx, dy, dungeon, all_entities); gdist = abs(dx)+abs(dy)
             self._log_trace(dungeon, f"AI status: gdist={gdist}, ideal={ideal}, los={los}, attack_priority={self.attack_priority}")
             if gdist == ideal:
@@ -1021,7 +1150,7 @@ class Enemy(Entity):
             elif gdist == 1 and self.smart_ranged_move and self.attack_priority == "ranged" and self.attack_range > 1:
                 smart_moved = self._move_smartly_check_success(player, dungeon, all_entities, px, py, mx, my, occupied_cells, ideal)
                 self._log_trace(dungeon, f"backing away for ranged attack (smart_moved={smart_moved})")
-                if random.random() < 0.7 and smart_moved:
+                if random.random() < (0.55 + 0.25 * smart_move_leniency) and smart_moved:
                     return
                 self._log_trace(dungeon, "ranged-attacking close player")
                 self._handle_attack(dx, dy, player, dialog)
@@ -1031,7 +1160,10 @@ class Enemy(Entity):
                     self._log_trace(dungeon, "attacking player from distance")
                     self._handle_attack(dx, dy, player, dialog)
                     return
-                smart_moved = self._move_smartly_check_success(player, dungeon, all_entities, px, py, mx, my, occupied_cells, ideal)
+                if random.random() < smart_move_leniency:
+                    smart_moved = self._move_smartly_check_success(player, dungeon, all_entities, px, py, mx, my, occupied_cells, ideal)
+                else:
+                    smart_moved = False
                 self._log_trace(dungeon, f"moved smartly check: {smart_moved}")
                 if smart_moved:
                     return
@@ -1047,34 +1179,77 @@ class Enemy(Entity):
     def _get_dungeon_core_attack_weights(self, player, dungeon):
         relation, distance = get_relation_and_distance(player, self, dungeon.tile_size)
         preferred = player.tactical_profile.get_preferred_action(relation, distance) if hasattr(player, "tactical_profile") else None
+        profile = getattr(player, "tactical_profile", None)
+        magic_read = self._read_player_magic_habit(player, relation, distance)
+        melee_bias = 0.0
+        move_bias = 0.0
+        magic_bias = 0.0
+        item_bias = 0.0
+        if profile:
+            melee_bias = profile.get_action_probability("melee", relation=relation, distance=distance, default=0.0)
+            move_bias = profile.get_action_probability("move", relation=relation, distance=distance, default=0.0)
+            magic_bias = profile.get_action_probability("magic", relation=relation, distance=distance, default=0.0)
+            item_bias = profile.get_action_probability("item", relation=relation, distance=distance, default=0.0)
         weights = {"line": 50, "diagonal": 45, "counter": 20, "knockback": 18}
         if relation == "front":
             weights["line"] += 10
             weights["counter"] += 20
-            weights["knockback"] += 10
+            weights["knockback"] += 28
+            if magic_read == "magic_fire":
+                weights["counter"] += 30
+                weights["line"] += 4
             if preferred == "melee":
                 weights["counter"] += 50
                 weights["knockback"] += 25
             elif preferred == "move":
                 weights["diagonal"] += 20
+            elif move_bias > melee_bias:
+                weights["diagonal"] += 12
+                weights["line"] -= 4
+            elif melee_bias >= move_bias and melee_bias >= magic_bias:
+                weights["counter"] += 8
         elif relation == "diagonal":
-            weights["diagonal"] += 25
-            weights["counter"] += 10
+            weights["diagonal"] += 45
+            weights["counter"] += 5
+            if magic_read == "magic_fire":
+                weights["counter"] += 10
             if preferred == "move":
-                weights["diagonal"] += 15
+                weights["diagonal"] += 20
             elif preferred == "melee":
-                weights["line"] += 5
+                weights["line"] += 2
+            if move_bias > melee_bias:
+                weights["diagonal"] += 18
+                weights["line"] -= 3
+            elif melee_bias > move_bias:
+                weights["line"] += 8
+            if magic_bias > 0.35:
+                weights["line"] += 4
         elif relation == "side":
             weights["diagonal"] += 12
             weights["counter"] += 25
-            weights["knockback"] += 10
+            weights["knockback"] += 24
+            if magic_read == "magic_fire":
+                weights["counter"] += 8
             if preferred == "melee":
                 weights["counter"] += 35
+            if move_bias > melee_bias:
+                weights["diagonal"] += 10
+            elif melee_bias > move_bias:
+                weights["counter"] += 6
         elif relation == "far":
             weights["line"] += 10
             weights["diagonal"] += 10
             weights["counter"] -= 5
             weights["knockback"] -= 5
+            if magic_read == "magic_fire":
+                weights["counter"] += 8
+            if magic_bias > move_bias:
+                weights["line"] += 10
+                weights["diagonal"] += 6
+            elif move_bias > magic_bias:
+                weights["diagonal"] += 12
+            if item_bias > 0.25:
+                weights["line"] += 2
         return weights, relation, distance, preferred
 
     def _read_player_magic_habit(self, player, relation, distance):
@@ -1083,12 +1258,18 @@ class Enemy(Entity):
             return None
         fire_local = profile.get_action_total("magic_fire", relation=relation, distance=distance)
         knockback_local = profile.get_action_total("magic_knockback", relation=relation, distance=distance)
+        magic_local = profile.get_action_total("magic", relation=relation, distance=distance)
         if fire_local >= 2 or knockback_local >= 2:
             return "magic_fire" if fire_local >= knockback_local else "magic_knockback"
+        if magic_local >= 2 and fire_local == 0 and knockback_local == 0:
+            return "magic_barrier"
         fire_total = profile.get_action_total("magic_fire")
         knockback_total = profile.get_action_total("magic_knockback")
+        magic_total = profile.get_action_total("magic")
         if fire_total >= 3 or knockback_total >= 3:
             return "magic_fire" if fire_total >= knockback_total else "magic_knockback"
+        if magic_total >= 3 and fire_total == 0 and knockback_total == 0:
+            return "magic_barrier"
         return None
 
     def _get_turn_attack_chance(self, player, relation, distance):
@@ -1105,8 +1286,11 @@ class Enemy(Entity):
 
     def _can_use_attack_mode(self, mode, dx, dy, dungeon, all_entities):
         if mode == "line":
-            if not (((abs(dx) <= max(1, self.attack_range_line) and dy == 0 and dx != 0)
-                    or (abs(dy) <= max(1, self.attack_range_line) and dx == 0 and dy != 0))):
+            line_range = max(1, self.attack_range_line)
+            if not (
+                (dy == 0 and dx != 0 and abs(dx) <= line_range)
+                or (dx == 0 and dy != 0 and abs(dy) <= line_range)
+            ):
                 return False
             return self._is_line_of_sight_clear(dx, dy, dungeon, all_entities)
         if mode == "diagonal":
@@ -1122,8 +1306,9 @@ class Enemy(Entity):
     def _score_dungeon_core_tile(self, gx, gy, px, py, relation=None):
         dx, dy = px - gx, py - gy
         dist = max(abs(dx), abs(dy))
-        line_ready = ((abs(dx) <= max(1, self.attack_range_line) and dy == 0 and dx != 0)
-                      or (abs(dy) <= max(1, self.attack_range_line) and dx == 0 and dy != 0))
+        line_range = max(1, self.attack_range_line)
+        line_ready = ((dy == 0 and dx != 0 and abs(dx) <= line_range)
+                      or (dx == 0 and dy != 0 and abs(dy) <= line_range))
         diag_ready = abs(dx) == abs(dy) and 0 < abs(dx) <= max(1, self.attack_range_diagonal)
         score = 0
         if line_ready:
@@ -1155,8 +1340,9 @@ class Enemy(Entity):
     def _score_dungeon_core_defensive_tile(self, gx, gy, px, py, magic_read):
         dx, dy = px - gx, py - gy
         dist = max(abs(dx), abs(dy))
-        line_ready = ((abs(dx) <= max(1, self.attack_range_line) and dy == 0 and dx != 0)
-                      or (abs(dy) <= max(1, self.attack_range_line) and dx == 0 and dy != 0))
+        line_range = max(1, self.attack_range_line)
+        line_ready = ((dy == 0 and dx != 0 and abs(dx) <= line_range)
+                      or (dx == 0 and dy != 0 and abs(dy) <= line_range))
         diag_ready = abs(dx) == abs(dy) and 0 < abs(dx) <= max(1, self.attack_range_diagonal)
 
         score = 0
@@ -1221,15 +1407,26 @@ class Enemy(Entity):
         mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
         px, py = int((player.x+player.width/2)//dungeon.tile_size), int((player.y+player.height/2)//dungeon.tile_size)
         dx, dy = px - mx, py - my
+        profile = getattr(player, "tactical_profile", None)
+        melee_bias = 0.0
+        move_bias = 0.0
+        magic_bias = 0.0
+        item_bias = 0.0
+        if profile:
+            total_actions = (
+                profile.get_action_total("melee")
+                + profile.get_action_total("move")
+                + profile.get_action_total("magic")
+                + profile.get_action_total("item")
+            )
+            if total_actions > 0:
+                melee_bias = profile.get_action_total("melee") / total_actions
+                move_bias = profile.get_action_total("move") / total_actions
+                magic_bias = profile.get_action_total("magic") / total_actions
+                item_bias = profile.get_action_total("item") / total_actions
         weights, relation, distance, preferred = self._get_dungeon_core_attack_weights(player, dungeon)
+        magic_read = self._read_player_magic_habit(player, relation, distance)
         self.turn_attack_chance = self._get_turn_attack_chance(player, relation, distance)
-        if relation == "diagonal" and distance == "1":
-            moved = self._move_dungeon_core(player, dungeon, relation)
-            if moved:
-                self._log_duel_trace(dungeon, player, "diagonal_move", extra=f"preferred={preferred}")
-            else:
-                self._log_duel_trace(dungeon, player, "diagonal_wait", extra=f"preferred={preferred}")
-            return
         available = []
         for mode in ("line", "diagonal", "counter", "knockback"):
             if distance == "1" and mode == "diagonal":
@@ -1238,7 +1435,7 @@ class Enemy(Entity):
                 available.append((weights.get(mode, 0), mode))
         if available:
             available.sort(key=lambda x: x[0], reverse=True)
-            if relation == "front" and distance == "1":
+            if relation in ("front", "diagonal") and distance == "1":
                 chosen_mode = random.choice([mode for _, mode in available])
             else:
                 chosen_mode = available[0][1]
@@ -1278,6 +1475,33 @@ class Enemy(Entity):
                 return
 
         if distance == "3plus":
+            wait_bias = 0.0
+            if profile:
+                wait_bias = profile.get_action_probability("wait", relation=relation, distance=distance, default=0.0)
+            if wait_bias <= 0.0:
+                total_bias = move_bias + item_bias + magic_bias + melee_bias
+                if total_bias > 0:
+                    wait_bias = (move_bias + item_bias + magic_bias) / max(total_bias, 1e-6)
+                    if melee_bias > max(move_bias, item_bias, magic_bias):
+                        wait_bias *= 0.6
+                else:
+                    wait_bias = 0.18
+            if preferred == "move":
+                wait_bias += 0.08
+            elif preferred == "melee":
+                wait_bias -= 0.05
+            elif preferred == "item":
+                wait_bias += 0.03
+            elif preferred == "magic":
+                wait_bias += 0.02
+            if magic_read == "magic_fire":
+                wait_bias += 0.04
+            wait_weight = max(5, min(45, int(wait_bias * 100)))
+            if random.randint(1, 100) <= wait_weight:
+                self.current_attack_mode = None
+                self._log_trace(dungeon, f"dungeon_core wait relation={relation} distance={distance} preferred={preferred}")
+                self._log_duel_trace(dungeon, player, "wait", extra=f"relation={relation}")
+                return
             rush_candidates = []
             for facing, sdx, sdy in [("right", dungeon.tile_size, 0), ("left", -dungeon.tile_size, 0), ("down", 0, dungeon.tile_size), ("up", 0, -dungeon.tile_size)]:
                 tx, ty = self.x + sdx, self.y + sdy

@@ -1,4 +1,7 @@
 ENEMY_DATA:
+## =============================================================================
+## 雑魚
+## =============================================================================
   slime:
     quest_targetable: true
     name: スライム
@@ -178,6 +181,7 @@ ENEMY_DATA:
       - red_stone
       - blue_stone
       - green_stone
+      - gold_ore
     normal_drop_rate: 0.15
     rare_drop_rate: 0.05
     hp: 12
@@ -418,6 +422,9 @@ ENEMY_DATA:
     attack_range: 1
     stupidity: 3
     image_scale: 1.0
+    stealth: true
+    stealth_reveal_range: 3
+    stealth_outline_alpha: 85
     close_attack_effect: physical_light
     ranged_attack_effect: arrow
     attack_priority: close
@@ -659,8 +666,44 @@ ENEMY_DATA:
     attack_range: 2
     stupidity: 3
     image_scale: 1.0
+    trap_type: poison_trap
+    trap_proc_chance: 0.2
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
+    attack_priority: close
+    damaged_detect_range: 10
+  trap_skeleton:
+    quest_targetable: true
+    name: ワナスケルトン
+    min_rank: B
+    move_face_chance: 0.25
+    image_folder: components/pictures/enemies/skeleton
+    image_color: '#88AFFF'
+    drops:
+      normal:
+      - broken_shield
+      - broken_sword
+      rare:
+      - fullmetal_sword
+      - fullmetal_round_shield
+      - fullmetal_breastplate
+    normal_drop_rate: 0.12
+    rare_drop_rate: 0.04
+    hp: 14
+    attack: 9
+    defense: 18
+    evasion: 12
+    exp: 18
+    reward_gold: 420
+    accuracy_close: 92
+    accuracy_ranged: 100
+    attack_range: 1
+    stupidity: 2
+    image_scale: 1.0
+    trap_type: poison_trap
+    trap_proc_chance: 0.22
+    close_attack_effect: physical_light
+    ranged_attack_effect: strange_mucus
     attack_priority: close
     damaged_detect_range: 10
   bukimi:
@@ -691,11 +734,14 @@ ENEMY_DATA:
     accuracy_close: 92
     accuracy_ranged: 88
     attack_range: 1
-    stupidity: 3
+    stupidity: 2
     image_scale: 1.0
     close_attack_effect: dark_bolt
     ranged_attack_effect: fireball
     attack_priority: close
+    stealth: true
+    stealth_reveal_range: 3
+    stealth_outline_alpha: 80
     damaged_detect_range: 12
   takotako:
     quest_targetable: true
@@ -724,12 +770,14 @@ ENEMY_DATA:
     accuracy_close: 70
     accuracy_ranged: 70
     attack_range: 3
-    stupidity: 3
+    stupidity: 4
     image_scale: 1.0
     close_attack_effect: strange_mucus
     ranged_attack_effect: strange_mucus
     attack_priority: ranged
     smart_ranged_move: true
+    trap_type: poison_trap
+    trap_proc_chance: 0.25
     damaged_detect_range: 12
   medaman:
     quest_targetable: true
@@ -761,7 +809,7 @@ ENEMY_DATA:
     close_attack_effect: dark_bolt
     ranged_attack_effect: dark_bolt
     attack_priority: ranged
-    smart_ranged_move: false
+    smart_ranged_move: true
     damaged_detect_range: 14
   slime_green:
     quest_targetable: true
@@ -790,13 +838,264 @@ ENEMY_DATA:
     accuracy_close: 100
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 3
+    stupidity: 4
     image_scale: 1.0
     close_attack_effect: fireball
     ranged_attack_effect: fireball
     attack_priority: close
     damaged_detect_range: 10
-# ーボスーーーーーーーーーーーーーーーーーーーーーーーーー
+  # guild_assassin:
+  #   quest_targetable: true
+  #   name: ギルドの刺客
+  #   min_rank: S
+  #   move_face_chance: 0.4
+  #   image_folder: components/pictures/enemies/skelton_sword_armor
+  #   crit_rate: 0.15
+  #   drops:
+  #     normal:
+  #     - hp_potion
+  #     rare:
+  #     - hunters_rapier
+  #   normal_drop_rate: 0.2
+  #   rare_drop_rate: 0.05
+  #   hp: 20
+  #   attack: 40
+  #   defense: 35
+  #   evasion: 35
+  #   exp: 200
+  #   reward_gold: 1000
+  #   accuracy_close: 95
+  #   accuracy_ranged: 90
+  #   attack_range: 1
+  #   stupidity: 1
+  #   status: darkness
+  #   status_chance: 20
+  #   image_scale: 1.0
+  #   close_attack_effect: physical_heavy
+  #   ranged_attack_effect: sonic_wave
+  #   attack_priority: close
+  #   damaged_detect_range: 15
+  boss_slime_echo:
+    quest_targetable: true
+    name: スイスイスライムjr
+    min_rank: S
+    max_rank: SS
+    move_face_chance: 0.25
+    image_folder: components/pictures/enemies/suisui_slime
+    image_color: "#a86f8f"
+    crit_rate: 0.08
+    status: poison
+    status_chance: 22
+    drops:
+      normal:
+      - red_stone
+      - blue_stone
+      rare:
+      - green_stone
+      - gold_ore
+    normal_drop_rate: 0.2
+    rare_drop_rate: 0.06
+    hp: 38
+    attack: 16
+    defense: 28
+    evasion: 20
+    exp: 110
+    reward_gold: 380
+    accuracy_close: 90
+    accuracy_ranged: 100
+    attack_range: 2
+    stupidity: 3
+    smart_ranged_move: true
+    image_scale: 1.0
+    close_attack_effect: physical_light
+    ranged_attack_effect: strange_mucus
+    attack_priority: close
+    damaged_detect_range: 16
+  boss_skeleton_echo:
+    quest_targetable: true
+    name: スケスケルトンjr
+    min_rank: S
+    max_rank: SS
+    move_face_chance: 0.1
+    image_folder: components/pictures/enemies/skeleton
+    image_color: "#6f8792"
+    crit_rate: 0.1
+    drops:
+      normal:
+      - blue_stone
+      - green_stone
+      rare:
+      - red_stone
+      - gold_ore
+    normal_drop_rate: 0.18
+    rare_drop_rate: 0.07
+    hp: 76
+    attack: 27
+    defense: 38
+    evasion: 8
+    exp: 125
+    reward_gold: 420
+    accuracy_close: 92
+    accuracy_ranged: 90
+    attack_range: 1
+    stupidity: 0
+    image_scale: 1.0
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: dark_bolt
+    attack_priority: close
+    damaged_detect_range: 18
+    turn_attack: true
+  boss_ghost_echo:
+    quest_targetable: true
+    name: ゴーゴゴーストjr
+    min_rank: S
+    max_rank: SS
+    move_face_chance: 0.15
+    image_folder: components/pictures/enemies/gogo_ghost
+    image_color: "#7484b8"
+    crit_rate: 0.1
+    status: darkness
+    status_chance: 28
+    stealth: true
+    stealth_reveal_range: 4
+    stealth_outline_alpha: 90
+    drops:
+      normal:
+      - blue_stone
+      - green_stone
+      rare:
+      - red_stone
+      - gold_ore
+    normal_drop_rate: 0.18
+    rare_drop_rate: 0.06
+    hp: 40
+    attack: 19
+    defense: 44
+    evasion: 26
+    exp: 130
+    reward_gold: 440
+    accuracy_close: 94
+    accuracy_ranged: 92
+    attack_range: 3
+    stupidity: 2
+    smart_ranged_move: true
+    image_scale: 1.0
+    close_attack_effect: dark_bolt
+    ranged_attack_effect: dark_bolt
+    attack_priority: ranged
+    damaged_detect_range: 20
+    turn_attack: true
+  boss_bat_echo:
+    quest_targetable: true
+    name: デカコウモリjr
+    min_rank: S
+    max_rank: SS
+    move_face_chance: 0.25
+    image_folder: components/pictures/enemies/deka_komori
+    image_color: "#8d6f5f"
+    crit_rate: 0.08
+    drops:
+      normal:
+      - red_stone
+      - green_stone
+      rare:
+      - blue_stone
+      - gold_ore
+    normal_drop_rate: 0.2
+    rare_drop_rate: 0.05
+    hp: 44
+    attack: 20
+    defense: 40
+    evasion: 24
+    exp: 140
+    reward_gold: 460
+    accuracy_close: 92
+    accuracy_ranged: 92
+    attack_range: 3
+    stupidity: 2
+    smart_ranged_move: true
+    image_scale: 1.0
+    close_attack_effect: explosion
+    ranged_attack_effect: sonic_wave
+    attack_priority: close
+    damaged_detect_range: 20
+  boss_eye_echo:
+    quest_targetable: true
+    name: メダマンjr
+    min_rank: S
+    max_rank: SS
+    move_face_chance: 0.2
+    image_folder: components/pictures/enemies/medaman
+    image_color: "#7a5e8b"
+    crit_rate: 0.08
+    status: darkness
+    status_chance: 30
+    stealth: true
+    stealth_reveal_range: 3
+    stealth_outline_alpha: 80
+    drops:
+      normal:
+      - blue_stone
+      - green_stone
+      rare:
+      - red_stone
+      - gold_ore
+    normal_drop_rate: 0.2
+    rare_drop_rate: 0.05
+    hp: 36
+    attack: 17
+    defense: 34
+    evasion: 24
+    exp: 118
+    reward_gold: 400
+    accuracy_close: 92
+    accuracy_ranged: 90
+    attack_range: 3
+    stupidity: 3
+    smart_ranged_move: true
+    image_scale: 1.0
+    close_attack_effect: dark_bolt
+    ranged_attack_effect: dark_bolt
+    attack_priority: ranged
+    damaged_detect_range: 18
+  boss_roll_echo:
+    quest_targetable: true
+    name: コロコロンjr
+    min_rank: S
+    max_rank: SS
+    move_face_chance: 0.3
+    image_folder: components/pictures/enemies/korokoron
+    image_color: "#5f8b7a"
+    crit_rate: 0.08
+    drops:
+      normal:
+      - hi_potion
+      - red_stone
+      rare:
+      - blue_stone
+      - gold_ore
+    normal_drop_rate: 0.2
+    rare_drop_rate: 0.06
+    hp: 80
+    attack: 29
+    defense: 70
+    evasion: 16
+    exp: 135
+    reward_gold: 480
+    accuracy_close: 90
+    accuracy_ranged: 86
+    attack_range: 2
+    stupidity: 0
+    image_scale: 1.0
+    knockback_proc_chance: 0.25
+    knockback_max_distance: 2
+    close_attack_effect: knockback
+    ranged_attack_effect: sonic_wave
+    attack_priority: close
+    damaged_detect_range: 18
+## =============================================================================
+## ーここからボスーーー
+## =============================================================================
   suisui_slime:
     quest_targetable: true
     name: スイスイスライム
@@ -965,6 +1264,99 @@ ENEMY_DATA:
     ranged_attack_effect: sonic_wave
     attack_priority: close
     damaged_detect_range: 100
+  korokoron:
+    quest_targetable: true
+    name: コロコロン
+    min_rank: A
+    move_face_chance: 0.4
+    max_concurrent: 1
+    max_spawns: 1
+    is_boss: true
+    spawn_chance: 0.1
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/korokoron
+    encounter_message: 
+    - コロコロン に 発見された！
+    - 丸い体が地面を転がり、こちらに向かってくる！
+    defeat_message: コロコロン を 討伐した！
+    detect_range: 15
+    crit_rate: 0.06
+    drops:
+      normal:
+      - hi_potion
+      - hi_potion
+      rare:
+      - red_stone
+      - blue_stone
+      - green_stone
+    normal_drop_rate: 0.25
+    rare_drop_rate: 0.15
+    hp: 90
+    attack: 28
+    defense: 100
+    evasion: 15
+    exp: 150
+    reward_gold: 2500
+    accuracy_close: 90
+    accuracy_ranged: 85
+    attack_range: 2
+    stupidity: 1
+    image_scale: 1.0
+    knockback_proc_chance: 0.35
+    knockback_max_distance: 2
+    close_attack_effect: knockback
+    ranged_attack_effect: sonic_wave
+    attack_priority: close
+    damaged_detect_range: 10
+  undead_father:
+    quest_targetable: false
+    name: 父の亡霊
+    min_rank: B
+    move_face_chance: 0.4
+    min_floor: 50
+    max_floor: 50
+    max_concurrent: 1
+    max_spawns: 1
+    is_boss: true
+    once_only: true
+    spawn_chance: 0.0
+    crit_rate: 0.1
+    detect_range: 15
+    bgm: components/sounds/bgm/fight_against_destiny.mp3
+    image_folder: components/pictures/enemies/father
+    encounter_message:
+    - …懐かしい感じがする。
+    - 父さん…父さんだろ…!
+    - 父さん…何でだ何でだよ!
+    defeat_message:
+    - 父さん…なんで…
+    - '父: これ以上ダンジョンに潜るな。'
+    - '父: できれば故郷に戻って母さんを大切にしてやってほしい'
+    - '父: もっと下層に行けば真実を知れるかもしれない'
+    - '父: お前の道はお前が決めるんだ'
+    - '父: …愛してる'
+    drops:
+      normal: []
+      rare:
+      - fathers_keepsake
+    normal_drop_rate: 0.0
+    rare_drop_rate: 1.0
+    hp: 100
+    attack: 30
+    defense: 60
+    evasion: 40
+    exp: 200
+    reward_gold: 200
+    accuracy_close: 90
+    accuracy_ranged: 90
+    attack_range: 4
+    stupidity: 0
+    image_scale: 1
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: dark_bolt
+    attack_priority: close
+    damaged_detect_range: 50
+    turn_attack: true
   meyon:
     quest_targetable: true
     name: メヨーン
@@ -1010,126 +1402,6 @@ ENEMY_DATA:
     attack_priority: ranged
     damaged_detect_range: 100
     smart_ranged_move: false
-  guild_assassin:
-    quest_targetable: true
-    name: ギルドの刺客
-    min_rank: S
-    move_face_chance: 0.4
-    image_folder: components/pictures/enemies/skelton_sword_armor
-    crit_rate: 0.15
-    drops:
-      normal:
-      - hp_potion
-      rare:
-      - hunters_rapier
-    normal_drop_rate: 0.2
-    rare_drop_rate: 0.05
-    hp: 150
-    attack: 40
-    defense: 35
-    evasion: 35
-    exp: 200
-    reward_gold: 1000
-    accuracy_close: 95
-    accuracy_ranged: 90
-    attack_range: 1
-    stupidity: 1
-    image_scale: 1.0
-    close_attack_effect: physical_heavy
-    ranged_attack_effect: sonic_wave
-    attack_priority: close
-    damaged_detect_range: 50
-  korokoron:
-    quest_targetable: true
-    name: コロコロン
-    min_rank: A
-    move_face_chance: 0.4
-    max_concurrent: 1
-    max_spawns: 1
-    is_boss: true
-    spawn_chance: 0.1
-    bgm: components/sounds/bgm/get_hornor.mp3
-    image_folder: components/pictures/enemies/korokoron
-    encounter_message: 
-    - コロコロン に 発見された！
-    - 丸い体が地面を転がり、こちらに向かってくる！
-    defeat_message: コロコロン を 討伐した！
-    detect_range: 15
-    crit_rate: 0.06
-    drops:
-      normal:
-      - hi_potion
-      - hi_potion
-      rare:
-      - red_stone
-      - blue_stone
-      - green_stone
-    normal_drop_rate: 0.25
-    rare_drop_rate: 0.15
-    hp: 90
-    attack: 28
-    defense: 100
-    evasion: 15
-    exp: 150
-    reward_gold: 2500
-    accuracy_close: 90
-    accuracy_ranged: 85
-    attack_range: 2
-    stupidity: 0
-    image_scale: 2.0
-    close_attack_effect: physical_heavy
-    ranged_attack_effect: sonic_wave
-    attack_priority: close
-    damaged_detect_range: 100
-  undead_father:
-    quest_targetable: false
-    name: 父の亡霊
-    min_rank: B
-    move_face_chance: 0.4
-    min_floor: 50
-    max_floor: 50
-    max_concurrent: 1
-    max_spawns: 1
-    is_boss: true
-    once_only: true
-    spawn_chance: 0.0
-    crit_rate: 0.1
-    detect_range: 15
-    bgm: components/sounds/bgm/fight_against_destiny.mp3
-    image_folder: components/pictures/enemies/dungeon_core_playerlike
-    encounter_message:
-    - …懐かしい感じがする。
-    - 父さん…父さんだろ…!
-    - 父さん…何でだ何でだよ!
-    defeat_message:
-    - 父さん…なんで…
-    - '父: これ以上ダンジョンに潜るな。'
-    - '父: できれば故郷に戻って母さんを大切にしてやってほしい'
-    - '父: もっと下層に行けば真実を知れるかもしれない'
-    - '父: お前の道はお前が決めるんだ'
-    - '父: …愛してる'
-    drops:
-      normal: []
-      rare:
-      - fathers_keepsake
-    normal_drop_rate: 0.0
-    rare_drop_rate: 1.0
-    hp: 100
-    attack: 30
-    defense: 60
-    evasion: 40
-    exp: 200
-    reward_gold: 200
-    accuracy_close: 90
-    accuracy_ranged: 90
-    attack_range: 4
-    stupidity: 0
-    image_scale: 1
-    close_attack_effect: physical_heavy
-    ranged_attack_effect: dark_bolt
-    attack_priority: close
-    damaged_detect_range: 50
-    turn_attack: true
   dungeon_core:
     quest_targetable: false
     name: ダンジョンコア
@@ -1141,7 +1413,7 @@ ENEMY_DATA:
     is_boss: true
     spawn_chance: 0.0
     crit_rate: 0.08
-    detect_range: 20
+    detect_range: 10
     encounter_trigger_range: 3
     bgm: components/sounds/bgm/fight_against_destiny.mp3
     image_folder: components/pictures/enemies/dungeon_core_playerlike
@@ -1171,7 +1443,7 @@ ENEMY_DATA:
     normal_drop_rate: 0.0
     rare_drop_rate: 0.0
     hp: 220
-    attack: 28
+    attack: 20
     defense: 95
     evasion: 18
     exp: 0
@@ -1179,7 +1451,7 @@ ENEMY_DATA:
     accuracy_close: 96
     accuracy_ranged: 96
     attack_range: 3
-    attack_range_line: 3
+    attack_range_line: 2
     attack_range_diagonal: 3
     stupidity: 0
     image_scale: 1.0
@@ -1189,6 +1461,9 @@ ENEMY_DATA:
       line: physical_heavy
       diagonal: sonic_wave
       counter: physical_heavy
+      knockback: knockback
+    knockback_proc_chance: 0.3
+    knockback_max_distance: 2
     attack_priority: close
     damaged_detect_range: 100
     turn_attack: true

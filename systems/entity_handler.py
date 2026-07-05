@@ -76,9 +76,12 @@ def _start_boss_battle(dungeon, player, boss):
     from systems.audio_manager import play_bgm
     from constants import BGM_BOSS
     game_state["is_boss_battle"] = True
+    game_state["boss_battle_persistent"] = getattr(boss, "type", None) == "dungeon_core"
     game_state["boss_encounter_pending"] = False
     if boss:
         boss.battle_locked = False
+        if hasattr(boss, "activate_battle_equipment"):
+            boss.activate_battle_equipment()
     target_bgm = getattr(boss, "bgm", None) or BGM_BOSS
     play_bgm(target_bgm)
     print(f"[SOUND] Boss battle confirmed! Switching to: {target_bgm}")
@@ -234,6 +237,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
             # ボスの場合、特別な演出
             if getattr(enemy, "is_boss", False):
                 from systems.ui import show_dialog
+                from systems.guild import GuildSystem
                 from constants import SOUND_QUEST_COMPLETE, SOUND_BOSS_VICTORY
                 from systems.magic_handler import FlashEffect
                 import os
@@ -257,6 +261,17 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
                     show_dialog(dialog, defeat_msg, modal=True, auto_close=0)
                 else:
                     show_dialog(dialog, f"{enemy.name} を 討伐した！", modal=True, auto_close=0)
+
+                # ダンジョンコア討伐時は、ギルドクエストを挟まず直接SSランクへ昇格させる
+                if enemy_type in ("undead_father", "dungeon_core"):
+                    guild = GuildSystem()
+                    ss_data = guild.get_current_rank("SS")
+                    player.guild_rank = "SS"
+                    player.guild_point = max(player.guild_point, ss_data.get("required_gp", player.guild_point))
+                    from systems.game_state import game_state
+                    game_state["post_boss_clear_pending"] = True
+                    game_state["ending_route"] = "core" if enemy_type == "dungeon_core" else "father"
+                    show_dialog(dialog, "ダンジョンコアを討伐した。", modal=True, auto_close=0)
                 
                 # once_only 敵の撃破記録
                 if enemy_type and ENEMY_DATA.get(enemy_type, {}).get("once_only"):
@@ -282,6 +297,8 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
         for enemy in dungeon.enemies:
             if getattr(enemy, "is_boss", False):
                 enemy.battle_locked = True
+                enemy.is_moving = False
+                enemy.target_x, enemy.target_y = enemy.x, enemy.y
         return
     
     if game_state["turn_state"] == "enemies":
@@ -441,7 +458,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
             pgx, pgy = int(player.x // dungeon.tile_size), int(player.y // dungeon.tile_size)
             dist = max(abs(egx - pgx), abs(egy - pgy))
             boss_cfg = _get_boss_encounter_config(getattr(enemy, "type", None))
-            trigger_range = max(1, boss_cfg["encounter_trigger_range"])
+            trigger_range = max(1, boss_cfg["encounter_trigger_range"] - player.get_aggro_modifier())
 
             if dist <= trigger_range:
                 active_boss = enemy
@@ -464,6 +481,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
                     from systems.ui import show_dialog
                     dialog_msg = boss_cfg["dialog_message"]
                     game_state["boss_encounter_pending"] = True
+                    game_state["boss_battle_persistent"] = boss_type == "dungeon_core"
                     active_boss.battle_locked = True
                     if dialog_msg:
                         show_dialog(dialog, dialog_msg, modal=True, auto_close=0)
@@ -474,6 +492,9 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
                         _start_boss_battle(dun, pl, boss)
 
                     def on_no(boss=active_boss, dun=dungeon, pl=player):
+                        from systems.game_state import game_state as gs
+                        gs["post_boss_clear_pending"] = True
+                        gs["ending_route"] = "core_refuse"
                         _warp_to_village_from_boss(dun, pl)
 
                     confirm_dialog.on_yes = on_yes if boss_cfg["yes_action"] == "battle_start" else None
@@ -485,7 +506,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
                     shown_bosses.add(boss_type)
                     player._shown_boss_messages = shown_bosses
     else:
-        if was_boss_battle:
+        if was_boss_battle and not game_state.get("boss_battle_persistent", False):
             game_state["is_boss_battle"] = False
             dungeon.play_floor_bgm()
             print("[SOUND] Boss battle ended. Reverting to floor BGM.")

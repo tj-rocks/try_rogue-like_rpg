@@ -67,6 +67,7 @@ def warp_to_floor(floor_level, player, is_death=False, debug_overflow=False, spa
     # ボス戦状態をリセット（次の階でBGMが正しく再生されるように）
     from systems.game_state import game_state
     game_state["is_boss_battle"] = False
+    game_state["boss_battle_persistent"] = False
     
     # 敵・アイテムを初期配置（村や固定マップ階層以外）
     if floor_level > 0 and not new_dungeon.floor_info.get("map"):
@@ -2130,7 +2131,7 @@ class Dungeon:
         for e in self.edges:
             dx, dy = (e["x"] * self.tile_size) + e["ox"] - camera_x, (e["y"] * self.tile_size) + e["oy"] - camera_y
             if -self.tile_size <= dx <= sw and -self.tile_size <= dy <= sh: screen.blit(e["img"], (dx, dy))
-        for t in self.traps: t.draw(screen, camera_x, camera_y, self.tile_size)
+        for t in self.traps: t.draw(screen, camera_x, camera_y, self.tile_size, player=player, dungeon=self)
         for i in self.dropped_items: i.draw(screen, camera_x, camera_y)
         for n in self.npcs:
             if camera_x - n.width <= n.x <= camera_x + sw and camera_y - n.height <= n.y <= camera_y + sh: n.draw(screen, camera_x, camera_y, player)
@@ -2200,6 +2201,17 @@ class Dungeon:
         if self.next_dungeon: return self.next_dungeon
         from systems.game_state import game_state
         if is_paused() or game_state.get("dialog_just_closed"): return self
+
+        def _block_stair(message):
+            if dialog and not dialog.is_active:
+                dialog.text = message
+                dialog.is_active = True
+            player.x, player.y = player.prev_x, player.prev_y
+            player.target_x, player.target_y = player.x, player.y
+            player.is_moving = False
+            self.spawn_pos = (tx, ty)
+            return self
+
         tx, ty = int((player.x + player.width / 2) // self.tile_size), int((player.y + player.height / 2) // self.tile_size)
         
         # ワープ直後の地点にいる場合は、そのタイルから完全に出るまで反応させない
@@ -2212,17 +2224,19 @@ class Dungeon:
         if not (0 <= tx < self.map_width and 0 <= ty < self.map_height): return self
         ct = self.map_data[ty][tx]
 
+        # ラスボス戦中は、階段タイルに触れた時だけ封鎖する。
+        if ct in (2, 3):
+            boss_in_battle = any(
+                getattr(enemy, "type", None) == "dungeon_core" and not getattr(enemy, "is_dead", False)
+                for enemy in getattr(self, "enemies", [])
+            )
+            if boss_in_battle and (game_state.get("is_boss_battle", False) or game_state.get("boss_encounter_pending", False)):
+                return _block_stair("ラスボス戦中は 階段を 使えない！")
+
         # --- モンスターブレイクアウト時の進入元階段の封鎖 ---
         if ct in (2, 3):
             if self.is_outbreak and not self.outbreak_cleared and self.entry_stairs == ct:
-                if dialog:
-                    dialog.text = Text.System.OUTBREAK_BLOCKED
-                    dialog.is_active = True
-                player.x, player.y = player.prev_x, player.prev_y
-                player.target_x, player.target_y = player.x, player.y
-                player.is_moving = False
-                self.spawn_pos = (tx, ty)
-                return self
+                return _block_stair(Text.System.OUTBREAK_BLOCKED)
 
         if ct == 3:
             # --- ランク制限チェック ---

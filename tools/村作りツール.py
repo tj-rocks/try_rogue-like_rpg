@@ -239,7 +239,7 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                             if os.path.exists(os.path.join(base_dir, str(img), "0.png")):
                                 image_file = "0.png"
                             else:
-                                image_file = "idel.png"
+                                image_file = "idle.png"
                             
                             tile["image_path"] = f"{img}/{image_file}" if img else ""
                             tile["desc"] = data.get("name", tile.get("desc"))
@@ -265,7 +265,14 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                             if not img:
                                 folder = data.get("image_folder", "")
                                 if folder:
-                                    for candidate in ("down.png", "left.png", "up.png", "right.png"):
+                                    for candidate in (
+                                        "down.png", "left.png", "up.png", "right.png",
+                                        "down_0.png", "down_1.png",
+                                        "left_0.png", "left_1.png",
+                                        "up_0.png", "up_1.png",
+                                        "right_0.png", "right_1.png",
+                                        "idle.png"
+                                    ):
                                         candidate_path = os.path.join(base_dir, folder, candidate)
                                         if os.path.exists(candidate_path):
                                             img = f"{folder}/{candidate}"

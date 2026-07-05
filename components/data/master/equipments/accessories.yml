@@ -127,7 +127,7 @@ ACCESSORY_DATA:
         block_chance_ranged: 0.0
         lantern_bonus: 0
         regen: 0
-        stupidity: 0
+        stupidity: 0.4
         armor_penetration: 0.0
         buff_value_ratio: 0
         buff_duration_ratio: 0
@@ -1172,6 +1172,53 @@ ACCESSORY_DATA:
           count_backstab: 1
           backstab_crit_bonus: 0.12
           flank_backstab: 1
+      magic:
+        fire_damage: 0.0
+        fire_range: 0
+        heal_ratio: 0.0
+        knockback_damage: 0.0
+        invincible_turns: 0
+        stave_bonus: 0
+        light_stave_bonus: 0
+
+  ring_of_trap_sense:
+    quest_targetable: true
+    name: "罠感知の指輪"
+    category: accessory
+    min_rank: F
+    max_rank: SS
+    rarity: 3
+    price: 2600
+    selling_price: 80
+    image_path: components/pictures/icon/ring.png
+    sound: components/sounds/sfx/equip.wav
+    image_scale: 1.0
+    shop:
+      buyable: true
+      usually_buyable: false
+      special_buyable: true
+    floor_spawnable: true
+    describe: 近くの罠の気配を感じ取る指輪 視界内の罠がうっすら見える
+    growth: {bonus_limit: 3, times_limit: 30, over_limit_growth_rate: 0.005}
+    type: accessory
+    bonus:
+      common:
+        aggro_mod: 0
+        attack: 0
+        accuracy_close: 0
+        accuracy_range: 0
+        crit_rate: 0.0
+        hp: 0
+        defense: 0
+        block_chance_close: 0.0
+        block_chance_ranged: 0.0
+        lantern_bonus: 0
+        regen: 0
+        stupidity: 0
+        armor_penetration: 0.0
+        buff_value_ratio: 0
+        buff_duration_ratio: 0
+        trap_sense: 1
       magic:
         fire_damage: 0.0
         fire_range: 0

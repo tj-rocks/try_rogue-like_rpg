@@ -306,6 +306,7 @@ ENEMY_DATA = get_normalized_enemy_data(RANK_FLOOR_MAP)
 WEAPON_DATA, ARMOR_DATA, SHIELD_DATA, ACCESSORY_DATA, WEAPON_CATEGORIES, ARMOR_CATEGORIES, SHIELD_CATEGORIES, ACCESSORY_CATEGORIES = get_normalized_equipment_data(RANK_FLOOR_MAP)
 WEAPON_TYPES = WEAPON_CATEGORIES # 後方互換性
 CONSUMABLE_DATA, STAVE_DATA = get_normalized_item_data(RANK_FLOOR_MAP)
+SKILL_DATA = load_master_data("skills.yml")
 
 # --- パーセント系ステータスのキー（強化ボーナス計算・UI表示で使用） ---
 PCT_STAT_KEYS = frozenset([

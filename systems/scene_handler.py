@@ -76,17 +76,36 @@ def handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_da
     screen.fill((0, 0, 0))
     game_state["ending_alpha"] = min(255, game_state.get("ending_alpha", 0) + 2)
     idx = game_state.get("ending_index", 0)
+    route = game_state.get("ending_route", "core")
     
     # 1. 画像の描画
-    if idx < len(ending_imgs):
+    route_imgs = ending_imgs
+    if story_data and "ending" in story_data:
+        ending_story = story_data["ending"]
+        if isinstance(ending_story, dict) and route in ending_story:
+            route_imgs = []
+            route_story = ending_story[route]
+            from systems.resources import load_scale_img
+            for page_idx in range(1, 4):
+                page_data = route_story.get(page_idx) or route_story.get(str(page_idx)) or {}
+                image_path = page_data.get("image")
+                img = load_scale_img(image_path, SCREEN_WIDTH, SCREEN_HEIGHT) if image_path else None
+                route_imgs.append(img)
+            while len(route_imgs) < len(ending_imgs):
+                route_imgs.append(None)
+
+    if idx < len(route_imgs):
         from systems.ui import draw_opening_scene
-        draw_opening_scene(screen, ending_imgs[idx], game_state["ending_alpha"])
+        draw_opening_scene(screen, route_imgs[idx] or ending_imgs[idx], game_state["ending_alpha"])
 
     # 2. テキストとBGMの管理
     dialog = ui_elements["dialog"]
     text = ""
     if story_data and "ending" in story_data:
-        page_data = story_data["ending"].get(idx + 1) or story_data["ending"].get(str(idx + 1))
+        ending_story = story_data["ending"]
+        if isinstance(ending_story, dict) and route in ending_story:
+            ending_story = ending_story[route]
+        page_data = ending_story.get(idx + 1) or ending_story.get(str(idx + 1))
         if page_data:
             text = page_data.get("text", "")
             if dialog.text != text:
@@ -120,8 +139,9 @@ def handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_da
         game_state["ending_index"] = idx + 1
         dialog.is_active = False
         
-        if game_state["ending_index"] >= len(ending_imgs):
+        if game_state["ending_index"] >= len(route_imgs):
             game_state["ending_index"] = 0
+            game_state["ending_route"] = "core"
             game_state["current_scene"] = "game"
     
     return game_state["current_scene"]

@@ -7,7 +7,7 @@ from constants import (
 from wordings import Text
 from systems.ui.ui_base import (
     get_standard_upper_layout, draw_dialog_frame, draw_text_wrapped,
-    draw_stat_bar, BaseListDialog, StateKeyMixin,
+    BaseListDialog, StateKeyMixin,
     EQUIP_STAT_LABEL_MAP, EQUIP_MAGIC_LABEL_MAP, format_stat_value
 )
 from systems.ui.ui_inventory import InventoryDialog
@@ -22,6 +22,7 @@ class OreSelectionDialog(StateKeyMixin):
         self.cursor_idx = 0
         self.target_item_data = None
         self.available_ores = []
+        self.selection_block_reason = None
         self.on_confirm = None
         self.parameter_selection_dialog = None
         self.confirm_dialog = None
@@ -82,7 +83,13 @@ class OreSelectionDialog(StateKeyMixin):
                             player = self.player_ref
                             item_type, iid = self.target_item_data
                             psd.update_from_selection(player, item_type, iid, ore_key)
-                            if psd.max_limit_reached:
+                            if getattr(psd, "selection_block_reason", None) == "no_skill_target":
+                                from systems.game_state import game_state
+                                dialog = game_state.get("dialog")
+                                if dialog:
+                                    dialog.text = "使えません。\nこの装備には金の鉱石で伸ばせる技がない。"
+                                    dialog.is_active = True
+                            elif psd.max_limit_reached:
                                 from systems.game_state import game_state
                                 dialog = game_state.get("dialog")
                                 if dialog:
@@ -271,25 +278,8 @@ class ParameterSelectionDialog(BaseListDialog):
         if stat_key == "max_limit":
             return
 
-        is_pct_stat = stat_key in PCT_STAT_KEYS
-        max_bonus = 0.10 if is_pct_stat else 10
-        base_val = self._inst_ref.get_stat(stat_key, 0) if self._inst_ref else 0
-        max_val = base_val + max_bonus
-
-        if max_val > 0:
-            before_ratio = before / max_val if max_val > 0 else 0
-            after_ratio = after / max_val if max_val > 0 else 0
-        else:
-            before_ratio = after_ratio = 0
-
-        diff = after_ratio - before_ratio
-        exaggerated_after = min(1.0, before_ratio + diff * 3)
-
         fh = font_small.get_height()
-
         bar_x = sep_x + 30
-        bar_w = 210
-
         y = self.y + 55
 
         if self._inst_ref:
@@ -318,24 +308,32 @@ class ParameterSelectionDialog(BaseListDialog):
                     screen.blit(scaled, (bar_x, y))
                     y += 80 + fh
 
-        screen.blit(font_small.render("強化前", True, (180, 180, 200)), (bar_x, y))
-        y += fh + fh // 4
-        before_rank = draw_stat_bar(screen, bar_x, y, before, stat_key,
-                                   bar_width=bar_w, bar_height=16, font=font_small, ratio=before_ratio)
-        rank_surf = font_small.render(before_rank, True, (200, 210, 220))
-        screen.blit(rank_surf, (bar_x + bar_w + 10, y - 1))
-        y += 16 + fh
+        title = font_small_bold.render(label, True, (255, 220, 120))
+        screen.blit(title, (bar_x, y))
+        y += fh + 8
 
-        screen.blit(font_small.render("強化後", True, (255, 200, 100)), (bar_x, y))
-        y += fh + fh // 4
-        after_rank = draw_stat_bar(screen, bar_x, y, after, stat_key,
-                                  bar_width=bar_w, bar_height=16, font=font_small, ratio=after_ratio, display_ratio=exaggerated_after)
-        rank_surf = font_small.render(after_rank, True, (255, 220, 100))
-        screen.blit(rank_surf, (bar_x + bar_w + 10, y - 1))
+        from constants import SKILL_DATA
+        skill_key = None
+        skill_name = None
+        if self.selected_ore_key == "gold_ore" and len(item) >= 7:
+            skill_key = item[6]
+            skill_data = SKILL_DATA.get(skill_key, {})
+            skill_name = skill_data.get("name", label)
+            desc = skill_data.get("describe", f"{skill_name} の説明はまだない。")
+        else:
+            desc = f"{label} を強化する。"
+
+        draw_text_wrapped(screen, font_small, desc, bar_x, y, self.width // 2 - 60, color=(190, 200, 210))
+
+        if skill_key:
+            y += 42
+            note = f"対象スキル: {skill_name or label}"
+            draw_text_wrapped(screen, font_small, note, bar_x, y, self.width // 2 - 60, color=(160, 180, 200))
 
     def update_from_selection(self, player, item_type, iid, ore_key):
         self.target_item_data = (item_type, iid)
         self.selected_ore_key = ore_key
+        self.selection_block_reason = None
         self._inst_ref = None
 
         if item_type == "weapon":   inv = player.weapon_inventory
@@ -350,12 +348,21 @@ class ParameterSelectionDialog(BaseListDialog):
 
         self._inst_ref = inst
 
-        from components.sprites.player import ORE_STAT_CATEGORIES
         from constants import CONSUMABLE_DATA
         ore_bonus = CONSUMABLE_DATA.get(ore_key, {}).get("enhance_bonus", 1)
-
-        base_stats = inst.get_base_upgradeable_stats()
-        target_stats = [k for k in base_stats if k in ORE_STAT_CATEGORIES.get(ore_key, set())]
+        target_stats = []
+        target_mode = "stat"
+        if ore_key == "gold_ore":
+            target_mode = "skill"
+            target_stats = inst.get_base_upgradeable_skills()
+            if not target_stats:
+                self.selection_block_reason = "no_skill_target"
+                self.items = ["cancel"]
+                self.available_params = ["cancel"]
+                self.max_limit_reached = True
+                return
+        else:
+            target_stats = inst.get_upgradeable_stats_for_ore(ore_key)
 
         ALL_LABEL_MAP = {
             "attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
@@ -372,6 +379,12 @@ class ParameterSelectionDialog(BaseListDialog):
             "magic_barrier_turns": "障壁ターン",
             "accuracy_bonus_close": "命中率",
             "accuracy_bonus": "命中率",
+            "backstab": "サイドアタック",
+            "confusion": "混乱",
+            "stun": "スタン",
+            "counter": "カウンター",
+            "knockback": "ノックバック",
+            "lifesteal": "ライフスティール",
         }
         PCT_KEYS = {
             "crit_bonus", "crit_rate",
@@ -387,6 +400,17 @@ class ParameterSelectionDialog(BaseListDialog):
 
         self.available_params = []
         for k in target_stats:
+            if target_mode == "skill":
+                label = ALL_LABEL_MAP.get(k, k)
+                skill_name = k
+                stat_key = inst.get_skill_upgrade_stat_key(k)
+                if not stat_key:
+                    continue
+                before = inst.get_stat(stat_key, 0)
+                after = before + ore_bonus
+                self.available_params.append((stat_key, label, before, after, False, False, skill_name))
+                continue
+
             remaining = get_upgrades_to_next_rank(inst, k)
             if remaining is not None and remaining > 100:
                 label = ALL_LABEL_MAP.get(k, k)
@@ -399,9 +423,7 @@ class ParameterSelectionDialog(BaseListDialog):
 
             inst.enhance = orig_enhance + ore_bonus
             inst.stats   = orig_stats.copy()
-            for bk in base_stats:
-                if bk not in inst.stats:
-                    inst.stats[bk] = orig_enhance
+            inst.stats.setdefault(k, 0)
             inst.stats[k] += ore_bonus
             after = inst.get_stat(k, 0) + inst.get_enhance_bonus(k)
 

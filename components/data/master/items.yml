@@ -285,6 +285,20 @@ CONSUMABLE_DATA:
     shop_buyable: false
     describe: "加護が宿る石 鍛冶屋で回避や回復、特殊効果などのパラメータを1つ選択して強化できる"
     floor_spawnable: true
+  gold_ore:
+    quest_targetable: true
+    name: "黄色の鉱石"
+    effect: material
+    enhance_bonus: 1
+    price: 8000
+    min_rank: A
+    max_rank: SS
+    rarity: 5
+    image_path: components/pictures/icon/gold_ore.png
+    max_stack: 3
+    shop_buyable: false
+    describe: "加護が宿る石 鍛冶屋で持っているスキルのうち1つを強化できる"
+    floor_spawnable: true
   # purple_stone:
   #   quest_targetable: true
   #   name: "紫の鉱石"
@@ -589,4 +603,3 @@ STAVE_DATA:
     shop_buyable: true
     describe: 正面の地面に、敵の侵入を防ぐ魔法の防壁（魔法陣）を配置する魔法の杖
     floor_spawnable: true
-

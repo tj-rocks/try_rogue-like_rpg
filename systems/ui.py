@@ -2367,6 +2367,20 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                            (player.facing == "left" and dx < 0) or \
                                            (player.facing == "right" and dx > 0)
                                 if is_valid:
+                                    post_core_clear_pending = bool(
+                                        dungeon and dungeon.current_floor == 0 and game_state.get("post_boss_clear_pending", False)
+                                    )
+                                    if post_core_clear_pending:
+                                        def _trigger_post_core_ending():
+                                            from systems.game_state import game_state as gs
+                                            gs["post_boss_clear_pending"] = False
+                                            gs["current_scene"] = "ending"
+                                            gs["ending_index"] = 0
+                                            gs["ending_timer"] = 0
+                                            gs["ending_alpha"] = 0
+                                        dialog.on_close_callback = _trigger_post_core_ending
+                                    else:
+                                        dialog.on_close_callback = None
                                     if getattr(npc, "role", None) == "inn":
                                         from constants import INN_FEE
                                         dialog.text = Text.NPC.INN_WELCOME

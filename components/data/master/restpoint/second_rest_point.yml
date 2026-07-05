@@ -672,7 +672,7 @@ TILE_MAPPINGS:
     char: P
     category: special
     desc: プレイヤー開始地点
-    image_path: components/pictures/player/walk/down_idel.png
+    image_path: components/pictures/player/walk/down_idle.png
     bg_image_path: components/pictures/dungeon/home/floor_lawn.png
     bg_color: '#2244cc'
     fg_color: '#fff'

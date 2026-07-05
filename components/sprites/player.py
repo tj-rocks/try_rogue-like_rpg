@@ -43,7 +43,23 @@ ORE_STAT_CATEGORIES = {
         # 以下は現在未使用（メイジ職廃止のため）。復活する場合はセットに追加するだけでOK:
         # "magic_fire_damage", "magic_fire_range", "magic_heal_ratio",
         # "magic_knockback_damage", "magic_invincible_turns"
+    },
+    "gold_ore": {
+        "attack_bonus", "accuracy_bonus_close", "accuracy_bonus",
+        "crit_rate", "crit_bonus", "armor_penetration",
+        "defense_bonus", "hp_bonus",
+        "block_chance_close", "block_chance_ranged", "regen_bonus", "lantern_bonus", "aggro_mod", "stupidity",
+        "magic_stave_bonus", "magic_light_stave_bonus",
     }
+}
+
+SKILL_UPGRADE_MAP = {
+    "backstab": ("backstab_crit_bonus", "背後攻撃"),
+    "confusion": ("stupidity_proc_chance", "混乱"),
+    "stun": ("stun_proc_chance", "スタン"),
+    "counter": ("counter_proc_chance", "カウンター"),
+    "knockback": ("knockback_proc_chance", "吹き飛ばし"),
+    "lifesteal": ("lifesteal_chance", "ライフスティール"),
 }
 
 class EquipInstance:
@@ -90,6 +106,20 @@ class EquipInstance:
                     compatible.append(k)
         return compatible
 
+    def get_base_upgradeable_skills(self):
+        skill_keys = []
+        for skill_name, (stat_key, _) in SKILL_UPGRADE_MAP.items():
+            val = self.get_stat(stat_key, 0)
+            if val > 0:
+                skill_keys.append(skill_name)
+        return skill_keys
+
+    def get_skill_upgrade_stat_key(self, skill_name):
+        entry = SKILL_UPGRADE_MAP.get(skill_name)
+        if not entry:
+            return None
+        return entry[0]
+
     def is_ore_compatible(self, ore_key):
         base_stats = self.get_base_upgradeable_stats()
         if not base_stats:
@@ -99,15 +129,27 @@ class EquipInstance:
             return any(k in allowed_stats for k in base_stats)
         return False
 
-    def apply_upgrade(self, stat_key, bonus):
+    def get_upgradeable_stats_for_ore(self, ore_key):
         base_stats = self.get_base_upgradeable_stats()
         if not base_stats:
+            return []
+        allowed_stats = ORE_STAT_CATEGORIES.get(ore_key, set())
+        return [k for k in base_stats if k in allowed_stats]
+
+    def apply_upgrade(self, stat_key, bonus):
+        base_stats = self.get_base_upgradeable_stats()
+        skill_stats = self.get_base_upgradeable_skills()
+        if not base_stats and not skill_stats:
             return
         
         # 過去データとの互換性のため、既存の enhance 値で初期化
         for k in base_stats:
             if k not in self.stats:
                 self.stats[k] = self.enhance
+        for skill_name in skill_stats:
+            stat_key = self.get_skill_upgrade_stat_key(skill_name)
+            if stat_key and stat_key not in self.stats:
+                self.stats[stat_key] = self.enhance
         
         if stat_key in self.stats:
             self.stats[stat_key] += bonus
@@ -479,6 +521,19 @@ class Player(Entity):
             inst = self._find_equip_inst(inv, eid)
             if inst: count += inst.get_stat("stun", 0)
         return count
+
+    @property
+    def trap_sense(self):
+        bonus = 0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst: bonus += inst.get_stat("trap_sense", 0)
+        return bonus
 
     @property
     def total_lifesteal_chance(self):
@@ -867,11 +922,11 @@ class Player(Entity):
                     if os.path.exists(lp): frames[i] = pygame.transform.flip(pygame.image.load(lp).convert_alpha(), True, False)
                     else: frames[i] = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
                 else: frames[i] = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-            ip = f"components/pictures/player/walk/{d}_idel.png"
+            ip = f"components/pictures/player/walk/{d}_idle.png"
             idf = None
             if os.path.exists(ip): idf = pygame.image.load(ip).convert_alpha()
             elif d == "right":
-                lip = f"components/pictures/player/walk/left_idel.png"
+                lip = f"components/pictures/player/walk/left_idle.png"
                 if os.path.exists(lip): idf = pygame.transform.flip(pygame.image.load(lip).convert_alpha(), True, False)
             self.idle_images[d] = idf
             mid = idf if idf else frames[0]
