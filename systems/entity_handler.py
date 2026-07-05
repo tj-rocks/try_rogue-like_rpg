@@ -470,10 +470,10 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
         if not was_boss_battle:
             shown_bosses = getattr(player, "_shown_boss_messages", set())
             boss_type = getattr(active_boss, "type", None)
+            boss_cfg = _get_boss_encounter_config(boss_type)
+            encounter_msg = boss_cfg["encounter_message"] or f"{active_boss.name} に 発見された！"
             if boss_type not in shown_bosses and not game_state.get("confirm_active", False):
                 from systems.game_state import game_state as gs
-                boss_cfg = _get_boss_encounter_config(boss_type)
-                encounter_msg = boss_cfg["encounter_message"] or f"{active_boss.name} に 発見された！"
                 shown_bosses.add(boss_type)
                 player._shown_boss_messages = shown_bosses
 
