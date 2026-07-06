@@ -508,6 +508,14 @@ class Enemy(Entity):
         else:
             self._log_trace(dungeon, f"_move_randomly: failed to move to {d[0]} ({tx//dungeon.tile_size}, {ty//dungeon.tile_size})")
 
+    def _get_player_combat_tile(self, player, tile_size):
+        use_target = getattr(player, "is_moving", False)
+        px_src = player.target_x if use_target else player.x
+        py_src = player.target_y if use_target else player.y
+        px = int((px_src + player.width / 2) // tile_size)
+        py = int((py_src + player.height / 2) // tile_size)
+        return px, py
+
     def _is_in_attack_range(self, dx, dy):
         mode = getattr(self, "current_attack_mode", None)
         if mode == "diagonal":
@@ -1008,7 +1016,7 @@ class Enemy(Entity):
             if self.immobilized_turns <= 0:
                 self.vulnerable_mult = 1.0  # 弱点化も解除
             mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
-            px, py = int((player.x+player.width/2)//dungeon.tile_size), int((player.y+player.height/2)//dungeon.tile_size)
+            px, py = self._get_player_combat_tile(player, dungeon.tile_size)
             dx, dy = px - mx, py - my
             if abs(dx) + abs(dy) <= 1:
                 self._handle_attack(dx, dy, player, dialog)
@@ -1021,7 +1029,7 @@ class Enemy(Entity):
             return
 
         mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
-        px, py = int((player.x+player.width/2)//dungeon.tile_size), int((player.y+player.height/2)//dungeon.tile_size)
+        px, py = self._get_player_combat_tile(player, dungeon.tile_size)
         
         # [NEW] 大型モンスター対応: 自分の占有グリッドの中からプレイヤーに最も近いものを選ぶ
         my_grids = self.get_occupied_grids_at(self.x, self.y, dungeon.tile_size)
@@ -1409,8 +1417,7 @@ class Enemy(Entity):
         return True
 
     def _move_dungeon_core(self, player, dungeon, relation=None):
-        px = int((player.x + player.width / 2) // dungeon.tile_size)
-        py = int((player.y + player.height / 2) // dungeon.tile_size)
+        px, py = self._get_player_combat_tile(player, dungeon.tile_size)
         candidates = []
         for facing, sdx, sdy in [("right", dungeon.tile_size, 0), ("left", -dungeon.tile_size, 0), ("down", 0, dungeon.tile_size), ("up", 0, -dungeon.tile_size)]:
             tx, ty = self.x + sdx, self.y + sdy
@@ -1426,7 +1433,7 @@ class Enemy(Entity):
         if getattr(self, "counter_ready_turns", 0) > 0:
             self.counter_ready_turns = 0
         mx, my = int((self.x+self.width/2)//dungeon.tile_size), int((self.y+self.height/2)//dungeon.tile_size)
-        px, py = int((player.x+player.width/2)//dungeon.tile_size), int((player.y+player.height/2)//dungeon.tile_size)
+        px, py = self._get_player_combat_tile(player, dungeon.tile_size)
         dx, dy = px - mx, py - my
         profile = getattr(player, "tactical_profile", None)
         melee_bias = 0.0
