@@ -818,6 +818,20 @@ class Enemy(Entity):
         if not target:
             return False
         gx, gy = target
+        try:
+            from systems.magic_handler import ProjectileEffect
+            from constants import ENEMY_DATA
+            from systems.sound_handler import sound_manager
+            spec = ENEMY_DATA.get(self.type, {})
+            effect_type = spec.get("ranged_attack_effect") or spec.get("close_attack_effect") or "dark_bolt"
+            tx = gx * dungeon.tile_size
+            ty = gy * dungeon.tile_size
+            sound_manager.play_sfx("components/sounds/sfx/light.wav")
+            dungeon.magic_effects.append(
+                ProjectileEffect(self.x, self.y, tx, ty, effect_type, duration=16)
+            )
+        except Exception:
+            pass
         trap = Trap(gx, gy, trap_type, revealed=True, source=getattr(self, "enemy_type", None))
         dungeon.traps.append(trap)
         self._log_trace(dungeon, f"deployed trap={trap_type} at ({gx}, {gy})")

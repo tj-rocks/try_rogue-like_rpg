@@ -2,9 +2,6 @@ SKILL_DATA:
   backstab:
     name: サイドアタック
     describe: 側面や背後を取った時に強い。正面から押し合うだけでは届かない相手に、位置取りで差をつける技。
-  confusion:
-    name: 混乱
-    describe: 相手の判断を少し鈍らせる。真正面の勝負を、ずらして崩すための技。
   stun:
     name: スタン
     describe: クリティカルな一撃と噛み合うと相手を止める。短い隙を大きな差に変える技。

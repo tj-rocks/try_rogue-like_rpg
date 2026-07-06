@@ -417,7 +417,6 @@ class ParameterSelectionDialog(BaseListDialog):
             "accuracy_bonus_close": "命中率",
             "accuracy_bonus": "命中率",
             "backstab": "サイドアタック",
-            "confusion": "混乱",
             "stun": "スタン",
             "counter": "カウンター",
             "knockback": "ノックバック",

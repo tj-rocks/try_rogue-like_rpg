@@ -55,7 +55,6 @@ ORE_STAT_CATEGORIES = {
 
 SKILL_UPGRADE_MAP = {
     "backstab": ("backstab_crit_bonus", "背後攻撃"),
-    "confusion": ("stupidity_proc_chance", "混乱"),
     "stun": ("stun_proc_chance", "スタン"),
     "counter": ("counter_proc_chance", "カウンター"),
     "knockback": ("knockback_proc_chance", "吹き飛ばし"),
@@ -91,7 +90,6 @@ class EquipInstance:
             "counter_proc_chance", "counter_damage_ratio",
             "stun_proc_chance", "stun_duration",
             "backstab_crit_bonus", "flank_backstab",
-            "stupidity_proc_chance", "stupidity_proc_amount",
         }
         compatible = []
         for k in all_upgradeable_keys:
@@ -442,45 +440,6 @@ class Player(Entity):
         ]:
             inst = self._find_equip_inst(inv, eid)
             if inst: count += inst.get_stat("count_backstab", 0)
-        return count
-
-    @property
-    def total_stupidity_proc_chance(self):
-        bonus = 0.0
-        for inv, eid in [
-            (self.weapon_inventory, self.equipped_weapon),
-            (self.armor_inventory, self.equipped_armor),
-            (self.shield_inventory, self.equipped_shield),
-            (self.accessory_inventory, self.equipped_accessory)
-        ]:
-            inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("stupidity_proc_chance", 0.0)
-        return bonus
-
-    @property
-    def total_stupidity_proc_amount(self):
-        bonus = 0
-        for inv, eid in [
-            (self.weapon_inventory, self.equipped_weapon),
-            (self.armor_inventory, self.equipped_armor),
-            (self.shield_inventory, self.equipped_shield),
-            (self.accessory_inventory, self.equipped_accessory)
-        ]:
-            inst = self._find_equip_inst(inv, eid)
-            if inst: bonus += inst.get_stat("stupidity_proc_amount", 0)
-        return bonus
-
-    @property
-    def total_confusion(self):
-        count = 0
-        for inv, eid in [
-            (self.weapon_inventory, self.equipped_weapon),
-            (self.armor_inventory, self.equipped_armor),
-            (self.shield_inventory, self.equipped_shield),
-            (self.accessory_inventory, self.equipped_accessory)
-        ]:
-            inst = self._find_equip_inst(inv, eid)
-            if inst: count += inst.get_stat("count_confusion", 0)
         return count
 
     @property

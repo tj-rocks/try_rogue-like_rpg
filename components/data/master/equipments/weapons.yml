@@ -745,10 +745,6 @@ WEAPON_DATA:
           count_backstab: 1
           backstab_crit_bonus: 0.1
           flank_backstab: 1
-        confusion:
-          count_confusion: 1
-          stupidity_proc_chance: 0.1
-          stupidity_proc_amount: 1
       magic:
         fire_damage: 0
         fire_range: 0
