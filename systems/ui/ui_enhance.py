@@ -8,7 +8,8 @@ from wordings import Text
 from systems.ui.ui_base import (
     get_standard_upper_layout, draw_dialog_frame, draw_text_wrapped,
     BaseListDialog, StateKeyMixin,
-    EQUIP_STAT_LABEL_MAP, EQUIP_MAGIC_LABEL_MAP, format_stat_value
+    EQUIP_STAT_LABEL_MAP, EQUIP_MAGIC_LABEL_MAP, format_stat_value,
+    draw_stat_bar
 )
 from systems.ui.ui_inventory import InventoryDialog
 
@@ -312,10 +313,46 @@ class ParameterSelectionDialog(BaseListDialog):
         screen.blit(title, (bar_x, y))
         y += fh + 8
 
+        if self.selected_ore_key != "gold_ore":
+            is_pct_stat = stat_key in PCT_STAT_KEYS
+            max_bonus = 0.10 if is_pct_stat else 10
+            base_val = self._inst_ref.get_stat(stat_key, 0) if self._inst_ref else 0
+            max_val = base_val + max_bonus
+            if max_val > 0:
+                before_ratio = before / max_val
+                after_ratio = after / max_val
+            else:
+                before_ratio = after_ratio = 0
+
+            diff = after_ratio - before_ratio
+            exaggerated_after = min(1.0, before_ratio + diff * 3)
+            bar_w = 210
+
+            screen.blit(font_small.render("強化前", True, (180, 180, 200)), (bar_x, y))
+            y += fh + fh // 4
+            before_rank = draw_stat_bar(
+                screen, bar_x, y, before, stat_key,
+                bar_width=bar_w, bar_height=16, font=font_small, ratio=before_ratio
+            )
+            rank_surf = font_small.render(before_rank, True, (200, 210, 220))
+            screen.blit(rank_surf, (bar_x + bar_w + 10, y - 1))
+            y += 16 + fh
+
+            screen.blit(font_small.render("強化後", True, (255, 200, 100)), (bar_x, y))
+            y += fh + fh // 4
+            after_rank = draw_stat_bar(
+                screen, bar_x, y, after, stat_key,
+                bar_width=bar_w, bar_height=16, font=font_small,
+                ratio=after_ratio, display_ratio=exaggerated_after
+            )
+            rank_surf = font_small.render(after_rank, True, (255, 220, 100))
+            screen.blit(rank_surf, (bar_x + bar_w + 10, y - 1))
+            return
+
         from constants import SKILL_DATA
         skill_key = None
         skill_name = None
-        if self.selected_ore_key == "gold_ore" and len(item) >= 7:
+        if len(item) >= 7:
             skill_key = item[6]
             skill_data = SKILL_DATA.get(skill_key, {})
             skill_name = skill_data.get("name", label)

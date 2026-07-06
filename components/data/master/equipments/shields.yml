@@ -535,12 +535,12 @@ SHIELD_DATA:
     image_scale: 1.0
     bonus:
       common:
-        aggro_mod: 2
+        aggro_mod: 3
         attack: 0
         accuracy_close: 0
         accuracy_range: 0
         crit_rate: 0.1
-        hp: 0
+        hp: 15
         defense: 0
         block_chance_close: 0.13
         block_chance_ranged: 0.13

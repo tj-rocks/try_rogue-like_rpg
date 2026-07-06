@@ -5,7 +5,7 @@ from wordings import Text
 class Trap:
     _image_cache = {}
 
-    def __init__(self, x, y, trap_type):
+    def __init__(self, x, y, trap_type, revealed=False, source=None):
         """
         x, y: グリッド座標
         trap_type: 'pitfall', 'damage_floor', 'mine'
@@ -14,7 +14,8 @@ class Trap:
         self.y = y
         self.type = trap_type
         self.data = TRAP_DATA.get(trap_type, {})
-        self.is_revealed = False
+        self.is_revealed = revealed
+        self.source = source
         self.is_triggered = False
         
         self.image = self._load_image()

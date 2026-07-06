@@ -2166,7 +2166,7 @@ def draw_vision_overlay(screen, player, dungeon):
     fade_px = int(f_tiles * tile_size * mult)
     
     # 3. マスクの生成・取得
-    fog_center_alpha = 18 if darkness_type == "fog" else 0
+    fog_center_alpha = 2 if darkness_type == "fog" else 0
     mask_key = (radius_px, fade_px, fog_center_alpha)
     if mask_key not in _vision_masks:
         _vision_masks[mask_key] = _create_radial_mask(radius_px, fade_px, fog_center_alpha)

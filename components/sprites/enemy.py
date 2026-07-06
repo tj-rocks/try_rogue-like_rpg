@@ -82,6 +82,7 @@ class Enemy(Entity):
         self.stealth_outline_alpha = data.get("stealth_outline_alpha", 90)
         self.trap_type = data.get("trap_type")
         self.trap_proc_chance = data.get("trap_proc_chance", 0.0)
+        self.battle_locked = bool(data.get("battle_locked_until_start", False))
         self.current_attack_mode = None
         self.walk_frames = {}
         self.walk_frame_sources = {}
@@ -366,6 +367,8 @@ class Enemy(Entity):
                     fog_alpha = 125
                 else:
                     fog_alpha = 70
+                if getattr(self, "type", "") == "dungeon_core":
+                    fog_alpha = 255
                 fog_visible = True
         stealth_visible = False
         stealth_alpha = 255
@@ -793,17 +796,35 @@ class Enemy(Entity):
                 return gx, gy
         return None
 
-    def _deploy_trap(self, player, dungeon, all_entities):
+    def _deploy_trap(self, player, dungeon, all_entities, dialog=None):
         from components.sprites.trap import Trap
         trap_type = getattr(self, "trap_type", None)
         if not trap_type:
             return False
+        if trap_type in ("random", "random_trap", "any"):
+            from constants import TRAP_DATA
+            trap_types = list(TRAP_DATA.keys())
+            weights = [TRAP_DATA[k].get("weight", 1) for k in trap_types]
+            trap_type = random.choices(trap_types, weights=weights, k=1)[0]
         target = self._get_trap_deploy_target(player, dungeon, all_entities)
         if not target:
             return False
         gx, gy = target
-        dungeon.traps.append(Trap(gx, gy, trap_type))
+        trap = Trap(gx, gy, trap_type, revealed=True, source=getattr(self, "enemy_type", None))
+        dungeon.traps.append(trap)
         self._log_trace(dungeon, f"deployed trap={trap_type} at ({gx}, {gy})")
+        if dialog:
+            from constants import COMBAT_LOG_WAIT_FRAMES
+            from systems.game_state import game_state
+            trap_name = trap.data.get("name", "罠")
+            msg = f"{self.name} は {trap_name}を 仕掛けた！"
+            if dialog.is_active:
+                dialog.text += "\n" + msg
+            else:
+                dialog.text = msg
+                dialog.is_active = True
+                game_state["dialog_modal"] = False
+            dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
         return True
 
     # ════════════════════════════════════════════════════════════════
@@ -1032,7 +1053,7 @@ class Enemy(Entity):
 
         trap_chance = float(getattr(self, "trap_proc_chance", 0.0))
         if trap_chance > 0 and random.random() < max(0.0, min(1.0, trap_chance)):
-            if self._deploy_trap(player, dungeon, all_entities):
+            if self._deploy_trap(player, dungeon, all_entities, dialog):
                 return
 
         # `smart_ranged_move` は「理想行動を取りやすい」だけにして、
@@ -1436,7 +1457,11 @@ class Enemy(Entity):
         if available:
             available.sort(key=lambda x: x[0], reverse=True)
             if relation in ("front", "diagonal") and distance == "1":
-                chosen_mode = random.choice([mode for _, mode in available])
+                chosen_mode = random.choices(
+                    [mode for _, mode in available],
+                    weights=[max(1, weight) for weight, _ in available],
+                    k=1,
+                )[0]
             else:
                 chosen_mode = available[0][1]
             self.current_attack_mode = chosen_mode
