@@ -958,9 +958,6 @@ ENEMY_DATA:
     crit_rate: 0.1
     status: darkness
     status_chance: 28
-    stealth: true
-    stealth_reveal_range: 4
-    stealth_outline_alpha: 90
     drops:
       normal:
       - blue_stone
@@ -1032,9 +1029,6 @@ ENEMY_DATA:
     crit_rate: 0.08
     status: darkness
     status_chance: 30
-    stealth: true
-    stealth_reveal_range: 3
-    stealth_outline_alpha: 80
     drops:
       normal:
       - blue_stone
