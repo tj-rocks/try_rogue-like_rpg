@@ -154,7 +154,7 @@ DUNGEON_IMAGES:
 # ==========================================
   '12':
     image: standard
-    sound: standard.mp3
+    sound: rest_point.mp3
     brightness: 5
     map: 1st_rest_point.txt
     wall_decoration_ratio: 0.3
@@ -213,7 +213,7 @@ DUNGEON_IMAGES:
 # ==========================================
   "22":
     image: temple
-    sound: temple.mp3
+    sound: rest_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     map: 2nd_rest_point.txt
@@ -268,7 +268,7 @@ DUNGEON_IMAGES:
 # ==========================================
   "31":
     image: tanko
-    sound: wood.mp3
+    sound: rest_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     map: 3rd_rest_point.txt
@@ -327,7 +327,7 @@ DUNGEON_IMAGES:
 # ==========================================
   "41":
     image: deep_rock
-    sound: deep_rock.mp3
+    sound: rest_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.5
@@ -428,7 +428,7 @@ DUNGEON_IMAGES:
 # ==========================================
   "56":
     image: fathers_city
-    sound: fathers_city.mp3
+    sound: rest_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.4
@@ -535,7 +535,7 @@ DUNGEON_IMAGES:
 # ==========================================
   "71":
     image: cave
-    sound: cave.mp3
+    sound: rest_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.3
@@ -610,7 +610,7 @@ DUNGEON_IMAGES:
     item_ratio: 0.3
   "81":
     image: old_liberary
-    sound: old_liberary.mp3
+    sound: rest_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
@@ -685,7 +685,7 @@ DUNGEON_IMAGES:
     item_ratio: 0.2
   "91":
     image: old_castle
-    sound: old_castle.mp3
+    sound: rest_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
     item_ratio: 0.2
