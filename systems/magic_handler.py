@@ -184,6 +184,34 @@ class KnockbackEffect(MagicEffect):
                 pygame.draw.circle(s, c_inner, (int(radius), int(radius)), int(radius // 2))
                 screen.blit(s, (curr_x - radius, curr_y - radius))
 
+class ParalysisEffect(MagicEffect):
+    """着弾地点に短く残る拘束系の発光演出。旧参照互換も兼ねる。"""
+    def __init__(self, x, y, color=(180, 120, 255), duration=24, size=20):
+        super().__init__(x, y, duration=duration)
+        self.color = color
+        self.size = size
+
+    def draw(self, screen, camera_x, camera_y):
+        draw_x = self.x - camera_x + 32
+        draw_y = self.y - camera_y + 32
+        alpha = int(220 * (self.duration / self.max_duration))
+
+        for i in range(3):
+            radius = int(self.size + i * 8 * (1.2 - self.duration / self.max_duration))
+            if radius <= 0:
+                continue
+            s = pygame.Surface((radius * 2 + 4, radius * 2 + 4), pygame.SRCALPHA)
+            ring = pygame.Color(*self.color)
+            ring.a = max(40, alpha // (i + 1))
+            pygame.draw.circle(s, ring, (radius + 2, radius + 2), radius, width=max(1, 3 - i))
+            screen.blit(s, (draw_x - radius - 2, draw_y - radius - 2))
+
+        core = pygame.Surface((18, 18), pygame.SRCALPHA)
+        core_color = pygame.Color(255, 255, 255)
+        core_color.a = alpha
+        pygame.draw.circle(core, core_color, (9, 9), 5)
+        screen.blit(core, (draw_x - 9, draw_y - 9))
+
 class DirectionalFlashEffect(MagicEffect):
     """プレイヤーの目の前などが光る演出"""
     def __init__(self, x, y, size=150, color=(255, 255, 200), duration=15):
