@@ -811,6 +811,14 @@ class Player(Entity):
         except:
             pass
 
+    def _log_duel_player_input(self, dungeon, action_type, target_tile=None, extra=""):
+        suffix_parts = []
+        if target_tile is not None:
+            suffix_parts.append(f"target=({target_tile[0]},{target_tile[1]})")
+        if extra:
+            suffix_parts.append(extra)
+        self._log_duel_trace(dungeon, action_type, " | ".join(suffix_parts))
+
     def _get_tactical_boss(self, dungeon):
         if not dungeon:
             return None
@@ -901,6 +909,16 @@ class Player(Entity):
             if event.type == pygame.KEYDOWN and event.key == KEY_ATTACK:
                 if dungeon.current_floor == 0 or dungeon.floor_info.get("no_attack", False): break
                 self.record_tactical_action(dungeon, "melee")
+                px = int((self.target_x + self.width / 2) // dungeon.tile_size)
+                py = int((self.target_y + self.height / 2) // dungeon.tile_size)
+                face_dx = {"up": 0, "down": 0, "left": -1, "right": 1}.get(self.facing, 0)
+                face_dy = {"up": -1, "down": 1, "left": 0, "right": 0}.get(self.facing, 0)
+                self._log_duel_player_input(
+                    dungeon,
+                    "melee_input",
+                    target_tile=(px + face_dx, py + face_dy),
+                    extra=f"from=({px},{py})",
+                )
                 self.waving_stave_inst = None; self._perform_attack(); turn_consumed = True; break
 
         if not turn_consumed:
@@ -917,6 +935,12 @@ class Player(Entity):
                 tx, ty = self.x + dx, self.y + dy
                 if self.can_move_grid(tx, ty, dungeon):
                     self.record_tactical_action(dungeon, "move")
+                    self._log_duel_player_input(
+                        dungeon,
+                        "move_input",
+                        target_tile=(int((tx + self.width / 2) // dungeon.tile_size), int((ty + self.height / 2) // dungeon.tile_size)),
+                        extra=f"from=({int((self.x + self.width / 2) // dungeon.tile_size)},{int((self.y + self.height / 2) // dungeon.tile_size)})",
+                    )
                     self.prev_x, self.prev_y = self.x, self.y; self.target_x, self.target_y = tx, ty; self.is_moving = True
                     dungeon.reveal_area(tx // dungeon.tile_size, ty // dungeon.tile_size)
                     self.step_toggle = not self.step_toggle; turn_consumed = True
@@ -975,6 +999,12 @@ class Player(Entity):
         all_ents = [self] + dungeon.enemies
         occs = set((int((e.target_x + e.width/2)//dungeon.tile_size), int((e.target_y + e.height/2)//dungeon.tile_size)) for e in all_ents if not getattr(e, "is_dead", False))
         game_state["occupied_cells"] = occs; game_state["all_entities_cache"] = all_ents
+        self._log_duel_player_input(
+            dungeon,
+            "enemy_turn_start",
+            target_tile=(int((self.target_x + self.width / 2) // dungeon.tile_size), int((self.target_y + self.height / 2) // dungeon.tile_size)),
+            extra=f"is_moving={self.is_moving}",
+        )
 
     def _perform_attack(self):
         self.is_attacking = True; self.attack_timer = ATTACK_ANIMATION_FRAMES
@@ -984,6 +1014,16 @@ class Player(Entity):
 
     def _perform_wave(self, inst, dungeon, dialog):
         self.record_tactical_action(dungeon, self._get_tactical_action_for_stave(inst))
+        px = int((self.target_x + self.width / 2) // dungeon.tile_size)
+        py = int((self.target_y + self.height / 2) // dungeon.tile_size)
+        face_dx = {"up": 0, "down": 0, "left": -1, "right": 1}.get(self.facing, 0)
+        face_dy = {"up": -1, "down": 1, "left": 0, "right": 0}.get(self.facing, 0)
+        self._log_duel_player_input(
+            dungeon,
+            f"stave_input:{getattr(inst, 'key', 'unknown')}",
+            target_tile=(px + face_dx, py + face_dy),
+            extra=f"from=({px},{py})",
+        )
         self.waving_stave_inst = inst
         self.is_attacking = True
         self.attack_timer = ATTACK_ANIMATION_FRAMES

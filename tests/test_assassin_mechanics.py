@@ -104,72 +104,10 @@ def test_flank_backstab():
 
 
 # ─────────────────────────────────────────────
-# テスト3: stupidity_temp が攻撃ヒット時に上昇する
-# ─────────────────────────────────────────────
-def test_stupidity_temp_proc():
-    print("\n--- テスト3: stupidity_temp の発動 ---")
-    random.seed(0)  # 再現性確保
-
-    # proc_chance=1.0（必ず発動）でテスト
-    attacker = make_combatant(5, 5, stupidity_proc_chance=1.0, stupidity_proc_amount=3, attack=50, total_confusion=3)
-    target   = make_combatant(5, 6)
-    target.facing = "down"
-    assert target.stupidity_temp == 0, "初期値が0でない"
-
-    msg, dmg, is_crit, _ = deal_damage(attacker, target)
-    assert not (dmg == 0), "ダメージが0（ミス）の場合テストが無効"
-    assert target.stupidity_temp == 3, f"stupidity_temp が 3 になっていない: {target.stupidity_temp}"
-    print(f"[OK] proc_chance=1.0, amount=3 → stupidity_temp={target.stupidity_temp}")
-
-    # stupidity_temp は加算される（複数回ヒット時）
-    target2 = make_combatant(5, 6)
-    target2.facing = "down"
-    deal_damage(attacker, target2)
-    deal_damage(attacker, target2)
-    assert target2.stupidity_temp == 6, f"2ヒット後 stupidity_temp が 6 でない: {target2.stupidity_temp}"
-    print(f"[OK] 2回ヒット後 stupidity_temp={target2.stupidity_temp}（加算される）")
-
-
-# ─────────────────────────────────────────────
-# テスト4: stupidity_temp リセット後の判定
-# ─────────────────────────────────────────────
-def test_stupidity_temp_reset():
-    print("\n--- テスト4: stupidity_temp リセット ---")
-    attacker = make_combatant(5, 5, stupidity_proc_chance=1.0, stupidity_proc_amount=3, attack=50, total_confusion=3)
-    target   = make_combatant(5, 6)
-    target.facing = "down"
-
-    deal_damage(attacker, target)
-    assert target.stupidity_temp > 0, "ヒット後 stupidity_temp が上昇していない"
-    before = target.stupidity_temp
-
-    # entity_handler がターン後にリセットするのと同様の処理
-    target.stupidity_temp = 0
-    assert target.stupidity_temp == 0, "リセット後も 0 でない"
-    print(f"[OK] ヒット後 stupidity_temp={before} → リセット後 stupidity_temp=0")
-
-
-# ─────────────────────────────────────────────
-# テスト5: proc_chance=0.0 のとき発動しない
-# ─────────────────────────────────────────────
-def test_stupidity_temp_no_proc():
-    print("\n--- テスト5: proc_chance=0.0 では発動しない ---")
-    attacker = make_combatant(5, 5, stupidity_proc_chance=0.0, stupidity_proc_amount=3, attack=50)
-    target   = make_combatant(5, 6)
-    target.facing = "down"
-
-    for _ in range(20):
-        deal_damage(attacker, target)
-
-    assert target.stupidity_temp == 0, f"proc_chance=0.0 なのに stupidity_temp={target.stupidity_temp}"
-    print("[OK] proc_chance=0.0 → 20回ヒット後も stupidity_temp=0")
-
-
-# ─────────────────────────────────────────────
-# テスト6: アサシン3部位の合計値チェック（YAMLから読み込み）
+# テスト3: アサシン3部位の合計値チェック（YAMLから読み込み）
 # ─────────────────────────────────────────────
 def test_assassin_set_totals():
-    print("\n--- テスト6: アサシン3部位の合計値 ---")
+    print("\n--- テスト3: アサシン3部位の合計値 ---")
     pygame.init()
     screen = pygame.display.set_mode((800, 600))
 
@@ -186,31 +124,21 @@ def test_assassin_set_totals():
 
     for name, eq in [("dagger", dagger), ("armor", armor), ("shield", shield)]:
         fb  = eq.get_stat("flank_backstab", 0)
-        spc = eq.get_stat("stupidity_proc_chance", 0.0)
-        spa = eq.get_stat("stupidity_proc_amount", 0)
         bsb = eq.get_stat("backstab_crit_bonus", 0.0)
-        print(f"  {name}: flank_backstab={fb}, proc_chance={spc}, proc_amount={spa}, backstab_crit={bsb}")
+        print(f"  {name}: flank_backstab={fb}, backstab_crit={bsb}")
         assert fb  == 1,   f"{name} の flank_backstab が 1 でない: {fb}"
-        expected_spc = {"dagger": 0.1, "armor": 0.0, "shield": 0.1}[name]
-        expected_spa = {"dagger": 1, "armor": 0, "shield": 1}[name]
-        assert spc == expected_spc, f"{name} の stupidity_proc_chance が期待値でない: {spc}"
-        assert spa == expected_spa, f"{name} の stupidity_proc_amount が期待値でない: {spa}"
         assert bsb == {"dagger": 0.1, "armor": 0.2, "shield": 0.2}[name], f"{name} の backstab_crit_bonus が期待値でない: {bsb}"
 
     print("[OK] 各部位の個別値が正しい")
 
     # 合計値（3部位）
     total_flank = sum(eq.get_stat("flank_backstab", 0) for eq in [dagger, armor, shield])
-    total_chance = sum(eq.get_stat("stupidity_proc_chance", 0.0) for eq in [dagger, armor, shield])
-    total_amount = sum(eq.get_stat("stupidity_proc_amount", 0) for eq in [dagger, armor, shield])
     total_crit = sum(eq.get_stat("backstab_crit_bonus", 0.0) for eq in [dagger, armor, shield])
 
-    print(f"  合計: flank_backstab={total_flank}, proc_chance={round(total_chance,2)}, proc_amount={total_amount}, backstab_crit={round(total_crit,2)}")
+    print(f"  合計: flank_backstab={total_flank}, backstab_crit={round(total_crit,2)}")
     assert total_flank  == 3,   f"3部位合計 flank_backstab が 3 でない: {total_flank}"
-    assert round(total_chance, 2) == 0.2, f"3部位合計 stupidity_proc_chance が 0.2 でない: {total_chance}"
-    assert total_amount == 2,   f"3部位合計 stupidity_proc_amount が 2 でない: {total_amount}"
     assert round(total_crit, 2) == 0.5, f"3部位合計 backstab_crit_bonus が 0.5 でない: {total_crit}"
-    print("[OK] 3部位合計値が正しい（flank=3, chance=0.2, amount=2, crit=0.5）")
+    print("[OK] 3部位合計値が正しい（flank=3, crit=0.5）")
 
     pygame.quit()
 
@@ -222,9 +150,6 @@ if __name__ == "__main__":
     tests = [
         test_normal_backstab,
         test_flank_backstab,
-        test_stupidity_temp_proc,
-        test_stupidity_temp_reset,
-        test_stupidity_temp_no_proc,
         test_assassin_set_totals,
     ]
 

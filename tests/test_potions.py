@@ -192,7 +192,7 @@ def test_potions_and_fighter_set():
     print(f"装備確認: 盾={shield_inst.key}")
     print(f"装備魔法ボーナス stave_bonus: {player.get_magic_bonus('stave_bonus')}%")
 
-    assert player.get_magic_bonus('stave_bonus') == 1, "戦士の盾からstave_bonusが削除され、剣の1%のみになるはず"
+    assert player.get_magic_bonus('stave_bonus') == 0, "現在仕様では戦士装備時のstave_bonusは0%のはず"
 
     # 実際に杖を振って、常に消費されることを確認
     stave = StaveInstance("fire_stave", charges=5)

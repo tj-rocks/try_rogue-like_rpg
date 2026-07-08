@@ -62,11 +62,13 @@ def run_setup_screen(screen, font_s, font_m):
     HOLY_KEYS = {"holy_sword", "holy_armor", "holy_shield"}
     BRAVE_FIGHTER_KEYS = {"brave_fighter_sword", "brave_fighter_armor", "brave_fighter_shield"}
     MASTERS_KEYS = {"masters_rapier", "masters_armor", "masters_buckler"}
+    SENIOR_KNIGHT_KEYS = {"senior_knight_hummer", "senior_knight_armor", "senior_knight_shield"}
     SERIES_PRESETS = {
         "アサシン": ASSASSIN_KEYS,
         "神聖": HOLY_KEYS,
         "勇敢戦士": BRAVE_FIGHTER_KEYS,
         "マスター": MASTERS_KEYS,
+        "上級騎士": SENIOR_KNIGHT_KEYS,
     }
     # デフォルトでは何も選択しない
     selected_equips = set()

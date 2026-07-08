@@ -108,19 +108,35 @@ class TestOutbreakEvent(unittest.TestCase):
         """発生条件（階層範囲、固定マップ）のテスト"""
         import constants
         from constants import OUTBREAK_MIN_FLOOR, OUTBREAK_MAX_FLOOR
+
+        def is_fixed_map_floor(floor_num):
+            d = warp_to_floor(floor_num, self.player, debug_overflow=False)
+            return bool(getattr(d, "floor_info", None) and isinstance(d.floor_info, dict) and d.floor_info.get("map"))
+
+        def find_in_range_non_fixed(start, end, step):
+            floor = start
+            while (floor <= end if step > 0 else floor >= end):
+                if not is_fixed_map_floor(floor):
+                    return floor
+                floor += step
+            return None
         
         original_chance = constants.OUTBREAK_CHANCE
         try:
             # 確実に発生する設定にして境界値をチェック
             constants.OUTBREAK_CHANCE = 1.0
             
-            # 1. 最小階層 (min_floor)
-            d1 = warp_to_floor(OUTBREAK_MIN_FLOOR, self.player)
-            self.assertTrue(d1.is_outbreak, f"{OUTBREAK_MIN_FLOOR}階は範囲内なので発生すべき")
+            # 1. 範囲先頭側の「固定マップではない」有効階層
+            first_valid = find_in_range_non_fixed(OUTBREAK_MIN_FLOOR, OUTBREAK_MAX_FLOOR, 1)
+            self.assertIsNotNone(first_valid, "アウトブレイク範囲内に通常フロアが必要")
+            d1 = warp_to_floor(first_valid, self.player)
+            self.assertTrue(d1.is_outbreak, f"{first_valid}階は範囲内かつ通常フロアなので発生すべき")
             
-            # 2. 最大階層 (max_floor)
-            d2 = warp_to_floor(OUTBREAK_MAX_FLOOR, self.player)
-            self.assertTrue(d2.is_outbreak, f"{OUTBREAK_MAX_FLOOR}階は範囲内なので発生すべき")
+            # 2. 範囲末尾側の「固定マップではない」有効階層
+            last_valid = find_in_range_non_fixed(OUTBREAK_MAX_FLOOR, OUTBREAK_MIN_FLOOR, -1)
+            self.assertIsNotNone(last_valid, "アウトブレイク範囲内に通常フロアが必要")
+            d2 = warp_to_floor(last_valid, self.player)
+            self.assertTrue(d2.is_outbreak, f"{last_valid}階は範囲内かつ通常フロアなので発生すべき")
             
             # 3. 範囲外 (max_floor + 1)
             d3 = warp_to_floor(OUTBREAK_MAX_FLOOR + 1, self.player)
