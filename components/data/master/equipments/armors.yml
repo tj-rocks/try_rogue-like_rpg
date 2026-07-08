@@ -484,7 +484,7 @@ ARMOR_DATA:
         lantern_bonus: 0
         regen: 0
         aggro_mod: 3
-        stupidity: 0.4
+        # stupidity: 0.4
         armor_penetration: 0.1
         buff_value_ratio: 0
         buff_duration_ratio: 0
@@ -588,11 +588,11 @@ ARMOR_DATA:
       magic:
         fire_damage: 0
         fire_range: 0
-        heal_ratio: 0.25
+        heal_ratio: 0
         knockback_damage: 0
         invincible_turns: 0
-        stave_bonus: 1
-        light_stave_bonus: 2
+        stave_bonus: 0
+        light_stave_bonus: 0
 
   test_all_bonus_armor:
     quest_targetable: false

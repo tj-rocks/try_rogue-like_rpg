@@ -544,26 +544,26 @@ STAVE_DATA:
     shop_buyable: true
     describe: 癒やしの光を放つ魔法の杖 自分や仲間の傷を癒やすことができる
     floor_spawnable: true
-  invincible_stave:
-    quest_targetable: true
-    name: 無敵の杖
-    effect_type: invincible
-    min_rank: D
-    max_rank: SS
-    rarity: 3
-    price: 3000
-    selling_price: 200
-    charges: 5
-    sound: components/sounds/sfx/invincible.wav
-    image_path: components/pictures/icon/stave.png
-    effect_color:
-    - 255
-    - 255
-    - 150
-    duration_turns: 30
-    shop_buyable: false
-    describe: 一時的にあらゆる攻撃を無効化する聖なる杖 ここぞという時の切り札
-    floor_spawnable: true
+  # invincible_stave:
+  #   quest_targetable: true
+  #   name: 無敵の杖
+  #   effect_type: invincible
+  #   min_rank: D
+  #   max_rank: SS
+  #   rarity: 3
+  #   price: 3000
+  #   selling_price: 200
+  #   charges: 5
+  #   sound: components/sounds/sfx/invincible.wav
+  #   image_path: components/pictures/icon/stave.png
+  #   effect_color:
+  #   - 255
+  #   - 255
+  #   - 150
+  #   duration_turns: 30
+  #   shop_buyable: false
+  #   describe: 一時的にあらゆる攻撃を無効化する聖なる杖 ここぞという時の切り札
+  #   floor_spawnable: true
   light_stave:
     quest_targetable: true
     name: 燈の杖

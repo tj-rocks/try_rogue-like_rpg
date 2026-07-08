@@ -31,7 +31,7 @@
 TRAP_DATA:
   pitfall:
     name: 落とし穴
-    weight: 20
+    weight: 5
     color:
     - 40
     - 40

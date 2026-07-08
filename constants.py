@@ -327,7 +327,6 @@ def _compute_stat_ranges():
         "armor_penetration", "aggro_mod", "stupidity",
         "accuracy_bonus_close", "regen_bonus",
         "backstab_crit_bonus", "flank_backstab",
-        "stupidity_proc_chance", "stupidity_proc_amount",
         "stun_proc_chance", "stun_duration",
         "counter_proc_chance", "counter_damage_ratio",
         "lifesteal_chance", "lifesteal_ratio",
@@ -335,7 +334,7 @@ def _compute_stat_ranges():
     # パーセント系のキー（UI表示時に100倍するので、レンジも100倍で格納）
     pct_keys = {
         "crit_rate", "block_chance_close", "block_chance_ranged", "armor_penetration",
-        "stupidity_proc_chance", "stun_proc_chance", "counter_proc_chance",
+        "stun_proc_chance", "counter_proc_chance",
         "lifesteal_chance", "lifesteal_ratio", "counter_damage_ratio",
     }
     all_equips = list(WEAPON_DATA.values()) + list(ARMOR_DATA.values()) + list(SHIELD_DATA.values()) + list(ACCESSORY_DATA.values())

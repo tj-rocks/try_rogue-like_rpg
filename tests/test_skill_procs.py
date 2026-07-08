@@ -194,43 +194,9 @@ def test_stun_no_proc():
     print("[OK] crit_rate=0.0 → stun_turns=0（クリティカルなし時は非発動）")
 
 
-def test_confusion_proc():
-    """混乱発動テスト"""
-    print("\n--- テスト7: 混乱発動 ---")
-    random.seed(42)
-    
-    attacker = make_combatant(5, 5, attack=50, stupidity_proc_chance=1.0, stupidity_proc_amount=3, total_confusion=3)
-    target = make_combatant(5, 6, hp=100)
-    target.facing = "down"
-    target.stupidity_temp = 0
-    
-    msg, dmg, is_crit, _ = deal_damage(attacker, target)
-    
-    assert dmg > 0, "ダメージが0（ミス）の場合テストが無効"
-    assert target.stupidity_temp == 3, f"stupidity_tempが3でない: {target.stupidity_temp}"
-    print(f"[OK] 混乱発動 → stupidity_temp={target.stupidity_temp}")
-
-
-def test_confusion_no_proc():
-    """混乱発動しないテスト"""
-    print("\n--- テスト8: 混乱発動しない ---")
-    random.seed(42)
-    
-    attacker = make_combatant(5, 5, attack=50, stupidity_proc_chance=0.0, stupidity_proc_amount=3)
-    target = make_combatant(5, 6, hp=100)
-    target.facing = "down"
-    target.stupidity_temp = 0
-    
-    for _ in range(20):
-        deal_damage(attacker, target)
-    
-    assert target.stupidity_temp == 0, f"混乱発動しないはず: {target.stupidity_temp}"
-    print("[OK] stupidity_proc_chance=0.0 → stupidity_temp=0")
-
-
 def test_backstab_crit_bonus():
     """バックスタブ会心ボーナステスト"""
-    print("\n--- テスト9: バックスタブ会心ボーナス ---")
+    print("\n--- テスト7: バックスタブ会心ボーナス ---")
     random.seed(42)
     
     # 背後攻撃設定
@@ -246,23 +212,21 @@ def test_backstab_crit_bonus():
 
 def test_skill_count_totals():
     """スキルセット装備の各スキルパラメータ存在確認テスト"""
-    print("\n--- テスト10: スキルセット装備パラメータ確認 ---")
+    print("\n--- テスト8: スキルセット装備パラメータ確認 ---")
     pygame.init()
     screen = pygame.display.set_mode((800, 600))
     
     from components.sprites.player import EquipInstance
     
-    # アサシンセット → backstab_crit_bonus と stupidity_proc_chance を持つ
+    # アサシンセット → backstab_crit_bonus を持つ
     dagger = EquipInstance("weapon", "assassin_dagger")
     armor = EquipInstance("armor", "assassin_light_armor")
     shield = EquipInstance("shield", "assassin_buckler")
     
     backstab_val = sum(eq.get_stat("backstab_crit_bonus", 0) for eq in [dagger, armor, shield])
-    confusion_val = sum(eq.get_stat("stupidity_proc_chance", 0) for eq in [dagger, armor, shield])
     
-    print(f"  アサシンセット: backstab_crit_bonus={backstab_val}, stupidity_proc_chance={confusion_val}")
+    print(f"  アサシンセット: backstab_crit_bonus={backstab_val}")
     assert backstab_val > 0, f"アサシンセットにbackstab_crit_bonusがない: {backstab_val}"
-    assert confusion_val > 0, f"アサシンセットにstupidity_proc_chanceがない: {confusion_val}"
     
     # 神聖セット → lifesteal_chance を持つ
     holy_sword = EquipInstance("weapon", "holy_sword")
@@ -310,8 +274,6 @@ if __name__ == "__main__":
         test_counter_no_proc,
         test_stun_proc,
         test_stun_no_proc,
-        test_confusion_proc,
-        test_confusion_no_proc,
         test_backstab_crit_bonus,
         test_skill_count_totals,
     ]

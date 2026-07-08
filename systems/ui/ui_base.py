@@ -26,8 +26,6 @@ EQUIP_STAT_LABEL_MAP = {
     "stupidity": Text.UI.STAT_CONFUSION_ICON,
     "backstab_crit_bonus": "背後会心",
     "flank_backstab": "側面背後",
-    "stupidity_proc_chance": "混乱発動率",
-    "stupidity_proc_amount": "混乱上昇量"
 }
 
 EQUIP_MAGIC_LABEL_MAP = {
@@ -47,7 +45,6 @@ EQUIP_SKILL_CATEGORY_MAP = {
     "counter":   ("counter_proc_chance", "counter_damage_ratio"),
     "stun":      ("stun_proc_chance", "stun_duration"),
     "backstab":  ("backstab_crit_bonus", "flank_backstab"),
-    "confusion": ("stupidity_proc_chance", "stupidity_proc_amount"),
     "knockback": ("knockback_proc_chance", "knockback_max_distance"),
 }
 EQUIP_SKILL_LABEL_MAP = {
@@ -55,7 +52,6 @@ EQUIP_SKILL_LABEL_MAP = {
     "counter":   "カウンター",
     "stun":      "スタン",
     "backstab":  "サイドアタック",
-    "confusion": "混乱",
     "knockback": "ノックバック",
 }
 
@@ -73,8 +69,6 @@ def get_player_skill_names(player):
         names.append(EQUIP_SKILL_LABEL_MAP.get("stun", "stun"))
     if getattr(player, "total_backstab", 0) >= 2 and (getattr(player, "total_backstab_crit_bonus", 0) or getattr(player, "total_flank_backstab", 0)):
         names.append(EQUIP_SKILL_LABEL_MAP.get("backstab", "backstab"))
-    if getattr(player, "total_confusion", 0) >= 2 and getattr(player, "total_stupidity_proc_chance", 0):
-        names.append(EQUIP_SKILL_LABEL_MAP.get("confusion", "confusion"))
     if getattr(player, "total_knockback", 0) >= 2:
         names.append(EQUIP_SKILL_LABEL_MAP.get("knockback", "knockback"))
     return names

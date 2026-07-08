@@ -271,23 +271,6 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
             target.stupidity = min(10, target.stupidity + int(stupidity_up))
             msg += "\n" + Text.Combat.CONFUSED.format(target=target_name, amount=int(stupidity_up))
 
-    # --- 敵の一時的 stupidity 上昇効果（装備スキル） ---
-    if not target_is_static and not is_miss and damage > 0 and hasattr(target, "stupidity_temp"):
-        total_confusion = getattr(attacker, "total_confusion", 0)
-        if isinstance(total_confusion, int) and total_confusion >= 2:
-            proc_chance = getattr(attacker, "total_stupidity_proc_chance", 0.0)
-            if isinstance(proc_chance, (int, float)) and proc_chance > 0:
-                rolled = random.random()
-                if rolled < proc_chance:
-                    proc_amount = getattr(attacker, "total_stupidity_proc_amount", 0)
-                    if isinstance(proc_amount, (int, float)) and proc_amount > 0:
-                        target.stupidity_temp += int(proc_amount)
-                        msg += f"\n{target_name}は一時的に混乱した！"
-                        if _os.environ.get("DEBUG_MODE") == "1":
-                            print(f"[混乱] ✅ 成功")
-                elif _os.environ.get("DEBUG_MODE") == "1":
-                    print(f"[混乱] ❌ 失敗")
-
     # --- スタン効果（クリティカル時のみ発動） ---
     if not target_is_static and not is_miss and damage > 0 and is_critical and hasattr(target, "stun_turns"):
         total_stun = getattr(attacker, "total_stun", 0)

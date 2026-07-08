@@ -676,6 +676,7 @@ ENEMY_DATA:
     quest_targetable: true
     name: ワナスケルトン
     min_rank: B
+    max_rank: SS
     move_face_chance: 0.25
     image_folder: components/pictures/enemies/skeleton
     image_color: '#88AFFF'
@@ -698,13 +699,14 @@ ENEMY_DATA:
     accuracy_close: 92
     accuracy_ranged: 100
     attack_range: 1
-    stupidity: 2
+    stupidity: 4
     image_scale: 1.0
-    trap_type: poison_trap
-    trap_proc_chance: 0.22
+    trap_type: random_trap
+    trap_proc_chance: 0.45
     close_attack_effect: physical_light
     ranged_attack_effect: strange_mucus
-    attack_priority: close
+    attack_priority: ranged
+    smart_ranged_move: true
     damaged_detect_range: 10
   bukimi:
     quest_targetable: true
@@ -882,7 +884,7 @@ ENEMY_DATA:
     max_rank: SS
     move_face_chance: 0.25
     image_folder: components/pictures/enemies/suisui_slime
-    image_color: "#a86f8f"
+    # image_color: "#a86f8f"
     crit_rate: 0.08
     status: poison
     status_chance: 22
@@ -918,7 +920,7 @@ ENEMY_DATA:
     max_rank: SS
     move_face_chance: 0.1
     image_folder: components/pictures/enemies/skeleton
-    image_color: "#6f8792"
+    # image_color: "#6f8792"
     crit_rate: 0.1
     drops:
       normal:
@@ -952,13 +954,10 @@ ENEMY_DATA:
     max_rank: SS
     move_face_chance: 0.15
     image_folder: components/pictures/enemies/gogo_ghost
-    image_color: "#7484b8"
+    # image_color: "#7484b8"
     crit_rate: 0.1
     status: darkness
     status_chance: 28
-    stealth: true
-    stealth_reveal_range: 4
-    stealth_outline_alpha: 90
     drops:
       normal:
       - blue_stone
@@ -992,7 +991,7 @@ ENEMY_DATA:
     max_rank: SS
     move_face_chance: 0.25
     image_folder: components/pictures/enemies/deka_komori
-    image_color: "#8d6f5f"
+    # image_color: "#8d6f5f"
     crit_rate: 0.08
     drops:
       normal:
@@ -1026,13 +1025,10 @@ ENEMY_DATA:
     max_rank: SS
     move_face_chance: 0.2
     image_folder: components/pictures/enemies/medaman
-    image_color: "#7a5e8b"
+    # image_color: "#7a5e8b"
     crit_rate: 0.08
     status: darkness
     status_chance: 30
-    stealth: true
-    stealth_reveal_range: 3
-    stealth_outline_alpha: 80
     drops:
       normal:
       - blue_stone
@@ -1065,7 +1061,7 @@ ENEMY_DATA:
     max_rank: SS
     move_face_chance: 0.3
     image_folder: components/pictures/enemies/korokoron
-    image_color: "#5f8b7a"
+    # image_color: "#5f8b7a"
     crit_rate: 0.08
     drops:
       normal:
@@ -1411,7 +1407,9 @@ ENEMY_DATA:
     max_concurrent: 1
     max_spawns: 1
     is_boss: true
+    once_only: true
     spawn_chance: 0.0
+    battle_locked_until_start: true
     crit_rate: 0.08
     detect_range: 10
     encounter_trigger_range: 3
@@ -1462,7 +1460,7 @@ ENEMY_DATA:
       diagonal: sonic_wave
       counter: physical_heavy
       knockback: knockback
-    knockback_proc_chance: 0.3
+    knockback_proc_chance: 1.0
     knockback_max_distance: 2
     attack_priority: close
     damaged_detect_range: 100

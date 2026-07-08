@@ -482,7 +482,7 @@ WEAPON_DATA:
     price: 2800
     image_path: components/pictures/weapon/fighters_sword.png
     sound: components/sounds/sfx/sword_swing.wav
-    image_scale: 1.2
+    image_scale: 1.0
     shop:
       buyable: true
       usually_buyable: true
@@ -514,7 +514,7 @@ WEAPON_DATA:
         heal_ratio: 0
         knockback_damage: 0
         invincible_turns: 0
-        stave_bonus: 1
+        stave_bonus: 0
         light_stave_bonus: 0
 
   hunters_rapier:
@@ -745,10 +745,6 @@ WEAPON_DATA:
           count_backstab: 1
           backstab_crit_bonus: 0.1
           flank_backstab: 1
-        confusion:
-          count_confusion: 1
-          stupidity_proc_chance: 0.1
-          stupidity_proc_amount: 1
       magic:
         fire_damage: 0
         fire_range: 0

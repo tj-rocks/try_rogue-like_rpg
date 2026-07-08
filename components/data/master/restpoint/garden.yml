@@ -223,6 +223,13 @@ TILE_MAPPINGS:
   statue:
     category: obstacle
     id: statue
+    positions:
+      - x: 25
+        y: 7
+        flip: false
+      - x: 32
+        y: 7
+        flip: true
   broken_pillar:
     category: obstacle
     id: broken_pillar
@@ -245,43 +252,6 @@ TILE_MAPPINGS:
   crystal:
     category: obstacle
     id: crystal
-    positions:
-      - x: 21
-        y: 6
-        flip: false
-      - x: 24
-        y: 6
-        flip: false
-      - x: 33
-        y: 6
-        flip: false
-      - x: 36
-        y: 6
-        flip: false
-      - x: 15
-        y: 8
-        flip: false
-      - x: 18
-        y: 8
-        flip: false
-      - x: 39
-        y: 8
-        flip: false
-      - x: 43
-        y: 8
-        flip: false
-      - x: 21
-        y: 15
-        flip: false
-      - x: 24
-        y: 15
-        flip: false
-      - x: 33
-        y: 15
-        flip: false
-      - x: 36
-        y: 15
-        flip: false
   sword_stuck:
     category: obstacle
     id: sword_stuck
@@ -291,12 +261,44 @@ TILE_MAPPINGS:
   stained_armor_stand:
     category: obstacle
     id: stained_armor_stand
+    positions:
+      - x: 25
+        y: 14
+        flip: true
+      - x: 32
+        y: 14
+        flip: true
   bed:
     category: obstacle
     id: bed
   candelabra:
     category: obstacle
     id: candelabra
+    positions:
+      - x: 21
+        y: 7
+        flip: false
+      - x: 24
+        y: 7
+        flip: false
+      - x: 33
+        y: 7
+        flip: false
+      - x: 36
+        y: 7
+        flip: false
+      - x: 21
+        y: 15
+        flip: false
+      - x: 24
+        y: 15
+        flip: false
+      - x: 33
+        y: 15
+        flip: false
+      - x: 36
+        y: 15
+        flip: false
   evil_statue:
     category: obstacle
     id: evil_statue
