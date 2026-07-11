@@ -736,6 +736,7 @@ WEAPON_DATA:
         block_chance_ranged: 0.05
         lantern_bonus: 0
         regen: 0
+        pursuit_evasion: 0.4
         # stupidity: 0
         armor_penetration: 0.3
         buff_value_ratio: 0

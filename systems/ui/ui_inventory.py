@@ -47,7 +47,7 @@ class InventoryDialog(BaseListDialog):
         S_MAP = {"attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
                  "dex_bonus": "器用さ", "crit_bonus": "会心率",
                  "block_chance_close": "近距離回避",
-                 "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正",
+                 "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正", "pursuit_evasion": "追跡妨害",
                  "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON,
                  "accuracy_bonus_close": "命中率"}
         MAGIC_MAP = {

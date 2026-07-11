@@ -7,7 +7,7 @@ from systems.combat_handler import deal_damage
 from systems.tactical_profile import TacticalProfile, get_relation_and_distance
 from constants import (
     KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_MOVE_LEFT, KEY_MOVE_RIGHT,
-    KEY_ATTACK, KEY_CONFIRM, KEY_TURN_ONLY,
+    KEY_ATTACK, KEY_CONFIRM, KEY_MENU, KEY_TURN_ONLY,
     ATTACK_TAME_DURATION, ATTACK_STRIKE_DURATION, ATTACK_ANIMATION_FRAMES, 
     COMBAT_LOG_WAIT_FRAMES, PLAYER_HP, PLAYER_COIN, PLAYER_ATTACK, 
     PLAYER_WEAPON, WEAPON_DATA, PLAYER_DEFENSE, PLAYER_ARMOR, ARMOR_DATA, ARMOR_COLORS,
@@ -36,7 +36,7 @@ ORE_STAT_CATEGORIES = {
         "defense_bonus", "hp_bonus"
     },
     "green_stone": {
-        "block_chance_close", "block_chance_ranged", "regen_bonus", "lantern_bonus", "aggro_mod", "stupidity"
+        "block_chance_close", "block_chance_ranged", "regen_bonus", "lantern_bonus", "aggro_mod", "pursuit_evasion", "stupidity"
     },
     "purple_stone": {
         "magic_stave_bonus", "magic_light_stave_bonus"
@@ -48,7 +48,7 @@ ORE_STAT_CATEGORIES = {
         "attack_bonus", "accuracy_bonus_close", "accuracy_bonus",
         "crit_rate", "crit_bonus", "armor_penetration",
         "defense_bonus", "hp_bonus",
-        "block_chance_close", "block_chance_ranged", "regen_bonus", "lantern_bonus", "aggro_mod", "stupidity",
+        "block_chance_close", "block_chance_ranged", "regen_bonus", "lantern_bonus", "aggro_mod", "pursuit_evasion", "stupidity",
         "magic_stave_bonus", "magic_light_stave_bonus",
     }
 }
@@ -744,6 +744,7 @@ class Player(Entity):
         self.stealth_buff_max_turns = 0
         self.stealth_buff_lantern = 0
         self.stealth_buff_aggro = 0
+        self.stealth_buff_pursuit_evasion = 0
         self.stealth_buff_stupidity = 0
         self.regen_pool = 0.0
         self.waving_stave_inst = None
@@ -901,8 +902,28 @@ class Player(Entity):
 
     def operate(self, dungeon, dialog=None, events=[]):
         if is_paused() or self.is_moving or self.is_attacking or game_state.get("dialog_just_closed") or is_enemy_acting(dungeon):
+            if os.environ.get("DEBUG_MODE") == "1":
+                pressed_keys = [e.key for e in events if getattr(e, "type", None) == pygame.KEYDOWN]
+                if any(k in pressed_keys for k in (KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_MOVE_LEFT, KEY_MOVE_RIGHT, KEY_MENU)):
+                    print(
+                        "[INPUT-BLOCK] operate blocked "
+                        f"paused={is_paused()} moving={self.is_moving} attacking={self.is_attacking} "
+                        f"dialog_just_closed={game_state.get('dialog_just_closed')} "
+                        f"enemy_acting={is_enemy_acting(dungeon)} "
+                        f"dialog_active={game_state.get('dialog_active')} dialog_modal={game_state.get('dialog_modal')} "
+                        f"confirm_active={game_state.get('confirm_active')} menu_active={game_state.get('menu_active')} "
+                        f"inventory_active={game_state.get('inventory_active')} status_active={game_state.get('status_active')} "
+                        f"enhance_active={game_state.get('enhance_active')} guild_active={game_state.get('guild_active')} "
+                        f"shop_active={game_state.get('shop_active')} warehouse_active={game_state.get('warehouse_active')} "
+                        f"teleport_active={game_state.get('teleport_active')} "
+                        f"pressed={pressed_keys} active_dir={list(active_direction_keys)}"
+                    )
             return
         if game_state.get("boss_encounter_pending", False):
+            if os.environ.get("DEBUG_MODE") == "1":
+                pressed_keys = [e.key for e in events if getattr(e, "type", None) == pygame.KEYDOWN]
+                if any(k in pressed_keys for k in (KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_MOVE_LEFT, KEY_MOVE_RIGHT, KEY_MENU)):
+                    print(f"[INPUT-BLOCK] boss_encounter_pending pressed={pressed_keys} active_dir={list(active_direction_keys)}")
             return
         turn_consumed = False
         for event in events:
@@ -984,6 +1005,7 @@ class Player(Entity):
                     self.stealth_buff_stupidity = 0
                     self.stealth_buff_lantern = 0
                     self.stealth_buff_aggro = 0
+                    self.stealth_buff_pursuit_evasion = 0
             
             if messages and dialog:
                 msg = "\n".join(messages)
@@ -1215,6 +1237,21 @@ class Player(Entity):
         if getattr(self, "stealth_buff_turns", 0) > 0:
             mod += getattr(self, "stealth_buff_aggro", 0)
         return mod
+
+    def get_pursuit_evasion(self):
+        bonus = 0
+        for inv, eid in [
+            (self.weapon_inventory, self.equipped_weapon),
+            (self.armor_inventory, self.equipped_armor),
+            (self.shield_inventory, self.equipped_shield),
+            (self.accessory_inventory, self.equipped_accessory)
+        ]:
+            inst = self._find_equip_inst(inv, eid)
+            if inst:
+                bonus += inst.get_stat("pursuit_evasion", 0) + inst.get_enhance_bonus("pursuit_evasion")
+        if getattr(self, "stealth_buff_turns", 0) > 0:
+            bonus += getattr(self, "stealth_buff_pursuit_evasion", 0)
+        return bonus
 
     def unequip_accessory(self):
         self.equipped_accessory = None
@@ -1709,6 +1746,7 @@ class Player(Entity):
             "stealth_buff_max_turns": getattr(self, "stealth_buff_max_turns", 0),
             "stealth_buff_lantern": getattr(self, "stealth_buff_lantern", 0),
             "stealth_buff_aggro": getattr(self, "stealth_buff_aggro", 0),
+            "stealth_buff_pursuit_evasion": getattr(self, "stealth_buff_pursuit_evasion", 0),
             "stealth_buff_stupidity": getattr(self, "stealth_buff_stupidity", 0),
             "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
             "completed_fixed_quests": self.completed_fixed_quests, "defeated_once_only": getattr(self, "defeated_once_only", []), "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
@@ -1762,6 +1800,7 @@ class Player(Entity):
         self.stealth_buff_max_turns = int(data.get("stealth_buff_max_turns", 0))
         self.stealth_buff_lantern = int(data.get("stealth_buff_lantern", 0))
         self.stealth_buff_aggro = int(data.get("stealth_buff_aggro", 0))
+        self.stealth_buff_pursuit_evasion = int(data.get("stealth_buff_pursuit_evasion", 0))
         self.stealth_buff_stupidity = int(data.get("stealth_buff_stupidity", 0))
         self.guild_point = int(data.get("guild_point", 0)); self.guild_rank = data.get("guild_rank", "F")
         self.active_quests = data.get("active_quests", [])

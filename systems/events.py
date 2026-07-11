@@ -4,6 +4,12 @@ from constants import KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_MOVE_LEFT, KEY_MOVE_RIGHT
 # 押されている方向キーを順番に記憶するリスト
 active_direction_keys = []
 
+def clear_input_events():
+    """ロード/セーブ突入時に入力キューと押下履歴を破棄する。"""
+    pygame.event.pump()
+    pygame.event.clear()
+    active_direction_keys.clear()
+
 def handle_events():
     global active_direction_keys
     events = pygame.event.get()

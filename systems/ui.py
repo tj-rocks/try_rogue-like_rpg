@@ -22,6 +22,7 @@ EQUIP_STAT_LABEL_MAP = {
     "block_chance_close": "近距離回避率",
     "block_chance_ranged": "遠距離回避率",
     "aggro_mod": "感知補正",
+    "pursuit_evasion": "追跡妨害",
     "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION,
     "stupidity": Text.UI.STAT_CONFUSION_ICON
 }
@@ -168,6 +169,7 @@ def show_loading_screen(screen, text=None):
     重い処理（ダンジョン生成やセーブ）の前に呼び出して、
     画面全体を少し暗くし、中央に読み込み中表示を出す。
     """
+    from systems.events import clear_input_events
     if text is None: text = Text.UI.NOW_LOADING
     
     sw, sh = screen.get_size()
@@ -198,6 +200,7 @@ def show_loading_screen(screen, text=None):
     
     # 画面を強制更新（これを行わないと、直後の重い処理中に画面に反映されない）
     pygame.display.flip()
+    clear_input_events()
 
 def draw_text_wrapped(screen, font, text, x, y, max_width, box_height=None, color=(255, 255, 255), align_h='left', align_v='top', alpha=255):
     """指定されたボックス内でテキストを折り返し、アライメント（左・中央・右 / 上・中・下）を考慮して描画する"""
@@ -290,6 +293,13 @@ def show_dialog(dialog, text, modal=False, auto_close=None):
     """
     if not dialog: return
     from constants import COMBAT_LOG_WAIT_FRAMES
+
+    if isinstance(text, list):
+        dialog.set_pages([str(t) for t in text if t is not None])
+        from systems.game_state import game_state
+        game_state["dialog_modal"] = modal
+        dialog.auto_close_timer = auto_close if auto_close is not None else COMBAT_LOG_WAIT_FRAMES
+        return
     
     if dialog.is_active:
         # 重複表示を避けるため、最後の行と同じなら追記しない
@@ -321,6 +331,7 @@ class Dialog:
         self.scroll_y = 0 # 現在の表示開始行
         self.max_scroll = 0
         self.just_opened_timer = 0 # 開いた直後の入力を無視するためのタイマー
+        self.page_wait_frames = 2
 
     @property
     def text(self):
@@ -341,6 +352,7 @@ class Dialog:
         self.text = self.pages[0]
         self._in_page_flip = False
         self.is_active = True
+        self.just_opened_timer = self.page_wait_frames
 
     # is_active（開閉状態）は独立した変数ではなく、中央の game_state を使うように変更！
     @property
@@ -370,7 +382,7 @@ class Dialog:
                 cb()
         else:
             # 開いた瞬間にフラグを立てる (2フレーム分無視)
-            self.just_opened_timer = 2
+            self.just_opened_timer = self.page_wait_frames
 
     def update(self):
         """毎フレーム呼ばれ、オートクローズタイマーのカウントダウンなどを行う"""
@@ -395,7 +407,7 @@ class Dialog:
                         self.text = self.pages[self.page_idx]
                         self._in_page_flip = False
                         self.scroll_y = 0
-                        self.just_opened_timer = 2 # 誤連打防止のための短いウェイト
+                        self.just_opened_timer = self.page_wait_frames
                         print(f"[UI] Dialog page advanced to: {self.page_idx + 1}/{len(self.pages)}")
                     else:
                         self.is_active = False
@@ -1207,7 +1219,7 @@ class BaseListDialog:
         bar_stat_keys = {
             "attack_bonus", "defense_bonus", "hp_bonus",
             "crit_bonus", "block_chance_close", "block_chance_ranged",
-            "armor_penetration", "aggro_mod", "stupidity",
+            "armor_penetration", "aggro_mod", "pursuit_evasion", "stupidity",
         }
         
         # instからステータスを取得してバー描画
@@ -1448,7 +1460,7 @@ class ParameterSelectionDialog(BaseListDialog):
             "dex_bonus": "器用さ",
             "crit_bonus": "会心率", "crit_rate": "会心率",
             "block_chance_close": "近距離回避",
-            "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正",
+            "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正", "pursuit_evasion": "追跡妨害",
             "armor_penetration": "防御無視", "stupidity": "混乱",
             "regen_bonus": "自然回復", "lantern_bonus": "光源範囲",
             "magic_fire_damage": "[炎]ダメ", "magic_fire_range": "[炎]射程",
@@ -1605,7 +1617,7 @@ class InventoryDialog(BaseListDialog):
         S_MAP = {"attack_bonus": "攻撃力", "defense_bonus": "防御力", "hp_bonus": "最大HP",
                  "dex_bonus": "器用さ", "crit_bonus": "会心率",
                  "block_chance_close": "近距離回避",
-                 "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正",
+                 "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正", "pursuit_evasion": "追跡妨害",
                  "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION, "stupidity": Text.UI.STAT_CONFUSION_ICON,
                  "accuracy_bonus_close": "命中率"}
         MAGIC_MAP = {
@@ -3633,6 +3645,7 @@ class StatusDialog:
             total_stave = get_total_bonus("magic_stave_bonus")
             total_regen = get_total_bonus("regen_bonus")
             total_aggro = get_total_bonus("aggro_mod")
+            total_pursuit = get_total_bonus("pursuit_evasion")
             total_stupidity = get_total_bonus("stupidity")
             total_penetration = get_total_bonus("armor_penetration")
             total_backstab = get_total_bonus("backstab_crit_bonus")
@@ -3688,6 +3701,9 @@ class StatusDialog:
                 has_any_bonus = True
             if total_aggro != 0:
                 left_lines.append(f"感知補正  {format_val(total_aggro)}")
+                has_any_bonus = True
+            if total_pursuit != 0:
+                left_lines.append(f"追跡妨害  {format_val(total_pursuit)}")
                 has_any_bonus = True
             if total_penetration != 0:
                 val = total_penetration * 100 if isinstance(total_penetration, float) and total_penetration <= 1.0 else total_penetration

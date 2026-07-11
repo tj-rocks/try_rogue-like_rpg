@@ -86,6 +86,7 @@ def use_consumable(item_key, player, dungeon=None):
         player.stealth_buff_max_turns = player.stealth_buff_turns  # HUDバー用
         player.stealth_buff_lantern = round(data.get("value", 1) * (1 + value_ratio))
         player.stealth_buff_aggro = round(data.get("aggro_mod", 2) * (1 + value_ratio))
+        player.stealth_buff_pursuit_evasion = round(data.get("pursuit_evasion", data.get("stupidity", 0)) * (1 + value_ratio))
         player.stealth_buff_stupidity = round(data.get("stupidity", 0) * (1 + value_ratio))
         # 他の秘薬バフをクリア
         player.attack_buff_turns = 0

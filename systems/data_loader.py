@@ -187,6 +187,7 @@ def get_normalized_equipment_data(floor_map):
         "block_chance_ranged":"block_chance_ranged",
         "lantern_bonus":      "lantern_bonus",
         "aggro_mod":          "aggro_mod",
+        "pursuit_evasion":    "pursuit_evasion",
         "stupidity":          "stupidity",
         "armor_penetration":  "armor_penetration",
         "buff_value_ratio":   "magic_buff_value_ratio",

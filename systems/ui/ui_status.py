@@ -433,6 +433,7 @@ class StatusDialog(StateKeyMixin):
             total_block_ranged = get_total_bonus("block_chance_ranged")
             total_regen = get_total_bonus("regen_bonus")
             total_aggro = get_total_bonus("aggro_mod")
+            total_pursuit = get_total_bonus("pursuit_evasion")
             total_stupidity = get_total_bonus("stupidity")
             total_penetration = get_total_bonus("armor_penetration")
 
@@ -469,6 +470,9 @@ class StatusDialog(StateKeyMixin):
                 has_any_bonus = True
             if total_aggro != 0:
                 left_lines.append(f"感知補正  {get_stat_rank(total_aggro, 'aggro_mod')}")
+                has_any_bonus = True
+            if total_pursuit != 0:
+                left_lines.append(f"追跡妨害  {get_stat_rank(total_pursuit, 'pursuit_evasion')}")
                 has_any_bonus = True
             if total_penetration != 0:
                 val = total_penetration * 100 if isinstance(total_penetration, float) and total_penetration <= 1.0 else total_penetration

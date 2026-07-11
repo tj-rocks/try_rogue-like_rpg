@@ -804,6 +804,13 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                 elif event.key == KEY_MENU:
                     if menu_dialog and not is_enemy_acting(dungeon):
                         menu_dialog.is_active = True
+                    elif os.environ.get("DEBUG_MODE") == "1":
+                        print(
+                            f"[INPUT-BLOCK] menu open failed "
+                            f"menu_dialog={bool(menu_dialog)} enemy_acting={is_enemy_acting(dungeon)} "
+                            f"dialog_active={dialog.is_active if dialog else None} "
+                            f"confirm_active={confirm_dialog.is_active if confirm_dialog else None}"
+                        )
 
 
 def draw_all_ui(screen, player, dialog, confirm_dialog, inventory_dialog, status_dialog,
