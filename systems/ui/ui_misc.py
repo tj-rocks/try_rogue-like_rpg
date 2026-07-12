@@ -418,6 +418,16 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
         confirm_dialog.handle_events(events)
         return
 
+    if (not dialog.is_active) and (not confirm_dialog.is_active) and game_state.get("pending_ending_after_dialog"):
+        game_state["post_boss_clear_pending"] = False
+        game_state["current_scene"] = "ending"
+        game_state["ending_route"] = game_state["pending_ending_after_dialog"]
+        game_state["pending_ending_after_dialog"] = None
+        game_state["ending_index"] = 0
+        game_state["ending_timer"] = 0
+        game_state["ending_alpha"] = 0
+        return
+
     if teleport_dialog and teleport_dialog.is_active:
         new_dungeon = teleport_dialog.handle_input(events, player)
         if dialog.is_active and dialog.just_opened_timer <= 0:
@@ -553,15 +563,19 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                     post_core_clear_pending = bool(
                                         dungeon and dungeon.current_floor == 0 and game_state.get("post_boss_clear_pending", False)
                                     )
-                                    if post_core_clear_pending:
-                                        def _trigger_post_core_ending():
+                                    ending_route = game_state.get("ending_route", "default")
+                                    if getattr(npc, "role", None) == "core_ending_guide":
+                                        game_state["pending_ending_after_dialog"] = "core"
+                                        dialog.on_close_callback = None
+                                    elif post_core_clear_pending and ending_route != "core":
+                                        def _trigger_post_boss_ending():
                                             from systems.game_state import game_state as gs
                                             gs["post_boss_clear_pending"] = False
                                             gs["current_scene"] = "ending"
                                             gs["ending_index"] = 0
                                             gs["ending_timer"] = 0
                                             gs["ending_alpha"] = 0
-                                        dialog.on_close_callback = _trigger_post_core_ending
+                                        dialog.on_close_callback = _trigger_post_boss_ending
                                     else:
                                         dialog.on_close_callback = None
                                     if getattr(npc, "role", None) == "inn":

@@ -8,7 +8,7 @@ import json
 import glob
 
 PORT = 8765
-URL = f"http://localhost:{PORT}/tools/village_editor.html"
+URL = f"http://localhost:{PORT}/tools/web/village_editor.html"
 
 
 def _get_theme_for_map(map_file):
@@ -337,6 +337,8 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 
                 # クライアントから送信されたentitiesを受け取る
                 entities = data.get('entities', [])
+                player_start_x = data.get('player_start_x')
+                player_start_y = data.get('player_start_y')
                 
                 # グループ化 (idをキーにする)
                 grouped = {}
@@ -388,6 +390,11 @@ class EditorRequestHandler(http.server.SimpleHTTPRequestHandler):
                 else:
                     with open(load_path, "r", encoding="utf-8") as f:
                         village_yml_data = pyyaml.safe_load(f) or {}
+
+                config_block = village_yml_data.setdefault("CONFIG", {})
+                if player_start_x is not None and player_start_y is not None:
+                    config_block["player_start_x"] = int(player_start_x)
+                    config_block["player_start_y"] = int(player_start_y)
                 
                 # positionsを各定義に注入
                 mappings = village_yml_data.get("TILE_MAPPINGS", {})

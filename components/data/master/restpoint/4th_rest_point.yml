@@ -475,6 +475,7 @@ TILE_MAPPINGS:
       - x: 31
         y: 9
         flip: false
+        max_rank: B
   story_helena:
     category: npc
     id: story_helena
@@ -482,6 +483,7 @@ TILE_MAPPINGS:
       - x: 30
         y: 12
         flip: true
+        max_rank: B
   story_geisel:
     category: npc
     id: story_geisel
@@ -496,6 +498,7 @@ TILE_MAPPINGS:
       - x: 18
         y: 11
         flip: false
+        max_rank: B
   story_olivia:
     category: npc
     id: story_olivia
@@ -503,6 +506,7 @@ TILE_MAPPINGS:
       - x: 32
         y: 10
         flip: false
+        max_rank: B
   story_gareth:
     category: npc
     id: story_gareth
@@ -510,6 +514,7 @@ TILE_MAPPINGS:
       - x: 32
         y: 12
         flip: false
+        max_rank: B
   story_rain:
     category: npc
     id: story_rain
@@ -517,6 +522,7 @@ TILE_MAPPINGS:
       - x: 27
         y: 10
         flip: true
+        max_rank: B
   story_yuru:
     category: npc
     id: story_yuru
@@ -524,6 +530,7 @@ TILE_MAPPINGS:
       - x: 29
         y: 10
         flip: false
+        max_rank: B
   wall_deco_tapestry:
     category: wall_decoration
     desc: タペストリー

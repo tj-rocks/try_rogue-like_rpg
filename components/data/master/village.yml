@@ -2,6 +2,8 @@ CONFIG:
   map_file: village.txt
   map_dir: components/data/dungeon
   image_dir: components/pictures/dungeon/home
+  player_start_x: 33
+  player_start_y: 45
 TILE_MAPPINGS:
   floor_lawn:
     char: .
@@ -91,6 +93,12 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 8
+        y: 13
+        flip: false
+      - x: 8
+        y: 18
+        flip: false
       - x: 17
         y: 18
         flip: false
@@ -116,6 +124,9 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 54
+        y: 22
+        flip: false
       - x: 17
         y: 27
         flip: false
@@ -136,6 +147,12 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 54
+        y: 27
+        flip: false
+      - x: 8
+        y: 31
+        flip: false
       - x: 16
         y: 31
         flip: false
@@ -156,11 +173,20 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 54
+        y: 31
+        flip: false
+      - x: 8
+        y: 35
+        flip: false
       - x: 45
         y: 35
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 54
+        y: 35
+        flip: false
       - x: 17
         y: 38
         flip: false
@@ -169,6 +195,15 @@ TILE_MAPPINGS:
         flip: false
       - x: 26
         y: 38
+        flip: false
+      - x: 30
+        y: 42
+        flip: false
+      - x: 31
+        y: 42
+        flip: false
+      - x: 32
+        y: 42
         flip: false
   wall_pass_iron_gate:
     char: '2'
@@ -223,6 +258,9 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 8
+        y: 12
+        flip: false
       - x: 17
         y: 12
         flip: false
@@ -238,6 +276,9 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 8
+        y: 17
+        flip: false
       - x: 17
         y: 17
         flip: false
@@ -273,6 +314,9 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 54
+        y: 21
+        flip: false
       - x: 17
         y: 26
         flip: false
@@ -293,6 +337,12 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 54
+        y: 26
+        flip: false
+      - x: 8
+        y: 30
+        flip: false
       - x: 16
         y: 30
         flip: false
@@ -313,11 +363,20 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 54
+        y: 30
+        flip: false
+      - x: 8
+        y: 34
+        flip: false
       - x: 45
         y: 34
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 54
+        y: 34
+        flip: false
       - x: 17
         y: 37
         flip: false
@@ -326,6 +385,15 @@ TILE_MAPPINGS:
         flip: false
       - x: 26
         y: 37
+        flip: false
+      - x: 30
+        y: 41
+        flip: false
+      - x: 31
+        y: 41
+        flip: false
+      - x: 32
+        y: 41
         flip: false
   wall_top_wood_classic:
     char: a
@@ -503,16 +571,25 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 53
+        y: 23
+        flip: false
       - x: 38
         y: 24
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 53
+        y: 24
+        flip: false
       - x: 34
         y: 25
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 53
+        y: 25
+        flip: false
   pot:
     category: obstacle
     id: pot
@@ -520,6 +597,8 @@ TILE_MAPPINGS:
       - x: 30
         y: 4
         flip: false
+        min_rank: SS
+        max_rank: SS
       - x: 8
         y: 7
         flip: false
@@ -636,6 +715,15 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 55
+        y: 32
+        flip: false
+      - x: 53
+        y: 33
+        flip: false
+      - x: 55
+        y: 33
+        flip: false
   sword_stuck:
     category: obstacle
     id: sword_stuck
@@ -645,12 +733,10 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
-      - x: 19
+      - x: 43
         y: 24
         flip: false
-        min_rank: F
-        max_rank: SS
-      - x: 43
+      - x: 55
         y: 24
         flip: false
       - x: 47
@@ -691,6 +777,22 @@ TILE_MAPPINGS:
   bed:
     category: obstacle
     id: bed
+    positions:
+      - x: 7
+        y: 14
+        flip: false
+        min_rank: D
+        max_rank: S
+      - x: 7
+        y: 16
+        flip: false
+        min_rank: D
+        max_rank: S
+      - x: 7
+        y: 32
+        flip: false
+        min_rank: D
+        max_rank: S
   candelabra:
     category: obstacle
     id: candelabra
@@ -708,7 +810,7 @@ TILE_MAPPINGS:
         y: 23
         flip: false
         min_rank: F
-        max_rank: SS
+        max_rank: S
   item_shop:
     category: npc
     id: item_shop
@@ -717,7 +819,7 @@ TILE_MAPPINGS:
         y: 23
         flip: false
         min_rank: F
-        max_rank: SS
+        max_rank: S
   merchant:
     category: npc
     id: merchant
@@ -725,21 +827,23 @@ TILE_MAPPINGS:
       - x: 15
         y: 4
         flip: true
+        min_rank: F
+        max_rank: S
       - x: 15
         y: 25
         flip: true
         min_rank: F
-        max_rank: SS
+        max_rank: S
       - x: 24
         y: 25
         flip: true
         min_rank: F
-        max_rank: SS
+        max_rank: S
       - x: 38
         y: 25
         flip: false
         min_rank: F
-        max_rank: SS
+        max_rank: S
   storage:
     category: npc
     id: storage
@@ -747,6 +851,8 @@ TILE_MAPPINGS:
       - x: 16
         y: 14
         flip: false
+        min_rank: F
+        max_rank: S
   inn:
     category: npc
     id: inn
@@ -755,10 +861,12 @@ TILE_MAPPINGS:
         y: 14
         flip: true
         min_rank: F
-        max_rank: SS
+        max_rank: S
       - x: 43
         y: 16
         flip: true
+        min_rank: F
+        max_rank: S
   blacksmith:
     category: npc
     id: blacksmith
@@ -766,6 +874,8 @@ TILE_MAPPINGS:
       - x: 47
         y: 23
         flip: false
+        min_rank: F
+        max_rank: S
   guild_receptionist:
     category: npc
     id: guild_receptionist
@@ -773,11 +883,13 @@ TILE_MAPPINGS:
       - x: 29
         y: 4
         flip: false
+        min_rank: F
+        max_rank: S
       - x: 31
         y: 4
         flip: false
         min_rank: F
-        max_rank: SS
+        max_rank: S
   guild_rankup_officer:
     category: npc
     id: guild_rankup_officer
@@ -785,6 +897,8 @@ TILE_MAPPINGS:
       - x: 33
         y: 4
         flip: false
+        min_rank: F
+        max_rank: S
   priest:
     category: npc
     id: priest
@@ -792,6 +906,8 @@ TILE_MAPPINGS:
       - x: 38
         y: 4
         flip: false
+        min_rank: F
+        max_rank: S
   doctor:
     category: npc
     id: doctor
@@ -800,7 +916,7 @@ TILE_MAPPINGS:
         y: 4
         flip: false
         min_rank: F
-        max_rank: SS
+        max_rank: S
   bank:
     category: npc
     id: bank
@@ -808,6 +924,8 @@ TILE_MAPPINGS:
       - x: 18
         y: 14
         flip: false
+        min_rank: F
+        max_rank: S
   guide_item:
     category: npc
     id: guide_item
@@ -816,7 +934,7 @@ TILE_MAPPINGS:
         y: 7
         flip: false
         min_rank: F
-        max_rank: SS
+        max_rank: S
   guide_inn:
     category: npc
     id: guide_inn
@@ -825,7 +943,7 @@ TILE_MAPPINGS:
         y: 14
         flip: false
         min_rank: F
-        max_rank: SS
+        max_rank: S
   guide_guild:
     category: npc
     id: guide_guild
@@ -837,7 +955,7 @@ TILE_MAPPINGS:
         y: 4
         flip: false
         min_rank: F
-        max_rank: SS
+        max_rank: S
   guild_guide:
     category: npc
     id: guild_guide
@@ -845,11 +963,13 @@ TILE_MAPPINGS:
       - x: 23
         y: 5
         flip: true
+        min_rank: F
+        max_rank: S
       - x: 32
         y: 7
         flip: false
         min_rank: F
-        max_rank: SS
+        max_rank: S
   wizard:
     category: npc
     id: wizard
@@ -858,7 +978,7 @@ TILE_MAPPINGS:
         y: 23
         flip: false
         min_rank: F
-        max_rank: SS
+        max_rank: S
   teleport_wizard:
     category: npc
     id: teleport_wizard
@@ -866,6 +986,8 @@ TILE_MAPPINGS:
       - x: 47
         y: 32
         flip: false
+        min_rank: F
+        max_rank: S
   guild_staff:
     category: npc
     id: guild_staff
@@ -873,9 +995,13 @@ TILE_MAPPINGS:
       - x: 27
         y: 4
         flip: false
+        min_rank: F
+        max_rank: S
       - x: 28
         y: 6
         flip: true
+        min_rank: F
+        max_rank: S
   tutorial_man1:
     category: npc
     id: tutorial_man1
@@ -883,18 +1009,28 @@ TILE_MAPPINGS:
       - x: 18
         y: 7
         flip: true
+        min_rank: F
+        max_rank: S
       - x: 25
         y: 16
         flip: true
+        min_rank: F
+        max_rank: S
       - x: 36
         y: 16
         flip: false
+        min_rank: F
+        max_rank: S
       - x: 23
         y: 32
         flip: true
+        min_rank: F
+        max_rank: S
       - x: 36
         y: 35
         flip: false
+        min_rank: F
+        max_rank: S
   story_kaya:
     category: npc
     id: story_kaya
@@ -902,6 +1038,8 @@ TILE_MAPPINGS:
       - x: 25
         y: 36
         flip: false
+        min_rank: F
+        max_rank: E
   tutorial_woman1:
     category: npc
     id: tutorial_woman1
@@ -909,6 +1047,8 @@ TILE_MAPPINGS:
       - x: 26
         y: 13
         flip: true
+        min_rank: F
+        max_rank: S
   tutorial_woman2:
     category: npc
     id: tutorial_woman2
@@ -916,9 +1056,13 @@ TILE_MAPPINGS:
       - x: 20
         y: 7
         flip: false
+        min_rank: F
+        max_rank: S
       - x: 37
         y: 13
         flip: false
+        min_rank: F
+        max_rank: S
   pub_master:
     category: npc
     id: pub_master
@@ -926,9 +1070,13 @@ TILE_MAPPINGS:
       - x: 15
         y: 6
         flip: true
+        min_rank: F
+        max_rank: S
       - x: 15
         y: 33
         flip: true
+        min_rank: F
+        max_rank: S
   guide_bank:
     category: npc
     id: guide_bank
@@ -937,7 +1085,7 @@ TILE_MAPPINGS:
         y: 16
         flip: false
         min_rank: F
-        max_rank: SS
+        max_rank: S
   villager:
     category: npc
     id: villager
@@ -949,6 +1097,8 @@ TILE_MAPPINGS:
       - x: 23
         y: 36
         flip: true
+        min_rank: F
+        max_rank: E
   story_yuru:
     category: npc
     id: story_yuru
@@ -956,6 +1106,8 @@ TILE_MAPPINGS:
       - x: 36
         y: 15
         flip: false
+        min_rank: F
+        max_rank: E
   story_rain:
     category: npc
     id: story_rain
@@ -963,6 +1115,8 @@ TILE_MAPPINGS:
       - x: 25
         y: 32
         flip: false
+        min_rank: F
+        max_rank: E
   story_camila:
     category: npc
     id: story_camila
@@ -970,6 +1124,8 @@ TILE_MAPPINGS:
       - x: 19
         y: 32
         flip: false
+        min_rank: F
+        max_rank: E
   story_gareth:
     category: npc
     id: story_gareth
@@ -977,6 +1133,8 @@ TILE_MAPPINGS:
       - x: 20
         y: 5
         flip: false
+        min_rank: F
+        max_rank: E
   story_helena:
     category: npc
     id: story_helena
@@ -984,6 +1142,8 @@ TILE_MAPPINGS:
       - x: 18
         y: 5
         flip: true
+        min_rank: F
+        max_rank: E
   story_olivia:
     category: npc
     id: story_olivia
@@ -991,9 +1151,16 @@ TILE_MAPPINGS:
     category: npc
     id: story_noname1
     positions:
+      - x: 9
+        y: 32
+        flip: false
+        min_rank: D
+        max_rank: S
       - x: 20
         y: 36
         flip: false
+        min_rank: F
+        max_rank: S
   story_noname2:
     category: npc
     id: story_noname2
@@ -1001,6 +1168,8 @@ TILE_MAPPINGS:
       - x: 19
         y: 35
         flip: false
+        min_rank: F
+        max_rank: S
   story_noname3:
     category: npc
     id: story_noname3
@@ -1008,6 +1177,8 @@ TILE_MAPPINGS:
       - x: 38
         y: 33
         flip: false
+        min_rank: F
+        max_rank: S
   story_noname4:
     category: npc
     id: story_noname4
@@ -1015,9 +1186,17 @@ TILE_MAPPINGS:
       - x: 25
         y: 15
         flip: true
+        min_rank: F
+        max_rank: S
   story_noname5:
     category: npc
     id: story_noname5
+    positions:
+      - x: 9
+        y: 14
+        flip: false
+        min_rank: C
+        max_rank: S
   crank_adventurer:
     category: npc
     id: crank_adventurer
@@ -1025,19 +1204,38 @@ TILE_MAPPINGS:
       - x: 37
         y: 18
         flip: false
+        min_rank: SS
+        max_rank: SS
   scientist_1:
     category: npc
     id: scientist_1
+  skill_guide:
+    category: npc
+    id: skill_guide
+  core_aftermath_guide:
+    category: npc
+    id: core_aftermath_guide
+  core_aftermath_villager:
+    category: npc
+    id: core_aftermath_villager
+    positions:
+      - x: 26
+        y: 18
+        flip: false
+        min_rank: S
+        max_rank: S
+  core_aftermath_merchant:
+    category: npc
+    id: core_aftermath_merchant
   crank_adventurer2:
     category: npc
     id: crank_adventurer2
     positions:
-      - x: 26
-        y: 18
-        flip: true
       - x: 33
         y: 32
         flip: true
+        min_rank: F
+        max_rank: S
   wall_deco_ivy:
     category: wall_decoration
     desc: 壁のツタ
@@ -1128,6 +1326,11 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 53
+        y: 27
+        flip: false
+        min_rank: D
+        max_rank: S
   wall_deco_tapestry:
     category: wall_decoration
     desc: タペストリー
@@ -1186,6 +1389,9 @@ TILE_MAPPINGS:
         flip: true
         min_rank: F
         max_rank: SS
+      - x: 54
+        y: 23
+        flip: true
       - x: 16
         y: 24
         flip: false
@@ -1199,6 +1405,9 @@ TILE_MAPPINGS:
         flip: true
         min_rank: F
         max_rank: SS
+      - x: 54
+        y: 24
+        flip: true
       - x: 16
         y: 25
         flip: false
@@ -1239,7 +1448,13 @@ TILE_MAPPINGS:
       - x: 16
         y: 32
         flip: false
+      - x: 54
+        y: 32
+        flip: false
       - x: 16
+        y: 33
+        flip: false
+      - x: 54
         y: 33
         flip: false
       - x: 16
@@ -1483,6 +1698,9 @@ TILE_MAPPINGS:
         flip: false
         min_rank: F
         max_rank: SS
+      - x: 53
+        y: 35
+        flip: false
   wall_deco_item_shop:
     category: wall_decoration
     desc: アイテム屋のシンボル
@@ -1595,12 +1813,22 @@ TILE_MAPPINGS:
       - x: 19
         y: 7
         flip: false
+      - x: 8
+        y: 15
+        flip: false
+        min_rank: D
+        max_rank: S
       - x: 15
         y: 16
         flip: false
       - x: 24
         y: 32
         flip: false
+      - x: 7
+        y: 33
+        flip: false
+        min_rank: D
+        max_rank: S
       - x: 19
         y: 33
         flip: false
@@ -1616,12 +1844,30 @@ TILE_MAPPINGS:
   dedicated_weapon_shop:
     category: npc
     id: dedicated_weapon_shop
+    positions:
+      - x: 55
+        y: 23
+        flip: true
+        min_rank: D
+        max_rank: S
   dedicated_armor_shop:
     category: npc
     id: dedicated_armor_shop
+    positions:
+      - x: 19
+        y: 24
+        flip: true
+        min_rank: D
+        max_rank: S
   dedicated_accessory_shop:
     category: npc
     id: dedicated_accessory_shop
+    positions:
+      - x: 53
+        y: 32
+        flip: false
+        min_rank: D
+        max_rank: S
   dungeon_core:
     category: enemy
     id: dungeon_core

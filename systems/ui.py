@@ -2205,6 +2205,16 @@ def draw_vision_overlay(screen, player, dungeon):
 
 def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_dialog, enhance_dialog, item_action_dialog, ore_selection_dialog, menu_dialog=None, player=None, dungeon=None, shop_dialog=None, stave_selection_dialog=None, guild_dialog=None, warehouse_dialog=None, bank_dialog=None, equip_dialog=None, stave_inv_dialog=None, event_inv_dialog=None, teleport_dialog=None, cutscene_manager=None, parameter_selection_dialog=None, ore_gift_dialog=None, **kwargs):
     """全てのUIイベントを一括で処理する"""
+
+    if (not dialog.is_active) and (not confirm_dialog.is_active) and game_state.get("pending_ending_after_dialog"):
+        game_state["post_boss_clear_pending"] = False
+        game_state["current_scene"] = "ending"
+        game_state["ending_route"] = game_state["pending_ending_after_dialog"]
+        game_state["pending_ending_after_dialog"] = None
+        game_state["ending_index"] = 0
+        game_state["ending_timer"] = 0
+        game_state["ending_alpha"] = 0
+        return
     
     if cutscene_manager and cutscene_manager.is_active:
         events.clear() # イベントを破棄して操作を受け付けない
@@ -2382,15 +2392,19 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                     post_core_clear_pending = bool(
                                         dungeon and dungeon.current_floor == 0 and game_state.get("post_boss_clear_pending", False)
                                     )
-                                    if post_core_clear_pending:
-                                        def _trigger_post_core_ending():
+                                    ending_route = game_state.get("ending_route", "default")
+                                    if getattr(npc, "role", None) == "core_ending_guide":
+                                        game_state["pending_ending_after_dialog"] = "core"
+                                        dialog.on_close_callback = None
+                                    elif post_core_clear_pending and ending_route != "core":
+                                        def _trigger_post_boss_ending():
                                             from systems.game_state import game_state as gs
                                             gs["post_boss_clear_pending"] = False
                                             gs["current_scene"] = "ending"
                                             gs["ending_index"] = 0
                                             gs["ending_timer"] = 0
                                             gs["ending_alpha"] = 0
-                                        dialog.on_close_callback = _trigger_post_core_ending
+                                        dialog.on_close_callback = _trigger_post_boss_ending
                                     else:
                                         dialog.on_close_callback = None
                                     if getattr(npc, "role", None) == "inn":
@@ -3030,6 +3044,8 @@ class GuildDialog:
                 player.completed_fixed_quests.append(q["id"])
             player.shop_bonus_refresh = True
             # ミッション達成→次回ショップ品揃え拡張
+            if dungeon:
+                dungeon.refresh_shop_stock(player_rank=player.guild_rank)
 
             # マスターデータからもエンディング対象かチェック（セーブデータにフラグがない場合への対策）
             is_ending_quest = q.get("ending", False)

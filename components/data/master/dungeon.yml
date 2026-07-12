@@ -678,8 +678,8 @@ DUNGEON_IMAGES:
     darkness_type: fog
     darkness_level: 4
   "90":
-    image: evil_castle
-    sound: evil_castle.mp3
+    image: old_castle
+    sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
     item_ratio: 0.2

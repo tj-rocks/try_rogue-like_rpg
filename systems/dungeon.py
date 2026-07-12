@@ -597,8 +597,8 @@ class Dungeon:
         ts = self.tile_size
         
         if self.current_floor == 0: # 村
-            # デフォルトは開始地点(P)
-            tx, ty = self.start_pos
+            # デフォルトは開始地点(P)。CONFIG指定があればそちらを優先
+            tx, ty = getattr(self, "fixed_spawn_pos", None) or self.start_pos
             
             # 死亡時は診療所(R)の右隣にスポーン
             if is_death and self.clinic_pos:
@@ -867,6 +867,7 @@ class Dungeon:
                 from systems.data_loader import load_master_data, MASTER_DATA_DIR
                 
                 village_data = load_master_data("village.yml") or {}
+                base_config = village_data.get("CONFIG", {}) or {}
                 base_mappings = village_data.get("TILE_MAPPINGS", {})
                 
                 # Check for map-specific custom yml config
@@ -881,8 +882,10 @@ class Dungeon:
                 tile_mappings_raw = {}
                 is_village_map = (base_name == "village")
                 
+                map_config = base_config
                 if custom_file:
                     custom_data = load_master_data(custom_file) or {}
+                    map_config = custom_data.get("CONFIG", {}) or base_config
                     custom_mappings = custom_data.get("TILE_MAPPINGS", {})
                     for k, v in base_mappings.items():
                         if isinstance(v, dict):
@@ -907,6 +910,15 @@ class Dungeon:
                             if not is_village_map:
                                 tile_mappings_raw[k].pop("positions", None)
                 
+                self.fixed_spawn_pos = None
+                cfg_spawn_x = map_config.get("player_start_x")
+                cfg_spawn_y = map_config.get("player_start_y")
+                if cfg_spawn_x is not None and cfg_spawn_y is not None:
+                    try:
+                        self.fixed_spawn_pos = (int(cfg_spawn_x), int(cfg_spawn_y))
+                    except (TypeError, ValueError):
+                        self.fixed_spawn_pos = None
+
                 # 非村の固定マップ（rest point等）では village.yml の具体的な home 画像パスを使わず、
                 # その階層のテーマテクスチャを使うため image_path を削除する
                 # （wall_decoration 等のカスタム画像は保持）
@@ -1813,6 +1825,10 @@ class Dungeon:
 
         SHOP_LIMIT_NORMAL = 10
         SHOP_LIMIT_BONUS = 30
+        BONUS_LIMIT_WEAPON_SHOP = 8
+        BONUS_LIMIT_DEDICATED_WEAPON = 4
+        BONUS_LIMIT_DEDICATED_ARMOR = 4
+        BONUS_LIMIT_DEDICATED_ACCESSORY = 4
 
         # 出現率をレアリティから算出（ドロップ率の5倍をショップ出現率とする）
         def get_shop_rate(v):
@@ -1824,6 +1840,12 @@ class Dungeon:
             if not self.guild_system: return True
             req_rank = v.get("min_rank") or v.get("rank") or "F"
             return self.guild_system.is_rank_at_least(player_rank, req_rank)
+
+        def is_bonus_rank_visible(v):
+            req_rank = v.get("min_rank") or v.get("rank") or "F"
+            if player_rank == "A":
+                return req_rank in ("A", "B")
+            return True
 
         # 通常時: usually_buyable かつ min_rank がプレイヤーランク以下で最も高いもの
         def get_fixed_items(data_dict, item_type):
@@ -1846,45 +1868,76 @@ class Dungeon:
             return [{"key": k, "type": item_type, "name": v["name"], "price": v["price"], "count": 1} for k, v in items]
 
         # ボーナスモード: special_buyable かつランクOKの全品
-        def get_bonus_items(data_dict, item_type, restrict_to_player_rank=False):
-            """ミッション後: special_buyable品を全部並べる。
-            restrict_to_player_rank=Trueの場合、プレイヤーと同じランクのみに絞る"""
+        def get_bonus_items(data_dict, item_type):
+            """ミッション後: special_buyable品をランク条件内で全部並べる"""
             result = []
             for k, v in data_dict.items():
                 shop = v.get("shop", {})
                 if not shop.get("special_buyable", False): continue
                 if not is_rank_ok(v): continue
-                if restrict_to_player_rank:
-                    item_rank = v.get("min_rank") or v.get("rank") or "F"
-                    if item_rank != player_rank: continue
+                if not is_bonus_rank_visible(v): continue
                 result.append({"key": k, "type": item_type, "name": v["name"], "price": v["price"], "count": 1})
             return result
 
+        def pick_bonus_items_with_cycle(items, category_key, limit):
+            if not items:
+                return []
+            player = getattr(self, "player", None)
+            if not player:
+                return items[:limit]
+            seen_map = getattr(player, "shop_seen_special", None)
+            if not isinstance(seen_map, dict):
+                seen_map = {}
+                player.shop_seen_special = seen_map
+
+            def item_token(entry):
+                return f"{entry['type']}:{entry['key']}"
+
+            all_tokens = {item_token(it) for it in items}
+            seen_tokens = set(seen_map.get(category_key, []))
+            fresh_items = [it for it in items if item_token(it) not in seen_tokens]
+            if not fresh_items:
+                seen_tokens = set()
+                fresh_items = items[:]
+
+            random.shuffle(fresh_items)
+            picked = fresh_items[:limit]
+            seen_tokens.update(item_token(it) for it in picked)
+
+            if all_tokens and seen_tokens.issuperset(all_tokens):
+                seen_map[category_key] = []
+            else:
+                seen_map[category_key] = sorted(seen_tokens)
+            return picked
+
         # --- 1. 武器屋 (武器・防具・盾) ---
         if bonus_mode:
-            # ボーナスモード: プレイヤーと同じランクのみに絞る
-            weapon_cands = get_bonus_items(WEAPON_DATA, "weapon", restrict_to_player_rank=True) + get_bonus_items(ARMOR_DATA, "armor", restrict_to_player_rank=True) + get_bonus_items(SHIELD_DATA, "shield", restrict_to_player_rank=True)
+            weapon_cands = get_bonus_items(WEAPON_DATA, "weapon") + get_bonus_items(ARMOR_DATA, "armor") + get_bonus_items(SHIELD_DATA, "shield")
+            weapon_cands = pick_bonus_items_with_cycle(weapon_cands, "weapon_shop", BONUS_LIMIT_WEAPON_SHOP)
         else:
             weapon_cands = get_fixed_items(WEAPON_DATA, "weapon") + get_fixed_items(ARMOR_DATA, "armor") + get_fixed_items(SHIELD_DATA, "shield")
-        self.weapon_shop_stock = weapon_cands[:]  # ボーナスモードはリミットなし
+        self.weapon_shop_stock = weapon_cands[:]
 
         # --- 1.2 武器専用屋 (武器のみ) ---
         if bonus_mode:
-            d_weapon_cands = get_bonus_items(WEAPON_DATA, "weapon", restrict_to_player_rank=True)
+            d_weapon_cands = get_bonus_items(WEAPON_DATA, "weapon")
+            d_weapon_cands = pick_bonus_items_with_cycle(d_weapon_cands, "dedicated_weapon_shop", BONUS_LIMIT_DEDICATED_WEAPON)
         else:
             d_weapon_cands = get_fixed_items(WEAPON_DATA, "weapon")
-        self.dedicated_weapon_shop_stock = d_weapon_cands[:]  # ボーナスモードはリミットなし
+        self.dedicated_weapon_shop_stock = d_weapon_cands[:]
 
         # --- 1.3 防具専用屋 (防具・盾のみ) ---
         if bonus_mode:
-            d_armor_cands = get_bonus_items(ARMOR_DATA, "armor", restrict_to_player_rank=True) + get_bonus_items(SHIELD_DATA, "shield", restrict_to_player_rank=True)
+            d_armor_cands = get_bonus_items(ARMOR_DATA, "armor") + get_bonus_items(SHIELD_DATA, "shield")
+            d_armor_cands = pick_bonus_items_with_cycle(d_armor_cands, "dedicated_armor_shop", BONUS_LIMIT_DEDICATED_ARMOR)
         else:
             d_armor_cands = get_fixed_items(ARMOR_DATA, "armor") + get_fixed_items(SHIELD_DATA, "shield")
-        self.dedicated_armor_shop_stock = d_armor_cands[:]  # ボーナスモードはリミットなし
+        self.dedicated_armor_shop_stock = d_armor_cands[:]
 
         # --- 1.4 アクセサリ専用屋 (アクセサリのみ) ---
         if bonus_mode:
-            d_acc_cands = get_bonus_items(ACCESSORY_DATA, "accessory", restrict_to_player_rank=True)
+            d_acc_cands = get_bonus_items(ACCESSORY_DATA, "accessory")
+            d_acc_cands = pick_bonus_items_with_cycle(d_acc_cands, "dedicated_accessory_shop", BONUS_LIMIT_DEDICATED_ACCESSORY)
         else:
             d_acc_cands = get_fixed_items(ACCESSORY_DATA, "accessory")
             # アクセサリにfixed品がない場合、ランダムで補充
@@ -2226,6 +2279,8 @@ class Dungeon:
 
         # ラスボス戦中は、階段タイルに触れた時だけ封鎖する。
         if ct in (2, 3):
+            if getattr(player, "guild_rank", None) == "SS":
+                return _block_stair("SSランク中は 階段を 使えない！")
             boss_in_battle = any(
                 getattr(enemy, "type", None) == "dungeon_core" and not getattr(enemy, "is_dead", False)
                 for enemy in getattr(self, "enemies", [])

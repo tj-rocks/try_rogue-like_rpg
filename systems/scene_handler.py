@@ -69,7 +69,7 @@ def handle_opening(screen, events, game_state, opening_imgs, start_new_game_func
     
     return game_state["current_scene"]
     
-def handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_data=None):
+def handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_data=None, player=None):
     """
     エンディング演出を処理する。
     """
@@ -140,6 +140,11 @@ def handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_da
         dialog.is_active = False
         
         if game_state["ending_index"] >= len(route_imgs):
+            if route == "core" and player is not None:
+                player.guild_rank = "S"
+                player.has_seen_ending = True
+                player.dungeon_core_cleared = True
+                player.save_to_file()
             game_state["ending_index"] = 0
             game_state["ending_route"] = "core"
             game_state["current_scene"] = "game"

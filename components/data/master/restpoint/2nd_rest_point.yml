@@ -685,6 +685,8 @@ TILE_MAPPINGS:
       - x: 37
         y: 9
         flip: false
+        min_rank: E
+        max_rank: D
   story_geisel:
     category: npc
     id: story_geisel
@@ -692,6 +694,8 @@ TILE_MAPPINGS:
       - x: 38
         y: 3
         flip: true
+        min_rank: E
+        max_rank: D
   story_kaya:
     category: npc
     id: story_kaya
@@ -699,6 +703,8 @@ TILE_MAPPINGS:
       - x: 40
         y: 3
         flip: false
+        min_rank: E
+        max_rank: D
   story_rain:
     category: npc
     id: story_rain
@@ -706,6 +712,8 @@ TILE_MAPPINGS:
       - x: 32
         y: 3
         flip: true
+        min_rank: E
+        max_rank: D
   story_yuru:
     category: npc
     id: story_yuru
@@ -713,6 +721,8 @@ TILE_MAPPINGS:
       - x: 35
         y: 3
         flip: true
+        min_rank: E
+        max_rank: D
   story_noname4:
     category: npc
     id: story_noname4
@@ -734,6 +744,8 @@ TILE_MAPPINGS:
       - x: 32
         y: 6
         flip: true
+        min_rank: E
+        max_rank: D
   story_gareth:
     category: npc
     id: story_gareth
@@ -741,6 +753,8 @@ TILE_MAPPINGS:
       - x: 37
         y: 6
         flip: false
+        min_rank: E
+        max_rank: D
   story_camila:
     category: npc
     id: story_camila
@@ -748,6 +762,8 @@ TILE_MAPPINGS:
       - x: 39
         y: 5
         flip: false
+        min_rank: E
+        max_rank: D
   tapestry:
     category: obstacle
     id: tapestry

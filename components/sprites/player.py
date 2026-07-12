@@ -763,6 +763,7 @@ class Player(Entity):
         self.completed_fixed_quests = []
         self.defeated_once_only = []
         self.has_seen_ending = False
+        self.dungeon_core_cleared = False
         self.event_items = [{"key": "fathers_charm", "count": 1}]
         self.warehouse_items = []
         self.warehouse_max = MAX_WAREHOUSE_SLOTS
@@ -772,6 +773,7 @@ class Player(Entity):
         self.curse_level = 0
         self.cursed_stats = []
         self.shop_bonus_refresh = False  # ミッション達成後にショップ品揃え拡張
+        self.shop_seen_special = {}
         self.tactical_profile = TacticalProfile()
 
         if PLAYER_ARMOR and PLAYER_ARMOR in ARMOR_DATA:
@@ -1749,11 +1751,12 @@ class Player(Entity):
             "stealth_buff_pursuit_evasion": getattr(self, "stealth_buff_pursuit_evasion", 0),
             "stealth_buff_stupidity": getattr(self, "stealth_buff_stupidity", 0),
             "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
-            "completed_fixed_quests": self.completed_fixed_quests, "defeated_once_only": getattr(self, "defeated_once_only", []), "has_seen_ending": self.has_seen_ending, "warehouse_items": self.warehouse_items, "event_items": self.event_items,
+            "completed_fixed_quests": self.completed_fixed_quests, "defeated_once_only": getattr(self, "defeated_once_only", []), "has_seen_ending": self.has_seen_ending, "dungeon_core_cleared": getattr(self, "dungeon_core_cleared", False), "warehouse_items": self.warehouse_items, "event_items": self.event_items,
             "current_floor": self.current_floor, "max_reached_floor": self.max_reached_floor, "equip_id_counter": globals().get("_equip_id_counter", 0),
             "boss_message_shown": getattr(self, "boss_message_shown", False),
             "curse_level": getattr(self, "curse_level", 0),
             "cursed_stats": getattr(self, "cursed_stats", []),
+            "shop_seen_special": getattr(self, "shop_seen_special", {}),
             "tactical_profile": self.tactical_profile.to_dict(),
         }
 
@@ -1808,11 +1811,12 @@ class Player(Entity):
             if "reward_gold" not in q: q["reward_gold"] = 1
             if "reward_gp" not in q: q["reward_gp"] = 1
         self.quest_tokens = data.get("quest_tokens", {}); self.completed_fixed_quests = data.get("completed_fixed_quests", []); self.defeated_once_only = data.get("defeated_once_only", [])
-        self.has_seen_ending = data.get("has_seen_ending", False); self.max_reached_floor = data.get("max_reached_floor", 0); self.warehouse_items = data.get("warehouse_items", []); self.event_items = data.get("event_items", [])
+        self.has_seen_ending = data.get("has_seen_ending", False); self.dungeon_core_cleared = data.get("dungeon_core_cleared", False); self.max_reached_floor = data.get("max_reached_floor", 0); self.warehouse_items = data.get("warehouse_items", []); self.event_items = data.get("event_items", [])
         self.current_floor = data.get("current_floor", 0)
         self.boss_message_shown = data.get("boss_message_shown", False)
         self.curse_level = int(data.get("curse_level", 0))
         self.cursed_stats = data.get("cursed_stats", [])
+        self.shop_seen_special = data.get("shop_seen_special", {})
         self.tactical_profile = TacticalProfile.from_dict(data.get("tactical_profile", {}))
         global _equip_id_counter
         _equip_id_counter = max(_equip_id_counter, data.get("equip_id_counter", 0))

@@ -48,38 +48,37 @@ ending:
       text: "冒険は続く。\nけれど、君の足取りはもう迷っていない"
       bgm: "components/sounds/bgm/winding_adventure.mp3"
   core:
-core:
-  1:
-    image: "components/pictures/ending/core_1.png"
-    text: "世界はダンジョンを一つ失った。\nそれは、一つの時代が終わったということだった。"
-    bgm: "components/sounds/bgm/winding_adventure.mp3"
-  2:
-    image: "components/pictures/ending/core_2.png"
-    text: "ほどなくして、村は姿を失った。\n商人も、武器屋も、冒険者も、\nあの場所に寄りかかっていた営みは、静かに消えていった。"
-    bgm: "components/sounds/bgm/winding_adventure.mp3"
-  3:
-    image: "components/pictures/ending/core_3.png"
-    text: "君の決断は、何かを救い、何かを終わらせた。\n意義があったのか、必要だったのか。\nその答えは、簡単には出ない。"
-    bgm: "components/sounds/bgm/winding_adventure.mp3"
-  4:
-    image: "components/pictures/ending/core_2.png"
-    text: "正しかったか正しくないかは、あとから誰かが決める。\nだが、決めて動いた事実だけは残る。\n君は、確かにそれをやった。"
-    bgm: "components/sounds/bgm/winding_adventure.mp3"
+    1:
+      image: "components/pictures/ending/core_1.png"
+      text: "世界はダンジョンを一つ失った。\nそれは、一つの時代が終わったということだった。"
+      bgm: "components/sounds/bgm/ending_1.mp3"
+    2:
+      image: "components/pictures/ending/core_2.png"
+      text: "ほどなくして、村は姿を失った。\n商人も、武器屋も、冒険者も、\nあの場所に寄りかかっていた営みは、静かに消えていった。"
+      bgm: "components/sounds/bgm/ending_1.mp3"
+    3:
+      image: "components/pictures/ending/core_3.png"
+      text: "君の決断は、何かを救い、何かを終わらせた。\n意義があったのか、必要だったのか。\nその答えは、簡単には出ない。"
+      bgm: "components/sounds/bgm/ending_1.mp3"
+    4:
+      image: "components/pictures/ending/core_2.png"
+      text: "正しかったか正しくないかは、あとから誰かが決める。\nだが、決めて動いた事実だけは残る。\n君は、確かにそれをやった。"
+      bgm: "components/sounds/bgm/ending_1.mp3"
 
-core_refuse:
-   1:
-     image: "components/pictures/ending/core_refuse_1.png"
-     text: "君は、ダンジョンコアを壊さない道を選んだ。\nここで何を残すかを、先に決めたということだ。"
-     bgm: "components/sounds/bgm/winding_adventure.mp3"
-   2:
-     image: "components/pictures/ending/core_refuse_2.png"
-     text: "ダンジョンはこの世界に数多くある。\nここ一つを壊したところで、すべてが変わるわけではない。\nだが、この村で続いていた何かは、まだ壊さずに済んだ。"
-     bgm: "components/sounds/bgm/winding_adventure.mp3"
-   3:
-     image: "components/pictures/ending/core_refuse_3.png"
-     text: "君の決断は、村を丸ごと終わらせるかわりに、\nしばらくは今のまま生かすことを選んだ。\n正しいかどうかは、簡単には言えない。"
-     bgm: "components/sounds/bgm/winding_adventure.mp3"
-   4:
-     image: "components/pictures/ending/core_refuse_2.png"
-     text: "正しかったか正しくないかは、あとから誰かが決める。\nだが、決めて動いた事実だけは残る。\n君は、確かにそれをやった。"
-     bgm: "components/sounds/bgm/winding_adventure.mp3"
+  core_refuse:
+    1:
+      image: "components/pictures/ending/core_refuse_1.png"
+      text: "君は、ダンジョンコアを壊さない道を選んだ。\nここで何を残すかを、先に決めたということだ。"
+      bgm: "components/sounds/bgm/winding_adventure.mp3"
+    2:
+      image: "components/pictures/ending/core_refuse_2.png"
+      text: "ダンジョンはこの世界に数多くある。\nここ一つを壊したところで、すべてが変わるわけではない。\nだが、この村で続いていた何かは、まだ壊さずに済んだ。"
+      bgm: "components/sounds/bgm/winding_adventure.mp3"
+    3:
+      image: "components/pictures/ending/core_refuse_3.png"
+      text: "君の決断は、村を丸ごと終わらせるかわりに、\nしばらくは今のまま生かすことを選んだ。\n正しいかどうかは、簡単には言えない。"
+      bgm: "components/sounds/bgm/winding_adventure.mp3"
+    4:
+      image: "components/pictures/ending/core_refuse_2.png"
+      text: "正しかったか正しくないかは、あとから誰かが決める。\nだが、決めて動いた事実だけは残る。\n君は、確かにそれをやった。"
+      bgm: "components/sounds/bgm/winding_adventure.mp3"

@@ -536,6 +536,38 @@ ENEMY_DATA:
     ranged_attack_effect: strange_mucus
     attack_priority: close
     damaged_detect_range: 10
+  tsuchidaruma:
+    quest_targetable: true
+    name: つちだるま
+    min_rank: C
+    move_face_chance: 0.25
+    image_folder: components/pictures/enemies/tsuchidaruma
+    drops:
+      normal:
+      - expired_potion
+      - hp_potion
+      rare:
+      - red_stone
+      - green_stone
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.05
+    hp: 18
+    attack: 14
+    defense: 22
+    evasion: 8
+    exp: 18
+    reward_gold: 120
+    accuracy_close: 88
+    accuracy_ranged: 70
+    attack_range: 1
+    stupidity: 4
+    image_scale: 1.0
+    knockback_proc_chance: 0.3
+    knockback_max_distance: 1
+    close_attack_effect: knockback
+    ranged_attack_effect: sonic_wave
+    attack_priority: close
+    damaged_detect_range: 10
   gogogolem:
     quest_targetable: true
     name: ゴゴゴーレム
@@ -1354,6 +1386,100 @@ ENEMY_DATA:
     attack_priority: close
     damaged_detect_range: 50
     turn_attack: false
+  urank:
+    quest_targetable: true
+    name: ウランク
+    min_rank: S
+    min_floor: 70
+    max_floor: 70
+    move_face_chance: 0.35
+    max_concurrent: 1
+    max_spawns: 1
+    is_boss: true
+    spawn_chance: 0.0
+    crit_rate: 0.1
+    detect_range: 15
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/urank
+    encounter_message:
+      - ウランク に 発見された！
+      - 不穏な気配が空気を重くする…。
+    defeat_message: ウランク を 討伐した！
+    status: darkness
+    status_chance: 25
+    drops:
+      normal:
+      - hi_potion
+      - red_stone
+      rare:
+      - gold_ore
+      - sage_potion
+    normal_drop_rate: 0.25
+    rare_drop_rate: 0.1
+    hp: 160
+    attack: 25
+    defense: 72
+    evasion: 24
+    exp: 220
+    reward_gold: 3200
+    accuracy_close: 92
+    accuracy_ranged: 92
+    attack_range: 3
+    stupidity: 0
+    image_scale: 1.0
+    close_attack_effect: dark_bolt
+    ranged_attack_effect: sonic_wave
+    attack_priority: ranged
+    damaged_detect_range: 100
+    smart_ranged_move: true
+    turn_attack: true
+  temedaman:
+    quest_targetable: true
+    name: テメダマン
+    min_rank: S
+    min_floor: 80
+    max_floor: 80
+    move_face_chance: 0.3
+    max_concurrent: 1
+    max_spawns: 1
+    is_boss: true
+    spawn_chance: 0.0
+    crit_rate: 0.08
+    detect_range: 15
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/temedaman
+    encounter_message:
+      - メダマ に 発見された！
+      - 粘つく視線が、じっとこちらを追ってくる…。
+    defeat_message: テメダマン を 討伐した！
+    status: poison
+    status_chance: 30
+    drops:
+      normal:
+      - hi_potion
+      - blue_stone
+      rare:
+      - gold_ore
+      - barrier_stave
+    normal_drop_rate: 0.25
+    rare_drop_rate: 0.08
+    hp: 185
+    attack: 26
+    defense: 88
+    evasion: 18
+    exp: 260
+    reward_gold: 3800
+    accuracy_close: 90
+    accuracy_ranged: 94
+    attack_range: 4
+    stupidity: 0
+    image_scale: 1.0
+    close_attack_effect: dark_bolt
+    ranged_attack_effect: dark_bolt
+    attack_priority: ranged
+    damaged_detect_range: 100
+    smart_ranged_move: true
+    turn_attack: true
   meyon:
     quest_targetable: true
     name: メヨーン
@@ -1399,6 +1525,52 @@ ENEMY_DATA:
     attack_priority: ranged
     damaged_detect_range: 100
     smart_ranged_move: false
+  armor_knight:
+    quest_targetable: true
+    name: 番人
+    min_rank: S
+    min_floor: 90
+    max_floor: 90
+    move_face_chance: 0.2
+    max_concurrent: 1
+    max_spawns: 1
+    is_boss: true
+    spawn_chance: 0.0
+    crit_rate: 0.1
+    detect_range: 15
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/armor_knight
+    encounter_message:
+      - 番人に 発見された！
+      - 重い足音が、静かに距離を詰めてくる…。
+    defeat_message: 番人 を 討伐した！
+    status: paralysis
+    status_chance: 18
+    drops:
+      normal:
+      - hi_potion
+      - red_stone
+      rare:
+      - gold_ore
+      - fire_stave
+    normal_drop_rate: 0.25
+    rare_drop_rate: 0.08
+    hp: 210
+    attack: 25
+    defense: 96
+    evasion: 12
+    exp: 320
+    reward_gold: 5200
+    accuracy_close: 94
+    accuracy_ranged: 86
+    attack_range: 1
+    stupidity: 0
+    image_scale: 1.5
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: sonic_wave
+    attack_priority: close
+    damaged_detect_range: 100
+    turn_attack: true
   dungeon_core:
     quest_targetable: false
     name: ダンジョンコア
@@ -1416,7 +1588,7 @@ ENEMY_DATA:
     encounter_trigger_range: 3
     encounter_dialog_range: 3
     bgm: components/sounds/bgm/last_battle.mp3
-    defeat_bgm: components/sounds/bgm/winding_adventure.mp3
+    defeat_bgm: components/sounds/bgm/ending_1.mp3
     image_folder: components/pictures/enemies/dungeon_core_playerlike
     encounter_message:
       - ダンジョンコア に 発見された！

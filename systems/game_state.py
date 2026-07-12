@@ -17,6 +17,7 @@ game_state = {
     "boss_battle_persistent": False,
     "post_boss_clear_pending": False,
     "ending_route": "default",
+    "pending_ending_after_dialog": None,
     "inventory_active": False,
     "enhance_active": False,
     "status_active": False,  # ステータス画面用
