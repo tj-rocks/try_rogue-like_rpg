@@ -252,6 +252,33 @@ skill_guide:
       - 技の案内人： 2つの装備でスキルを発動させるか、1つに絞って性能を高めるか、ここが腕の見せどころだ
       - 技の案内人： 迷ったらいつでも話しかけて。今の構成に合う考え方を一緒に整理しよう
 
+core_aftermath_guide:
+  name: ギルド職員
+  image_path: components/pictures/npc/guide_guild_1
+  dialogue:
+    default:
+      - ギルド職員： ……戻られたのですね。
+      - ギルド職員： ダンジョンが消えてから、村の人も商いも、少しずつここを離れていきました。
+      - ギルド職員： あなたの決断で終わったものもあります。けれど、あなたが決めて進んだことも確かです。
+      - ギルド職員： その先を見届けるなら、どうかこちらへ。
+  role: core_ending_guide
+
+core_aftermath_villager:
+  name: 村人
+  image_path: components/pictures/npc/villager_1
+  dialogue:
+    default:
+      - 村人： あの迷宮がなくなるなんて、思ってもみなかったよ。
+      - 村人： 稼ぎ場を失って困る者もいる。けれど、あれで救われた命もあるのかもしれないね。
+
+core_aftermath_merchant:
+  name: 商人
+  image_path: components/pictures/npc/main_merchant
+  dialogue:
+    default:
+      - 商人： 商売はもう上がりだ。冒険者が来なけりゃ、この村に用はねえ。
+      - 商人： だが最後に立ち会ったのが、お前さんみたいな顔をしてる奴でまだよかったよ。
+
 # --- ストーリー担当NPC ---
 
 story_yuru:
@@ -266,7 +293,7 @@ story_yuru:
     D: 220
     C: 150
     B: 80
-    A: 80
+    A: 255
   dialogue:
     F:
       - ユル： 希望に燃えている！冒険者って最高だな！

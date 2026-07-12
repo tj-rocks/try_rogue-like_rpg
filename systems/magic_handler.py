@@ -234,6 +234,71 @@ class DirectionalFlashEffect(MagicEffect):
             pygame.draw.circle(s, c_flash, (radius, radius), radius)
             screen.blit(s, (draw_x - radius, draw_y - radius))
 
+class BossDefeatAuraEffect(MagicEffect):
+    """ボス撃破後にその場へ残る残光と上昇粒子の演出。"""
+    def __init__(self, x, y, duration=360, color=(210, 240, 255), radius=56):
+        super().__init__(x, y, duration=duration)
+        self.color = color
+        self.radius = radius
+        self.particles = []
+
+    def update(self):
+        super().update()
+        import random
+
+        progress = 1.0 - (self.duration / self.max_duration)
+        spawn_count = 2 if self.duration > self.max_duration * 0.5 else 1
+        for _ in range(spawn_count):
+            angle = random.uniform(-0.8, 0.8)
+            px = self.x + random.randint(-self.radius // 3, self.radius // 3)
+            py = self.y + random.randint(-10, 10)
+            self.particles.append({
+                "x": px,
+                "y": py,
+                "vx": angle,
+                "vy": random.uniform(-1.8, -0.8),
+                "life": random.randint(18, 36),
+                "max_life": 36,
+                "size": random.randint(3, 7),
+                "alpha_scale": max(0.25, 1.0 - progress * 0.6),
+            })
+
+        for particle in self.particles[:]:
+            particle["x"] += particle["vx"]
+            particle["y"] += particle["vy"]
+            particle["life"] -= 1
+            if particle["life"] <= 0:
+                self.particles.remove(particle)
+
+    def draw(self, screen, camera_x, camera_y):
+        draw_x = self.x - camera_x + 32
+        draw_y = self.y - camera_y + 32
+        ratio = max(0.0, self.duration / self.max_duration)
+
+        # 地面に残る淡い残光
+        for i in range(3):
+            aura_radius = int(self.radius * (1.0 - i * 0.18) * (0.85 + 0.15 * ratio))
+            if aura_radius <= 0:
+                continue
+            s = pygame.Surface((aura_radius * 2 + 4, aura_radius + 8), pygame.SRCALPHA)
+            aura = pygame.Color(*self.color)
+            aura.a = int((70 - i * 18) * ratio)
+            pygame.draw.ellipse(s, aura, (2, 2, aura_radius * 2, aura_radius))
+            screen.blit(s, (draw_x - aura_radius - 2, draw_y - aura_radius // 2))
+
+        # 上へ抜ける小粒
+        for particle in self.particles:
+            alpha = int(180 * (particle["life"] / particle["max_life"]) * particle["alpha_scale"])
+            size = particle["size"]
+            s = pygame.Surface((size * 2 + 2, size * 2 + 2), pygame.SRCALPHA)
+            c = pygame.Color(*self.color)
+            c.a = alpha
+            pygame.draw.circle(s, c, (size + 1, size + 1), size)
+            core = pygame.Color(255, 255, 255)
+            core.a = min(255, alpha + 40)
+            pygame.draw.circle(s, core, (size + 1, size + 1), max(1, size // 2))
+            screen.blit(s, (particle["x"] - camera_x - size, particle["y"] - camera_y - size))
+
 def _is_fighters_full_set(player):
     """戦士シリーズフルセット装備中かどうかを判定"""
     w_inst = player._find_equip_inst(player.weapon_inventory, player.equipped_weapon)

@@ -406,7 +406,7 @@ class ParameterSelectionDialog(BaseListDialog):
             "dex_bonus": "器用さ",
             "crit_bonus": "会心率", "crit_rate": "会心率",
             "block_chance_close": "近距離回避",
-            "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正",
+            "block_chance_ranged": "遠距離回避", "aggro_mod": "感知補正", "pursuit_evasion": "追跡妨害",
             "armor_penetration": "防御無視", "stupidity": "混乱",
             "regen_bonus": "自然回復", "lantern_bonus": "光源範囲",
             "magic_fire_damage": "[炎]ダメ", "magic_fire_range": "[炎]射程",

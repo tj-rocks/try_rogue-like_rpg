@@ -215,6 +215,8 @@ TILE_MAPPINGS:
       - x: 12
         y: 6
         flip: false
+        min_rank: F
+        max_rank: E
   story_noname4:
     category: npc
     id: story_noname4
@@ -229,6 +231,8 @@ TILE_MAPPINGS:
       - x: 18
         y: 6
         flip: true
+        min_rank: F
+        max_rank: D
   story_gareth:
     category: npc
     id: story_gareth
@@ -236,6 +240,8 @@ TILE_MAPPINGS:
       - x: 20
         y: 6
         flip: false
+        min_rank: F
+        max_rank: D
   story_camila:
     category: npc
     id: story_camila
@@ -243,6 +249,8 @@ TILE_MAPPINGS:
       - x: 6
         y: 8
         flip: false
+        min_rank: F
+        max_rank: E
   story_geisel:
     category: npc
     id: story_geisel
@@ -250,6 +258,8 @@ TILE_MAPPINGS:
       - x: 19
         y: 11
         flip: true
+        min_rank: F
+        max_rank: D
   story_kaya:
     category: npc
     id: story_kaya
@@ -257,6 +267,8 @@ TILE_MAPPINGS:
       - x: 21
         y: 11
         flip: false
+        min_rank: F
+        max_rank: D
   story_rain:
     category: npc
     id: story_rain
@@ -264,6 +276,8 @@ TILE_MAPPINGS:
       - x: 7
         y: 12
         flip: true
+        min_rank: F
+        max_rank: D
   story_yuru:
     category: npc
     id: story_yuru
@@ -271,3 +285,5 @@ TILE_MAPPINGS:
       - x: 9
         y: 12
         flip: false
+        min_rank: F
+        max_rank: D

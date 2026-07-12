@@ -536,6 +536,38 @@ ENEMY_DATA:
     ranged_attack_effect: strange_mucus
     attack_priority: close
     damaged_detect_range: 10
+  tsuchidaruma:
+    quest_targetable: true
+    name: つちだるま
+    min_rank: C
+    move_face_chance: 0.25
+    image_folder: components/pictures/enemies/tsuchidaruma
+    drops:
+      normal:
+      - expired_potion
+      - hp_potion
+      rare:
+      - red_stone
+      - green_stone
+    normal_drop_rate: 0.15
+    rare_drop_rate: 0.05
+    hp: 18
+    attack: 14
+    defense: 22
+    evasion: 8
+    exp: 18
+    reward_gold: 120
+    accuracy_close: 88
+    accuracy_ranged: 70
+    attack_range: 1
+    stupidity: 4
+    image_scale: 1.0
+    knockback_proc_chance: 0.3
+    knockback_max_distance: 1
+    close_attack_effect: knockback
+    ranged_attack_effect: sonic_wave
+    attack_priority: close
+    damaged_detect_range: 10
   gogogolem:
     quest_targetable: true
     name: ゴゴゴーレム
@@ -666,8 +698,8 @@ ENEMY_DATA:
     attack_range: 2
     stupidity: 3
     image_scale: 1.0
-    trap_type: poison_trap
-    trap_proc_chance: 0.2
+    # trap_type: poison_trap
+    # trap_proc_chance: 0.2
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
     attack_priority: close
@@ -778,8 +810,8 @@ ENEMY_DATA:
     ranged_attack_effect: strange_mucus
     attack_priority: ranged
     smart_ranged_move: true
-    trap_type: poison_trap
-    trap_proc_chance: 0.25
+    # trap_type: poison_trap
+    # trap_proc_chance: 0.25
     damaged_detect_range: 12
   medaman:
     quest_targetable: true
@@ -1319,6 +1351,7 @@ ENEMY_DATA:
     crit_rate: 0.1
     detect_range: 15
     bgm: components/sounds/bgm/fight_against_destiny.mp3
+    defeat_bgm: components/sounds/bgm/ending_1.mp3
     image_folder: components/pictures/enemies/father
     encounter_message:
     - …懐かしい感じがする。
@@ -1338,7 +1371,7 @@ ENEMY_DATA:
     normal_drop_rate: 0.0
     rare_drop_rate: 1.0
     hp: 100
-    attack: 30
+    attack: 20
     defense: 60
     evasion: 40
     exp: 200
@@ -1346,12 +1379,106 @@ ENEMY_DATA:
     accuracy_close: 90
     accuracy_ranged: 90
     attack_range: 4
-    stupidity: 0
+    stupidity: 1
     image_scale: 1
     close_attack_effect: physical_heavy
     ranged_attack_effect: dark_bolt
     attack_priority: close
     damaged_detect_range: 50
+    turn_attack: false
+  urank:
+    quest_targetable: true
+    name: ウランク
+    min_rank: S
+    min_floor: 70
+    max_floor: 70
+    move_face_chance: 0.35
+    max_concurrent: 1
+    max_spawns: 1
+    is_boss: true
+    spawn_chance: 0.0
+    crit_rate: 0.1
+    detect_range: 15
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/urank
+    encounter_message:
+      - ウランク に 発見された！
+      - 不穏な気配が空気を重くする…。
+    defeat_message: ウランク を 討伐した！
+    status: darkness
+    status_chance: 25
+    drops:
+      normal:
+      - hi_potion
+      - red_stone
+      rare:
+      - gold_ore
+      - sage_potion
+    normal_drop_rate: 0.25
+    rare_drop_rate: 0.1
+    hp: 160
+    attack: 25
+    defense: 72
+    evasion: 24
+    exp: 220
+    reward_gold: 3200
+    accuracy_close: 92
+    accuracy_ranged: 92
+    attack_range: 3
+    stupidity: 0
+    image_scale: 1.0
+    close_attack_effect: dark_bolt
+    ranged_attack_effect: sonic_wave
+    attack_priority: ranged
+    damaged_detect_range: 100
+    smart_ranged_move: true
+    turn_attack: true
+  temedaman:
+    quest_targetable: true
+    name: テメダマン
+    min_rank: S
+    min_floor: 80
+    max_floor: 80
+    move_face_chance: 0.3
+    max_concurrent: 1
+    max_spawns: 1
+    is_boss: true
+    spawn_chance: 0.0
+    crit_rate: 0.08
+    detect_range: 15
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/temedaman
+    encounter_message:
+      - メダマ に 発見された！
+      - 粘つく視線が、じっとこちらを追ってくる…。
+    defeat_message: テメダマン を 討伐した！
+    status: poison
+    status_chance: 30
+    drops:
+      normal:
+      - hi_potion
+      - blue_stone
+      rare:
+      - gold_ore
+      - barrier_stave
+    normal_drop_rate: 0.25
+    rare_drop_rate: 0.08
+    hp: 185
+    attack: 26
+    defense: 88
+    evasion: 18
+    exp: 260
+    reward_gold: 3800
+    accuracy_close: 90
+    accuracy_ranged: 94
+    attack_range: 4
+    stupidity: 0
+    image_scale: 1.0
+    close_attack_effect: dark_bolt
+    ranged_attack_effect: dark_bolt
+    attack_priority: ranged
+    damaged_detect_range: 100
+    smart_ranged_move: true
     turn_attack: true
   meyon:
     quest_targetable: true
@@ -1398,6 +1525,52 @@ ENEMY_DATA:
     attack_priority: ranged
     damaged_detect_range: 100
     smart_ranged_move: false
+  armor_knight:
+    quest_targetable: true
+    name: 番人
+    min_rank: S
+    min_floor: 90
+    max_floor: 90
+    move_face_chance: 0.2
+    max_concurrent: 1
+    max_spawns: 1
+    is_boss: true
+    spawn_chance: 0.0
+    crit_rate: 0.1
+    detect_range: 15
+    bgm: components/sounds/bgm/get_hornor.mp3
+    image_folder: components/pictures/enemies/armor_knight
+    encounter_message:
+      - 番人に 発見された！
+      - 重い足音が、静かに距離を詰めてくる…。
+    defeat_message: 番人 を 討伐した！
+    status: paralysis
+    status_chance: 18
+    drops:
+      normal:
+      - hi_potion
+      - red_stone
+      rare:
+      - gold_ore
+      - fire_stave
+    normal_drop_rate: 0.25
+    rare_drop_rate: 0.08
+    hp: 210
+    attack: 25
+    defense: 96
+    evasion: 12
+    exp: 320
+    reward_gold: 5200
+    accuracy_close: 94
+    accuracy_ranged: 86
+    attack_range: 1
+    stupidity: 0
+    image_scale: 1.5
+    close_attack_effect: physical_heavy
+    ranged_attack_effect: sonic_wave
+    attack_priority: close
+    damaged_detect_range: 100
+    turn_attack: true
   dungeon_core:
     quest_targetable: false
     name: ダンジョンコア
@@ -1413,14 +1586,31 @@ ENEMY_DATA:
     crit_rate: 0.08
     detect_range: 10
     encounter_trigger_range: 3
-    bgm: components/sounds/bgm/fight_against_destiny.mp3
+    encounter_dialog_range: 3
+    bgm: components/sounds/bgm/last_battle.mp3
+    defeat_bgm: components/sounds/bgm/ending_1.mp3
     image_folder: components/pictures/enemies/dungeon_core_playerlike
     encounter_message:
       - ダンジョンコア に 発見された！
-      - 静かな視線が、こちらの旅路を見つめている。
+      - 静かにこちらを見つめている。
     dialog_message:
-      - 「ここまで来たのか」
-      - 「進むのなら、覚悟を見せろ」
+      - ダンジョンコア：ようこそ。お待ちしておりました。
+      - ダンジョンコア：あなたを迎えるために、この庭園を整えておいたのです。
+      - ダンジョンコア：ここまで来る者は多くありません。来られたとしても、私の前まで辿り着ける者は、さらに少ない。
+      - ダンジョンコア：私はずっと、あなた方を見てきました。
+      - ダンジョンコア：挑む者も、怯える者も、壊れていく者も、夢にしがみつく者も。
+      - ダンジョンコア：そしてあなたのことも、見ていました。
+      - ダンジョンコア：退くとき、踏み込むとき、迷うとき、あなたはいつも自分で決めてここまで来た。
+      - ダンジョンコア：私を討伐する前に、少しだけ話を聞いていただけませんか。
+      - ダンジョンコア：ええ、私は人の魂を喰らって生きています。昔からギルドとも協力関係にあります。
+      - ダンジョンコア：それが私の生きるために必要だからです。
+      - ダンジョンコア：ですが、私は誰かを無理にダンジョンへ誘ったことはありません。あなた方は自ら望んで、ここへ来た。
+      - ダンジョンコア：回復薬や魔法の杖を、あなたも使ってきたはずです。
+      - ダンジョンコア：もうお気づきでしょう。ダンジョンのアイテムも、敵も、その多くは冒険者たちの魂の残骸から生まれたものです。
+      - ダンジョンコア：私を悪だと言うのなら、あなたは何が違うのですか。
+      - ダンジョンコア：夢のために魂を喰らってきたのは、あなたも同じではありませんか。
+      - ダンジョンコア：それでも、あなたが私を討つと決めたのなら、私は止めません。
+      - ダンジョンコア：どうか剣を抜く前に、もう一度だけ考えてください。
     select_dialog:
       message:
         - 戦いますか
@@ -1434,15 +1624,17 @@ ENEMY_DATA:
       shield:
         key: broken_shield
     defeat_message:
-      - ダンジョンコア は 静かに崩れ落ちた。
+      - ダンジョンコア：ありがとうございます。やっとこれで解放されます。
+      - ダンジョンコア：最後に戦った相手があなたで本当に良かった。      
     drops:
-      normal: []
+      normal: 
+        - return_wing
       rare: []
-    normal_drop_rate: 0.0
+    normal_drop_rate: 1.0
     rare_drop_rate: 0.0
-    hp: 220
+    hp: 280
     attack: 20
-    defense: 95
+    defense: 55
     evasion: 18
     exp: 0
     reward_gold: 0

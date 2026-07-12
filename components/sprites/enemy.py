@@ -70,6 +70,7 @@ class Enemy(Entity):
         self.status_to_inflict = data.get("status"); self.status_chance = data.get("status_chance", 100)
         self.detect_range = data.get("detect_range", ENEMY_AGGRO_RADIUS)
         self.damaged_detect_range = data.get("damaged_detect_range", 100)
+        self.player_detected = False
         self.counter_ready_turns = 0
         self.attack_modes = data.get("attack_modes", [])
         self.attack_range_line = data.get("attack_range_line", self.attack_range)
@@ -1287,13 +1288,28 @@ class Enemy(Entity):
                 best_dx, best_dy = tdx, tdy
         
         dx, dy = best_dx, best_dy
-        rad = max(1, self.detect_range - player.get_aggro_modifier())
-        if getattr(self, "damage_flash_timer", 0) > 0: rad = max(rad, self.damaged_detect_range)
-        
-        # 感知範囲外チェック
-        if abs(dx) > rad or abs(dy) > rad:
-            self._log_trace(dungeon, f"out of range (dist to player: {abs(dx)},{abs(dy)} > detect_range: {rad}) | self:({self.x},{self.y}) player_actual:({player.x},{player.y}) ts:{dungeon.tile_size}")
-            return
+        detect_rad = max(1, self.detect_range - player.get_aggro_modifier())
+        if getattr(self, "damage_flash_timer", 0) > 0:
+            detect_rad = max(detect_rad, self.damaged_detect_range)
+
+        in_detect_range = abs(dx) <= detect_rad and abs(dy) <= detect_rad
+        if not self.player_detected:
+            if not in_detect_range:
+                self._log_trace(dungeon, f"out of range (dist to player: {abs(dx)},{abs(dy)} > detect_range: {detect_rad}) | self:({self.x},{self.y}) player_actual:({player.x},{player.y}) ts:{dungeon.tile_size}")
+                return
+            self.player_detected = True
+        else:
+            if not in_detect_range:
+                self.player_detected = False
+                self._log_trace(dungeon, f"lost player: range break ({abs(dx)},{abs(dy)} > {detect_rad})")
+                return
+            pursuit_evasion = max(0, getattr(player, "get_pursuit_evasion", lambda: 0)())
+            if pursuit_evasion > 0 and getattr(self, "damage_flash_timer", 0) <= 0 and (abs(dx) + abs(dy)) > 1:
+                lose_chance = min(0.60, float(pursuit_evasion) * 0.10)
+                if random.random() < lose_chance:
+                    self.player_detected = False
+                    self._log_trace(dungeon, f"lost player: pursuit_evasion={pursuit_evasion} chance={lose_chance:.2f}")
+                    return
             
         # 困惑度テーブルを参照してぼーっと確率を決定（一時的 stupidity も加算）
         effective_stupidity = min(10, self.stupidity + self.stupidity_temp)
@@ -1357,11 +1373,12 @@ class Enemy(Entity):
 
         # ── [ESCAPE_BLOCK] 逃げ道封鎖AI + フランク (削除時はこのブロックごと除去) ──
         if (abs(dx) + abs(dy)) > 1:
+            ally_search_radius = max(1, detect_rad)
             nearby_allies = [
                 e for e in all_entities
                 if e is not self and isinstance(e, Enemy) and not getattr(e, "is_dead", False)
-                and abs(int((e.x+e.width/2)//dungeon.tile_size) - px) <= rad
-                and abs(int((e.y+e.height/2)//dungeon.tile_size) - py) <= rad
+                and abs(int((e.x+e.width/2)//dungeon.tile_size) - px) <= ally_search_radius
+                and abs(int((e.y+e.height/2)//dungeon.tile_size) - py) <= ally_search_radius
             ]
             if nearby_allies:
                 my_dist = abs(mx - px) + abs(my - py)

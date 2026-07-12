@@ -100,7 +100,7 @@ def main():
 
             elif scene == "ending":
                 from systems.resources import ending_imgs, story_data
-                handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_data)
+                handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_data, player=player)
 
             # 3. 画面更新
             pygame.display.flip()

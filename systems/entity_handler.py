@@ -56,20 +56,37 @@ def _normalize_dialog_text(value):
         return "\n".join(str(v) for v in value if v is not None)
     return str(value)
 
+def _normalize_dialog_sequence(value):
+    if not value:
+        return []
+    if isinstance(value, list):
+        return [str(v) for v in value if v is not None and str(v) != ""]
+    text = str(value)
+    return [text] if text else []
+
 def _get_boss_encounter_config(boss_type):
     cfg = ENEMY_DATA.get(boss_type, {})
     select_cfg = cfg.get("select_dialog") or {}
+    has_select_dialog = isinstance(select_cfg, Mapping) and bool(select_cfg)
     if not isinstance(select_cfg, Mapping):
         select_cfg = {}
     return {
         "encounter_message": _normalize_dialog_text(cfg.get("encounter_message")),
         "dialog_message": _normalize_dialog_text(cfg.get("dialog_message")),
+        "dialog_sequence": _normalize_dialog_sequence(cfg.get("dialog_message")),
+        "has_select_dialog": has_select_dialog,
         "prompt": _normalize_dialog_text(select_cfg.get("message")) or "戦いますか",
         "yes_text": str(select_cfg.get("yes_text") or "はい"),
         "no_text": str(select_cfg.get("no_text") or "いいえ"),
         "yes_action": select_cfg.get("yes_action") or "battle_start",
         "no_action": select_cfg.get("no_action") or "village_warp",
         "encounter_trigger_range": int(cfg.get("encounter_trigger_range", cfg.get("detect_range", 3) or 3)),
+        "encounter_dialog_range": int(
+            cfg.get(
+                "encounter_dialog_range",
+                cfg.get("encounter_trigger_range", cfg.get("detect_range", 3) or 3),
+            )
+        ),
     }
 
 def _start_boss_battle(dungeon, player, boss):
@@ -239,26 +256,48 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
                 from systems.ui import show_dialog
                 from systems.guild import GuildSystem
                 from constants import SOUND_QUEST_COMPLETE, SOUND_BOSS_VICTORY
-                from systems.magic_handler import FlashEffect
+                from systems.magic_handler import FlashEffect, BossDefeatAuraEffect
+                from systems.audio_manager import play_bgm
                 import os
+                enemy_type = getattr(enemy, "type", None)
                 
                 # 白フラッシュエフェクト（約1秒）
                 dungeon.magic_effects.append(FlashEffect(color=(255, 255, 255), duration=60))
+                dungeon.magic_effects.append(
+                    BossDefeatAuraEffect(
+                        enemy.x,
+                        enemy.y,
+                        duration=360,
+                        color=(210, 240, 255) if enemy_type == "dungeon_core" else (235, 235, 255),
+                        radius=max(enemy.width, enemy.height),
+                    )
+                )
                 
                 # 勝利SEの再生 (自作の boss_victory.wav があれば優先)
                 victory_se = SOUND_BOSS_VICTORY if os.path.exists(SOUND_BOSS_VICTORY) else SOUND_QUEST_COMPLETE
                 
                 if os.path.exists(victory_se):
                     pygame.mixer.Sound(victory_se).play()
+
+                # ボス撃破時点で戦闘BGMを解除し、専用曲があればそちらへ切り替える
+                game_state["is_boss_battle"] = False
+                game_state["boss_battle_persistent"] = False
+                game_state["boss_encounter_pending"] = False
+                defeat_bgm = ENEMY_DATA.get(enemy_type, {}).get("defeat_bgm")
+                if defeat_bgm:
+                    play_bgm(defeat_bgm)
+                else:
+                    dungeon.play_floor_bgm()
                 
                 # 撃破メッセージを表示 (モーダル表示：入力を待つ)
-                # enemies.yml の defeat_message があればそれを使う
-                enemy_type = getattr(enemy, "type", None)
-                defeat_msg = ENEMY_DATA.get(enemy_type, {}).get("defeat_message")
-                if defeat_msg:
-                    if isinstance(defeat_msg, list):
-                        defeat_msg = "\n".join(defeat_msg)
-                    show_dialog(dialog, defeat_msg, modal=True, auto_close=0)
+                # enemies.yml の defeat_message があれば順送りでそれを使う
+                defeat_sequence = _normalize_dialog_sequence(
+                    ENEMY_DATA.get(enemy_type, {}).get("defeat_message")
+                )
+                if defeat_sequence:
+                    dialog.page_wait_frames = 60
+                    show_dialog(dialog, defeat_sequence, modal=True, auto_close=0)
+                    dialog.on_close_callback = lambda d=dialog: setattr(d, "page_wait_frames", 2)
                 else:
                     show_dialog(dialog, f"{enemy.name} を 討伐した！", modal=True, auto_close=0)
 
@@ -271,7 +310,6 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
                     from systems.game_state import game_state
                     game_state["post_boss_clear_pending"] = True
                     game_state["ending_route"] = "core" if enemy_type == "dungeon_core" else "father"
-                    show_dialog(dialog, "ダンジョンコアを討伐した。", modal=True, auto_close=0)
                 
                 # once_only 敵の撃破記録
                 if enemy_type and ENEMY_DATA.get(enemy_type, {}).get("once_only"):
@@ -458,7 +496,7 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
             pgx, pgy = int(player.x // dungeon.tile_size), int(player.y // dungeon.tile_size)
             dist = max(abs(egx - pgx), abs(egy - pgy))
             boss_cfg = _get_boss_encounter_config(getattr(enemy, "type", None))
-            trigger_range = max(1, boss_cfg["encounter_trigger_range"] - player.get_aggro_modifier())
+            trigger_range = max(1, boss_cfg["encounter_dialog_range"])
 
             if dist <= trigger_range:
                 active_boss = enemy
@@ -480,13 +518,10 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
                 if confirm_dialog:
                     from systems.ui import show_dialog
                     dialog_msg = boss_cfg["dialog_message"]
+                    dialog_sequence = boss_cfg["dialog_sequence"]
                     game_state["boss_encounter_pending"] = True
                     game_state["boss_battle_persistent"] = boss_type == "dungeon_core"
                     active_boss.battle_locked = True
-                    if dialog_msg:
-                        show_dialog(dialog, dialog_msg, modal=True, auto_close=0)
-                    else:
-                        show_dialog(dialog, encounter_msg, modal=True, auto_close=0)
 
                     def on_yes(boss=active_boss, dun=dungeon, pl=player):
                         _start_boss_battle(dun, pl, boss)
@@ -499,7 +534,30 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
 
                     confirm_dialog.on_yes = on_yes if boss_cfg["yes_action"] == "battle_start" else None
                     confirm_dialog.on_no = on_no if boss_cfg["no_action"] == "village_warp" else None
-                    dialog.on_close_callback = lambda cd=confirm_dialog, cfg=boss_cfg: _open_boss_select_dialog(cd, cfg)
+
+                    def _finish_boss_dialog(
+                        cd=confirm_dialog,
+                        cfg=boss_cfg,
+                        boss=active_boss,
+                        dun=dungeon,
+                        pl=player,
+                        d=dialog,
+                    ):
+                        d.page_wait_frames = 2
+                        if cfg["has_select_dialog"]:
+                            _open_boss_select_dialog(cd, cfg)
+                        else:
+                            _start_boss_battle(dun, pl, boss)
+
+                    if dialog_sequence:
+                        dialog.page_wait_frames = 60
+                        show_dialog(dialog, dialog_sequence, modal=True, auto_close=0)
+                        dialog.on_close_callback = _finish_boss_dialog
+                    else:
+                        dialog.page_wait_frames = 60
+                        show_dialog(dialog, dialog_msg or encounter_msg, modal=True, auto_close=0)
+                        dialog.just_opened_timer = 60
+                        dialog.on_close_callback = _finish_boss_dialog
                     gs["dialog_modal"] = True
             else:
                 if boss_type not in shown_bosses:

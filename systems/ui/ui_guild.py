@@ -340,6 +340,8 @@ class GuildDialog(StateKeyMixin):
             if q.get("id") and q.get("id") not in player.completed_fixed_quests:
                 player.completed_fixed_quests.append(q.get("id"))
             player.shop_bonus_refresh = True
+            if self.dungeon_ref:
+                self.dungeon_ref.refresh_shop_stock(player_rank=player.guild_rank)
 
             # マスターデータからもエンディング対象かチェック（セーブデータにフラグがない場合への対策）
             is_ending_quest = q.get("ending", False)

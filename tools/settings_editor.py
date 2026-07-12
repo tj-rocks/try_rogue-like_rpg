@@ -8,7 +8,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(PROJECT_ROOT, "components/data/master")
-HTML_PATH = os.path.join(PROJECT_ROOT, "tools/settings_editor.html")
+HTML_PATH = os.path.join(PROJECT_ROOT, "tools/web/settings_editor.html")
 PORT = 8765
 
 FILES = {

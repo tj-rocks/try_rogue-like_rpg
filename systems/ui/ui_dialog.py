@@ -32,6 +32,7 @@ class Dialog:
         self.scroll_y = 0 # 現在の表示開始行
         self.max_scroll = 0
         self.just_opened_timer = 0 # 開いた直後の入力を無視するためのタイマー
+        self.page_wait_frames = 2
 
     @property
     def text(self):
@@ -39,10 +40,10 @@ class Dialog:
 
     @text.setter
     def text(self, value):
-        self._text = value
+        self._text = "" if value is None else str(value)
         # 直接テキストが代入された場合、それを唯一のページとする（ページ送り処理中を除く）
         if not getattr(self, "_in_page_flip", False):
-            self.pages = [value]
+            self.pages = [self._text]
             self.page_idx = 0
 
     def set_pages(self, pages_list):
@@ -52,6 +53,7 @@ class Dialog:
         self.text = self.pages[0]
         self._in_page_flip = False
         self.is_active = True
+        self.just_opened_timer = self.page_wait_frames
 
     # is_active（開閉状態）は独立した変数ではなく、中央の game_state を使うように変更！
     @property
@@ -81,7 +83,7 @@ class Dialog:
                 cb()
         else:
             # 開いた瞬間にフラグを立てる (2フレーム分無視)
-            self.just_opened_timer = 2
+            self.just_opened_timer = self.page_wait_frames
 
     def update(self):
         """毎フレーム呼ばれ、オートクローズタイマーのカウントダウンなどを行う"""
@@ -106,7 +108,7 @@ class Dialog:
                         self.text = self.pages[self.page_idx]
                         self._in_page_flip = False
                         self.scroll_y = 0
-                        self.just_opened_timer = 2 # 誤連打防止のための短いウェイト
+                        self.just_opened_timer = self.page_wait_frames
                         print(f"[UI] Dialog page advanced to: {self.page_idx + 1}/{len(self.pages)}")
                     else:
                         self.is_active = False

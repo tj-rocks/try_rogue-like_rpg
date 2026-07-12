@@ -723,6 +723,7 @@ def draw_debug_overlay(screen, dungeon, player):
         "[N/B] : Warp Next/Prev Floor | [Shift]+ : Jump 10F",
         "[G] : God Mode (Invincibility + Atk x100)",
         "[H] : Heal HP | [K] : Kill All Enemies",
+        "[Y] : Trigger Shop Sale",
         "[PageUp/Dn] : Adjust GP (+/-100)",
         "[. / ,] : Rank UP / DOWN",
         "[J] : Last Boss Mode",
@@ -820,6 +821,10 @@ def main():
                         count = len(dungeon.enemies)
                         dungeon.enemies = []
                         print(f"[DEBUG] Annihilated {count} enemies!")
+                    elif event.key == pygame.K_y: # Trigger shop sale refresh
+                        player.shop_bonus_refresh = True
+                        dungeon.refresh_shop_stock(player_rank=player.guild_rank)
+                        print(f"[DEBUG] Shop Sale Triggered! Rank={player.guild_rank}")
                     
                     # 進捗調整
                     elif event.key == pygame.K_PAGEUP:
@@ -829,14 +834,16 @@ def main():
                         player.guild_point = max(0, player.guild_point - 100)
                         print(f"[DEBUG] GP decreased to {player.guild_point}")
                     elif event.key == pygame.K_PERIOD:
-                        ranks = ["F", "E", "D", "C", "B", "A", "S"]
+                        from constants import RANK_ORDER
+                        ranks = list(RANK_ORDER) if RANK_ORDER else ["F", "E", "D", "C", "B", "A", "S", "SS"]
                         idx = ranks.index(player.guild_rank) if player.guild_rank in ranks else 0
                         if idx < len(ranks) - 1:
                             player.guild_rank = ranks[idx + 1]
                             print(f"[DEBUG] Rank UP: {player.guild_rank}")
                             dungeon = setup_gungeon_mode(dungeon, player) # クエスト候補更新のため
                     elif event.key == pygame.K_COMMA:
-                        ranks = ["F", "E", "D", "C", "B", "A", "S"]
+                        from constants import RANK_ORDER
+                        ranks = list(RANK_ORDER) if RANK_ORDER else ["F", "E", "D", "C", "B", "A", "S", "SS"]
                         idx = ranks.index(player.guild_rank) if player.guild_rank in ranks else 0
                         if idx > 0:
                             player.guild_rank = ranks[idx - 1]
@@ -869,7 +876,7 @@ def main():
                 draw_debug_overlay(screen, dungeon, player)
             elif scene == "ending":
                 from systems.resources import ending_imgs, story_data
-                handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_data)
+                handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_data, player=player)
             elif scene == "opening":
                 from systems.resources import opening_imgs, story_data
                 def dummy_start(): pass

@@ -22,6 +22,7 @@ EQUIP_STAT_LABEL_MAP = {
     "block_chance_close": "近距離回避率",
     "block_chance_ranged": "遠距離回避率",
     "aggro_mod": "感知補正",
+    "pursuit_evasion": "追跡妨害",
     "armor_penetration": Text.UI.STAT_ARMOR_PENETRATION,
     "stupidity": Text.UI.STAT_CONFUSION_ICON,
     "backstab_crit_bonus": "背後会心",
@@ -204,6 +205,7 @@ def show_loading_screen(screen, text=None):
     重い処理（ダンジョン生成やセーブ）の前に呼び出して、
     画面全体を少し暗くし、中央に読み込み中表示を出す。
     """
+    from systems.events import clear_input_events
     if text is None: text = Text.UI.NOW_LOADING
     
     sw, sh = screen.get_size()
@@ -234,6 +236,7 @@ def show_loading_screen(screen, text=None):
     
     # 画面を強制更新（これを行わないと、直後の重い処理中に画面に反映されない）
     pygame.display.flip()
+    clear_input_events()
 
 def draw_text_wrapped(screen, font, text, x, y, max_width, box_height=None, color=(255, 255, 255), align_h='left', align_v='top', alpha=255):
     """指定されたボックス内でテキストを折り返し、アライメント（左・中央・右 / 上・中・下）を考慮して描画する"""
@@ -326,6 +329,13 @@ def show_dialog(dialog, text, modal=False, auto_close=None):
     """
     if not dialog: return
     from constants import COMBAT_LOG_WAIT_FRAMES
+
+    if isinstance(text, list):
+        dialog.set_pages([str(t) for t in text if t is not None])
+        from systems.game_state import game_state
+        game_state["dialog_modal"] = modal
+        dialog.auto_close_timer = auto_close if auto_close is not None else COMBAT_LOG_WAIT_FRAMES
+        return
     
     if dialog.is_active:
         # 重複表示を避けるため、最後の行と同じなら追記しない
@@ -542,7 +552,7 @@ class BaseListDialog(StateKeyMixin):
         bar_stat_keys = {
             "attack_bonus", "defense_bonus", "hp_bonus",
             "crit_bonus", "block_chance_close", "block_chance_ranged",
-            "armor_penetration", "aggro_mod", "stupidity",
+            "armor_penetration", "aggro_mod", "pursuit_evasion", "stupidity",
         }
         
         # instからステータスを取得してバー描画
@@ -617,6 +627,13 @@ def show_dialog(dialog, text, modal=False, auto_close=None):
     """メッセージウィンドウにテキストを表示する。既に表示中の場合は改行して追記する。"""
     if not dialog: return
     from constants import COMBAT_LOG_WAIT_FRAMES
+
+    if isinstance(text, list):
+        dialog.set_pages([str(t) for t in text if t is not None])
+        from systems.game_state import game_state
+        game_state["dialog_modal"] = modal
+        dialog.auto_close_timer = auto_close if auto_close is not None else COMBAT_LOG_WAIT_FRAMES
+        return
 
     if dialog.is_active:
         last_line = dialog.text.split("\n")[-1] if dialog.text else ""

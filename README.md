@@ -105,7 +105,7 @@ bash tests/run_tests.sh changed
 
 - `tools/ダンジョン系のデバッグ.py`: 階層・装備・所持品を切り替えながら戦闘や進行を確認
 - `tools/村作りツール.py`: 固定マップ / 村マップの配置編集
-- `tools/settings_editor.py` / `tools/settings_editor.html`: 各種 YAML 設定の編集補助
+- `tools/settings_editor.py` / `tools/web/settings_editor.html`: 各種 YAML 設定の編集補助
 - `tools/オートバランス調整.py`
 - `tools/戦闘バランス調整.py`
 - `tools/モンスターその他調整.py`
@@ -133,4 +133,3 @@ bash tests/run_tests.sh changed
 - 日本語ファイル名のツールが含まれます
 - セーブデータを直接触る場合は `components/data/savefile/` のバックアップ推奨です
 - 固定マップ階層やボス周りは、通常階層とは別ルールが混ざるため QA 時は個別確認が安全です
-

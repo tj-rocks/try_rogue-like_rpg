@@ -264,13 +264,6 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                 elif status_to_add == "darkness":
                     msg += f"\n{target_name}は暗闇に包まれた！視界が狭まった！"
 
-    # --- 敵の困惑（stupidity）上昇効果 ---
-    if not target_is_static and not is_miss and damage > 0:
-        stupidity_up = getattr(attacker, "total_stupidity", 0)
-        if isinstance(stupidity_up, (int, float)) and stupidity_up > 0 and hasattr(target, "stupidity"):
-            target.stupidity = min(10, target.stupidity + int(stupidity_up))
-            msg += "\n" + Text.Combat.CONFUSED.format(target=target_name, amount=int(stupidity_up))
-
     # --- スタン効果（クリティカル時のみ発動） ---
     if not target_is_static and not is_miss and damage > 0 and is_critical and hasattr(target, "stun_turns"):
         total_stun = getattr(attacker, "total_stun", 0)

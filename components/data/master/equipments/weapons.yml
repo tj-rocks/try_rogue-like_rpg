@@ -706,10 +706,10 @@ WEAPON_DATA:
     quest_targetable: true
     name: アサシンダガー
     category: dagger
-    max_floor: 49
+    max_floor: 99
     min_rank: B
     max_rank: SS
-    min_floor: 50
+    min_floor: 49
     rarity: 4
     price: 12000
     image_path: components/pictures/weapon/assassin_dagger.png
@@ -736,6 +736,7 @@ WEAPON_DATA:
         block_chance_ranged: 0.05
         lantern_bonus: 0
         regen: 0
+        pursuit_evasion: 0.4
         # stupidity: 0
         armor_penetration: 0.3
         buff_value_ratio: 0
