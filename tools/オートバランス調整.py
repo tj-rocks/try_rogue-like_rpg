@@ -11,6 +11,7 @@ from systems.data_loader import MASTER_DATA_DIR, load_master_data
 
 PORT = 5010
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+WEB_DIRECTORY = os.path.join(DIRECTORY, "web")
 
 class AutoBalancerHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -28,7 +29,7 @@ class AutoBalancerHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            ui_path = os.path.join(DIRECTORY, 'auto_balancer.html')
+            ui_path = os.path.join(WEB_DIRECTORY, 'auto_balancer.html')
             with open(ui_path, 'rb') as f:
                 self.wfile.write(f.read())
         elif self.path == '/api/data':
@@ -123,7 +124,7 @@ if __name__ == "__main__":
         
     with httpd:
         print(f"🚀 Auto-Balancer Server running at http://localhost:{PORT}")
-        print(f"Serving UI from: {os.path.join(DIRECTORY, 'auto_balancer.html')}")
+        print(f"Serving UI from: {os.path.join(WEB_DIRECTORY, 'auto_balancer.html')}")
         
         import webbrowser
         import threading

@@ -13,6 +13,7 @@ from systems.data_loader import get_normalized_enemy_data, get_normalized_equipm
 
 PORT = 5005
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+WEB_DIRECTORY = os.path.join(DIRECTORY, "web")
 
 def apply_surgical_update(file_type, target_id, updates):
     KEY_MAP_TO_NEW = {
@@ -206,7 +207,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            ui_path = os.path.join(DIRECTORY, 'dashboard.html')
+            ui_path = os.path.join(WEB_DIRECTORY, 'dashboard.html')
             with open(ui_path, 'rb') as f:
                 self.wfile.write(f.read())
         elif self.path == '/api/data':
@@ -320,7 +321,7 @@ if __name__ == "__main__":
         
     with httpd:
         print(f"🚀 Dashboard Server running at http://localhost:{PORT}")
-        print(f"Serving UI from: {os.path.join(DIRECTORY, 'dashboard.html')}")
+        print(f"Serving UI from: {os.path.join(WEB_DIRECTORY, 'dashboard.html')}")
         
         # 自動でブラウザを開く
         import webbrowser

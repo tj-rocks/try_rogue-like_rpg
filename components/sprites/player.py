@@ -1469,6 +1469,7 @@ class Player(Entity):
                     self._execute_strike(dungeon, dialog)
 
     def update(self, dungeon, dt=1/60, dialog=None, events=[]):
+        self.current_dungeon = dungeon
         if self.is_falling: self.falling_timer -= 1; return
         if not is_paused() and game_state["turn_state"] == "player": self.operate(dungeon, dialog, events)
         self.update_animation(dungeon, dt, dialog)
@@ -1685,6 +1686,10 @@ class Player(Entity):
             if self.has_item("revive_amulet"):
                 self.remove_item_by_key("revive_amulet"); self.hp = self.max_hp // 2; self.is_dead = False; self.damage_flash_timer = 120
                 self.condition = "normal"; self.status_timer = 0
+                current_dungeon = getattr(self, "current_dungeon", None)
+                if current_dungeon is not None:
+                    from systems.magic_handler import FlashEffect
+                    current_dungeon.magic_effects.append(FlashEffect(color=(255, 245, 180), duration=18))
             else: self.hp = 0; self.is_dead = True
         else: self.damage_flash_timer = 60 + HIT_STUN_DURATION
 

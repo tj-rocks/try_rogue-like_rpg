@@ -963,8 +963,8 @@ ENEMY_DATA:
       - gold_ore
     normal_drop_rate: 0.18
     rare_drop_rate: 0.07
-    hp: 76
-    attack: 27
+    hp: 41
+    attack: 22
     defense: 38
     evasion: 8
     exp: 125
@@ -999,7 +999,7 @@ ENEMY_DATA:
       - gold_ore
     normal_drop_rate: 0.18
     rare_drop_rate: 0.06
-    hp: 40
+    hp: 26
     attack: 19
     defense: 44
     evasion: 26
@@ -1008,7 +1008,7 @@ ENEMY_DATA:
     accuracy_close: 94
     accuracy_ranged: 92
     attack_range: 3
-    stupidity: 2
+    stupidity: 4
     smart_ranged_move: true
     image_scale: 1.0
     close_attack_effect: dark_bolt
@@ -1104,8 +1104,8 @@ ENEMY_DATA:
       - gold_ore
     normal_drop_rate: 0.2
     rare_drop_rate: 0.06
-    hp: 80
-    attack: 29
+    hp: 35
+    attack: 21
     defense: 70
     evasion: 16
     exp: 135
@@ -1416,8 +1416,8 @@ ENEMY_DATA:
       - sage_potion
     normal_drop_rate: 0.25
     rare_drop_rate: 0.1
-    hp: 160
-    attack: 25
+    hp: 24
+    attack: 21
     defense: 72
     evasion: 24
     exp: 220
@@ -1463,8 +1463,8 @@ ENEMY_DATA:
       - barrier_stave
     normal_drop_rate: 0.25
     rare_drop_rate: 0.08
-    hp: 185
-    attack: 26
+    hp: 17
+    attack: 22
     defense: 88
     evasion: 18
     exp: 260
@@ -1556,7 +1556,7 @@ ENEMY_DATA:
     normal_drop_rate: 0.25
     rare_drop_rate: 0.08
     hp: 210
-    attack: 25
+    attack: 22
     defense: 96
     evasion: 12
     exp: 320
@@ -1632,7 +1632,7 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 1.0
     rare_drop_rate: 0.0
-    hp: 280
+    hp: 230
     attack: 20
     defense: 55
     evasion: 18
