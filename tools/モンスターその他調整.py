@@ -11,6 +11,7 @@ from systems.data_loader import MASTER_DATA_DIR, load_master_data
 
 PORT = 5020
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+WEB_DIRECTORY = os.path.join(DIRECTORY, "web")
 
 def load_all_items():
     """ゲーム内の全マスターデータからアイテムキーと日本語表示名のマッピングを作成する"""
@@ -78,7 +79,7 @@ class MonsterEditorHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            ui_path = os.path.join(DIRECTORY, 'monster_editor.html')
+            ui_path = os.path.join(WEB_DIRECTORY, 'monster_editor.html')
             with open(ui_path, 'rb') as f:
                 self.wfile.write(f.read())
         elif self.path == '/api/data':
@@ -215,7 +216,7 @@ if __name__ == "__main__":
         
     with httpd:
         print(f"🚀 Monster Editor Server running at http://localhost:{PORT}")
-        print(f"Serving UI from: {os.path.join(DIRECTORY, 'monster_editor.html')}")
+        print(f"Serving UI from: {os.path.join(WEB_DIRECTORY, 'monster_editor.html')}")
         
         import webbrowser
         import threading
