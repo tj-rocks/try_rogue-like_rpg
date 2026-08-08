@@ -8,6 +8,16 @@ from systems.ui.ui_base import (
     get_standard_upper_layout, draw_dialog_frame, draw_text_wrapped, BaseListDialog, StateKeyMixin
 )
 
+MENU_UNICODE_KEYS = {"m", "M", "ｍ", "Ｍ"}
+
+
+def is_menu_key_event(event, key_menu):
+    if event.type != pygame.KEYDOWN:
+        return False
+    if event.key == key_menu:
+        return True
+    return getattr(event, "unicode", "") in MENU_UNICODE_KEYS
+
 
 class TeleportDialog(BaseListDialog):
     """テレポート屋（転移）での目的地選択を行うダイアログ"""
@@ -820,7 +830,7 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                     else:
                                         dialog.set_pages(npc.get_dialogue(player))
                                     return
-                elif event.key == KEY_MENU:
+                elif is_menu_key_event(event, KEY_MENU):
                     if menu_dialog and not is_enemy_acting(dungeon):
                         menu_dialog.is_active = True
                     elif os.environ.get("DEBUG_MODE") == "1":

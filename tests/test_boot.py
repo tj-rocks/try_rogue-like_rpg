@@ -21,6 +21,15 @@ from constants import (
     KEY_ATTACK, KEY_MENU
 )
 from systems.events import active_direction_keys
+from systems.ui.ui_misc import is_menu_key_event
+
+def test_fullwidth_menu_key_event():
+    print("--- 全角Mメニュー入力テスト ---")
+    assert is_menu_key_event(pygame.event.Event(pygame.KEYDOWN, {"key": KEY_MENU, "unicode": "m"}), KEY_MENU)
+    assert is_menu_key_event(pygame.event.Event(pygame.KEYDOWN, {"key": 0, "unicode": "Ｍ"}), KEY_MENU)
+    assert is_menu_key_event(pygame.event.Event(pygame.KEYDOWN, {"key": 0, "unicode": "ｍ"}), KEY_MENU)
+    assert not is_menu_key_event(pygame.event.Event(pygame.KEYDOWN, {"key": 0, "unicode": "x"}), KEY_MENU)
+    print("[OK] 全角Mメニュー入力テスト合格")
 
 def test_game_full_interaction_sequence():
     print("--- 起動・入力・結果検証 統合テスト開始 ---")
@@ -119,6 +128,7 @@ def test_game_full_interaction_sequence():
 
 if __name__ == "__main__":
     try:
+        test_fullwidth_menu_key_event()
         test_game_full_interaction_sequence()
         pygame.quit()
     except:
