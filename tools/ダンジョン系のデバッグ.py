@@ -758,7 +758,8 @@ def main():
     """最強デバッグツール：セットアップ画面でセーブ・装備・フロアを選んで起動する"""
     try:
         pygame.init()
-        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        from constants import get_display_flags
+        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), get_display_flags())
         pygame.display.set_caption("ULTIMATE DEBUG TOOL")
 
         # 1. セットアップ画面

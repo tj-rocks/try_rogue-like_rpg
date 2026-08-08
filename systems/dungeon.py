@@ -2075,7 +2075,8 @@ class Dungeon:
                         return self
 
                 msg = trap.trigger(player, self, dialog)
-                print(f"[DUNGEON] Trap Triggered: type={trap.type}, msg={msg.split('\\n')[0]}")
+                first_msg_line = msg.split("\n")[0]
+                print(f"[DUNGEON] Trap Triggered: type={trap.type}, msg={first_msg_line}")
                 if dialog:
                     # すでにメッセージがある場合は改行して追加
                     if dialog.is_active:

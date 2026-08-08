@@ -3,7 +3,7 @@ from components.sprites.player import Player
 from systems.dungeon import warp_to_floor
 from systems.ui import UIManager
 from wordings import Text
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, get_display_flags
 
 
 def _ensure_display():
@@ -14,7 +14,7 @@ def _ensure_display():
         pygame.display.init()
     screen = pygame.display.get_surface()
     if screen is None:
-        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), get_display_flags())
     return screen
 
 def setup_ui_relations(ui_elements, player, dungeon, game_state):

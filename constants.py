@@ -20,6 +20,18 @@ SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 900
 TILE_SIZE = 64
 
+def get_display_flags():
+    """
+    画面作成時のpygameフラグ。
+    DISPLAY_SCALE=1 のとき、内部解像度はそのままにウィンドウをOS側で縮小可能にする。
+    小さい画面のPC向け。
+    """
+    import os
+    flags = 0
+    if os.environ.get("DISPLAY_SCALE") == "1" and hasattr(pygame, "SCALED"):
+        flags |= pygame.SCALED
+    return flags
+
 # --- デバッグ・ログ設定 ---
 ENABLE_DEBUG_LOGGING = True  # Falseにすると全print出力がミュートされ、パフォーマンスが向上します
 

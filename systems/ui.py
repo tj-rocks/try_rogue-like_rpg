@@ -635,7 +635,8 @@ class ConfirmDialog:
                 elif event.key == KEY_CONFIRM:
                     from constants import SOUND_CANCEL
                     selection = "YES" if self.cursor_idx == 0 else "NO"
-                    print(f"[CONFIRM] Selection: {selection} (Msg: {self.text.split('\n')[0][:20]}...)")
+                    first_text_line = self.text.split("\n")[0][:20]
+                    print(f"[CONFIRM] Selection: {selection} (Msg: {first_text_line}...)")
                     
                     if self.cursor_idx == 0:
                         play_sfx(SOUND_SELECT)
