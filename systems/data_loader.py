@@ -192,6 +192,7 @@ def get_normalized_equipment_data(floor_map):
         "armor_penetration":  "armor_penetration",
         "buff_value_ratio":   "magic_buff_value_ratio",
         "buff_duration_ratio":"magic_buff_duration_ratio",
+        "trap_sense":         "trap_sense",
         "backstab_crit_bonus":"backstab_crit_bonus",
         "flank_backstab":     "flank_backstab",
         "stun_proc_chance": "stun_proc_chance",

@@ -3,6 +3,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 import os
 import sys
+from copy import deepcopy
 
 # プロジェクトルートをパスに追加
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -10,6 +11,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from components.sprites.player import Player
 from systems.entity_handler import update_dungeon_entities
 from systems.dungeon import warp_to_floor
+from systems.game_state import game_state
 
 class TestBossMessageSuppression(unittest.TestCase):
     def setUp(self):
@@ -49,8 +51,11 @@ class TestBossMessageSuppression(unittest.TestCase):
         
         self.dialog = MagicMock()
         self.dialog.is_active = False
+        self._game_state_backup = deepcopy(game_state)
 
     def tearDown(self):
+        game_state.clear()
+        game_state.update(self._game_state_backup)
         import pygame
         pygame.quit()
 
@@ -136,6 +141,45 @@ class TestBossMessageSuppression(unittest.TestCase):
         self.player.boss_message_shown = True # 一旦Trueにしてからロード
         self.player.load_dict(data_no_flg)
         self.assertEqual(self.player.boss_message_shown, False) # デフォルト値 False になるはず
+
+    @patch('systems.ui.show_dialog')
+    @patch('systems.audio_manager.play_bgm')
+    def test_undead_father_defeat_keeps_rank_but_sets_intermediate_ending(self, mock_play_bgm, mock_show_dialog):
+        self.player.guild_rank = "S"
+        self.player.guild_point = 123
+
+        father = MagicMock()
+        father.is_boss = True
+        father.is_dead = True
+        father.damage_flash_timer = 0
+        father.attack_pre_delay_timer = 0
+        father.peak_hold_timer = 0
+        father.name = "アンデッドの父"
+        father.x = 100
+        father.y = 100
+        father.width = 32
+        father.height = 32
+        father.type = "undead_father"
+        father.drops = {}
+        father.normal_drop_rate = 0
+        father.rare_drop_rate = 0
+        father._log_trace = MagicMock()
+        father.update_animation = MagicMock()
+
+        self.dungeon.enemies = [father]
+
+        game_state["post_boss_clear_pending"] = False
+        game_state["ending_route"] = "default"
+        game_state["is_boss_battle"] = True
+        game_state["boss_battle_persistent"] = True
+        game_state["boss_encounter_pending"] = True
+
+        update_dungeon_entities(self.dungeon, self.player, 0.1, self.dialog)
+
+        self.assertEqual(self.player.guild_rank, "S")
+        self.assertEqual(self.player.guild_point, 123)
+        self.assertTrue(game_state["post_boss_clear_pending"])
+        self.assertEqual(game_state["ending_route"], "father")
 
 if __name__ == '__main__':
     unittest.main()

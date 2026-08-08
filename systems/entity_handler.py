@@ -301,15 +301,17 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
                 else:
                     show_dialog(dialog, f"{enemy.name} を 討伐した！", modal=True, auto_close=0)
 
-                # ダンジョンコア討伐時は、ギルドクエストを挟まず直接SSランクへ昇格させる
+                # 父撃破は中間クリア用の紙芝居へ、ダンジョンコア討伐時は加えてSSへ昇格させる
                 if enemy_type in ("undead_father", "dungeon_core"):
+                    from systems.game_state import game_state
+                    game_state["post_boss_clear_pending"] = True
+                    game_state["ending_route"] = "father" if enemy_type == "undead_father" else "core"
+
+                if enemy_type == "dungeon_core":
                     guild = GuildSystem()
                     ss_data = guild.get_current_rank("SS")
                     player.guild_rank = "SS"
                     player.guild_point = max(player.guild_point, ss_data.get("required_gp", player.guild_point))
-                    from systems.game_state import game_state
-                    game_state["post_boss_clear_pending"] = True
-                    game_state["ending_route"] = "core" if enemy_type == "dungeon_core" else "father"
                 
                 # once_only 敵の撃破記録
                 if enemy_type and ENEMY_DATA.get(enemy_type, {}).get("once_only"):

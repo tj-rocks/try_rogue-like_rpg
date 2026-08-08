@@ -60,6 +60,32 @@ class TestBlacksmithStones(unittest.TestCase):
         # Overall enhance should be 1
         self.assertEqual(self.weapon.enhance, 1)
 
+    def test_blacksmith_rejects_accessory_without_consuming_ore(self):
+        from systems.item_handler import make_enhance_callback
+
+        player = Player()
+        accessory = EquipInstance("accessory", "luminous_gem")
+        player.accessory_inventory = [accessory]
+        player.items = [{"key": "red_stone", "count": 1}]
+
+        class MockDialog:
+            text = ""
+            is_active = False
+
+        class MockEnhanceDialog:
+            is_active = True
+
+        dialog = MockDialog()
+        enhance_dialog = MockEnhanceDialog()
+        on_select = make_enhance_callback(player, dialog, enhance_dialog)
+
+        on_select("accessory", accessory.iid, "red_stone", "attack_bonus")
+
+        self.assertEqual(accessory.enhance, 0)
+        self.assertEqual(accessory.stats, {})
+        self.assertTrue(player.has_item("red_stone"))
+        self.assertEqual(dialog.text, "この装備は鍛冶できない。")
+
     def test_growth_decay_curve(self):
         # 新方式: per-stat の強化回数(self.stats)に基づく減衰カーブ。
         # 1-10回の区間は times_limit に依存せず安定（整数系は growth_room=10 -> +0.5/回）。

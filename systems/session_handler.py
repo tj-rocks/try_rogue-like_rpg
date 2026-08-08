@@ -128,6 +128,8 @@ def continue_game(ui_elements, game_state, player):
         
     if target_path and player.load_from_file(target_path):
         print(f"[SESSION] Game loaded from: {target_path}")
+        if player.apply_new_game_plus_start():
+            print("[SESSION] New Game+ start applied: guild rank and GP reset.")
 
         floor = player.current_floor if hasattr(player, "current_floor") else 0
         dungeon = warp_to_floor(floor, player, spawn_reason="continue")

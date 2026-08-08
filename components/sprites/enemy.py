@@ -47,10 +47,15 @@ class Enemy(Entity):
             hp_val = hardcore_round(hp_val * p_atk, is_hp=True)
             print(f"[Obstacle] {enemy_type} HP set to {hp_val}")
             
-        self.attack = data.get("attack", 0)
+        stat_multiplier = 1.0
+        if player and hasattr(player, "get_enemy_stat_multiplier"):
+            stat_multiplier = player.get_enemy_stat_multiplier()
+
+        from systems.math_utils import hardcore_round
+        self.attack = hardcore_round(data.get("attack", 0) * stat_multiplier)
         super().__init__(x, y, hp_val, hp_val, self.attack, self.width, self.height)
         self.type = enemy_type; self.name = data.get("name", "モンスター")
-        self.defense = data.get("defense", 0); self.evasion = data.get("evasion", 0)
+        self.defense = hardcore_round(data.get("defense", 0) * stat_multiplier); self.evasion = data.get("evasion", 0)
         self.attack_pre_delay_timer = 0; self.attack_range = data.get("attack_range", 1)
         self.exp = data.get("exp", 5); self.drops = data.get("drops", []); self.is_boss = data.get("is_boss", False)
         # ボスはアグレッシブに動くよう、困惑度（stupidity）を強制的に0にする

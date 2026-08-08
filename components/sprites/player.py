@@ -764,6 +764,8 @@ class Player(Entity):
         self.defeated_once_only = []
         self.has_seen_ending = False
         self.dungeon_core_cleared = False
+        self.ending_clear_count = 0
+        self.new_game_plus_pending = False
         self.event_items = [{"key": "fathers_charm", "count": 1}]
         self.warehouse_items = []
         self.warehouse_max = MAX_WAREHOUSE_SLOTS
@@ -1757,6 +1759,8 @@ class Player(Entity):
             "stealth_buff_stupidity": getattr(self, "stealth_buff_stupidity", 0),
             "guild_point": self.guild_point, "guild_rank": self.guild_rank, "active_quests": self.active_quests, "quest_tokens": self.quest_tokens,
             "completed_fixed_quests": self.completed_fixed_quests, "defeated_once_only": getattr(self, "defeated_once_only", []), "has_seen_ending": self.has_seen_ending, "dungeon_core_cleared": getattr(self, "dungeon_core_cleared", False), "warehouse_items": self.warehouse_items, "event_items": self.event_items,
+            "ending_clear_count": getattr(self, "ending_clear_count", 0),
+            "new_game_plus_pending": getattr(self, "new_game_plus_pending", False),
             "current_floor": self.current_floor, "max_reached_floor": self.max_reached_floor, "equip_id_counter": globals().get("_equip_id_counter", 0),
             "boss_message_shown": getattr(self, "boss_message_shown", False),
             "curse_level": getattr(self, "curse_level", 0),
@@ -1817,6 +1821,8 @@ class Player(Entity):
             if "reward_gp" not in q: q["reward_gp"] = 1
         self.quest_tokens = data.get("quest_tokens", {}); self.completed_fixed_quests = data.get("completed_fixed_quests", []); self.defeated_once_only = data.get("defeated_once_only", [])
         self.has_seen_ending = data.get("has_seen_ending", False); self.dungeon_core_cleared = data.get("dungeon_core_cleared", False); self.max_reached_floor = data.get("max_reached_floor", 0); self.warehouse_items = data.get("warehouse_items", []); self.event_items = data.get("event_items", [])
+        self.ending_clear_count = int(data.get("ending_clear_count", 0))
+        self.new_game_plus_pending = bool(data.get("new_game_plus_pending", False))
         self.current_floor = data.get("current_floor", 0)
         self.boss_message_shown = data.get("boss_message_shown", False)
         self.curse_level = int(data.get("curse_level", 0))
@@ -1828,6 +1834,31 @@ class Player(Entity):
         # God Mode はセーブしないので、ロード時に常にOFF
         self.is_god = False
 
+    def get_enemy_stat_multiplier(self):
+        clear_count = max(0, int(getattr(self, "ending_clear_count", 0)))
+        if clear_count <= 0:
+            return 1.0
+        if clear_count == 1:
+            return 1.3
+        if clear_count == 2:
+            return 1.5
+        return round(1.5 + (clear_count - 2) * 0.2, 1)
+
+    def apply_new_game_plus_start(self):
+        if not getattr(self, "new_game_plus_pending", False):
+            return False
+        self.guild_rank = "-"
+        self.guild_point = 0
+        self.has_seen_ending = False
+        self.dungeon_core_cleared = False
+        once_only_bosses = {"undead_father", "dungeon_core"}
+        self.defeated_once_only = [
+            enemy_type for enemy_type in getattr(self, "defeated_once_only", [])
+            if enemy_type not in once_only_bosses
+        ]
+        self.new_game_plus_pending = False
+        self.save_to_file(show_loading=False)
+        return True
 
     def accept_quest(self, q):
         if not self.active_quests: self.active_quests.append(q)
@@ -1844,11 +1875,11 @@ class Player(Entity):
             if q.get("is_fixed") and q.get("id") not in self.completed_fixed_quests:
                 self.completed_fixed_quests.append(q.get("id"))
 
-    def save_to_file(self, filepath=None):
+    def save_to_file(self, filepath=None, show_loading=True):
         if filepath is None: from systems.data_loader import SAVE_DATA_PATH; filepath = SAVE_DATA_PATH
         import json; print(f"[SYSTEM] Saving progress to {filepath}...")
         screen = pygame.display.get_surface()
-        if screen:
+        if screen and show_loading:
             from systems.ui import show_loading_screen
             from wordings import Text
             show_loading_screen(screen, text=Text.UI.SAVING)

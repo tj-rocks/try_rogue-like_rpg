@@ -37,15 +37,15 @@ ending:
   father:
     1:
       image: "components/pictures/ending/father_1.png"
-      text: "ついに君は、父の亡霊と向き合い\n失われた時間の答えを受け取った"
+      text: "探し続けた背中は、ダンジョンの奥で止まっていた。\n薄々わかっていた答えが、ようやく君に追いついた"
       bgm: "components/sounds/bgm/winding_adventure.mp3"
     2:
       image: "components/pictures/ending/father_2.png"
-      text: "もう追うだけの旅ではない。\n君は、父の願いを抱いて歩き出す"
+      text: "だが、父はただ眠っていたのではない。\n死者のはずのその姿は、モンスターとして君の前に立ちはだかった。\nなぜ、こんなことが起きたのか"
       bgm: "components/sounds/bgm/winding_adventure.mp3"
     3:
       image: "components/pictures/ending/father_3.png"
-      text: "冒険は続く。\nけれど、君の足取りはもう迷っていない"
+      text: "父の意思を継ぎ、ダンジョンの謎へ踏み込むのか。\nそれとも、待ち続ける母のもとへ帰るのか。\nその答えは、君の歩む先にだけある"
       bgm: "components/sounds/bgm/winding_adventure.mp3"
   core:
     1:
@@ -61,7 +61,7 @@ ending:
       text: "君の決断は、何かを救い、何かを終わらせた。\n意義があったのか、必要だったのか。\nその答えは、簡単には出ない。"
       bgm: "components/sounds/bgm/ending_1.mp3"
     4:
-      image: "components/pictures/ending/core_2.png"
+      image: "components/pictures/ending/core_4.png"
       text: "正しかったか正しくないかは、あとから誰かが決める。\nだが、決めて動いた事実だけは残る。\n君は、確かにそれをやった。"
       bgm: "components/sounds/bgm/ending_1.mp3"
 

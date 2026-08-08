@@ -1107,7 +1107,7 @@ TILE_MAPPINGS:
         y: 15
         flip: false
         min_rank: F
-        max_rank: E
+        max_rank: S
   story_rain:
     category: npc
     id: story_rain
@@ -1204,8 +1204,8 @@ TILE_MAPPINGS:
       - x: 37
         y: 18
         flip: false
-        min_rank: SS
-        max_rank: SS
+        min_rank: F
+        max_rank: S
   scientist_1:
     category: npc
     id: scientist_1
@@ -1215,6 +1215,12 @@ TILE_MAPPINGS:
   core_aftermath_guide:
     category: npc
     id: core_aftermath_guide
+    positions:
+      - x: 30
+        y: 7
+        flip: true
+        min_rank: SS
+        max_rank: SS
   core_aftermath_villager:
     category: npc
     id: core_aftermath_villager
@@ -1222,7 +1228,7 @@ TILE_MAPPINGS:
       - x: 26
         y: 18
         flip: false
-        min_rank: S
+        min_rank: F
         max_rank: S
   core_aftermath_merchant:
     category: npc
