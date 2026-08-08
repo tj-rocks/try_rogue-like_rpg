@@ -419,9 +419,13 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
         return
 
     if (not dialog.is_active) and (not confirm_dialog.is_active) and game_state.get("pending_ending_after_dialog"):
+        ending_route = game_state["pending_ending_after_dialog"]
+        if ending_route == "core":
+            from systems.scene_handler import save_core_clear_before_ending
+            save_core_clear_before_ending(player, game_state)
         game_state["post_boss_clear_pending"] = False
         game_state["current_scene"] = "ending"
-        game_state["ending_route"] = game_state["pending_ending_after_dialog"]
+        game_state["ending_route"] = ending_route
         game_state["pending_ending_after_dialog"] = None
         game_state["ending_index"] = 0
         game_state["ending_timer"] = 0

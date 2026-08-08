@@ -347,6 +347,20 @@ def make_enhance_callback(player, dialog, enhance_dialog):
     """
     def on_select(item_type, iid, ore_key, stat_key):
         if not iid or not ore_key or not stat_key: return
+
+        # 鍛冶できるのは武器・鎧・盾のみ。
+        # UI以外から直接呼ばれても、アクセサリなどを強化しない。
+        inventories = {
+            "weapon": player.weapon_inventory,
+            "armor": player.armor_inventory,
+            "shield": getattr(player, "shield_inventory", []),
+        }
+        inventory = inventories.get(item_type)
+        if inventory is None:
+            dialog.text = "この装備は鍛冶できない。"
+            dialog.is_active = True
+            enhance_dialog.is_active = False
+            return
         
         # 選択された鉱石を1つ消費
         if not player.has_item(ore_key):
@@ -355,10 +369,6 @@ def make_enhance_callback(player, dialog, enhance_dialog):
             enhance_dialog.is_active = False
             return
             
-        if item_type == "weapon": inventory = player.weapon_inventory
-        elif item_type == "armor": inventory = player.armor_inventory
-        elif item_type == "shield": inventory = player.shield_inventory
-        else: inventory = getattr(player, "accessory_inventory", [])
         inst = player._find_equip_inst(inventory, iid)
         
         if inst:

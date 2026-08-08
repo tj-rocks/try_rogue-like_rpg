@@ -6,6 +6,31 @@ from systems.game_state import is_paused
 from systems.entity_handler import update_dungeon_entities
 from systems.death_handler import handle_death_sequence
 
+def save_core_clear_before_ending(player, game_state):
+    """
+    コアエンディング開始前に、周回開始に必要な状態を保存する。
+    Fin画面やエンディング終了後処理に依存しないための安全弁。
+    """
+    if player is None:
+        return False
+    if game_state.get("core_clear_saved_for_ending"):
+        return False
+
+    player.has_seen_ending = True
+    player.dungeon_core_cleared = True
+    player.ending_clear_count = int(getattr(player, "ending_clear_count", 0)) + 1
+    player.new_game_plus_pending = True
+    print(
+        f"[ENDING] saving core clear before ending "
+        f"ending_clear_count={player.ending_clear_count} "
+        f"new_game_plus_pending={player.new_game_plus_pending}",
+        flush=True,
+    )
+    player.save_to_file(show_loading=False)
+    game_state["core_clear_saved_for_ending"] = True
+    print("[ENDING] saved core clear before ending", flush=True)
+    return True
+
 def handle_opening(screen, events, game_state, opening_imgs, start_new_game_func, ui_elements, story_data=None):
     """
     オープニング演出を処理する。
@@ -73,6 +98,19 @@ def handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_da
     """
     エンディング演出を処理する。
     """
+    def log_ending(msg):
+        print(f"[ENDING] {msg}")
+
+    def finish_ending(route_imgs_len):
+        if route == "core" and player is not None:
+            save_core_clear_before_ending(player, game_state)
+            game_state["fin_save_pending"] = False
+            game_state["fin_save_screen_drawn"] = False
+        game_state["ending_index"] = 0
+        game_state["ending_route"] = "core"
+        game_state["current_scene"] = "fin" if route == "core" else "game"
+        log_ending(f"Finished route={route} pages={route_imgs_len} next_scene={game_state['current_scene']}")
+
     screen.fill((0, 0, 0))
     game_state["ending_alpha"] = min(255, game_state.get("ending_alpha", 0) + 2)
     idx = game_state.get("ending_index", 0)
@@ -86,7 +124,9 @@ def handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_da
             route_imgs = []
             route_story = ending_story[route]
             from systems.resources import load_scale_img
-            for page_idx in range(1, 4):
+            page_keys = [k for k in route_story.keys() if str(k).isdigit()]
+            max_page = max([int(k) for k in page_keys], default=len(ending_imgs))
+            for page_idx in range(1, max_page + 1):
                 page_data = route_story.get(page_idx) or route_story.get(str(page_idx)) or {}
                 image_path = page_data.get("image")
                 img = load_scale_img(image_path, SCREEN_WIDTH, SCREEN_HEIGHT) if image_path else None
@@ -120,6 +160,7 @@ def handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_da
                 game_state["current_bgm"] = bgm
 
     # 3. ダイアログの更新と描画
+    was_dialog_active = dialog.is_active
     dialog.handle_events(events)
     dialog.update()
     if dialog.is_active:
@@ -128,27 +169,91 @@ def handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_da
     game_state["ending_timer"] = game_state.get("ending_timer", 0) + 1
     
     skip = False
-    for event in events:
-        if event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_z):
-            if not dialog.is_active:
-                skip = True
+    if was_dialog_active and not dialog.is_active:
+        skip = True
+    else:
+        for event in events:
+            if event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_z):
+                if not dialog.is_active:
+                    skip = True
     
     if game_state["ending_timer"] > 600 or skip:
+        log_ending(
+            f"advance route={route} idx={idx} pages={len(route_imgs)} "
+            f"skip={skip} timer={game_state['ending_timer']} "
+            f"was_dialog_active={was_dialog_active} dialog_active={dialog.is_active}"
+        )
         game_state["ending_timer"] = 0
         game_state["ending_alpha"] = 0
-        game_state["ending_index"] = idx + 1
-        dialog.is_active = False
+        next_index = idx + 1
+        game_state["ending_index"] = next_index
+        log_ending(f"next_index={next_index} pages={len(route_imgs)}")
+        if dialog.is_active:
+            dialog.is_active = False
         
-        if game_state["ending_index"] >= len(route_imgs):
-            if route == "core" and player is not None:
-                player.guild_rank = "S"
-                player.has_seen_ending = True
-                player.dungeon_core_cleared = True
-                player.save_to_file()
-            game_state["ending_index"] = 0
-            game_state["ending_route"] = "core"
-            game_state["current_scene"] = "game"
+        if next_index >= len(route_imgs):
+            finish_ending(len(route_imgs))
     
+    return game_state["current_scene"]
+
+def handle_fin(screen, events, game_state, player=None):
+    """
+    コアエンディング後の余韻画面。
+    自動でタイトルへ戻さず、プレイヤーが終わりを受け取れる静止画面にする。
+    """
+    from systems.ui import draw_text_wrapped
+    import pygame
+
+    screen.fill((0, 0, 0))
+    font_large = pygame.font.Font(None, 96)
+    font_small = pygame.font.Font(None, 28)
+
+    if game_state.get("fin_save_pending"):
+        print(
+            f"[FIN] save_pending screen_drawn={game_state.get('fin_save_screen_drawn')} "
+            f"player_present={player is not None}"
+        )
+        draw_text_wrapped(
+            screen,
+            font_small,
+            "保存中...",
+            0,
+            SCREEN_HEIGHT // 2 - 15,
+            SCREEN_WIDTH,
+            align_h="center",
+            color=(235, 235, 220),
+        )
+        if game_state.get("fin_save_screen_drawn"):
+            if player is not None:
+                print("[FIN] saving new game plus state")
+                player.save_to_file(show_loading=False)
+            game_state["fin_save_pending"] = False
+            game_state["fin_save_screen_drawn"] = False
+            print("[FIN] save complete; showing Fin")
+        else:
+            game_state["fin_save_screen_drawn"] = True
+        return game_state["current_scene"]
+
+    draw_text_wrapped(
+        screen,
+        font_large,
+        "Fin",
+        0,
+        SCREEN_HEIGHT // 2 - 70,
+        SCREEN_WIDTH,
+        align_h="center",
+        color=(235, 235, 220),
+    )
+    draw_text_wrapped(
+        screen,
+        font_small,
+        "ゲームを終了して、次回「つづきから」で新たな周回を開始できます",
+        0,
+        SCREEN_HEIGHT // 2 + 35,
+        SCREEN_WIDTH,
+        align_h="center",
+        color=(150, 150, 150),
+    )
     return game_state["current_scene"]
 
 def handle_title(screen, events, game_state, title_bg, has_save, start_new_game_func, continue_game_func):

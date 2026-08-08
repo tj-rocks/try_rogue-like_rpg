@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from dependencies import *
 from systems.session_handler import start_new_game as session_start, continue_game as session_continue, init_ui_elements
-from systems.scene_handler import handle_opening, handle_title, handle_game, handle_ending
+from systems.scene_handler import handle_opening, handle_title, handle_game, handle_ending, handle_fin
 from systems.audio_manager import play_bgm
 
 def main():
@@ -59,11 +59,31 @@ def main():
             for event in events:
                 if event.type == pygame.KEYDOWN and event.key == KEY_DEBUG:
                     toggle_debug_logging(ui_elements.get("dialog"))
+                elif (
+                    os.environ.get("DEBUG_MODE") == "1"
+                    and event.type == pygame.KEYDOWN
+                    and event.key == pygame.K_F10
+                    and player is not None
+                ):
+                    player.guild_rank = "SS"
+                    player.guild_point = max(player.guild_point, 0)
+                    player.defeated_once_only = [
+                        enemy_type for enemy_type in getattr(player, "defeated_once_only", [])
+                        if enemy_type != "dungeon_core"
+                    ]
+                    game_state["post_boss_clear_pending"] = True
+                    game_state["ending_route"] = "core"
+                    game_state["pending_ending_after_dialog"] = None
+                    if ui_elements.get("dialog"):
+                        ui_elements["dialog"].text = "DEBUG: ダンジョンコア撃破後の状態にしました。"
+                        ui_elements["dialog"].is_active = True
+                        game_state["dialog_modal"] = False
 
             scene = game_state["current_scene"]
             
             # BGMの切り替え管理
             if scene != last_scene:
+                print(f"[SCENE] {last_scene} -> {scene}", flush=True)
                 if scene == "opening": play_bgm(BGM_OPENING)
                 elif scene == "title":
                     play_bgm(BGM_TITLE)
@@ -100,10 +120,23 @@ def main():
 
             elif scene == "ending":
                 from systems.resources import ending_imgs, story_data
-                handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_data, player=player)
+                returned_scene = handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_data, player=player)
+                if returned_scene != scene:
+                    print(
+                        f"[SCENE] handle_ending returned {returned_scene} "
+                        f"current_scene={game_state.get('current_scene')}",
+                        flush=True,
+                    )
+
+            elif scene == "fin":
+                handle_fin(screen, events, game_state, player=player)
 
             # 3. 画面更新
+            if game_state.get("current_scene") == "fin":
+                print("[SCENE] before flip while current_scene=fin", flush=True)
             pygame.display.flip()
+            if game_state.get("current_scene") == "fin":
+                print("[SCENE] after flip while current_scene=fin", flush=True)
 
     except Exception as e:
         print(f"[Fatal Error] {e}")
