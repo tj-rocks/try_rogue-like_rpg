@@ -26,22 +26,24 @@ def test_accessory_pickup_scenario():
     initial_equipped = player.equipped_accessory
     print(f"初期状態のアクセサリ: {initial_equipped}")
 
-    # 2. アクセサリアイテムの生成 (luminous_gem)
+    # 2. アクセサリアイテムの生成
     from constants import ACCESSORY_DATA
-    accessory_data = ACCESSORY_DATA.get("luminous_gem")
+    accessory_key = "adventurers_lantern"
+    accessory_data = ACCESSORY_DATA.get(accessory_key)
     if not accessory_data:
-        print("❌ エラー: luminous_gem が ACCESSORY_DATA に見つかりません")
+        print(f"❌ エラー: {accessory_key} が ACCESSORY_DATA に見つかりません")
         sys.exit(1)
     
-    item_sprite = DroppedAccessory(0, 0, "luminous_gem", accessory_data)
+    item_sprite = DroppedAccessory(0, 0, accessory_key, accessory_data)
 
     # 3. アイテム取得実行
     msg = item_sprite.collect(player)
     print(f"取得メッセージ: {msg}")
 
-    # 4. 検証: メッセージに「光る指輪」が含まれているか
-    if "光る指輪" not in msg:
-        print(f"❌ エラー: メッセージに '光る指輪' が含まれていません (表示: {msg})")
+    expected_name = accessory_data.get("name", "")
+    # 4. 検証: メッセージにアクセサリ名が含まれているか
+    if expected_name not in msg:
+        print(f"❌ エラー: メッセージに '{expected_name}' が含まれていません (表示: {msg})")
         sys.exit(1)
 
     # 5. 検証: プレイヤーの装備状態 (自動装備されないこと)
@@ -55,13 +57,13 @@ def test_accessory_pickup_scenario():
         sys.exit(1)
 
     accessory_inst = player._find_equip_inst(player.accessory_inventory, player.accessory_inventory[0].iid)
-    if not accessory_inst or accessory_inst.key != "luminous_gem":
+    if not accessory_inst or accessory_inst.key != accessory_key:
         key = accessory_inst.key if accessory_inst else "None"
-        print(f"❌ エラー: インベントリ内のアクセサリが 'luminous_gem' になっていません (現在: {key})")
+        print(f"❌ エラー: インベントリ内のアクセサリが '{accessory_key}' になっていません (現在: {key})")
         sys.exit(1)
     
     # 6. 検証: 装備インスタンスの名前
-    if accessory_inst.get_name() != "光る指輪":
+    if accessory_inst.get_name() != expected_name:
         print(f"❌ エラー: アクセサリ名が正しくありません (現在: {accessory_inst.get_name()})")
         sys.exit(1)
 
@@ -77,9 +79,10 @@ def test_accessory_pickup_scenario():
         sys.exit(1)
 
     # 7. 検証: 装備効果（ステータス・視界）が正しく反映されているか
-    expected_hp_bonus = accessory_data.get("hp_bonus", 0)
-    expected_def_bonus = accessory_data.get("defense_bonus", 0)
-    expected_vision_bonus = accessory_data.get("lantern_bonus", 0)
+    common_bonus = accessory_data.get("bonus", {}).get("common", {})
+    expected_hp_bonus = common_bonus.get("hp", accessory_data.get("hp_bonus", accessory_data.get("hp", 0)))
+    expected_def_bonus = common_bonus.get("defense", accessory_data.get("defense_bonus", accessory_data.get("defense", 0)))
+    expected_vision_bonus = common_bonus.get("lantern_bonus", accessory_data.get("lantern_bonus", 0))
 
     if player.max_hp != base_hp + expected_hp_bonus:
         print(f"❌ エラー: HPボーナスが適用されていません (期待: {base_hp + expected_hp_bonus}, 実際: {player.max_hp})")
