@@ -397,10 +397,12 @@ class Dungeon:
         self.entry_stairs = None
         
         # 発生判定（設定された階層範囲内、かつ村や固定マップ階層以外）
+        # そのランクで到達可能な最深階では、下り階段がランク制限で使えず詰みやすいため発生させない。
         if current_level > 0 and not is_fixed_map:
             from constants import OUTBREAK_CHANCE, OUTBREAK_MIN_FLOOR, OUTBREAK_MAX_FLOOR
             in_range = OUTBREAK_MIN_FLOOR <= current_level <= OUTBREAK_MAX_FLOOR
-            if (in_range and random.random() < OUTBREAK_CHANCE) or self.debug_overflow:
+            can_outbreak_here = self._can_outbreak_at_current_rank(player)
+            if can_outbreak_here and ((in_range and random.random() < OUTBREAK_CHANCE) or self.debug_overflow):
                 self.is_outbreak = True
         
         # --- 設定値のバリデーション ---
@@ -784,6 +786,18 @@ class Dungeon:
                 play_bgm(BGM_OVERFLOW)
                 
                 self.outbreak_intro_done = True
+
+    def _can_outbreak_at_current_rank(self, player):
+        """現在ランクの到達可能最深階ではアウトブレイクを発生させない。"""
+        if player is None:
+            return True
+        guild_rank = getattr(player, "guild_rank", None)
+        if not guild_rank:
+            return True
+        max_floor = GuildSystem().get_max_floor(guild_rank)
+        if max_floor <= 0:
+            return True
+        return self.current_floor < max_floor
 
     def update_outbreak_status(self, player, dialog):
         """アウトブレイクのクリア判定"""
@@ -2075,7 +2089,8 @@ class Dungeon:
                         return self
 
                 msg = trap.trigger(player, self, dialog)
-                print(f"[DUNGEON] Trap Triggered: type={trap.type}, msg={msg.split('\\n')[0]}")
+                first_msg_line = msg.split("\n")[0]
+                print(f"[DUNGEON] Trap Triggered: type={trap.type}, msg={first_msg_line}")
                 if dialog:
                     # すでにメッセージがある場合は改行して追加
                     if dialog.is_active:

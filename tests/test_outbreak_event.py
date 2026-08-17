@@ -158,5 +158,24 @@ class TestOutbreakEvent(unittest.TestCase):
             # 設定を元に戻す
             constants.OUTBREAK_CHANCE = original_chance
 
+    def test_no_outbreak_at_rank_max_floor(self):
+        """ランク到達可能最深階では、退路詰み防止のためアウトブレイクを発生させない"""
+        self.player.guild_rank = "F"
+
+        # Fランク上限は既存ランク制限テスト上 B11F。
+        # debug_overflow=True でも、上限階では発生しないこと。
+        max_floor_dungeon = warp_to_floor(11, self.player, debug_overflow=True)
+        self.assertFalse(
+            max_floor_dungeon.is_outbreak,
+            "ランク到達可能最深階ではアウトブレイクが発生してはならない",
+        )
+
+        # 1つ手前の通常階では、debug_overflow=True なら発生してよい。
+        before_max_dungeon = warp_to_floor(10, self.player, debug_overflow=True)
+        self.assertTrue(
+            before_max_dungeon.is_outbreak,
+            "ランク到達可能最深階の手前ではアウトブレイクが発生可能である必要がある",
+        )
+
 if __name__ == '__main__':
     unittest.main()

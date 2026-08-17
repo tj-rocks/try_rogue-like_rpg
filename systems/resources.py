@@ -1,13 +1,13 @@
 
 import pygame
 import os
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, GAME_TITLE
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, GAME_TITLE, get_display_flags
 
 # pygame全体を初期化（FontやDisplayの準備に必要）
 pygame.init()
 
 # --- 画面（Display）の設定 ---
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), get_display_flags())
 pygame.display.set_caption(GAME_TITLE)
 
 # --- フォントの設定 ---
