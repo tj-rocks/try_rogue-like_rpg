@@ -1864,7 +1864,9 @@ class Dungeon:
         # 通常時: usually_buyable かつ min_rank がプレイヤーランク以下で最も高いもの
         def get_fixed_items(data_dict, item_type):
             """通常時: usually_buyable品のうち、min_rankがプレイヤーランク以下で最も高いものを返す"""
-            p_idx = RANK_ORDER.index(player_rank) if player_rank in RANK_ORDER else 0
+            # ギルド未所属（"-"）でも、序盤用のFランク装備は購入できるようにする。
+            stock_rank = "F" if player_rank == "-" else player_rank
+            p_idx = RANK_ORDER.index(stock_rank) if stock_rank in RANK_ORDER else RANK_ORDER.index("F")
             best_rank_idx = -1
             items = []
             for k, v in data_dict.items():
