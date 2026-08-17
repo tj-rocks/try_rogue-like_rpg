@@ -1861,7 +1861,14 @@ class Player(Entity):
         return True
 
     def accept_quest(self, q):
-        if not self.active_quests: self.active_quests.append(q)
+        if self.active_quests:
+            return False
+
+        self.active_quests.append(q)
+        if self.guild_point == 0:
+            self.guild_point = 50
+            return True
+        return False
 
     def remove_quest(self, q):
         if q in self.active_quests: self.active_quests.remove(q)

@@ -273,7 +273,7 @@ class GuildDialog(StateKeyMixin):
                 return
 
             def on_accept():
-                player.accept_quest(q)
+                gp_recovery_granted = player.accept_quest(q)
                 if q in self.dungeon_ref.guild_system.available_quests:
                     self.dungeon_ref.guild_system.available_quests.remove(q)
                 elif q in self.dungeon_ref.guild_system.fixed_quests:
@@ -284,6 +284,8 @@ class GuildDialog(StateKeyMixin):
                 sound_manager.play_sfx(SOUND_SELECT)
 
                 dialog.text = Text.NPC.GUILD_ACCEPT_DONE
+                if gp_recovery_granted:
+                    dialog.text += "\n\n【再起支援】50 GPを受け取りました"
                 dialog.is_active = True
                 self.setup(player, self.dungeon_ref)
 

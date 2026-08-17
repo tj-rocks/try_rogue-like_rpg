@@ -16,6 +16,21 @@ pygame.display.set_mode((1, 1))
 from components.sprites.player import Player
 from constants import FIXED_QUEST_DATA
 
+
+def test_quest_acceptance_gp_recovery():
+    """GPが尽きた状態で依頼を受けた時だけ、再起用の50 GPを付与する。"""
+    quest = {"id": "gp_recovery_test", "title": "再起支援テスト"}
+
+    player = Player()
+    player.guild_point = 0
+    assert player.accept_quest(quest) is True
+    assert player.guild_point == 50
+
+    player.remove_quest(quest)
+    player.guild_point = 20
+    assert player.accept_quest(quest) is False
+    assert player.guild_point == 20
+
 def test_quest_lifecycle():
     print("--- クエスト受注・達成テスト開始 ---")
     
