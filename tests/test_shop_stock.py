@@ -23,6 +23,16 @@ def test_normal_stock_only_fixed_rank():
 
     from systems.dungeon import warp_to_floor
 
+    # ギルド未所属でも序盤用のFランク装備は販売される
+    unranked_player = Player()
+    unranked_player.guild_rank = "-"
+    unranked_dungeon = warp_to_floor(0, unranked_player, spawn_reason="test")
+    unranked_stock = unranked_dungeon.weapon_shop_stock
+    assert unranked_stock, "未所属ランクの武器屋在庫が空です"
+    for stock in unranked_stock:
+        data = {**WEAPON_DATA, **ARMOR_DATA, **SHIELD_DATA}[stock["key"]]
+        assert data.get("min_rank", "F") == "F", f"未所属ランクでF以外の商品が販売されています: {stock['key']}"
+
     # Fランクプレイヤー
     player = Player()
     player.guild_rank = "F"
