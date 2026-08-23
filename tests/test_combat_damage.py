@@ -16,7 +16,18 @@ pygame.display.set_mode((1, 1))
 
 from components.sprites.player import Player
 from components.sprites.enemy import Enemy
-from systems.combat_handler import calculate_damage
+from systems.combat_handler import calculate_damage, deal_damage
+
+
+def test_player_miss_message_omits_self_name():
+    player = Player()
+    enemy = Enemy(0, 0, "slime")
+
+    with patch("systems.combat_handler.calculate_damage", return_value=(0, False, True)):
+        message, _, _, _ = deal_damage(player, enemy)
+
+    assert message == "ミス 攻撃は 外れた"
+    assert "自分" not in message
 
 def test_combat_damage_calculation():
     print("\n[TEST] 戦闘ダメージ計算テストを開始 (実クラス使用版)...")

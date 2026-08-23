@@ -213,7 +213,11 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     target_is_static = getattr(target, "is_static", False)
     
     if is_miss:
-        msg = "ミス " + Text.Combat.MISS.format(attacker=attacker_name, target=target_name)
+        if getattr(attacker, "__class__", None).__name__ == "Player":
+            miss_text = Text.Combat.PLAYER_MISS
+        else:
+            miss_text = Text.Combat.MISS.format(attacker=attacker_name, target=target_name)
+        msg = "ミス " + miss_text
         return msg, 0, False, True
     
     if damage == 0:

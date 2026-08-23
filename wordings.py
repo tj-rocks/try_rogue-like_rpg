@@ -135,6 +135,7 @@ class Text:
         DAMAGE = "{attacker} は {target} に {damage} ダメージを与えた"
         CRITICAL = "クリティカルヒット "
         MISS = "{attacker} の 攻撃は 外れた"
+        PLAYER_MISS = "攻撃は 外れた"
         CONFUSED = "{target} は困惑し、意識が乱れている！（+{amount}）"
 
     class Items:
@@ -142,6 +143,7 @@ class Text:
         USE_NOTHING = "{item} を 使った\nしかし 何も 起こらなかった"
         RECOVER_HP = "{item} を 使った\nHPが {recovered} 回復した"
         ANTIDOTE_USE = "{name}を使用した 毒が消えた"
+        ANTIDOTE_NOT_POISONED = "毒状態じゃありません"
         POISON_SELF_USE = "{name}を使用した！ ウッ、身体が毒に侵された！"
         WARP_HOME_USE = "{name}を使用した 身体が光に包まれる..."
         BUFF_ATTACK_USE = "{name}を使用した！ 攻撃力が一時的に上昇し、防御無視と会心率が強化された！"

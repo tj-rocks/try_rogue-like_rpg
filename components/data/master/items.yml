@@ -458,7 +458,7 @@ CONSUMABLE_DATA:
     max_rank: SS
     rarity: 1
     category: event
-    image_path: components/pictures/icon/item.png
+    image_path: components/pictures/icon/fathers_charm.png
     shop_buyable: false
     min_floor: 999
     max_floor: 999
