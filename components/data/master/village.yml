@@ -597,7 +597,7 @@ TILE_MAPPINGS:
       - x: 30
         y: 4
         flip: false
-        min_rank: SS
+        min_rank: F
         max_rank: SS
       - x: 8
         y: 7

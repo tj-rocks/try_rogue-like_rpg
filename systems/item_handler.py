@@ -13,6 +13,10 @@ def use_consumable(item_key, player, dungeon=None):
     data = CONSUMABLE_DATA[item_key]
     effect = data.get("effect")
 
+    # 毒状態でなければ毒消薬は使用せず、所持数も減らさない。
+    if effect == "antidote" and getattr(player, "condition", "normal") != "poison":
+        return Text.Items.ANTIDOTE_NOT_POISONED
+
     # 🎵 SE再生
     from systems.sound_handler import sound_manager
     sound_manager.play_sfx(data.get("sound"))
