@@ -347,9 +347,9 @@ def execute_stave(player, stave, dungeon, dialog):
         from systems.sound_handler import sound_manager
         sound_manager.play_sfx(sound_path)
 
-    msg = f"{player.name} は {stave.name} を振った！\n"
+    msg = f"{stave.name} を振った！\n"
     if is_saved:
-        msg = f"{player.name} は {stave.name} を振った！（魔力が共鳴し回数を消費しなかった！）\n"
+        msg = f"{stave.name} を振った！（魔力が共鳴し回数を消費しなかった！）\n"
     
     if effect_type == "knockback":
         msg += _effect_knockback(player, settings, dungeon, dialog, is_enhanced)

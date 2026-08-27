@@ -132,6 +132,7 @@ COMBAT:
   CRITICAL_DAMAGE_MULTIPLIER: 1.5  # クリティカル時のダメージ倍率
   BACKSTAB_CRITICAL_DAMAGE_MULTIPLIER: 2.5  # バックアタック時のクリティカルダメージ倍率
   BACKSTAB_CRIT_BONUS: 0.25        # バックアタック時の会心率増加量
+  ENEMY_RANGED_DAMAGE_MULTIPLIER: 0.60  # 敵の遠距離攻撃ダメージ倍率（0.60 = 40%減）
   ENEMY_THINK_LIMIT_PER_FRAME: 10   # 1フレームに思考を許される敵の最大数（負荷対策）
   
   # アニメーションフレーム設定 (1/60秒単位)
