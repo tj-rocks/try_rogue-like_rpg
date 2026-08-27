@@ -807,7 +807,11 @@ class Enemy(Entity):
             self.dash_distance = (abs(px-mx)+abs(py-my) - (self.width/TILE_SIZE/2 + player.width/TILE_SIZE/2) + 1) * TILE_SIZE
         else: self.dash_distance = 0
         self.current_attack_damage_mult = 1.0
-        if self.current_attack_pattern.get("type") == "ranged":
+        attack_type = self.current_attack_pattern.get("type")
+        if attack_type == "close":
+            from constants import ENEMY_CLOSE_DAMAGE_MULTIPLIER
+            self.current_attack_damage_mult *= ENEMY_CLOSE_DAMAGE_MULTIPLIER
+        elif attack_type == "ranged":
             from constants import ENEMY_RANGED_DAMAGE_MULTIPLIER
             self.current_attack_damage_mult *= ENEMY_RANGED_DAMAGE_MULTIPLIER
         if (
