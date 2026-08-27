@@ -200,10 +200,13 @@ def draw_title_screen(screen, background_img, selected_idx, has_save):
             
         draw_text_wrapped(screen, font_medium, item, 0, start_y + i * 80, screen.get_width(), align_h='center', color=color)
 
-def show_loading_screen(screen, text=None):
+def show_loading_screen(screen, text=None, progress=None):
     """
     重い処理（ダンジョン生成やセーブ）の前に呼び出して、
     画面全体を少し暗くし、中央に読み込み中表示を出す。
+
+    progress に 0.0～1.0 を渡すと、メッセージの下に進捗バーと
+    パーセントを表示する。None の場合は従来どおりメッセージのみ。
     """
     from systems.events import clear_input_events
     if text is None: text = Text.UI.NOW_LOADING
@@ -216,7 +219,8 @@ def show_loading_screen(screen, text=None):
     screen.blit(overlay, (0, 0))
     
     # 2. 中央のメッセージボックス
-    box_w, box_h = 300, 100
+    has_progress = progress is not None
+    box_w, box_h = (440, 170) if has_progress else (300, 100)
     box_rect = pygame.Rect((sw - box_w) // 2, (sh - box_h) // 2, box_w, box_h)
     
     # 角丸のボックス
@@ -227,12 +231,31 @@ def show_loading_screen(screen, text=None):
     pygame.draw.rect(screen, (255, 255, 255), inner_box, 1, border_radius=6)
     
     # テキスト描画
-    draw_text_wrapped(screen, font_medium, text, box_rect.x, box_rect.y, box_w, box_h, align_h='center', align_v='center', color=(255, 255, 200))
+    text_height = 85 if has_progress else box_h
+    draw_text_wrapped(screen, font_medium, text, box_rect.x, box_rect.y, box_w, text_height, align_h='center', align_v='center', color=(255, 255, 200))
+
+    if has_progress:
+        progress = max(0.0, min(1.0, float(progress)))
+        bar_rect = pygame.Rect(box_rect.x + 35, box_rect.y + 98, box_w - 70, 22)
+        fill_rect = bar_rect.inflate(-4, -4)
+        fill_rect.width = round(fill_rect.width * progress)
+
+        pygame.draw.rect(screen, (12, 12, 24), bar_rect, border_radius=7)
+        if fill_rect.width > 0:
+            pygame.draw.rect(screen, (245, 205, 70), fill_rect, border_radius=5)
+        pygame.draw.rect(screen, (235, 235, 245), bar_rect, 2, border_radius=7)
+
+        percent_text = f"{round(progress * 100)}%"
+        draw_text_wrapped(screen, font_small, percent_text,
+                          box_rect.x, box_rect.y + 126, box_w, 32,
+                          align_h='center', align_v='center',
+                          color=(230, 230, 240))
     
     # 3. スピナー（静止画だが、呼び出し直後に一瞬見えるだけで安心感が出る）
     # 円形の装飾
-    center_x, center_y = sw // 2, sh // 2 + 35
-    pygame.draw.circle(screen, (255, 255, 100), (center_x, center_y), 5)
+    if not has_progress:
+        center_x, center_y = sw // 2, sh // 2 + 35
+        pygame.draw.circle(screen, (255, 255, 100), (center_x, center_y), 5)
     
     # 画面を強制更新（これを行わないと、直後の重い処理中に画面に反映されない）
     pygame.display.flip()

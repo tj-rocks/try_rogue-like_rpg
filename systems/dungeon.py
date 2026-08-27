@@ -129,19 +129,23 @@ class Dungeon:
             elif isinstance(v, str):
                 folders.add(v)
 
+        pending_folders = [
+            folder for folder in sorted(folders)
+            if folder not in cls._texture_cache
+            and os.path.exists(f"{main_path}/{folder}")
+        ]
         loaded = 0
-        total = len(folders)
-        for folder in sorted(folders):
-            if folder in cls._texture_cache:
-                continue
+        total = len(pending_folders)
+        for folder in pending_folders:
             img_dir = f"{main_path}/{folder}"
-            if not os.path.exists(img_dir):
-                continue
 
             if screen:
                 from systems.ui import show_loading_screen
-                show_loading_screen(screen, f"Now Loading... ({loaded+1}/{total})")
-                pygame.display.flip()
+                show_loading_screen(
+                    screen,
+                    f"Now Loading... ({loaded + 1}/{total})",
+                    loaded / total,
+                )
 
             textures = {}
             available_floor_variants = []
@@ -234,6 +238,10 @@ class Dungeon:
 
             loaded += 1
             print(f"[PRELOAD] Theme '{folder}' cached. ({loaded}/{total})")
+
+        if screen and total:
+            from systems.ui import show_loading_screen
+            show_loading_screen(screen, f"Now Loading... ({total}/{total})", 1.0)
 
         print(f"[PRELOAD] All themes preloaded. ({loaded} themes)")
 

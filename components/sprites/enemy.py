@@ -807,12 +807,15 @@ class Enemy(Entity):
             self.dash_distance = (abs(px-mx)+abs(py-my) - (self.width/TILE_SIZE/2 + player.width/TILE_SIZE/2) + 1) * TILE_SIZE
         else: self.dash_distance = 0
         self.current_attack_damage_mult = 1.0
+        if self.current_attack_pattern.get("type") == "ranged":
+            from constants import ENEMY_RANGED_DAMAGE_MULTIPLIER
+            self.current_attack_damage_mult *= ENEMY_RANGED_DAMAGE_MULTIPLIER
         if (
             getattr(self, "type", "") == "dungeon_core"
             and mode == "line"
             and getattr(self, "current_attack_distance", 0) == 2
         ):
-            self.current_attack_damage_mult = 2 / 3
+            self.current_attack_damage_mult *= 2 / 3
 
     def _deal_impact_damage(self, dungeon):
         from constants import COMBAT_LOG_WAIT_FRAMES
