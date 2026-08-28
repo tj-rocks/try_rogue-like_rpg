@@ -10,6 +10,58 @@ from systems.ui.ui_base import (
 
 MENU_UNICODE_KEYS = {"m", "M", "ｍ", "Ｍ"}
 
+# UIキーの長押し・高速連打を抑える共通入力ガード。
+# KEYUPまでは同じキーを再受付せず、離して押し直した場合にも短い間隔を設ける。
+_ui_held_keys = set()
+_ui_last_keydown_ms = {}
+UI_CURSOR_INPUT_INTERVAL_MS = 100
+UI_ACTION_INPUT_INTERVAL_MS = 180
+
+
+def _filter_ui_input_events(events):
+    from constants import (
+        KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_MOVE_LEFT, KEY_MOVE_RIGHT,
+        KEY_CONFIRM, KEY_CANCEL, KEY_MENU, KEY_INVENTORY, KEY_STATUS, KEY_MAP,
+    )
+
+    cursor_keys = {KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_MOVE_LEFT, KEY_MOVE_RIGHT}
+    action_keys = {
+        KEY_CONFIRM, KEY_CANCEL, KEY_MENU, KEY_INVENTORY, KEY_STATUS, KEY_MAP,
+        pygame.K_RETURN, pygame.K_z,
+    }
+    guarded_keys = cursor_keys | action_keys
+    now = pygame.time.get_ticks()
+    filtered = []
+
+    for event in events:
+        key = getattr(event, "key", None)
+        if event.type == pygame.KEYUP and key in guarded_keys:
+            _ui_held_keys.discard(key)
+            filtered.append(event)
+            continue
+
+        if event.type != pygame.KEYDOWN or key not in guarded_keys:
+            filtered.append(event)
+            continue
+
+        interval = (
+            UI_CURSOR_INPUT_INTERVAL_MS
+            if key in cursor_keys
+            else UI_ACTION_INPUT_INTERVAL_MS
+        )
+        last_accepted = _ui_last_keydown_ms.get(key, -interval)
+        is_too_soon = now - last_accepted < interval
+        is_key_repeat = key in _ui_held_keys
+        _ui_held_keys.add(key)
+
+        if is_too_soon or is_key_repeat:
+            continue
+
+        _ui_last_keydown_ms[key] = now
+        filtered.append(event)
+
+    return filtered
+
 
 def is_menu_key_event(event, key_menu):
     if event.type != pygame.KEYDOWN:
@@ -400,6 +452,8 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
     if cutscene_manager and cutscene_manager.is_active:
         events.clear()
         return
+
+    events = _filter_ui_input_events(events)
 
     if ore_gift_dialog and ore_gift_dialog.is_active:
         from constants import KEY_CONFIRM

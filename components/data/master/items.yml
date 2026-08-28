@@ -97,7 +97,7 @@ CONSUMABLE_DATA:
     price: 2000
     min_rank: F
     max_rank: SS
-    rarity: 4
+    rarity: 3
     image_path: components/pictures/icon/gem_teleport.png
     sound: components/sounds/sfx/recharge.wav
     shop_buyable: false
