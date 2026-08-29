@@ -133,6 +133,8 @@ class Text:
     class Combat:
         BLOCK = "{target} は 盾で 攻撃を ブロックした"
         DAMAGE = "{attacker} は {target} に {damage} ダメージを与えた"
+        PLAYER_DAMAGE = "{target} に {damage} ダメージを与えた"
+        DAMAGE_TO_PLAYER = "{attacker} は {damage} ダメージを与えた"
         CRITICAL = "クリティカルヒット "
         MISS = "{attacker} の 攻撃は 外れた"
         PLAYER_MISS = "攻撃は 外れた"

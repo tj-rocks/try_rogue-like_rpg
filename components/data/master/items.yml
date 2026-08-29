@@ -44,7 +44,7 @@ CONSUMABLE_DATA:
     price:  8000
     min_rank: D
     max_rank: SS
-    rarity: 7
+    rarity: 6
     image_path: components/pictures/icon/omamori.png
     floor_spawnable: false
     shop_buyable: false

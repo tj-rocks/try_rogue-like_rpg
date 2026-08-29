@@ -211,9 +211,11 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     attacker_name = getattr(attacker, "name", "誰か")
     target_name = getattr(target, "name", "誰か")
     target_is_static = getattr(target, "is_static", False)
+    attacker_is_player = getattr(attacker, "__class__", None).__name__ == "Player"
+    target_is_player = getattr(target, "__class__", None).__name__ == "Player"
     
     if is_miss:
-        if getattr(attacker, "__class__", None).__name__ == "Player":
+        if attacker_is_player:
             miss_text = Text.Combat.PLAYER_MISS
         else:
             miss_text = Text.Combat.MISS.format(attacker=attacker_name, target=target_name)
@@ -228,7 +230,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     if (
         counter_ready_turns > 0
         and not is_magic
-        and getattr(attacker, "__class__", None).__name__ == "Player"
+        and attacker_is_player
     ):
         target.counter_ready_turns = 0
         target._force_critical_once = True
@@ -251,9 +253,22 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
         if is_backstab and hasattr(target, "flash_color"):
             target.flash_color = (255, 50, 50)
         prefix = "背後を突いた " if is_backstab else ""
-        msg = prefix + Text.Combat.CRITICAL + Text.Combat.DAMAGE.format(attacker=attacker_name, target=target_name, damage=damage)
+        damage_text = (
+            Text.Combat.PLAYER_DAMAGE.format(target=target_name, damage=damage)
+            if attacker_is_player
+            else Text.Combat.DAMAGE_TO_PLAYER.format(attacker=attacker_name, damage=damage)
+            if target_is_player
+            else Text.Combat.DAMAGE.format(attacker=attacker_name, target=target_name, damage=damage)
+        )
+        msg = prefix + Text.Combat.CRITICAL + damage_text
     else:
-        msg = Text.Combat.DAMAGE.format(attacker=attacker_name, target=target_name, damage=damage)
+        msg = (
+            Text.Combat.PLAYER_DAMAGE.format(target=target_name, damage=damage)
+            if attacker_is_player
+            else Text.Combat.DAMAGE_TO_PLAYER.format(attacker=attacker_name, damage=damage)
+            if target_is_player
+            else Text.Combat.DAMAGE.format(attacker=attacker_name, target=target_name, damage=damage)
+        )
         
     # --- [NEW] 状態異常の付与判定 ---
     status_to_add = getattr(attacker, "status_to_inflict", None)
