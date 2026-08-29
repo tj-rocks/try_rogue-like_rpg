@@ -29,6 +29,30 @@ def test_player_miss_message_omits_self_name():
     assert message == "ミス 攻撃は 外れた"
     assert "自分" not in message
 
+
+def test_player_damage_message_omits_self_name():
+    player = Player()
+    enemy = Enemy(0, 0, "slime")
+
+    with patch("systems.combat_handler.calculate_damage", return_value=(10, False, False)):
+        message, damage, _, _ = deal_damage(player, enemy)
+
+    assert message == f"{enemy.name} に 10 ダメージを与えた"
+    assert damage == 10
+    assert "自分" not in message
+
+
+def test_damage_to_player_message_omits_self_name():
+    player = Player()
+    enemy = Enemy(0, 0, "slime")
+
+    with patch("systems.combat_handler.calculate_damage", return_value=(10, False, False)):
+        message, damage, _, _ = deal_damage(enemy, player)
+
+    assert message == f"{enemy.name} は 10 ダメージを与えた"
+    assert damage == 10
+    assert "自分" not in message
+
 def test_combat_damage_calculation():
     print("\n[TEST] 戦闘ダメージ計算テストを開始 (実クラス使用版)...")
 
