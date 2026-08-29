@@ -123,7 +123,9 @@ class ShopDialog(BaseListDialog):
                     self.stock_ref[self.cursor_idx]["count"] -= 1
                     if self.stock_ref[self.cursor_idx]["count"] <= 0: self.stock_ref.pop(self.cursor_idx)
                     play_sfx(SOUND_PURCHASE); self.refresh_items_from_stock(); self.cursor_idx = min(self.cursor_idx, len(self.items)-1); dialog.text = Text.Items.BOUGHT.format(name=name); dialog.is_active = True
-                confirm_dialog.on_yes = do_buy; confirm_dialog.is_active = True
+                confirm_dialog.on_yes = do_buy
+                confirm_dialog.on_no = None
+                confirm_dialog.is_active = True
         else:  # SELL
             if (itype == "weapon_inst" and key_or_iid == player.equipped_weapon) or (itype == "armor_inst" and key_or_iid == player.equipped_armor) or (itype == "shield_inst" and key_or_iid == player.equipped_shield) or (itype == "accessory_inst" and key_or_iid == getattr(player, "equipped_accessory", None)):
                 dialog.text = Text.Items.CANT_SELL_EQUIPPED; dialog.is_active = True; return
@@ -139,7 +141,10 @@ class ShopDialog(BaseListDialog):
                     elif itype == "accessory_inst": player.remove_accessory_by_iid(key_or_iid); ok = True
                     if ok: player.coin += price; play_sfx(SOUND_PURCHASE); dialog.text = Text.Items.SOLD.format(name=name, price=price); dialog.auto_close_timer = 60
                     self.setup_sell_mode(player); self.cursor_idx = min(self.cursor_idx, len(self.items)-1); dialog.is_active = True
-                confirm_dialog.on_yes = do_sell; confirm_dialog.is_active = True
+                confirm_dialog.on_yes = do_sell
+                # 直前に使った鍛冶確認などの「いいえ」処理を持ち越さない。
+                confirm_dialog.on_no = None
+                confirm_dialog.is_active = True
 
     def draw(self, screen, player, guild_system=None):
         if not self.is_active: return

@@ -28,6 +28,8 @@ def test_shop_sell_accessory():
     shop.open_shop("テストショップ", [])
     dialog = Dialog(800, 600)
     confirm_dialog = ConfirmDialog(800, 600)
+    # 直前の別画面（鍛冶など）が残した「いいえ」処理を再現する。
+    confirm_dialog.on_no = lambda: setattr(shop, "mode", "STALE_CALLBACK_RAN")
     
     # SELLモードに切り替え
     shop.setup_sell_mode(player)
@@ -59,6 +61,7 @@ def test_shop_sell_accessory():
     
     # confirm_dialog がアクティブになり、do_sell() コールバックが登録されたはず
     assert confirm_dialog.is_active, "確認ダイアログが表示されていません！"
+    assert confirm_dialog.on_no is None, "以前の確認画面の「いいえ」処理が残っています！"
     
     # YESを選択して売却を実行
     confirm_dialog.on_yes()
