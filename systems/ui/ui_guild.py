@@ -154,7 +154,7 @@ class GuildDialog(StateKeyMixin):
         if self._pending_report and not confirm_dialog.is_active:
             q = self._pending_report
 
-            if q.get("is_rank_up"):
+            if q.get("is_rank_up") or (player.guild_rank == "S" and not q.get("is_rank_up")):
                 from constants import MAX_ITEM_SLOTS
                 if len(player.items) >= MAX_ITEM_SLOTS:
                     dialog.text = "お祝いの品をお渡ししたいのですが、\nバッグがいっぱいのようですね。\n荷物を整理してからもう一度話しかけてください。"
@@ -368,8 +368,17 @@ class GuildDialog(StateKeyMixin):
 
             # 通常の報告完了処理
             report_msg = q.get("report_message") or self._get_fixed_quest_report_message(q)
+            if player.guild_rank == "S" and not q.get("is_rank_up"):
+                report_msg = (report_msg or "見事に依頼を達成しましたね！\nおめでとうございます！")
+                report_msg += "\n\nSランク依頼達成ボーナスとして、好きなアイテムを1つ差し上げます！"
             dialog.text = report_msg if report_msg else "見事に依頼を達成しましたね！\nおめでとうございます！"
             dialog.is_active = True
+
+            # Sランク到達後の通常依頼でも、昇格時と同じアイテム選択報酬を出す。
+            if player.guild_rank == "S" and not q.get("is_rank_up"):
+                if hasattr(self, "ore_gift_dialog") and self.ore_gift_dialog:
+                    self.ore_gift_dialog.setup(player, dialog)
+                    self.ore_gift_dialog.is_active = True
 
             self.mode = "AUTO_REPORT"
             self.items = [("auto_report", q)]

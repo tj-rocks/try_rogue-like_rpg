@@ -287,7 +287,8 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     if not target_is_static and not is_miss and damage > 0 and is_critical and hasattr(target, "stun_turns"):
         total_stun = getattr(attacker, "total_stun", 0)
         stun_chance = getattr(attacker, "total_stun_proc_chance", 0.0)
-        if isinstance(total_stun, int) and total_stun >= 2 and isinstance(stun_chance, (int, float)) and stun_chance > 0:
+        if isinstance(total_stun, int) and total_stun >= 1 and isinstance(stun_chance, (int, float)) and stun_chance > 0:
+            stun_chance *= min(1.0, total_stun / 2.0)
             stun_duration = getattr(attacker, "total_stun_duration", 1)
             if isinstance(stun_duration, (int, float)) and stun_duration > 0:
                 target.stun_turns = int(stun_duration)
@@ -300,12 +301,13 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     # --- ライフスティール効果（クリティカル時のみ発動） ---
     if not target_is_static and not is_miss and damage > 0 and is_critical and hasattr(attacker, "hp"):
         total_lifesteal = getattr(attacker, "total_lifesteal", 0)
-        if isinstance(total_lifesteal, int) and total_lifesteal >= 2:
+        if isinstance(total_lifesteal, int) and total_lifesteal >= 1:
             lifesteal_chance = getattr(attacker, "total_lifesteal_chance", 0.0)
             if isinstance(lifesteal_chance, (int, float)) and lifesteal_chance > 0:
+                lifesteal_chance *= min(1.0, total_lifesteal / 2.0)
                 lifesteal_ratio = getattr(attacker, "total_lifesteal_ratio", 0.0)
                 if isinstance(lifesteal_ratio, (int, float)) and lifesteal_ratio > 0:
-                    heal_amount = int(damage * lifesteal_ratio)
+                    heal_amount = int(damage * lifesteal_ratio * min(1.0, total_lifesteal / 2.0))
                     attacker.hp = min(attacker.max_hp, attacker.hp + heal_amount)
                     msg += f"\n{attacker_name}は{heal_amount}回復した！"
                     # ライフスティール発動時も対象に赤色フラッシュ
@@ -321,17 +323,18 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
         # targetがプレイヤーで、attackerが敵の場合のみカウンター発動
         # count_counter の合計が2以上で発動
         total_counter = getattr(target, "total_counter", 0)
-        if isinstance(total_counter, int) and total_counter >= 2:
+        if isinstance(total_counter, int) and total_counter >= 1:
             proc_chance = getattr(target, "total_counter_proc_chance", 0.0)
             if isinstance(proc_chance, (int, float)) and proc_chance > 0:
                 rolled = random.random()
                 if _os.environ.get("DEBUG_MODE") == "1":
                     print(f"[カウンター] chance={proc_chance:.2%}, rolled={rolled:.4f} -> {'✅ 成功' if rolled < proc_chance else '❌ 失敗'}")
+                proc_chance *= min(1.0, total_counter / 2.0)
                 if rolled < proc_chance:
                     counter_damage_ratio = getattr(target, "total_counter_damage_ratio", 0.5)
                     if isinstance(counter_damage_ratio, (int, float)) and counter_damage_ratio > 0:
                         # カウンター攻撃を実行（プレイヤーの攻撃力ベース）
-                        counter_damage = int(getattr(target, "total_attack", target.attack) * counter_damage_ratio)
+                        counter_damage = int(getattr(target, "total_attack", target.attack) * counter_damage_ratio * min(1.0, total_counter / 2.0))
                         if hasattr(attacker, "take_damage"):
                             attacker.take_damage(counter_damage)
                         else:
