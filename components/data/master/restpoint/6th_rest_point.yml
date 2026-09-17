@@ -2,6 +2,8 @@ CONFIG:
   map_file: 6th_rest_point.txt
   map_dir: components/data/dungeon
   image_dir: components/pictures/dungeon/home
+  player_start_x: 33
+  player_start_y: 45
 TILE_MAPPINGS:
   floor_lawn:
     char: .
@@ -224,6 +226,10 @@ TILE_MAPPINGS:
   anvil:
     category: obstacle
     id: anvil
+    positions:
+      - x: 15
+        y: 17
+        flip: false
   crystal:
     category: obstacle
     id: crystal
@@ -271,6 +277,10 @@ TILE_MAPPINGS:
   blacksmith:
     category: npc
     id: blacksmith
+    positions:
+      - x: 15
+        y: 16
+        flip: false
   guild_receptionist:
     category: npc
     id: guild_receptionist

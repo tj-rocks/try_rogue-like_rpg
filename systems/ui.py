@@ -4007,7 +4007,9 @@ class ShopDialog(BaseListDialog):
                     self.stock_ref[self.cursor_idx]["count"] -= 1
                     if self.stock_ref[self.cursor_idx]["count"] <= 0: self.stock_ref.pop(self.cursor_idx)
                     play_sfx(SOUND_PURCHASE); self.refresh_items_from_stock(); self.cursor_idx = min(self.cursor_idx, len(self.items)-1); dialog.text = Text.Items.BOUGHT.format(name=name); dialog.is_active = True
-                confirm_dialog.on_yes = do_buy; confirm_dialog.is_active = True
+                confirm_dialog.on_yes = do_buy
+                confirm_dialog.on_no = None
+                confirm_dialog.is_active = True
         else: # SELL
             if (itype == "weapon_inst" and key_or_iid == player.equipped_weapon) or (itype == "armor_inst" and key_or_iid == player.equipped_armor) or (itype == "shield_inst" and key_or_iid == player.equipped_shield) or (itype == "accessory_inst" and key_or_iid == getattr(player, "equipped_accessory", None)):
                 dialog.text = Text.Items.CANT_SELL_EQUIPPED; dialog.is_active = True; return
@@ -4023,7 +4025,10 @@ class ShopDialog(BaseListDialog):
                     elif itype == "accessory_inst": player.remove_accessory_by_iid(key_or_iid); ok = True
                     if ok: player.coin += price; play_sfx(SOUND_PURCHASE); dialog.text = Text.Items.SOLD.format(name=name, price=price); dialog.auto_close_timer = 60
                     self.setup_sell_mode(player); self.cursor_idx = min(self.cursor_idx, len(self.items)-1); dialog.is_active = True
-                confirm_dialog.on_yes = do_sell; confirm_dialog.is_active = True
+                confirm_dialog.on_yes = do_sell
+                # 直前に使った鍛冶確認などの「いいえ」処理を持ち越さない。
+                confirm_dialog.on_no = None
+                confirm_dialog.is_active = True
 
     def draw(self, screen, player, guild_system=None):
         if not self.is_active: return
@@ -4662,7 +4667,7 @@ class GuildGuideDialog(BaseListDialog):
             {"key": "your_rank", "name": "あなたのランク", "desc": rank_info_desc},
             {"key": "guild_point", "name": "ギルドポイント", "desc": "【ギルドポイント(GP)とは】\nクエストを達成すると貰えるポイントよ \nランクを上げる条件になるほか、神官様に死の呪いを解いてもらう際にも必要になるわ"},
             {"key": "adventure_rank", "name": "冒険者ランク", "desc": "【冒険者ランク】\nランクは -（未加入）から始まり、F, E, D, C, B, A, S, SS までの9段階あるわ \nランクが上がると、より難易度と報酬の高い依頼を受けられるようになるのよ"},
-            {"key": "floor_limit", "name": "到達可能階層", "desc": "【ランク制限】\nランクに応じて進める限界階層が決まっているわ \n- : B0F(村のみ)\nF : B11F まで\nE : B21F まで\nD : B30F まで\nC : B35F まで\nB : B55F まで\nそれ以上のランクになれば、さらに深くまで進めるようになるわ！"},
+            {"key": "floor_limit", "name": "到達可能階層", "desc": "【ランク制限】\nランクに応じて進める限界階層が決まっているわ \n- : B0F(村のみ)\nF : B11F まで\nE : B21F まで\nD : B30F まで\nC : B40F まで\nB : B55F まで\nそれ以上のランクになれば、さらに深くまで進めるようになるわ！"},
             {"key": "promotion_exam", "name": "昇級試験", "desc": "【昇級試験】\nランクごとに必要なGPが溜まると、ギルドで試験を受けられるわ \n試験クエストを受けて、そのランクのボスが落とす『冒険者の証』を回収して報告すればランクアップよ！"},
             {"key": "quit", "name": "閉じる", "desc": "説明を終わります"}
         ]

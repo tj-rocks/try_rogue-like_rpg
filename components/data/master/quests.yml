@@ -49,7 +49,7 @@ FIXED_QUESTS:
     reward_gp: 50
     title: スイスイスライムの討伐
     requester: ギルドマスター
-    description: "ダンジョン深層に現れるという、驚異的な回避能力を持つスライムを討伐してください (想定階層: 10F)"
+    description: "ダンジョン深層に現れるという、驚異的な回避能力を持つスライムを討伐してください (想定階層: 11F)"
     report_message: "見事に依頼を達成しましたね！\nあの素早いスライムを仕留めるとは…\nお見事です！"
     repeatable: true
     chance: 1.0
@@ -65,7 +65,7 @@ FIXED_QUESTS:
     reward_gp: 150
     title: スケスケスケルトンの討伐
     requester: ギルドマスター
-    description: "ダンジョンに現れる姿の薄いスケルトンを討伐し、その脅威を排除してください (想定階層: 20F)"
+    description: "ダンジョンに現れる姿の薄いスケルトンを討伐し、その脅威を排除してください (想定階層: 21F)"
     report_message: "お見事です！\nあの不気味な骸骨を倒しましたか…\nこれで冒険者たちも安心ですね"
     repeatable: true
     chance: 1.0
@@ -81,7 +81,7 @@ FIXED_QUESTS:
     reward_gp: 250
     title: デカコウモリの討伐
     requester: ギルドマスター
-    description: "ダンジョン中層に現れるという、猛毒を持つ巨大なコウモリを討伐してください (想定階層: 35F)"
+    description: "ダンジョン中層に現れるという、猛毒を持つ巨大なコウモリを討伐してください (想定階層: 40F)"
     report_message: "あの巨大なコウモリを…！\n毒にやられなかったですか？\n大したものですね！"
     repeatable: true
     chance: 1.0
