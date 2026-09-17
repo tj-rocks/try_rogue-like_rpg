@@ -62,15 +62,15 @@ def get_player_skill_names(player):
     if not player:
         return names
 
-    if getattr(player, "total_lifesteal", 0) >= 2 and getattr(player, "total_lifesteal_chance", 0):
+    if getattr(player, "total_lifesteal", 0) >= 1 and getattr(player, "total_lifesteal_chance", 0):
         names.append(EQUIP_SKILL_LABEL_MAP.get("lifesteal", "lifesteal"))
-    if getattr(player, "total_counter", 0) >= 2:
+    if getattr(player, "total_counter", 0) >= 1:
         names.append(EQUIP_SKILL_LABEL_MAP.get("counter", "counter"))
-    if getattr(player, "total_stun", 0) >= 2 and getattr(player, "total_stun_proc_chance", 0):
+    if getattr(player, "total_stun", 0) >= 1 and getattr(player, "total_stun_proc_chance", 0):
         names.append(EQUIP_SKILL_LABEL_MAP.get("stun", "stun"))
-    if getattr(player, "total_backstab", 0) >= 2 and (getattr(player, "total_backstab_crit_bonus", 0) or getattr(player, "total_flank_backstab", 0)):
+    if getattr(player, "total_backstab", 0) >= 1 and (getattr(player, "total_backstab_crit_bonus", 0) or getattr(player, "total_flank_backstab", 0)):
         names.append(EQUIP_SKILL_LABEL_MAP.get("backstab", "backstab"))
-    if getattr(player, "total_knockback", 0) >= 2:
+    if getattr(player, "total_knockback", 0) >= 1:
         names.append(EQUIP_SKILL_LABEL_MAP.get("knockback", "knockback"))
     return names
 

@@ -1636,9 +1636,10 @@ class Player(Entity):
                     # --- knockbackスキル発動（クリティカル不問） ---
                     if dmg > 0 and not miss and not getattr(e, "is_static", False):
                         total_knockback = getattr(self, "total_knockback", 0)
-                        if isinstance(total_knockback, int) and total_knockback >= 2:
+                        if isinstance(total_knockback, int) and total_knockback >= 1:
                             kb_chance = getattr(self, "total_knockback_proc_chance", 0.0)
                             if isinstance(kb_chance, (int, float)) and kb_chance > 0:
+                                kb_chance *= min(1.0, total_knockback / 2.0)
                                 if random.random() < kb_chance:
                                     kb_max_dist = max(1, int(getattr(self, "total_knockback_max_distance", 5)))
                                     e_gx = int((e.x + e.width / 2) // dungeon.tile_size)
