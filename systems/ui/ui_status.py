@@ -516,9 +516,6 @@ class StatusDialog(StateKeyMixin):
                         count = player._count_owned_items(q.get('target_key'))
                         prog = f"({count}/{q.get('amount') or 0})"
 
-                    if q.get("is_rank_up"):
-                        prog = ""
-
                     reward = q.get("reward_gold", 0)
                     lines.append(f"・{q.get('title')}")
                     if prog:

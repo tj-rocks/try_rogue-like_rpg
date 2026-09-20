@@ -3799,10 +3799,6 @@ class StatusDialog:
                         count = player._count_owned_items(q.get('target_key'))
                         prog = f"({count}/{q.get('amount') or 0})"
                     
-                    # 昇級試験の場合は進捗を「未達成/達成」のような形にするか、あるいはprogを隠す
-                    if q.get("is_rank_up"):
-                        prog = "" # タイトルに「冒険者の証の回収」とあるので、進捗数値は不要
-                    
                     reward = q.get("reward_gold", 0)
                     lines.append(f"・{q.get('title')}")
                     if prog:
