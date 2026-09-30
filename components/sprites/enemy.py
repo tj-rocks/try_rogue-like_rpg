@@ -808,12 +808,18 @@ class Enemy(Entity):
         else: self.dash_distance = 0
         self.current_attack_damage_mult = 1.0
         attack_type = self.current_attack_pattern.get("type")
-        if attack_type == "close":
-            from constants import ENEMY_CLOSE_DAMAGE_MULTIPLIER
-            self.current_attack_damage_mult *= ENEMY_CLOSE_DAMAGE_MULTIPLIER
-        elif attack_type == "ranged":
-            from constants import ENEMY_RANGED_DAMAGE_MULTIPLIER
-            self.current_attack_damage_mult *= ENEMY_RANGED_DAMAGE_MULTIPLIER
+        from constants import ENEMY_LATE_DAMAGE_START_FLOOR, ENEMY_LATE_DAMAGE_END_FLOOR
+        # 開始階の直前を従来倍率とし、到達階まで均等に弱体化を緩める。
+        floor = getattr(dungeon, "current_floor", 1)
+        floor_span = max(1, ENEMY_LATE_DAMAGE_END_FLOOR - ENEMY_LATE_DAMAGE_START_FLOOR + 1)
+        progress = max(0.0, min(1.0, (floor - ENEMY_LATE_DAMAGE_START_FLOOR + 1) / floor_span))
+        # 99Fは全体の弱体化対象外（共通倍率1.0）。攻撃固有補正は維持する。
+        if floor != 99 and attack_type == "close":
+            from constants import ENEMY_CLOSE_DAMAGE_MULTIPLIER, ENEMY_LATE_CLOSE_DAMAGE_MULTIPLIER
+            self.current_attack_damage_mult *= ENEMY_CLOSE_DAMAGE_MULTIPLIER + (ENEMY_LATE_CLOSE_DAMAGE_MULTIPLIER - ENEMY_CLOSE_DAMAGE_MULTIPLIER) * progress
+        elif floor != 99 and attack_type == "ranged":
+            from constants import ENEMY_RANGED_DAMAGE_MULTIPLIER, ENEMY_LATE_RANGED_DAMAGE_MULTIPLIER
+            self.current_attack_damage_mult *= ENEMY_RANGED_DAMAGE_MULTIPLIER + (ENEMY_LATE_RANGED_DAMAGE_MULTIPLIER - ENEMY_RANGED_DAMAGE_MULTIPLIER) * progress
         if (
             getattr(self, "type", "") == "dungeon_core"
             and mode == "line"

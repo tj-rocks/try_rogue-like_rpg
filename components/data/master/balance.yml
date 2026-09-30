@@ -134,6 +134,10 @@ COMBAT:
   BACKSTAB_CRIT_BONUS: 0.25        # バックアタック時の会心率増加量
   ENEMY_CLOSE_DAMAGE_MULTIPLIER: 0.70  # 敵の近距離攻撃ダメージ倍率（0.70 = 30%減）
   ENEMY_RANGED_DAMAGE_MULTIPLIER: 0.60  # 敵の遠距離攻撃ダメージ倍率（0.60 = 40%減）
+  ENEMY_LATE_DAMAGE_START_FLOOR: 50    # この階層から1階ごとに倍率を徐々に上げる
+  ENEMY_LATE_DAMAGE_END_FLOOR: 80      # この階層で下記の倍率に到達し、以降は固定（99Fのみ共通倍率1.0）
+  ENEMY_LATE_CLOSE_DAMAGE_MULTIPLIER: 0.85
+  ENEMY_LATE_RANGED_DAMAGE_MULTIPLIER: 0.80
   ENEMY_THINK_LIMIT_PER_FRAME: 10   # 1フレームに思考を許される敵の最大数（負荷対策）
   
   # アニメーションフレーム設定 (1/60秒単位)

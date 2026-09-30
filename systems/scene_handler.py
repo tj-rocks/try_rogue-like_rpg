@@ -148,7 +148,7 @@ def handle_ending(screen, events, game_state, ending_imgs, ui_elements, story_da
         page_data = ending_story.get(idx + 1) or ending_story.get(str(idx + 1))
         if page_data:
             text = page_data.get("text", "")
-            if dialog.text != text:
+            if text and dialog.text != text:
                 dialog.text = text
                 dialog.is_active = True
                 game_state["dialog_modal"] = False
