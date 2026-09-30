@@ -65,6 +65,9 @@ ending:
       text: "正しかったか正しくないかは、あとから誰かが決める。\nだが、決めて動いた事実だけは残る。\n君は、確かにそれをやった。"
       bgm: "components/sounds/bgm/ending_1.mp3"
 
+    5:
+      image: "components/pictures/ending/credits.png"
+
   core_refuse:
     1:
       image: "components/pictures/ending/core_refuse_1.png"
@@ -82,3 +85,5 @@ ending:
       image: "components/pictures/ending/core_refuse_2.png"
       text: "正しかったか正しくないかは、あとから誰かが決める。\nだが、決めて動いた事実だけは残る。\n君は、確かにそれをやった。"
       bgm: "components/sounds/bgm/winding_adventure.mp3"
+    5:
+      image: "components/pictures/ending/credits.png"

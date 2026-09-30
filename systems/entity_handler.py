@@ -186,8 +186,32 @@ def update_dungeon_entities(dungeon, player, dt, dialog=None, confirm_dialog=Non
                     dropped_token = True
                     break
             
-            # 2. 通常のドロップ判定 (証を落とした場合は確実にスキップ)
-            if not dropped_token and isinstance(drops, dict):
+            # 帰還手段は抽選や通常ドロップの重複チェックで失わせない。
+            if enemy.type == "dungeon_core":
+                center_x, center_y = dungeon.map_width // 2, dungeon.map_height // 2
+                occupied = {
+                    (int((item.x + dungeon.tile_size / 2) // dungeon.tile_size),
+                     int((item.y + dungeon.tile_size / 2) // dungeon.tile_size))
+                    for item in dungeon.dropped_items
+                    if not getattr(item, "is_collected", False)
+                }
+                floors = [
+                    (x, y) for y, row in enumerate(dungeon.map_data)
+                    for x, tile in enumerate(row) if tile in (1, 4)
+                ]
+                # 中央に近い空き床を優先。全床が埋まっていても消失させず重ねる。
+                drop_x, drop_y = min(
+                    floors,
+                    key=lambda pos: (pos in occupied, (pos[0] - center_x) ** 2 + (pos[1] - center_y) ** 2),
+                    default=(int(enemy.x // dungeon.tile_size), int(enemy.y // dungeon.tile_size)),
+                )
+                dungeon.dropped_items.append(DroppedConsumable(
+                    drop_x * dungeon.tile_size, drop_y * dungeon.tile_size,
+                    "return_wing", CONSUMABLE_DATA["return_wing"],
+                ))
+
+            # 2. 通常のドロップ判定 (証または帰還の道標を出した場合はスキップ)
+            elif not dropped_token and isinstance(drops, dict):
                 from constants import DROP_RATE_MULTIPLIER
                 from systems.game_state import game_state
                 
