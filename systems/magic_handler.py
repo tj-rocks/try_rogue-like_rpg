@@ -366,6 +366,12 @@ def execute_stave(player, stave, dungeon, dialog):
     else:
         msg += "しかし 何もおきなかった！"
 
+    # 杖の効果解決後、生存中のラスボスの次の行動を魔法反撃にする。
+    counter = {"fire": "fire", "barrier": "fire", "knockback": "knockback"}.get(effect_type)
+    for enemy in dungeon.enemies:
+        if (getattr(enemy, "type", "") == "dungeon_core"
+                and not enemy.is_dead and not enemy.battle_locked):
+            enemy.pending_magic_counter = counter
     return msg
 
 def _effect_knockback(player, settings, dungeon, dialog, is_enhanced=False):

@@ -931,8 +931,8 @@ ENEMY_DATA:
     rare_drop_rate: 0.06
     hp: 38
     attack: 16
-    defense: 28
-    evasion: 20
+    defense: 32
+    evasion: 22
     exp: 110
     reward_gold: 380
     accuracy_close: 90
@@ -965,8 +965,8 @@ ENEMY_DATA:
     rare_drop_rate: 0.07
     hp: 41
     attack: 22
-    defense: 38
-    evasion: 8
+    defense: 40
+    evasion: 11
     exp: 125
     reward_gold: 420
     accuracy_close: 92
@@ -1001,8 +1001,8 @@ ENEMY_DATA:
     rare_drop_rate: 0.06
     hp: 26
     attack: 19
-    defense: 44
-    evasion: 26
+    defense: 46
+    evasion: 28
     exp: 130
     reward_gold: 440
     accuracy_close: 94
@@ -1036,8 +1036,8 @@ ENEMY_DATA:
     rare_drop_rate: 0.05
     hp: 44
     attack: 20
-    defense: 40
-    evasion: 24
+    defense: 42
+    evasion: 26
     exp: 140
     reward_gold: 460
     accuracy_close: 92
@@ -1072,8 +1072,8 @@ ENEMY_DATA:
     rare_drop_rate: 0.05
     hp: 36
     attack: 17
-    defense: 34
-    evasion: 24
+    defense: 40
+    evasion: 26
     exp: 118
     reward_gold: 400
     accuracy_close: 92
@@ -1107,7 +1107,7 @@ ENEMY_DATA:
     hp: 35
     attack: 21
     defense: 70
-    evasion: 16
+    evasion: 18
     exp: 135
     reward_gold: 480
     accuracy_close: 90
@@ -1419,7 +1419,7 @@ ENEMY_DATA:
     hp: 24
     attack: 21
     defense: 72
-    evasion: 24
+    evasion: 26
     exp: 220
     reward_gold: 3200
     accuracy_close: 92
@@ -1466,7 +1466,7 @@ ENEMY_DATA:
     hp: 17
     attack: 22
     defense: 88
-    evasion: 18
+    evasion: 20
     exp: 260
     reward_gold: 3800
     accuracy_close: 90
@@ -1558,7 +1558,7 @@ ENEMY_DATA:
     hp: 210
     attack: 22
     defense: 96
-    evasion: 12
+    evasion: 14
     exp: 320
     reward_gold: 5200
     accuracy_close: 94
@@ -1589,6 +1589,11 @@ ENEMY_DATA:
     encounter_dialog_range: 3
     bgm: components/sounds/bgm/last_battle.mp3
     defeat_bgm: components/sounds/bgm/ending_1.mp3
+    # 既存ライフスティール: クリティカル時に与ダメージの20%を回復
+    count_lifesteal: 2
+    lifesteal_chance: 1.0
+    lifesteal_ratio: 0.20
+    turn_attack_min_chance: 0.65  # 振り向きだけで終わるターンを減らす
     image_folder: components/pictures/enemies/dungeon_core_playerlike
     encounter_message:
       - ダンジョンコア に 発見された！
@@ -1635,7 +1640,7 @@ ENEMY_DATA:
     hp: 300
     attack: 20
     defense: 100
-    evasion: 30
+    evasion: 35
     exp: 0
     reward_gold: 0
     accuracy_close: 96
