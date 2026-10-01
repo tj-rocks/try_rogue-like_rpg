@@ -68,8 +68,12 @@ class Enemy(Entity):
         self.smart_ranged_move = data.get("smart_ranged_move", True)
         self.turn_attack = data.get("turn_attack", False)
         self.turn_attack_chance = data.get("turn_attack_chance", 0.5)
+        self.turn_attack_min_chance = data.get("turn_attack_min_chance", 0.0)
         self.move_face_chance = data.get("move_face_chance", 0.0)
         self.bgm = data.get("bgm"); self.crit_rate = data.get("crit_rate", 0.01)
+        self.total_lifesteal = data.get("count_lifesteal", 0)
+        self.total_lifesteal_chance = data.get("lifesteal_chance", 0.0)
+        self.total_lifesteal_ratio = data.get("lifesteal_ratio", 0.0)
         self.accuracy_close = data.get("accuracy_close", data.get("accuracy_bonus", 100))
         self.accuracy_ranged = data.get("accuracy_ranged", data.get("accuracy_bonus", 100))
         self.status_to_inflict = data.get("status"); self.status_chance = data.get("status_chance", 100)
@@ -614,12 +618,12 @@ class Enemy(Entity):
     def _choose_dungeon_core_diagonal_action(self, player):
         profile = getattr(player, "tactical_profile", None)
         use_profile = bool(profile and random.random() < 0.7)
-        weights = {"diagonal": 30, "step_front": 30, "wait": 20}
+        weights = {"diagonal": 45, "step_front": 30, "wait": 5}
         if use_profile:
             move_bias, melee_bias, magic_bias, item_bias, wait_bias = self._get_dungeon_core_action_biases(profile)
             weights["diagonal"] += int(move_bias * 20)
             weights["step_front"] += int(melee_bias * 20)
-            weights["wait"] += int((magic_bias + item_bias + wait_bias) * 20)
+            weights["wait"] += int((magic_bias + item_bias + wait_bias) * 10)
         return random.choices(
             ["diagonal", "step_front", "wait"],
             weights=[weights["diagonal"], weights["step_front"], weights["wait"]],
@@ -1234,7 +1238,37 @@ class Enemy(Entity):
                 
         return False
 
+    def _execute_magic_counter(self, effect, player, dungeon, dialog):
+        from constants import STAVE_DATA
+        from systems.magic_handler import FireEffect, KnockbackEffect
+        from systems.sound_handler import sound_manager
+
+        self.counter_ready_turns = 0
+        self.predicted_attack_tile = None
+        self.current_attack_mode = None
+        settings = STAVE_DATA[f"{effect}_stave"]
+        sound_manager.play_sfx(settings.get("sound"))
+        if effect == "fire":
+            dungeon.magic_effects.append(FireEffect(player.x, player.y))
+        else:
+            dungeon.magic_effects.append(KnockbackEffect(self.x, self.y, player.x, player.y))
+        msg, damage, critical, miss = deal_damage(
+            self, player, is_magic=True, damage_mult=settings.get("damage_mult", 1.0),
+        )
+        if effect == "knockback" and damage > 0 and not miss and not player.is_dead:
+            self._apply_knockback_to_player(player, dungeon)
+        if dialog:
+            from systems.game_state import game_state
+            label = "炎" if effect == "fire" else "吹き飛ばし"
+            msg = f"{self.name} の魔法カウンター！ {label}で反撃！\n{msg}"
+            dialog.text = f"{dialog.text}\n{msg}" if dialog.is_active else msg
+            dialog.is_active = True
+            dialog.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+            game_state["dialog_modal"] = False
+
     def take_turn(self, player, dungeon, all_entities, dialog=None, occupied_cells=None):
+        magic_counter = getattr(self, "pending_magic_counter", None)
+        self.pending_magic_counter = None
         if getattr(self, "battle_locked", False):
             self._log_trace(dungeon, "battle_locked: take_turn skipped")
             return
@@ -1245,6 +1279,11 @@ class Enemy(Entity):
         if self.stun_turns > 0:
             self.stun_turns -= 1
             self._log_trace(dungeon, f"stunned! remaining turns: {self.stun_turns}")
+            return
+        # 障壁に閉じ込められた場合も、杖への反撃はこのターンの行動として行う。
+        if self.type == "dungeon_core" and magic_counter in ("fire", "knockback"):
+            if not player.is_dead:
+                self._execute_magic_counter(magic_counter, player, dungeon, dialog)
             return
         if self.is_static:
             self._log_trace(dungeon, "take_turn bypassed: is_static=True")
@@ -1583,14 +1622,15 @@ class Enemy(Entity):
     def _get_turn_attack_chance(self, player, relation, distance):
         profile = getattr(player, "tactical_profile", None)
         base = max(0.0, min(1.0, getattr(self, "turn_attack_chance", 0.5)))
+        minimum = max(0.0, min(1.0, getattr(self, "turn_attack_min_chance", 0.0)))
         if not profile:
-            return base
+            return max(minimum, base)
         melee = profile.get_action_probability("melee", relation=relation, distance=distance, default=0.0)
         move = profile.get_action_probability("move", relation=relation, distance=distance, default=0.0)
         magic = profile.get_action_probability("magic", relation=relation, distance=distance, default=0.0)
         item = profile.get_action_probability("item", relation=relation, distance=distance, default=0.0)
         learned = 0.2 + (0.6 * melee) + (0.15 * magic) + (0.05 * item) - (0.2 * move)
-        return max(0.05, min(0.95, learned if learned > 0 else base))
+        return max(minimum, max(0.05, min(0.95, learned if learned > 0 else base)))
 
     def _can_use_attack_mode(self, mode, dx, dy, dungeon, all_entities):
         if mode == "line":
