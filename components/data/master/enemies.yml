@@ -1632,10 +1632,10 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 1.0
     rare_drop_rate: 0.0
-    hp: 230
+    hp: 300
     attack: 20
-    defense: 55
-    evasion: 18
+    defense: 100
+    evasion: 30
     exp: 0
     reward_gold: 0
     accuracy_close: 96
