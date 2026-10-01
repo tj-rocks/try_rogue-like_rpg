@@ -618,12 +618,12 @@ class Enemy(Entity):
     def _choose_dungeon_core_diagonal_action(self, player):
         profile = getattr(player, "tactical_profile", None)
         use_profile = bool(profile and random.random() < 0.7)
-        weights = {"diagonal": 45, "step_front": 30, "wait": 5}
+        weights = {"diagonal": 80, "step_front": 15, "wait": 5}
         if use_profile:
             move_bias, melee_bias, magic_bias, item_bias, wait_bias = self._get_dungeon_core_action_biases(profile)
             weights["diagonal"] += int(move_bias * 20)
-            weights["step_front"] += int(melee_bias * 20)
-            weights["wait"] += int((magic_bias + item_bias + wait_bias) * 10)
+            weights["step_front"] += int(melee_bias * 10)
+            weights["wait"] += int((magic_bias + item_bias + wait_bias) * 5)
         return random.choices(
             ["diagonal", "step_front", "wait"],
             weights=[weights["diagonal"], weights["step_front"], weights["wait"]],
@@ -699,11 +699,11 @@ class Enemy(Entity):
             should_predict_step_in = random.random() < 0.2
 
         if not should_predict_step_in:
-            advance_chance = 0.6
+            advance_chance = 0.9
             if preferred == "melee":
-                advance_chance = 0.75
+                advance_chance = 0.95
             elif preferred == "move":
-                advance_chance = 0.65
+                advance_chance = 0.9
             if random.random() < advance_chance:
                 moved = self._move_dungeon_core(player, dungeon, relation)
                 self._log_trace(
@@ -1537,7 +1537,7 @@ class Enemy(Entity):
             move_bias = profile.get_action_probability("move", relation=relation, distance=distance, default=0.0)
             magic_bias = profile.get_action_probability("magic", relation=relation, distance=distance, default=0.0)
             item_bias = profile.get_action_probability("item", relation=relation, distance=distance, default=0.0)
-        weights = {"line": 50, "diagonal": 45, "counter": 20, "knockback": 18}
+        weights = {"line": 70, "diagonal": 60, "counter": 20, "knockback": 25}
         if relation == "front":
             weights["line"] += 10
             weights["counter"] += 20
@@ -1597,6 +1597,8 @@ class Enemy(Entity):
                 weights["diagonal"] += 12
             if item_bias > 0.25:
                 weights["line"] += 2
+        # 通常の反撃待ちは少数に留め、自分から攻撃する行動を優先する。
+        weights["counter"] = max(1, min(10, weights["counter"] // 4))
         return weights, relation, distance, preferred
 
     def _read_player_magic_habit(self, player, relation, distance):
@@ -1853,7 +1855,7 @@ class Enemy(Entity):
                 wait_bias += 0.02
             if magic_read == "magic_fire":
                 wait_bias += 0.04
-            wait_weight = max(5, min(45, int(wait_bias * 100)))
+            wait_weight = max(2, min(10, int(wait_bias * 25)))
             if random.randint(1, 100) <= wait_weight:
                 self.current_attack_mode = None
                 self._log_trace(dungeon, f"dungeon_core wait relation={relation} distance={distance} preferred={preferred}")
