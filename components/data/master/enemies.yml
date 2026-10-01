@@ -1177,7 +1177,7 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/skeleton
     encounter_message: 
       - スケスケスケルトン に 発見された！
-      - 半透明の骨が不気味に揺れている…'
+      - 半透明の骨が不気味に揺れている…
     defeat_message: スケスケスケルトン を 討伐した！
     detect_range: 15
     drops:
@@ -1449,7 +1449,7 @@ ENEMY_DATA:
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/temedaman
     encounter_message:
-      - メダマ に 発見された！
+      - テメダマン に 発見された！
       - 粘つく視線が、じっとこちらを追ってくる…。
     defeat_message: テメダマン を 討伐した！
     status: poison
@@ -1593,7 +1593,7 @@ ENEMY_DATA:
     count_lifesteal: 2
     lifesteal_chance: 1.0
     lifesteal_ratio: 0.20
-    turn_attack_min_chance: 0.65  # 振り向きだけで終わるターンを減らす
+    turn_attack_min_chance: 0.90  # 振り向き後も積極的に攻撃する
     image_folder: components/pictures/enemies/dungeon_core_playerlike
     encounter_message:
       - ダンジョンコア に 発見された！
@@ -1637,10 +1637,10 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 1.0
     rare_drop_rate: 0.0
-    hp: 300
+    hp: 400
     attack: 20
     defense: 100
-    evasion: 35
+    evasion: 40
     exp: 0
     reward_gold: 0
     accuracy_close: 96

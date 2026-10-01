@@ -213,6 +213,8 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     target_is_static = getattr(target, "is_static", False)
     attacker_is_player = getattr(attacker, "__class__", None).__name__ == "Player"
     target_is_player = getattr(target, "__class__", None).__name__ == "Player"
+    attacker_subject = "" if attacker_is_player else f"{attacker_name}は"
+    target_subject = "" if target_is_player else f"{target_name}は"
     
     if is_miss:
         if attacker_is_player:
@@ -223,7 +225,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
         return msg, 0, False, True
     
     if damage == 0:
-        msg = Text.Combat.BLOCK.format(target=target_name)
+        msg = Text.Combat.PLAYER_BLOCK if target_is_player else Text.Combat.BLOCK.format(target=target_name)
         return msg, 0, False, False
     
     counter_ready_turns = _as_int_or_zero(getattr(target, "counter_ready_turns", 0))
@@ -240,7 +242,8 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
             target.has_dealt_impact_damage = False
             target.current_attack_mode = "counter"
         counter_msg, _, _, _ = deal_damage(target, attacker, is_magic=False, damage_mult=1.25)
-        counter_prefix = f"{target_name}のカウンター！\n{counter_msg}\n"
+        counter_name = "" if target_is_player else f"{target_name}の"
+        counter_prefix = f"{counter_name}カウンター！\n{counter_msg}\n"
     else:
         counter_prefix = ""
 
@@ -279,9 +282,9 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
             if hasattr(target, "condition"):
                 target.condition = status_to_add
                 if status_to_add == "poison":
-                    msg += f"\n{target_name}は毒を受けてしまった"
+                    msg += f"\n{target_subject}毒を受けてしまった"
                 elif status_to_add == "darkness":
-                    msg += f"\n{target_name}は暗闇に包まれた！視界が狭まった！"
+                    msg += f"\n{target_subject}暗闇に包まれた！視界が狭まった！"
 
     # --- スタン効果（クリティカル時のみ発動） ---
     if not target_is_static and not is_miss and damage > 0 and is_critical and hasattr(target, "stun_turns"):
@@ -294,7 +297,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                 target.stun_turns = int(stun_duration)
                 if hasattr(target, "flash_color"):
                     target.flash_color = (50, 100, 255)
-                msg += f"\n{target_name}はスタンした！"
+                msg += f"\n{target_subject}スタンした！"
                 if _os.environ.get("DEBUG_MODE") == "1":
                     print(f"[スタン] ✅ クリティカル発動")
 
@@ -309,7 +312,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                 if isinstance(lifesteal_ratio, (int, float)) and lifesteal_ratio > 0:
                     heal_amount = int(damage * lifesteal_ratio * min(1.0, total_lifesteal / 2.0))
                     attacker.hp = min(attacker.max_hp, attacker.hp + heal_amount)
-                    msg += f"\n{attacker_name}は{heal_amount}回復した！"
+                    msg += f"\n{attacker_subject}{heal_amount}回復した！"
                     # ライフスティール発動時も対象に赤色フラッシュ
                     if hasattr(target, "flash_color"):
                         target.flash_color = (255, 50, 50)
@@ -339,7 +342,7 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
                             attacker.take_damage(counter_damage)
                         else:
                             attacker.hp = max(0, attacker.hp - counter_damage)
-                        msg += f"\n{target_name}は反撃！{counter_damage}のダメージ！"
+                        msg += f"\n{target_subject}反撃！{counter_damage}のダメージ！"
                         # プレイヤーが敵の方向いて攻撃モーションを再生
                         if (hasattr(target, "set_facing") and hasattr(target, "_perform_attack")
                                 and hasattr(attacker, "x") and hasattr(attacker, "y")
