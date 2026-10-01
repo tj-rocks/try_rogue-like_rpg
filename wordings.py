@@ -132,6 +132,7 @@ class Text:
 
     class Combat:
         BLOCK = "{target} は 盾で 攻撃を ブロックした"
+        PLAYER_BLOCK = "盾で 攻撃を ブロックした"
         DAMAGE = "{attacker} は {target} に {damage} ダメージを与えた"
         PLAYER_DAMAGE = "{target} に {damage} ダメージを与えた"
         DAMAGE_TO_PLAYER = "{attacker} は {damage} ダメージを与えた"
@@ -177,7 +178,7 @@ class Text:
 
     class NPC:
         INN_WELCOME = "今日もご苦労様 ゆっくり休んでいくかい？"
-        INN_FEE_INFO = "宿泊代は {fee} G だよお金が足りないみたいだね"
+        INN_FEE_INFO = "宿泊代は {fee} G だよ。お金が足りないみたいだね"
         INN_RECOVERED = "今日もご苦労様でした \nこれまでの冒険を 確実に 記録しましたよ"
         INN_DEBT = "お金が足りないだって しょうがない、今回はツケにしておいてあげるよ"
         INN_NO = "無理するんじゃないよー"
@@ -185,19 +186,19 @@ class Text:
         DEDICATED_WEAPON_SHOP_WELCOME = "いらっしゃい！うちは武器専門店だぜ"
         DEDICATED_ARMOR_SHOP_WELCOME = "いらっしゃい！うちは防具と盾の専門店だ"
         DEDICATED_ACCESSORY_SHOP_WELCOME = "いらっしゃいませ。こちらは装飾品（アクセサリ）専門店です"
-        ITEM_SHOP_WELCOME = "いらっしゃいませ薬や巻物など、冒険の必需品を取り揃えております"
-        MERCHANT_WELCOME = "へっへっへ、いいモノあるよ買っていくかい？"
+        ITEM_SHOP_WELCOME = "いらっしゃいませ。薬や巻物など、冒険の必需品を取り揃えております"
+        MERCHANT_WELCOME = "へっへっへ、いいモノあるよ。買っていくかい？"
         BANK_WELCOME = "預金なら当銀行へ お預け入れですか？お引き出しですか？"
         WAREHOUSE_WELCOME = "荷物が重くなったら預かり所へ なにかお預かりしますか？"
-        BLACKSMITH_WELCOME = "鉱石を持ってくれば装備を叩き直してやるぜ\n装備には成長の限界がある\n最初は効果が大きいが、鍛えすぎると変化が極小さくなるぞ\nMax Limitと出たらもう鍛えられないぜ"
+        BLACKSMITH_WELCOME = "鉱石を持ってくれば装備を叩き直してやるぜ\n装備には成長の限界がある\n最初は効果が大きいが、鍛えすぎると変化が極めて小さくなるぞ\nMax Limitと出たらもう鍛えられないぜ"
         BLACKSMITH_NO_ORE = "武器や防具を鍛えたいなら『鉱石』を持ってきな"
         BLACKSMITH_NO_ITEM = "おいおい、その鉱石は持ってないじゃないか"
         BLACKSMITH_ENHANCE_PREVIEW = "{name}\n{label}: {before:.2f}{unit} → {after:.2f}{unit}\n強化回数: +{enhance}回目 (+{ore_bonus})"
         GUILD_LIMIT = "これ以上は同時に依頼を受けられません"
-        GUILD_ACCEPTED = "{title}』を受注した\n頑張ってこいよ"
+        GUILD_ACCEPTED = "『{title}』を受注した\n頑張ってこいよ"
         GUILD_COMPLETED = "依頼達成です\n報酬として {gold} G と {gp} GP を受け取った"
         GUILD_RANK_UP_DONE = "がんばりましたね これでランク{rank}に昇格ですおめでとう"
-        GUILD_WELCOME_UNRANKED = "ようこそ冒険者ギルドへ\nまずは冒険者になるための実力を示してください\n「昇給試験を受ける」から試験を受けてください"
+        GUILD_WELCOME_UNRANKED = "ようこそ冒険者ギルドへ\nまずは冒険者になるための実力を示してください\n「昇級試験を受ける」から試験を受けてください"
         GUILD_REMIND_UNRANKED = "入会試験の内容は覚えていますか？\n地下5階にある『冒険者の証』を持ち帰ってきてください"
         GUILD_WELCOME_RANKUP_READY = "お疲れ様でした\nGPが貯まりましたので、\n新しいランクへの『昇級試験』を受けることができます"
         GUILD_WELCOME_DEFAULT = "ようこそ今日はどんな用件ですか"
@@ -250,7 +251,7 @@ class Text:
             "魔法の研究のために{name}が必要です 分けていただけませんか？",
             "娘の誕生日に{name}を贈りたいのですが、自分では手に入らなくて…",
             "お客さんから{name}の注文が入りました 至急納品をお願いします！",
-            "備蓄用の{name}が底を突いてしまいました 協力をお願いします",
+            "備蓄用の{name}が底をついてしまいました 協力をお願いします",
             "珍しい{name}に興味があります 見つけたら持ってきてください"
         ]
         QUEST_REQUESTER_NPCS = [

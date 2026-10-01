@@ -760,22 +760,22 @@ def handle_ui_events(events, dialog, confirm_dialog, inventory_dialog, status_di
                                             if player.guild_rank == "-":
                                                 has_q = any(q.get("id") == "rank_up_F" for q in player.active_quests)
                                                 if is_ready_to_report:
-                                                    dialog.text = "昇給試験担当です。\nおお！無事に証を持ち帰りましたね。さあ、報告を完了させましょう！"
+                                                    dialog.text = "昇級試験担当です。\nおお！無事に証を持ち帰りましたね。さあ、報告を完了させましょう！"
                                                 elif not has_q:
-                                                    dialog.text = "昇給試験担当です。\nまずはギルドへ正式に加入するための試験を受けてくださいね。"
+                                                    dialog.text = "昇級試験担当です。\nまずはギルドへ正式に加入するための試験を受けてくださいね。"
                                                 else:
-                                                    dialog.text = "昇給試験担当です。\nFランク加入の試験クエストは順調ですか？"
+                                                    dialog.text = "昇級試験担当です。\nFランク加入の試験クエストは順調ですか？"
                                             elif is_ready_to_report:
-                                                dialog.text = "昇給試験担当です。\nおお！無事に証を持ち帰りましたね。さあ、報告を完了させましょう！"
+                                                dialog.text = "昇級試験担当です。\nおお！無事に証を持ち帰りましたね。さあ、報告を完了させましょう！"
                                             elif already_active:
-                                                dialog.text = "昇給試験担当です。\n試験クエストは順調ですか？対象フロアの最奥で証を見つけてきてくださいね！"
+                                                dialog.text = "昇級試験担当です。\n試験クエストは順調ですか？対象フロアの最奥で証を見つけてきてくださいね！"
                                             elif next_rank_data and player.guild_point >= next_rank_data["required_gp"]:
-                                                dialog.text = "昇給試験担当です。\n現在のポイントは十分です！次のランクの試験を受けられますよ。"
+                                                dialog.text = "昇級試験担当です。\n現在のポイントは十分です！次のランクの試験を受けられますよ。"
                                             elif next_rank_data:
                                                 needed = next_rank_data["required_gp"] - player.guild_point
-                                                dialog.text = f"昇給試験担当です。\n次の{next_rank_data['rank']}ランクの試験を受けるには、あと {needed} GP 必要です。"
+                                                dialog.text = f"昇級試験担当です。\n次の{next_rank_data['rank']}ランクの試験を受けるには、あと {needed} GP 必要です。"
                                             else:
-                                                dialog.text = "昇給試験担当です。\nあなたは既に最高ランクに到達しています！"
+                                                dialog.text = "昇級試験担当です。\nあなたは既に最高ランクに到達しています！"
                                             return
                                     elif getattr(npc, "role", None) == "storage":
                                         if warehouse_dialog:

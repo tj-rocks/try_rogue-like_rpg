@@ -78,7 +78,7 @@ class GuildSystem:
             desc = f"あと {needed} GP 必要です\n(現在: {player.guild_point} GP / 目標: {next_rank_data['required_gp']} GP)"
         else:
             title = f"次の{next_rank}ランクへの昇格基準を満たしています！"
-            desc = "昇給試験担当にお声がけください。"
+            desc = "昇級試験担当にお声がけください。"
         
         return title, desc
 

@@ -1177,7 +1177,7 @@ ENEMY_DATA:
     image_folder: components/pictures/enemies/skeleton
     encounter_message: 
       - スケスケスケルトン に 発見された！
-      - 半透明の骨が不気味に揺れている…'
+      - 半透明の骨が不気味に揺れている…
     defeat_message: スケスケスケルトン を 討伐した！
     detect_range: 15
     drops:
@@ -1449,7 +1449,7 @@ ENEMY_DATA:
     bgm: components/sounds/bgm/get_hornor.mp3
     image_folder: components/pictures/enemies/temedaman
     encounter_message:
-      - メダマ に 発見された！
+      - テメダマン に 発見された！
       - 粘つく視線が、じっとこちらを追ってくる…。
     defeat_message: テメダマン を 討伐した！
     status: poison

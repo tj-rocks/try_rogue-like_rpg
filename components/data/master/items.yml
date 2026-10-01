@@ -522,7 +522,7 @@ STAVE_DATA:
       left: [[-1, -1], [-1, 0], [-1, 1], [-2, -1], [-2, 0], [-2, 1]]
       right: [[1, -1], [1, 0], [1, 1], [2, -1], [2, 0], [2, 1]]
     shop_buyable: true
-    describe: 燃え盛る炎を放つ魔法の杖 自分前方の広範囲を焼き尽くし、敵に大ダメージを与える
+    describe: 燃え盛る炎を放つ魔法の杖 前方の広範囲を焼き尽くし、敵に大ダメージを与える
     floor_spawnable: true
   heal_stave:
     quest_targetable: true

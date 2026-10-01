@@ -12,25 +12,28 @@ def main():
     canvas = pygame.Surface((1200, 900))
     canvas.fill((0, 0, 0))
 
-    def line(text, y, size=28, color=(235, 235, 220)):
+    def line(text, y, size=28, color=(235, 235, 220), center_x=600):
         font = pygame.font.Font(font_path, size)
         surface = font.render(text, True, color)
-        rect = surface.get_rect(midtop=(600, y))
+        rect = surface.get_rect(midtop=(center_x, y))
         assert canvas.get_rect().contains(rect), text
         canvas.blit(surface, rect)
 
     line("CREDITS", 54, 48)
+    line("開発：Taiji Iwasaki", 143)
+    line("PM / QA : Yasutoki Iwasaki", 185)
+    line("Test / Debug : Harunobu Iwasaki", 227)
     groups = [
-        (145, "Graphics / Textures", ["ShareTextures", "ぴぽや", "Original graphics & photography"]),
-        (293, "Sound Effects", ["効果音ラボ"]),
-        (377, "Music", ["Suno"]),
-        (461, "AI-Generated Graphics", ["OpenAI ChatGPT", "Google Gemini"]),
-        (577, "Development Support", ["OpenAI ChatGPT", "OpenAI Codex", "Google Gemini"]),
+        (320, 332, "Graphics / Textures", ["ShareTextures", "ぴぽや", "Original graphics & photography"]),
+        (320, 494, "Sound Effects", ["効果音ラボ"]),
+        (320, 602, "Music", ["Suno"]),
+        (880, 332, "AI-Generated Graphics", ["OpenAI ChatGPT", "Google Gemini"]),
+        (880, 494, "Development Support", ["OpenAI ChatGPT", "OpenAI Codex", "Google Gemini"]),
     ]
-    for y, heading, names in groups:
-        line(heading, y, 24, (150, 150, 150))
+    for center_x, y, heading, names in groups:
+        line(heading, y, 24, (150, 150, 150), center_x=center_x)
         for index, name in enumerate(names):
-            line(name, y + 34 + index * 32)
+            line(name, y + 38 + index * 34, 26, center_x=center_x)
     line("Thanks for playing.", 757, 32)
     line("This game is distributed free of charge and is not monetized.", 823, 22, (150, 150, 150))
     pygame.image.save(canvas, "components/pictures/ending/credits.png")
