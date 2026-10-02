@@ -21,6 +21,7 @@ def test_new_game_plus_pending_resets_rank_and_gp_only():
     player = Player()
     player.guild_rank = "SS"
     player.guild_point = 9999
+    player.max_reached_floor = 99
     player.coin = 1234
     player.ending_clear_count = 1
     player.new_game_plus_pending = True
@@ -33,6 +34,7 @@ def test_new_game_plus_pending_resets_rank_and_gp_only():
     assert applied is True
     assert player.guild_rank == "-"
     assert player.guild_point == 0
+    assert player.max_reached_floor == 99
     assert player.coin == 1234
     assert player.ending_clear_count == 1
     assert player.has_seen_ending is False
@@ -41,28 +43,46 @@ def test_new_game_plus_pending_resets_rank_and_gp_only():
     assert player.new_game_plus_pending is False
 
 
-def test_enemy_attack_and_defense_scale_by_ending_clear_count():
+def test_enemy_hp_attack_and_defense_scale_by_difficulty_bonus():
     player = Player()
-    player.ending_clear_count = 1
+    player.difficulty_bonus = 0.20
 
     enemy = Enemy(0, 0, "slime", player=player)
     data = ENEMY_DATA["slime"]
 
-    assert enemy.attack == hardcore_round(data.get("attack", 0) * 1.3)
-    assert enemy.defense == hardcore_round(data.get("defense", 0) * 1.3)
+    assert enemy.max_hp == hardcore_round(data.get("hp", 0) * 1.2, is_hp=True)
+    assert enemy.attack == hardcore_round(data.get("attack", 0) * 1.2)
+    assert enemy.defense == hardcore_round(data.get("defense", 0) * 1.2)
 
 
-def test_enemy_multiplier_progression():
+def test_enemy_multiplier_uses_saved_difficulty_bonus():
     player = Player()
-
-    player.ending_clear_count = 0
+    player.difficulty_bonus = 0.0
     assert player.get_enemy_stat_multiplier() == 1.0
 
-    player.ending_clear_count = 1
-    assert player.get_enemy_stat_multiplier() == 1.3
+    player.difficulty_bonus = 0.20
+    assert player.get_enemy_stat_multiplier() == 1.2
 
-    player.ending_clear_count = 2
-    assert player.get_enemy_stat_multiplier() == 1.5
+    player.difficulty_bonus = 0.40
+    assert player.get_enemy_stat_multiplier() == 1.4
 
-    player.ending_clear_count = 3
-    assert player.get_enemy_stat_multiplier() == 1.7
+
+def test_core_ending_save_resets_max_reached_floor():
+    from types import SimpleNamespace
+    from systems.scene_handler import save_core_clear_before_ending
+
+    player = SimpleNamespace(
+        has_seen_ending=False,
+        dungeon_core_cleared=False,
+        ending_clear_count=0,
+        difficulty_bonus=0.0,
+        max_reached_floor=99,
+        new_game_plus_pending=False,
+        save_to_file=lambda **kwargs: None,
+    )
+    game_state = {}
+
+    assert save_core_clear_before_ending(player, game_state)
+    assert player.max_reached_floor == 0
+    assert player.difficulty_bonus == 0.20
+    assert player.new_game_plus_pending is True

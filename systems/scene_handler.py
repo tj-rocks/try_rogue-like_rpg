@@ -19,10 +19,13 @@ def save_core_clear_before_ending(player, game_state):
     player.has_seen_ending = True
     player.dungeon_core_cleared = True
     player.ending_clear_count = int(getattr(player, "ending_clear_count", 0)) + 1
+    player.difficulty_bonus = round(float(getattr(player, "difficulty_bonus", 0.0)) + 0.20, 2)
+    player.max_reached_floor = 0
     player.new_game_plus_pending = True
     print(
         f"[ENDING] saving core clear before ending "
         f"ending_clear_count={player.ending_clear_count} "
+        f"difficulty_bonus={player.difficulty_bonus:.0%} "
         f"new_game_plus_pending={player.new_game_plus_pending}",
         flush=True,
     )
