@@ -1595,7 +1595,7 @@ ENEMY_DATA:
     lifesteal_ratio: 0.20
     damage_cap: 20  # 1回に受ける通常ダメージの上限
     current_hp_damage_chance: 0.15  # 主人公への命中時、現在HP割合ダメージになる確率
-    current_hp_damage_ratio: 0.50   # 割合ダメージで削る主人公の現在HP割合
+    current_hp_damage_ratio: 0.30   # 割合ダメージで削る主人公の現在HP割合
     turn_attack_min_chance: 0.90  # 振り向き後も積極的に攻撃する
     image_folder: components/pictures/enemies/dungeon_core_playerlike
     encounter_message:
@@ -1640,10 +1640,10 @@ ENEMY_DATA:
       rare: []
     normal_drop_rate: 1.0
     rare_drop_rate: 0.0
-    hp: 400
+    hp: 362
     attack: 20
-    defense: 100
-    evasion: 40
+    defense: 88
+    evasion: 30
     exp: 0
     reward_gold: 0
     accuracy_close: 96
