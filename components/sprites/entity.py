@@ -20,6 +20,7 @@ class Entity:
         self.attack_timer = 0
         self.damage_flash_timer = 0
         self.flash_color = (255, 255, 255)
+        self.percentage_damage_effect_timer = 0
         self.is_dead = False
         self.is_falling = False
         self.move_speed = 300 # 1秒あたりの移動ピクセル数 (例: 300なら1マス64ピクセルを約0.2秒で移動)
@@ -140,6 +141,8 @@ class Entity:
                 
         if getattr(self, "damage_flash_timer", 0) > 0:
             self.damage_flash_timer -= 1
+        if getattr(self, "percentage_damage_effect_timer", 0) > 0:
+            self.percentage_damage_effect_timer -= 1
 
         return movement_finished
 

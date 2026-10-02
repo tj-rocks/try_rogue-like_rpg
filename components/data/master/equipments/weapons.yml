@@ -487,7 +487,7 @@ WEAPON_DATA:
       buyable: true
       usually_buyable: true
       special_buyable: true
-    describe: 余計な特殊効果はないが、圧倒的な基礎火力を誇る無骨な鉄剣。秘薬の効果をさらに高める。
+    describe: 圧倒的な基礎火力を誇る無骨な鉄剣。秘薬の効果をさらに高める。
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
@@ -625,7 +625,7 @@ WEAPON_DATA:
       buyable: true
       usually_buyable: false
       special_buyable: true
-    describe: 聖なる加護を受けた剣 所持者の生命力と自然回復を高め、回復魔法や杖の効果を増幅する
+    describe: 聖なる加護を受けた剣 所持者の生命力と自然回復を高める
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     floor_spawnable: true
@@ -671,7 +671,7 @@ WEAPON_DATA:
       buyable: true
       usually_buyable: false
       special_buyable: true
-    describe: 隠密偵察用の小型ナイフ 攻撃力は控えめだが、会心率と回避率が高い
+    describe: 隠密偵察用の小型ナイフ 攻撃力は控えめだが、会心率とガード率が高い
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: dagger
     floor_spawnable: true
@@ -970,7 +970,7 @@ WEAPON_DATA:
       usually_buyable: false
       special_buyable: true
     floor_spawnable: true
-    describe: 装備者の生命を守る聖剣。攻撃時に体力を吸収し、長時間の探索を可能にする。
+    describe: 装備者の生命を守る聖剣。クリティカル時に生命を吸収する可能性がある。
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: onehanded_sword
     bonus:

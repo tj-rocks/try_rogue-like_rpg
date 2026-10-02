@@ -1327,6 +1327,17 @@ class Player(Entity):
         
         is_v = not (getattr(self, "damage_flash_timer", 0) > HIT_STUN_DURATION and (self.damage_flash_timer - HIT_STUN_DURATION) % 4 < 2)
         if is_v: screen.blit(img, (draw_x, draw_y))
+        percentage_effect_timer = getattr(self, "percentage_damage_effect_timer", 0)
+        if percentage_effect_timer > 0:
+            # 現在HP割合ダメージ専用の、主人公を中心に広がる赤い衝撃波。
+            progress = 1.0 - percentage_effect_timer / 20.0
+            radius = int(self.width * (0.55 + progress * 1.25))
+            alpha = int(220 * (percentage_effect_timer / 20.0))
+            effect = pygame.Surface((radius * 2 + 8, radius * 2 + 8), pygame.SRCALPHA)
+            center = (radius + 4, radius + 4)
+            pygame.draw.circle(effect, (255, 55, 55, alpha), center, radius, 4)
+            pygame.draw.circle(effect, (255, 180, 80, alpha // 2), center, max(1, radius - 12), 2)
+            screen.blit(effect, (cx - radius - 4, cy - radius - 4))
         if self.equipped_armor: self._draw_armor_overlay(screen, bdx, bdy, scale_x=fsx, scale_y=fsy, tint_color=poison_tint, alpha=player_alpha)
         if self.equipped_shield and so: self._draw_shield_overlay(screen, bdx, bdy, scale_x=fsx, scale_y=fsy, tint_color=poison_tint, alpha=player_alpha)
         if self.invincible_turns > 0:

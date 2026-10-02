@@ -425,7 +425,7 @@ ARMOR_DATA:
       buyable: true
       usually_buyable: false
       special_buyable: true
-    describe: 聖なる加護を受けた巡礼者の軽防具 最大HPと自然回復能力を高め、回復魔法や杖の効果を増幅する
+    describe: 聖なる加護を受けた巡礼者の軽防具 最大HPと自然回復能力を高める
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -468,7 +468,7 @@ ARMOR_DATA:
       buyable: true
       usually_buyable: false
       special_buyable: true
-    describe: 隠密性に特化した偵察用の軽装鎧 敵に見つかりにくくなり、回避率と会心率が高まる
+    describe: 隠密性に特化した偵察用の軽装鎧 敵に見つかりにくくなり、ガード率と会心率が高まる
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -560,7 +560,7 @@ ARMOR_DATA:
       buyable: true
       usually_buyable: false
       special_buyable: true
-    describe: 聖なる力を宿した鎧。高い防御力と回復能力を持ち、攻撃で体力を吸収する効果を備える。
+    describe: 聖なる力を宿した鎧。高い防御力と回復能力を持ち、クリティカル時に生命を吸収する可能性がある。
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     floor_spawnable: true
     bonus:
@@ -652,7 +652,7 @@ ARMOR_DATA:
       usually_buyable: false
       special_buyable: true
     floor_spawnable: true
-    describe: 勇気ある戦士の鎧。高い防御力と回復力を持つ。
+    describe: 勇気ある戦士の鎧。高い防御力とスタン効果を持つ。
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: heavy_armor
     bonus:
@@ -702,7 +702,7 @@ ARMOR_DATA:
       usually_buyable: false
       special_buyable: true
     floor_spawnable: true
-    describe: 技巧を極めた戦士の鎧。回避とカウンターを強化する。
+    describe: 技巧を極めた戦士の鎧。命中・防御性能とカウンターを強化する。
     growth: {bonus_limit: 2, times_limit: 30, over_limit_growth_rate: 0.003}
     type: heavy_armor
     bonus:
@@ -752,7 +752,7 @@ ARMOR_DATA:
       usually_buyable: false
       special_buyable: true
     floor_spawnable: true
-    describe: 上級騎士の鎧。最高クラスの防御力とスタン効果。
+    describe: 上級騎士の鎧。最高クラスの防御力と吹き飛ばし効果。
     growth: {bonus_limit: 4, times_limit: 50, over_limit_growth_rate: 0.005}
     type: heavy_armor
     bonus:
