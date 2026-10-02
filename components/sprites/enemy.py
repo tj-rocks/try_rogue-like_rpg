@@ -52,6 +52,7 @@ class Enemy(Entity):
             stat_multiplier = player.get_enemy_stat_multiplier()
 
         from systems.math_utils import hardcore_round
+        hp_val = hardcore_round(hp_val * stat_multiplier, is_hp=True)
         self.attack = hardcore_round(data.get("attack", 0) * stat_multiplier)
         super().__init__(x, y, hp_val, hp_val, self.attack, self.width, self.height)
         self.type = enemy_type; self.name = data.get("name", "モンスター")

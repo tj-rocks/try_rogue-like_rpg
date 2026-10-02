@@ -436,9 +436,6 @@ class WarehouseDialog(BaseListDialog):
         elif self.mode == "WITHDRAW": title_str += f" ({Text.UI.WAREHOUSE_MODE_WITHDRAW})"
         from systems.resources import font_small_bold
         screen.blit(font_small_bold.render(title_str, True, (255, 200, 100)), (self.x + 30, self.y + 20))
-        cap_str = Text.UI.WAREHOUSE_CAPACITY.format(current=len(player.warehouse_items), max=player.warehouse_max)
-        screen.blit(self.font.render(cap_str, True, (200, 200, 200)), (sep_x - 150, self.y + 20))
-
         if not self.items:
             screen.blit(self.font.render(Text.UI.WAREHOUSE_EMPTY, True, (150, 150, 150)), (self.x + 50, self.y + 100))
         else:
