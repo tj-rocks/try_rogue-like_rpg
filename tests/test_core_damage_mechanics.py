@@ -17,7 +17,7 @@ def test_core_normal_damage_is_capped_at_twenty():
     assert boss.hp == before_hp - 20
 
 
-def test_core_percentage_attack_removes_half_of_current_player_hp():
+def test_core_percentage_attack_removes_thirty_percent_of_current_player_hp():
     boss = Enemy(0, 0, "dungeon_core")
     player = Player()
     player.hp = 101
@@ -27,8 +27,8 @@ def test_core_percentage_attack_removes_half_of_current_player_hp():
     ):
         message, damage, _, _ = deal_damage(boss, player)
 
-    assert damage == 51
-    assert player.hp == 50
+    assert damage == 31
+    assert player.hp == 70
     assert player.percentage_damage_effect_timer == 20
     assert "割合ダメージ" in message
 
