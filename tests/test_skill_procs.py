@@ -3,6 +3,7 @@ import pygame
 import sys
 import os
 import random
+from unittest.mock import patch
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ["TEST_MODE"] = "1"
@@ -106,6 +107,19 @@ def test_lifesteal_no_proc():
     
     assert attacker.hp == initial_hp, f"クリティカルなしなのにHPが変化: {attacker.hp} vs {initial_hp}"
     print("[OK] crit_rate=0.0 → HP変化なし（クリティカルなし時は非発動）")
+
+
+def test_lifesteal_respects_configured_chance():
+    """クリティカル時でも、設定された確率に失敗すれば回復しない。"""
+    attacker = make_combatant(5, 5, attack=50, crit_rate=1.0, lifesteal_chance=0.5, lifesteal_ratio=0.2, total_lifesteal=2)
+    attacker.max_hp = 1000
+    target = make_combatant(5, 6, hp=1000)
+    target.facing = "down"
+    initial_hp = attacker.hp
+    with patch("systems.combat_handler.random.random", side_effect=[0.0, 0.0, 0.99]):
+        _, _, is_crit, _ = deal_damage(attacker, target)
+    assert is_crit
+    assert attacker.hp == initial_hp
 
 
 def test_counter_proc():

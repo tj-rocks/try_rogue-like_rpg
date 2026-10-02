@@ -74,6 +74,9 @@ class Enemy(Entity):
         self.total_lifesteal = data.get("count_lifesteal", 0)
         self.total_lifesteal_chance = data.get("lifesteal_chance", 0.0)
         self.total_lifesteal_ratio = data.get("lifesteal_ratio", 0.0)
+        self.damage_cap = data.get("damage_cap")
+        self.current_hp_damage_chance = data.get("current_hp_damage_chance", 0.0)
+        self.current_hp_damage_ratio = data.get("current_hp_damage_ratio", 0.0)
         self.accuracy_close = data.get("accuracy_close", data.get("accuracy_bonus", 100))
         self.accuracy_ranged = data.get("accuracy_ranged", data.get("accuracy_bonus", 100))
         self.status_to_inflict = data.get("status"); self.status_chance = data.get("status_chance", 100)
@@ -81,6 +84,7 @@ class Enemy(Entity):
         self.damaged_detect_range = data.get("damaged_detect_range", 100)
         self.player_detected = False
         self.counter_ready_turns = 0
+        self.predicted_attack_miss_streak = 0
         self.attack_modes = data.get("attack_modes", [])
         self.attack_range_line = data.get("attack_range_line", self.attack_range)
         self.attack_range_diagonal = data.get("attack_range_diagonal", self.attack_range)
@@ -194,6 +198,14 @@ class Enemy(Entity):
                     self._log_trace(None, f"frame_cache facing={d} count={len(fl)} srcs={','.join(srcs) if srcs else '-'} cached={cache_key in Enemy._image_cache}")
             except:
                 pass
+
+    def take_damage(self, amount):
+        """ダンジョンコアを含む敵固有の被ダメージ補正を適用する。"""
+        cap = getattr(self, "damage_cap", None)
+        if isinstance(cap, (int, float)) and cap > 0:
+            amount = min(amount, cap)
+        super().take_damage(amount)
+        return amount
 
     def _log_trace(self, dungeon, msg):
         try:
@@ -630,12 +642,22 @@ class Enemy(Entity):
             k=1,
         )[0], use_profile
 
+    def _should_force_dungeon_core_non_prediction(self, dungeon):
+        """同じ読み攻撃の連続空振り後、次の手だけ予測をやめる。"""
+        if getattr(self, "predicted_attack_miss_streak", 0) < 5:
+            return False
+        self.predicted_attack_miss_streak = 0
+        self._log_trace(dungeon, "dungeon_core prediction_miss_streak=5; switch_to_non_prediction")
+        return True
+
     def _try_dungeon_core_predicted_attack(self, player, dungeon, all_entities, dialog, dx, dy, relation, distance):
         if getattr(self, "type", "") != "dungeon_core":
             return False
         if relation != "front" or distance != "2":
             return False
         if not ((dx == 2 and dy == 0) or (dx == -2 and dy == 0) or (dx == 0 and dy == 2) or (dx == 0 and dy == -2)):
+            return False
+        if self._should_force_dungeon_core_non_prediction(dungeon):
             return False
 
         profile = getattr(player, "tactical_profile", None)
@@ -685,6 +707,11 @@ class Enemy(Entity):
             return False
         if not ((abs(dx) == 2 and abs(dy) == 1) or (abs(dx) == 1 and abs(dy) == 2)):
             return False
+        if self._should_force_dungeon_core_non_prediction(dungeon):
+            moved = self._move_dungeon_core(player, dungeon, relation)
+            self._log_trace(dungeon, f"dungeon_core side_gap_non_prediction=advance moved={moved}")
+            self._log_duel_trace(dungeon, player, "side_gap_non_prediction")
+            return moved
 
         profile = getattr(player, "tactical_profile", None)
         move_bias, melee_bias, magic_bias, item_bias, wait_bias = self._get_dungeon_core_action_biases(profile)
@@ -845,8 +872,12 @@ class Enemy(Entity):
                     from systems.game_state import game_state
                     if d.is_active: d.text += "\n" + f"{self.name} の攻撃は外れた！"; d.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
                     else: d.text = f"{self.name} の攻撃は外れた！"; d.is_active = True; game_state["dialog_modal"] = False; d.auto_close_timer = COMBAT_LOG_WAIT_FRAMES
+                self.predicted_attack_miss_streak = getattr(self, "predicted_attack_miss_streak", 0) + 1
+                self._log_trace(dungeon, f"dungeon_core prediction_miss_streak={self.predicted_attack_miss_streak}")
                 self.predicted_attack_tile = None
                 return
+        if predicted_tile:
+            self.predicted_attack_miss_streak = 0
         msg, dmg, crit, miss = deal_damage(self, t, damage_mult=getattr(self, "current_attack_damage_mult", 1.0))
         from systems.sound_handler import sound_manager
         sound_manager.play_sfx(SOUND_ATTACK_MISS if miss or dmg == 0 else (self.current_attack_pattern.get("hit_sound", "components/sounds/sfx/projectile_hit.wav")))

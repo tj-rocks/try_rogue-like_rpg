@@ -1593,6 +1593,9 @@ ENEMY_DATA:
     count_lifesteal: 2
     lifesteal_chance: 1.0
     lifesteal_ratio: 0.20
+    damage_cap: 20  # 1回に受ける通常ダメージの上限
+    current_hp_damage_chance: 0.15  # 主人公への命中時、現在HP割合ダメージになる確率
+    current_hp_damage_ratio: 0.50   # 割合ダメージで削る主人公の現在HP割合
     turn_attack_min_chance: 0.90  # 振り向き後も積極的に攻撃する
     image_folder: components/pictures/enemies/dungeon_core_playerlike
     encounter_message:

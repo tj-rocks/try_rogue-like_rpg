@@ -542,7 +542,7 @@ STAVE_DATA:
     - 100
     heal_ratio: 0.7
     shop_buyable: true
-    describe: 癒やしの光を放つ魔法の杖 自分や仲間の傷を癒やすことができる
+    describe: 癒やしの光を放つ魔法の杖 自分の傷を癒やすことができる
     floor_spawnable: true
   # invincible_stave:
   #   quest_targetable: true

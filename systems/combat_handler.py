@@ -247,7 +247,26 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
     else:
         counter_prefix = ""
 
-    target.take_damage(damage)
+    # ダンジョンコアの割合攻撃: 防御力や最大HPに左右されず、現在HPの半分を削る。
+    is_current_hp_damage = False
+    if target_is_player:
+        current_hp_damage_chance = getattr(attacker, "current_hp_damage_chance", 0.0)
+        current_hp_damage_ratio = getattr(attacker, "current_hp_damage_ratio", 0.0)
+        if (
+            isinstance(current_hp_damage_chance, (int, float))
+            and isinstance(current_hp_damage_ratio, (int, float))
+            and current_hp_damage_chance > 0
+            and current_hp_damage_ratio > 0
+            and random.random() < min(1.0, current_hp_damage_chance)
+        ):
+            import math
+            damage = max(1, math.ceil(target.hp * current_hp_damage_ratio))
+            is_current_hp_damage = True
+            target.percentage_damage_effect_timer = 20
+
+    applied_damage = target.take_damage(damage)
+    if isinstance(applied_damage, (int, float)):
+        damage = applied_damage
     
     # メッセージ生成
     if is_critical:
@@ -272,6 +291,9 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
             if target_is_player
             else Text.Combat.DAMAGE.format(attacker=attacker_name, target=target_name, damage=damage)
         )
+
+    if is_current_hp_damage:
+        msg = "割合ダメージ！\n" + msg
         
     # --- [NEW] 状態異常の付与判定 ---
     status_to_add = getattr(attacker, "status_to_inflict", None)
@@ -309,7 +331,11 @@ def deal_damage(attacker, target, is_magic=False, damage_mult=1.0):
             if isinstance(lifesteal_chance, (int, float)) and lifesteal_chance > 0:
                 lifesteal_chance *= min(1.0, total_lifesteal / 2.0)
                 lifesteal_ratio = getattr(attacker, "total_lifesteal_ratio", 0.0)
-                if isinstance(lifesteal_ratio, (int, float)) and lifesteal_ratio > 0:
+                if (
+                    isinstance(lifesteal_ratio, (int, float))
+                    and lifesteal_ratio > 0
+                    and random.random() < min(1.0, lifesteal_chance)
+                ):
                     heal_amount = int(damage * lifesteal_ratio * min(1.0, total_lifesteal / 2.0))
                     attacker.hp = min(attacker.max_hp, attacker.hp + heal_amount)
                     msg += f"\n{attacker_subject}{heal_amount}回復した！"
