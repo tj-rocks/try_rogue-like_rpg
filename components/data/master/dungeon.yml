@@ -538,7 +538,7 @@ DUNGEON_IMAGES:
     sound: rest_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
-    item_ratio: 0.3
+    item_ratio: 0.4
     map: 6th_rest_point.txt
     no_attack: true
   "72":
@@ -546,7 +546,7 @@ DUNGEON_IMAGES:
     sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.3
+    item_ratio: 0.4
     darkness_type: fog   
     area_message:
       - 古い聖地
@@ -558,40 +558,40 @@ DUNGEON_IMAGES:
     darkness_type: fog   
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.3
+    item_ratio: 0.4
   "74":
     image: holy_place
     sound: holy_place.mp3
     darkness_type: fog       
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.3
+    item_ratio: 0.4
   "75":
     image: holy_place
     sound: holy_place.mp3
     darkness_type: fog
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.3
+    item_ratio: 0.4
   "76":
     image: holy_place
     sound: holy_place.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.3
+    item_ratio: 0.4
   "77":
     image: holy_place
     sound: holy_place.mp3
     darkness_type: fog   
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.3
+    item_ratio: 0.4
   "78":
     image: old_liberary
     sound: old_liberary.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.3
+    item_ratio: 0.4
     area_message:
       - 聖地の図書館
       - ダンジョンの記録が全て保管されている
@@ -601,19 +601,19 @@ DUNGEON_IMAGES:
     sound: old_liberary.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.3
+    item_ratio: 0.4
   "80":
     image: old_liberary
     sound: old_liberary.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.3
+    item_ratio: 0.4
   "81":
     image: old_liberary
     sound: rest_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
     map: 7th_rest_point.txt
     no_attack: true
   "82":
@@ -621,25 +621,25 @@ DUNGEON_IMAGES:
     sound: old_liberary.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
   "83":
     image: old_liberary
     sound: old_liberary.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
   "84":
     image: old_liberary
     sound: old_liberary.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
   "85":
     image: evil_castle
     sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
     darkness_level: 5
     area_message:
       - 邪悪な神殿
@@ -650,7 +650,7 @@ DUNGEON_IMAGES:
     sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
     darkness_type: fog
     darkness_level: 4
   "87":
@@ -658,7 +658,7 @@ DUNGEON_IMAGES:
     sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
     darkness_type: fog
     darkness_level: 4
   "88":
@@ -666,7 +666,7 @@ DUNGEON_IMAGES:
     sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
     darkness_type: fog
     darkness_level: 4
   "89":
@@ -674,7 +674,7 @@ DUNGEON_IMAGES:
     sound: evil_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
     darkness_type: fog
     darkness_level: 4
   "90":
@@ -682,13 +682,13 @@ DUNGEON_IMAGES:
     sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
   "91":
     image: old_castle
     sound: rest_point.mp3
     brightness: 5
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
     map: 8th_rest_point.txt
     no_attack: true
   "92":
@@ -696,38 +696,38 @@ DUNGEON_IMAGES:
     sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
   "93":
     image: old_castle
     sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
   "94":
     image: old_castle
     sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
   "95":
     image: old_castle
     sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
   "96":
     image: old_castle
     sound: old_castle.mp3
     brightness: 1
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
   "97":
     image: garden
     sound: garden.mp3
     darkness_type: fog     
     brightness: 2
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
     area_message:
       - ダンジョンの終着の入り口の庭園
       - 整えられた庭園が誰をもてなすのか
@@ -737,12 +737,12 @@ DUNGEON_IMAGES:
     darkness_type: fog     
     brightness: 2
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
   "99":
     image: garden
     sound: garden.mp3
     darkness_type: fog     
     brightness: 4
     wall_decoration_ratio: 0.3
-    item_ratio: 0.2
+    item_ratio: 0.4
     map: garden.txt
