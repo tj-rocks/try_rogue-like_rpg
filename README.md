@@ -124,6 +124,19 @@ bash tests/run_tests.sh changed
 
 2026年8月30日時点で、正式テストスイートは **46 / 46件成功** です。詳しい使い方は [tests/README.md](tests/README.md) を参照してください。
 
+## クレジット
+
+- 開発：Taiji Iwasaki
+- PM / QA : Yasutoki Iwasaki
+- Test / Debug : Harunobu Iwasaki
+- Graphics / Textures：ShareTextures、ぴぽや、Original graphics & photography
+- Sound Effects：効果音ラボ
+- Music：Suno
+- AI-Generated Graphics：OpenAI ChatGPT、Google Gemini
+- Development Support：OpenAI ChatGPT、OpenAI Codex、Google Gemini
+
+このゲームは無料で配布しており、収益化はしていません。
+
 ## 開発方針
 
 - ゲームデータと処理を分離し、YAML中心で調整できる構成にする
