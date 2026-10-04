@@ -20,8 +20,8 @@ def main():
         canvas.blit(surface, rect)
 
     line("CREDITS", 54, 48)
-    line("開発：Taiji Iwasaki", 143)
-    line("PM / QA : Yasutoki Iwasaki", 185)
+    line("PM / QA : Yasutoki Iwasaki", 143)
+    line("開発：Taiji Iwasaki", 185)
     line("Test / Debug : Harunobu Iwasaki", 227)
     groups = [
         (320, 332, "Graphics / Textures", ["ShareTextures", "ぴぽや", "Original graphics & photography"]),
