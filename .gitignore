@@ -20,3 +20,9 @@ scratch/
 scratch_*.py
 *.log
 
+
+# Local backups and editor workflows
+components/data/savefile/backups/
+components/data/savefile/*.test_backup
+components/data/master/*.yml.bak
+.windsurf/
